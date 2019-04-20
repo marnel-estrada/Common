@@ -8,3 +8,11 @@ Common/Assets/Plugins/Editor/JetBrains/
 *.sln
 Common/Common.sln.DotSettings.user
 Common/.idea/
+.idea/
+Assets/Plugins/Editor/JetBrains/JetBrains.Rider.Unity.Editor.Plugin.Repacked.dll
+Assets/Plugins/Editor/JetBrains/
+Library/
+Temp/
+Common.sln.DotSettings.user
+Logs/
+obj/

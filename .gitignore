@@ -1,0 +1,9 @@
+Common/Library/
+Common/Logs/Packages-Update.log
+Common/obj/Debug/Assembly-CSharp.csprojAssemblyReference.cache
+Common/Temp/UnityLockfile
+Common/Temp/
+Common/Assets/Plugins/Editor/JetBrains/
+*.csproj
+*.sln
+Common/Common.sln.DotSettings.user

@@ -1,0 +1,11 @@
+{
+    "name": "com.squeakywheel.common",
+    "displayName": "Squeaky Wheel Common",
+    "version": "0.0.1",
+    "unity": "2018.1",
+    "description": "Common code",
+    "keywords": [
+        "unity"
+    ],
+    "category": "Unity"
+}

@@ -7,3 +7,4 @@ Common/Assets/Plugins/Editor/JetBrains/
 *.csproj
 *.sln
 Common/Common.sln.DotSettings.user
+Common/.idea/

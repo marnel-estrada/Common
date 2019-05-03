@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 270c2778254bb40db88e8cb58b9756f6
+guid: d87240f539c2d0847aab449549eec009
 labels:
 - pool
 - resource
@@ -17,4 +17,7 @@ labels:
 - object
 - instantiate
 DefaultImporter:
+  externalObjects: {}
   userData: 
+  assetBundleName: 
+  assetBundleVariant: 

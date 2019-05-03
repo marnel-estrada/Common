@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: e99f5638aff4f4b948b2095c533891da
+guid: 50177deb3f34edd4da416a94f275ac39
 labels:
 - pool
 - resource
@@ -17,8 +17,11 @@ labels:
 - object
 - instantiate
 MonoImporter:
+  externalObjects: {}
   serializedVersion: 2
   defaultReferences: []
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
+  assetBundleName: 
+  assetBundleVariant: 

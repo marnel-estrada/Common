@@ -1,0 +1,18 @@
+{
+    "name": "CommonEcs.Grid2D",
+    "references": [
+        "Unity.Entities",
+        "CommonCore",
+        "CommonEcs",
+        "Unity.Mathematics"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}

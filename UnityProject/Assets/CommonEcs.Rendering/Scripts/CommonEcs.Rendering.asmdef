@@ -1,0 +1,22 @@
+{
+    "name": "CommonEcs.Rendering",
+    "references": [
+        "CommonCore",
+        "CommonEcs",
+        "Unity.Entities",
+        "Unity.Mathematics",
+        "Unity.Collections",
+        "Unity.Burst",
+        "Unity.Transforms",
+        "Unity.Entities.Hybrid"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}

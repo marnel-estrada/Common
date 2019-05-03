@@ -1,0 +1,21 @@
+{
+    "name": "CommonEcs.AStar",
+    "references": [
+        "Unity.Entities",
+        "CommonCore",
+        "CommonEcs",
+        "Unity.Mathematics",
+        "Unity.Collections",
+        "Unity.Burst",
+        "CommonEcs.Grid2D"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}

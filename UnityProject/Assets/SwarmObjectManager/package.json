@@ -1,0 +1,11 @@
+{
+    "name": "com.squeakywheel.common.swarm",
+    "displayName": "Squeaky Wheel Common: Swarm Object Manager",
+    "version": "1.0.0",
+    "unity": "2019.1",
+    "description": "Swarm Object Manager",
+    "keywords": [
+        "unity"
+    ],
+    "category": "Unity"
+}

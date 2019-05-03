@@ -1,0 +1,24 @@
+{
+    "name": "CommonEcs",
+    "references": [
+        "Unity.Entities",
+        "Unity.Entities.Hybrid",
+        "Unity.Transforms",
+        "Unity.Burst",
+        "Unity.Entities.Properties",
+        "Unity.Transforms.Hybrid",
+        "Unity.Mathematics",
+        "Unity.Collections",
+        "Unity.Rendering.Hybrid",
+        "CommonCore"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}

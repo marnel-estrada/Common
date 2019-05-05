@@ -16,3 +16,4 @@ Temp/
 Common.sln.DotSettings.user
 Logs/
 obj/
+*.DotSettings

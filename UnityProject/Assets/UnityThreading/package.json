@@ -1,9 +1,9 @@
 {
     "name": "com.squeakywheel.common.unitythreading",
-    "displayName": "Squeaky Wheel Common: Unity Threading",
+    "displayName": "Common.UnityThreading",
     "version": "1.0.0",
     "unity": "2019.1",
-    "description": "Unity Threading",
+    "description": "Common.UnityThreading",
     "keywords": [
         "unity"
     ],

@@ -1,0 +1,16 @@
+{
+    "name": "com.squeakywheel.common.ecs.grid2d",
+    "displayName": "Common.ECS.Grid2D",
+    "version": "1.0.0",
+    "unity": "2019.1",
+    "description": "Common.ECS.Grid2D",
+    "dependencies": {
+        "com.unity.entities": "0.0.12",
+        "com.unity.burst": "1.0.1",
+        "com.squeakywheel.common.ecs": "1.0.0"
+    },
+    "keywords": [
+        "unity", "common"
+    ],
+    "category": "Unity"
+}

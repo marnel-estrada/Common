@@ -1,0 +1,17 @@
+{
+    "name": "com.squeakywheel.common.ecs.astar",
+    "displayName": "Common.ECS.AStar",
+    "version": "1.0.0",
+    "unity": "2019.1",
+    "description": "Common.ECS.AStar",
+    "dependencies": {
+        "com.unity.entities": "0.0.12",
+        "com.unity.burst": "1.0.1",
+        "com.squeakywheel.common.ecs": "1.0.0",
+        "com.squeakywheel.common.ecs.grid2d": "1.0.0"
+    },
+    "keywords": [
+        "unity", "common"
+    ],
+    "category": "Unity"
+}

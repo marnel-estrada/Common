@@ -8,7 +8,7 @@ using Unity.Transforms;
 namespace CommonEcs {
     public class SpriteInLayerHandle {
         private readonly EntityManager entityManager;
-        private readonly Entity spriteLayerEntity; // The entity of the layer where the sprite would be added
+        private Entity spriteLayerEntity; // The entity of the layer where the sprite would be added
 
         private Entity spriteEntity;
 
@@ -18,6 +18,10 @@ namespace CommonEcs {
 
             this.spriteLayerEntity = spriteLayerEntity;
             Assertion.Assert(this.spriteLayerEntity != Entity.Null);
+        }
+
+        public void Init(Entity spriteLayerEntity) {
+            this.spriteLayerEntity = spriteLayerEntity;
         }
 
         public Entity SpriteEntity {

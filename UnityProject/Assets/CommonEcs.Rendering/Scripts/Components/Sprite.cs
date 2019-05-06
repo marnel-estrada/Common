@@ -121,6 +121,23 @@
             this.index3 = 0;
             this.index4 = 0;
         }
+        
+        public void SetLocalVertices(float width, float height, float2 pivot) {
+            this.width = width;
+            this.height = height;
+            
+            float halfWidth = width * 0.5f;
+            float halfHeight = height * 0.5f;
+
+            float2 offset = new float2(0.5f, 0.5f) - pivot;    
+            
+            this.v1 = new float3(-halfWidth + (offset.x * width), -halfHeight + (offset.y * height), 0); // Lower left
+            this.v2 = new float3(halfWidth + (offset.x * width), -halfHeight + (offset.y * height), 0); // Lower right
+            this.v3 = new float3(-halfWidth + (offset.x * width), halfHeight + (offset.y * height), 0); // Upper left
+            this.v4 = new float3(halfWidth + (offset.x * width), halfHeight + (offset.y * height), 0); // Upper right
+
+            this.verticesChanged.Value = true;
+        }
 
         /// <summary>
         /// Sets the UV (the first one)

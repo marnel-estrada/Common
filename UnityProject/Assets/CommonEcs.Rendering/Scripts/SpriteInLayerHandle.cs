@@ -1,5 +1,6 @@
 ﻿using Common;
 
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -29,28 +30,37 @@ namespace CommonEcs {
         /// Creates the sprite entity with the specified sprite data
         /// </summary>
         /// <param name="sprite"></param>
-        public void Create(ref Sprite sprite, float3 translation, bool isStatic) {
+        public void Create(ref Sprite sprite, float3 translation, quaternion rotation, bool isStatic) {
             // Avoid creating a new sprite entity when another one exists
             Assertion.Assert(!this.Exists);
+            Assertion.Assert(this.spriteLayerEntity != Entity.Null);
 
             this.spriteEntity = this.entityManager.CreateEntity();
-            this.entityManager.AddComponentData(this.spriteEntity, sprite);
+            
+            EntityCommandBuffer buffer = new EntityCommandBuffer(Allocator.TempJob);
+            
+            buffer.AddComponent(this.spriteEntity, sprite);
 
-            this.entityManager.AddComponentData(this.spriteEntity, new Translation() {
+            buffer.AddComponent(this.spriteEntity, new Translation() {
                 Value = translation
             });
             
-            this.entityManager.AddComponentData(this.spriteEntity, new LocalToWorld());
+            buffer.AddComponent(this.spriteEntity, new Rotation() {
+                Value = rotation
+            });
 
-            this.entityManager.AddComponentData(this.spriteEntity, new UseYAsSortOrder());
+            buffer.AddComponent(this.spriteEntity, new UseYAsSortOrder());
 
-            this.entityManager.AddComponentData(this.spriteEntity, new AddToSpriteLayer() {
+            buffer.AddComponent(this.spriteEntity, new AddToSpriteLayer() {
                 layerEntity = this.spriteLayerEntity
             });
 
             if (isStatic) {
-                this.entityManager.AddComponentData(this.spriteEntity, new Static());
+                buffer.AddComponent(this.spriteEntity, new Static());
             }
+            
+            buffer.Playback(this.entityManager);
+            buffer.Dispose();
         }
 
         /// <summary>

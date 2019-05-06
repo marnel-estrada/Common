@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Common {
+namespace CommonEcs {
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct IntStackArray10 {
         private int item0;

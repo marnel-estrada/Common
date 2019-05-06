@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommonEcs;
+
 using Unity.Entities;
 
 namespace Common.Ecs.Fsm {

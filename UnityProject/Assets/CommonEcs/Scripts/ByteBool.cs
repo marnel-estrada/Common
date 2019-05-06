@@ -1,5 +1,6 @@
-﻿namespace Common {
-    using System;
+﻿using System;
+
+namespace CommonEcs {
     /// <summary>
     /// A blittable boolean that is internally implemented as a byte
     /// </summary>
@@ -56,7 +57,6 @@
         /// <returns></returns>
         public static implicit operator bool(ByteBool source) {
             return source.Value;
-        }
-        
+        }   
     }
 }

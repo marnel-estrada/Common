@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Common.Ecs {
+﻿namespace Common.Ecs {
     /// <summary>
     /// A utility struct that keeps track of an index
     /// </summary>

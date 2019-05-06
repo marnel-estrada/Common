@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 
-using CommonEcs;
-
 using Unity.Entities;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 
-namespace Common {
+namespace CommonEcs {
     /// <summary>
     /// Updates duration timers with time scaling
     /// </summary>

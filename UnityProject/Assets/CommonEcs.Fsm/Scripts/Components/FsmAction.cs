@@ -1,4 +1,6 @@
-﻿using Unity.Entities;
+﻿using CommonEcs;
+
+using Unity.Entities;
 
 namespace Common.Ecs.Fsm {
     public struct FsmAction : IComponentData {

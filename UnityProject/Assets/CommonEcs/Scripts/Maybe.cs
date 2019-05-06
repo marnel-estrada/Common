@@ -1,5 +1,3 @@
-using Common;
-
 using UnityEngine.Assertions;
 
 namespace CommonEcs {

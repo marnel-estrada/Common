@@ -1,4 +1,6 @@
-﻿using Unity.Collections;
+﻿using CommonEcs;
+
+using Unity.Collections;
 using Unity.Entities;
 
 namespace Common.Ecs.Fsm {

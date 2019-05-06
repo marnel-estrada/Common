@@ -1,7 +1,7 @@
 using Unity.Entities;
 using UnityEngine;
 
-namespace CommonEcs.Scripts {
+namespace CommonEcs {
     public static class GameObjectEntityExtensions {
         /// <summary>
         /// Add Component to GameObject and associated entity (if any).

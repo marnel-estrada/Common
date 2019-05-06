@@ -1,5 +1,3 @@
-using Common;
-
 using Unity.Entities;
 
 namespace CommonEcs {

@@ -1,6 +1,6 @@
 ﻿using Unity.Entities;
 
-namespace Common {
+namespace CommonEcs {
     /// <summary>
     /// A common component that can be used as a filter to debug certain entities
     /// </summary>

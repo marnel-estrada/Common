@@ -1,9 +1,10 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using Common;
+
+using UnityEngine;
 
 using Unity.Entities;
 
-namespace Common {
+namespace CommonEcs {
     /// <summary>
     /// Component for duration timing
     /// </summary>

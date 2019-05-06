@@ -3,7 +3,7 @@ using Unity.Rendering;
 
 using UnityEngine;
 
-namespace Common {
+namespace CommonEcs {
     /// <summary>
     /// Creates a mesh dynamically based on the specified settings
     /// </summary>

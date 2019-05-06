@@ -1,16 +1,15 @@
 ﻿using Common;
 
+using System.Collections.Generic;
+
+using Unity.Collections;
+using Unity.Entities;
+
 namespace CommonEcs {
-    using System.Collections.Generic;
-
-    using Unity.Collections;
-    using Unity.Entities;
-
     /// <summary>
     /// A utility class that aids in SharedComponent chunk iteration
     /// </summary>
     public class SharedComponentQuery<T> where T : struct, ISharedComponentData {
-
         private readonly ComponentSystemBase system;
         private readonly EntityManager entityManager;
 
@@ -60,6 +59,5 @@ namespace CommonEcs {
                 return this.indices;
             }
         }
-
     }
 }

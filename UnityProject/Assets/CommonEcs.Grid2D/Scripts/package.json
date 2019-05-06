@@ -7,6 +7,7 @@
     "dependencies": {
         "com.unity.entities": "0.0.12",
         "com.unity.burst": "1.0.1",
+        "com.squeakywheel.common.core": "1.0.0",
         "com.squeakywheel.common.ecs": "1.0.0"
     },
     "keywords": [

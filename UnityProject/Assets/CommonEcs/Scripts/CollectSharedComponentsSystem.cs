@@ -7,7 +7,7 @@ namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public abstract class CollectSharedComponentsSystem<T> : ComponentSystem where T : struct, ISharedComponentData {
         protected struct Collected : ISystemStateComponentData {
-        }
+        } 
 
         private EntityQuery query;
         private ArchetypeChunkEntityType entityType;

@@ -52,6 +52,8 @@ namespace CommonEcs {
             buffer.AddComponent(this.spriteEntity, new Rotation() {
                 Value = rotation
             });
+            
+            buffer.AddComponent(this.spriteEntity, new LocalToWorld());
 
             buffer.AddComponent(this.spriteEntity, new UseYAsSortOrder());
 

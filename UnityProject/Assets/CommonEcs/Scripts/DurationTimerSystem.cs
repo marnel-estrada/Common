@@ -32,7 +32,6 @@ namespace CommonEcs {
             IReadOnlyList<TimeReference> timeReferences = this.timeReferenceQuery.SharedComponents;
 
             JobHandle lastHandle = dependency;
-
             ArchetypeChunkComponentType<DurationTimer> timerType = GetArchetypeChunkComponentType<DurationTimer>();
             
             // Note here that we start counting from 1 since the first entry is always a default one
@@ -46,7 +45,7 @@ namespace CommonEcs {
                     scaledDeltaTime = UnityEngine.Time.deltaTime * timeReference.TimeScale
                 };
 
-                JobChunkExtensions.Schedule(job, this.scaledQuery, dependency);
+                lastHandle = JobChunkExtensions.Schedule(job, this.scaledQuery, lastHandle);
             }
             
             return lastHandle;

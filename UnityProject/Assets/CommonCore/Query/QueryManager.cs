@@ -1,16 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using UnityEngine;
-
-using Common;
-
-namespace Common {
+﻿namespace Common {
     public static class QueryManager {
-
         public delegate V QueryProvider<R, V>(R request) where R : QueryRequest;
 
         private static readonly QueryManagerImplementation INTERNAL_MANAGER = new QueryManagerImplementation();
@@ -52,6 +41,5 @@ namespace Common {
         public static V Query<R, V>(R request) where R : QueryRequest {
             return INTERNAL_MANAGER.Query<R, V>(request);
         }
-
     }
 }

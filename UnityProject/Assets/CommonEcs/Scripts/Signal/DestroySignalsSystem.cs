@@ -1,7 +1,7 @@
 ﻿using Unity.Entities;
 
 namespace CommonEcs {
-    [UpdateBefore(typeof(EndPresentationEntityCommandBufferSystem))]
+    [UpdateAfter(typeof(EndPresentationEntityCommandBufferSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class DestroySignalsSystem : ComponentSystem {
         private EntityQuery query;

@@ -1,11 +1,9 @@
 ﻿using System.Diagnostics.Contracts;
 
+using Unity.Entities;
+using Unity.Mathematics;
+
 namespace CommonEcs {
-    using Unity.Entities;
-    using Unity.Mathematics;
-
-    using UnityEngine;
-
     public struct Grid2D : IComponentData {
         // The id of the grid
         // This may be used to identify a grid if there are multiple grids
@@ -27,8 +25,8 @@ namespace CommonEcs {
         public readonly float2 min;
         public readonly float2 max;
 
-        public readonly int2 minCoordinate;
-        public readonly int2 maxCoordinte;
+        public int2 minCoordinate;
+        public int2 maxCoordinte;
 
         /// <summary>
         /// Constructor

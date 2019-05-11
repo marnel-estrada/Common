@@ -28,9 +28,9 @@ namespace CommonEcs {
         /// <summary>
         /// Computes the weight for the specified movement
         /// </summary>
-        /// <param name="from"></param>
-        /// <param name="to"></param>
+        /// <param name="start"></param>
+        /// <param name="destination"></param>
         /// <returns></returns>
-        float GetWeight(int2 from, int2 to);
+        float GetWeight(int2 start, int2 destination);
     }
 }

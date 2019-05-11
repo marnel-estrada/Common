@@ -19,6 +19,7 @@ namespace CommonEcs {
         [ReadOnly]
         public NativeArray<int2> neighborOffsets;
 
+        [ReadOnly]
         public GridWrapper gridWrapper;
 
         public ComponentDataFromEntity<AStarPath> allPaths;
@@ -36,6 +37,7 @@ namespace CommonEcs {
         // This will be specified by client code
         public NativeHashMap<int2, byte> closeSet;
 
+        [ReadOnly]
         private HeuristicCalculator heuristicCalculator;
 
         public OpenSet openSet;

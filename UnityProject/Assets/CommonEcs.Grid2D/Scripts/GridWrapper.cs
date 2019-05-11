@@ -35,6 +35,10 @@ namespace CommonEcs {
             return new Maybe<Entity>(this.cellEntities[index].entity);
         }
 
+        public Maybe<Entity> GetCellEntity(int2 gridCoordinates) {
+            return GetCellEntity(gridCoordinates.x, gridCoordinates.y);
+        }
+
         public Maybe<Entity> GetCellEntityAtWorld(int worldX, int worldY) {
             return GetCellEntityAtWorld(new int2(worldX, worldY));
         }

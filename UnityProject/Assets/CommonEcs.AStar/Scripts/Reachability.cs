@@ -20,10 +20,10 @@ namespace CommonEcs {
         /// <summary>
         /// Returns whether or not the specified movement is reachable.
         /// </summary>
-        /// <param name="from"></param>
-        /// <param name="to"></param>
+        /// <param name="start"></param>
+        /// <param name="destination"></param>
         /// <returns></returns>
-        bool IsReachable(int2 from, int2 to);
+        bool IsReachable(int2 start, int2 destination);
 
         /// <summary>
         /// Computes the weight for the specified movement

@@ -1,5 +1,6 @@
 using Unity.Burst;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
@@ -28,12 +29,15 @@ namespace CommonEcs {
         public GridWrapper gridWrapper;
 
         [NativeDisableParallelForRestriction]
-        public NativeArray<AStarPath> allPaths;
-
-        public DynamicBuffer<Int2BufferElement> pathList;
+        public NativeArray<AStarPath> paths;
 
         [NativeDisableParallelForRestriction]
-        public NativeArray<Waiting> allWaiting;
+        [NativeDisableContainerSafetyRestriction]
+        [NativeDisableUnsafePtrRestriction]
+        public BufferAccessor<Int2BufferElement> pathLists;
+
+        [NativeDisableParallelForRestriction]
+        public NativeArray<Waiting> waitingArray;
 
         // This is the master container for all AStarNodes. The key is the hash code of the position.
         // This will be specified by client code
@@ -56,7 +60,7 @@ namespace CommonEcs {
             DoSearch();
 
             // Mark as done waiting for the agent to respond
-            this.allWaiting[this.requestIndex] = new Waiting {
+            this.waitingArray[this.requestIndex] = new Waiting {
                 done = true
             };
         }
@@ -64,7 +68,7 @@ namespace CommonEcs {
         private void DoSearch() {
             if (!this.reachability.IsReachable(this.goalPosition)) {
                 // Goal is not reachable
-                this.allPaths[this.requestIndex] = new AStarPath(0, false);
+                this.paths[this.requestIndex] = new AStarPath(0, false);
 
                 return;
             }
@@ -82,7 +86,7 @@ namespace CommonEcs {
                 if (current.position.Equals(this.goalPosition)) {
                     // Goal has been found
                     int pathCount = ConstructPath(current);
-                    this.allPaths[this.requestIndex] = new AStarPath(pathCount, true);
+                    this.paths[this.requestIndex] = new AStarPath(pathCount, true);
 
                     return;
                 }
@@ -102,9 +106,9 @@ namespace CommonEcs {
             // Open set has been exhausted. Path is unreachable.
             if (minHPosition.HasValue) {
                 int pathCount = ConstructPath(minHPosition.Value);
-                this.allPaths[this.requestIndex] = new AStarPath(pathCount, false); // false for unreachable
+                this.paths[this.requestIndex] = new AStarPath(pathCount, false); // false for unreachable
             } else {
-                this.allPaths[this.requestIndex] = new AStarPath(0, false);
+                this.paths[this.requestIndex] = new AStarPath(0, false);
             }
         }
 
@@ -121,14 +125,15 @@ namespace CommonEcs {
             // Note here that we no longer need to reverse the ordering of the path
             // We just add them as reversed in AStarPath
             // AStarPath then knows how to handle this
-            this.pathList.Clear();
+            DynamicBuffer<Int2BufferElement> pathList = this.pathLists[this.requestIndex];
+            pathList.Clear();
             AStarNode current = this.allNodes[destination.index];
             while (current.parent >= 0) {
-                this.pathList.Add(new Int2BufferElement(current.position));
+                pathList.Add(new Int2BufferElement(current.position));
                 current = this.allNodes[current.parent];
             }
 
-            return this.pathList.Length;
+            return pathList.Length;
         }
 
         private void ProcessNode(in AStarNode current) {

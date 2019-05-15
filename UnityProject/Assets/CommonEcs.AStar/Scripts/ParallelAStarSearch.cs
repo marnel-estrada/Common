@@ -10,6 +10,7 @@ namespace CommonEcs {
     /// </summary>
     /// <typeparam name="HeuristicCalculator"></typeparam>
     /// <typeparam name="ReachabilityType"></typeparam>
+    [BurstCompile]
     public struct ParallelAStarSearch<HeuristicCalculator, ReachabilityType> : IJob 
         where HeuristicCalculator : struct, HeuristicCostCalculator where ReachabilityType : struct, Reachability {
         public int requestIndex;
@@ -28,9 +29,6 @@ namespace CommonEcs {
 
         [NativeDisableParallelForRestriction]
         public NativeArray<AStarPath> allPaths;
-
-        // [NativeDisableParallelForRestriction]
-        // public BufferAccessor<Int2BufferElement> allPathLists;
 
         public DynamicBuffer<Int2BufferElement> pathList;
 

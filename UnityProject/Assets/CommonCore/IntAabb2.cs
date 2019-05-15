@@ -18,6 +18,7 @@ namespace Common {
         }
 
         public IntAabb2(int2 min, int2 max) {
+            Empty();
             AddToContain(min.x, min.y);
             AddToContain(max.x, max.y);
         }
@@ -52,30 +53,29 @@ namespace Common {
             }
         }
 
+        private readonly IntVector2 center = new IntVector2();
+        
         /// <summary>
         /// Resolves the center of the bounds
         /// </summary>
         public IntVector2 Center {
             get {
-                IntVector2 center = new IntVector2();
-                center.x = (this.min.x + this.max.x) >> 1; // Divide 2
-                center.y = (this.min.y + this.max.y) >> 1; // Divide 2
-                return center;
+                this.center.x = (this.min.x + this.max.x) >> 1; // Divide 2
+                this.center.y = (this.min.y + this.max.y) >> 1; // Divide 2
+                return this.center;
             }
         }
-
+        
         /// <summary>
         /// Returns the size of the bounds
         /// </summary>
-        public IntVector2 Size {
+        public int2 BoundsSize {
             get {
-                IntVector2 size = new IntVector2();
-                size.x = this.max.x - this.min.x;
-                size.y = this.max.y - this.min.y;
-                return size;
+                int x = this.max.x - this.min.x + 1;
+                int y = this.max.y - this.min.y + 1;
+                return new int2(x, y);
             }
         }
-
 
         /// <summary>
         /// Expands the bounds to contain the specified point

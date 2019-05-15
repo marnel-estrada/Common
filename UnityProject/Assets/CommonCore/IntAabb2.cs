@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Common.Math;
 
-using UnityEngine;
-
-using Common.Math;
+using Unity.Mathematics;
 
 namespace Common {
     /// <summary>
     /// An implementation of AABB but using integer coordinates
     /// </summary>
     public class IntAabb2 {
-
         private readonly IntVector2 min = new IntVector2();
         private readonly IntVector2 max = new IntVector2();
 
@@ -22,6 +15,11 @@ namespace Common {
         /// </summary>
         public IntAabb2() {
             Empty();
+        }
+
+        public IntAabb2(int2 min, int2 max) {
+            AddToContain(min.x, min.y);
+            AddToContain(max.x, max.y);
         }
 
         public IntVector2 Min {
@@ -250,6 +248,5 @@ namespace Common {
         public override string ToString() {
             return "min: " + min + "; max: " + max;
         }
-
     }
 }

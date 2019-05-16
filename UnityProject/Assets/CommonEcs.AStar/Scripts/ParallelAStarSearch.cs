@@ -21,6 +21,9 @@ namespace CommonEcs {
         [ReadOnly]
         public ReachabilityType reachability;
 
+        [ReadOnly]
+        private HeuristicCalculator heuristicCalculator;
+        
         // This will be specified by client on whether it wants to include diagonal neighbors
         [ReadOnly]
         public NativeArray<int2> neighborOffsets;
@@ -47,9 +50,6 @@ namespace CommonEcs {
         // This will be specified by client code
         public NativeHashMap<int2, byte> closeSet;
 
-        [ReadOnly]
-        private HeuristicCalculator heuristicCalculator;
-
         public OpenSet openSet;
         
         public void Execute() {
@@ -66,13 +66,6 @@ namespace CommonEcs {
         }
 
         private void DoSearch() {
-            if (!this.reachability.IsReachable(this.goalPosition)) {
-                // Goal is not reachable
-                this.paths[this.requestIndex] = new AStarPath(0, false);
-
-                return;
-            }
-
             float startNodeH = this.heuristicCalculator.ComputeCost(this.startPosition, this.goalPosition);
             AStarNode startNode = CreateNode(this.startPosition, -1, 0, startNodeH);
             this.openSet.Push(startNode);

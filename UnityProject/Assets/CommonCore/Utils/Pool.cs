@@ -8,21 +8,19 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 using System;
+using System.Collections.Generic;
 
 namespace Common {
 	/**
 	 * A generic pool class.
 	 */
 	public class Pool<T> where T : class, new() {
-
-		private readonly SimpleList<T> recycledItems; // list of unused instances
-
-		/**
-		 * Constructor
-		 */
-		public Pool() {
-			this.recycledItems = new SimpleList<T>(10);
-		}
+		// We used queue instead of stack so that there's less chance that a recycled instance would
+		// be used in more than one context
+		private readonly Queue<T> queue = new Queue<T>(10);
+		
+		// We used HashSet for faster checking if the instance is already in the pool
+		private readonly HashSet<T> hashSet = new HashSet<T>();
 		
 		private static readonly object SYNC_LOCK = new object();
 
@@ -32,15 +30,15 @@ namespace Common {
 		public T Request() {
 			lock (SYNC_LOCK) {
 				// check from pooledList
-				if (this.recycledItems.IsEmpty()) {
+				if (this.queue.Count <= 0) {
 					// create a new one
 					return new T();
 				}
 
 				// get from pool
 				// get from end of the list
-				T instance = this.recycledItems[this.recycledItems.Count - 1];
-				this.recycledItems.RemoveAt(this.recycledItems.Count - 1);
+				T instance = this.queue.Dequeue();
+				this.hashSet.Remove(instance); // Remove from hashSet as well
 
 				return instance;
 			}
@@ -55,15 +53,17 @@ namespace Common {
 				Assertion.AssertNotNull(instance);
 
 				// The item to be recycled should not be present in recycled items
-				Assertion.Assert(!this.recycledItems.Contains(instance));
+				bool alreadyPooled = this.hashSet.Contains(instance);
+				Assertion.Assert(!alreadyPooled); // Should not be in the recycled items
 
-				if (this.recycledItems.Contains(instance)) {
+				if (alreadyPooled) {
 					// Don't add if it was already recycled before
 					// Note that execution just continues in production
 					return;
 				}
 
-				this.recycledItems.Add(instance);
+				this.queue.Enqueue(instance);
+				this.hashSet.Add(instance);
 			}
 		}
 
@@ -72,9 +72,8 @@ namespace Common {
         /// </summary>
         public int Count {
             get {
-                return this.recycledItems.Count;
+                return this.queue.Count;
             }
         }
-
 	}
 }

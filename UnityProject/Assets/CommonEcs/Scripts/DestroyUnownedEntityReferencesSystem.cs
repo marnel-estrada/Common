@@ -9,23 +9,23 @@ namespace CommonEcs {
         
         private ArchetypeChunkEntityType entityType;
         private ArchetypeChunkComponentType<EntityReference> referenceType;
-
+    
         private EndPresentationEntityCommandBufferSystem barrier;
-
+    
         protected override void OnCreateManager() {
             this.query = GetEntityQuery(typeof(EntityReference));
             this.barrier = this.World.GetOrCreateSystem<EndPresentationEntityCommandBufferSystem>();
         }
-
+    
         protected override void OnUpdate() {
             this.entityType = GetArchetypeChunkEntityType();
             this.referenceType = GetArchetypeChunkComponentType<EntityReference>(true);
-
+    
             NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
             
             // Collection of referenced entities
             NativeHashMap<Entity, byte> referencedEntities = new NativeHashMap<Entity, byte>(10, Allocator.TempJob);
-
+    
             // Note here that we store the referenced entities here so that we can check if they
             // are still referenced by another entities before destroying them
             StoreReferencedEntities(ref chunks, ref referencedEntities);
@@ -34,13 +34,13 @@ namespace CommonEcs {
             referencedEntities.Dispose();
             chunks.Dispose();
         }
-
+    
         private void StoreReferencedEntities(ref NativeArray<ArchetypeChunk> chunks, ref NativeHashMap<Entity, byte> referencedEntities) {
             for (int i = 0; i < chunks.Length; ++i) {
                 StoreReferencedEntities(chunks[i], ref referencedEntities);
             }
         }
-
+    
         private void StoreReferencedEntities(ArchetypeChunk chunk,
             ref NativeHashMap<Entity, byte> referencedEntities) {
             NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
@@ -53,14 +53,14 @@ namespace CommonEcs {
                 }
             }
         }
-
+    
         private void DestroyUnownedReferences(ref NativeArray<ArchetypeChunk> chunks,
             ref NativeHashMap<Entity, byte> referencedEntities) {
             for (int i = 0; i < chunks.Length; ++i) {
                 DestroyUnownedReferences(chunks[i], ref referencedEntities);
             }
         }
-
+    
         private void DestroyUnownedReferences(ArchetypeChunk chunk, ref NativeHashMap<Entity, byte> referencedEntities) {
             NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
             NativeArray<EntityReference> references = chunk.GetNativeArray(this.referenceType);

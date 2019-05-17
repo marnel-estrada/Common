@@ -10,7 +10,9 @@ namespace CommonEcs {
 
         public void Execute(int index, TransformAccess transform) {
             this.stashes[index] = new TransformStash {
-                rotation = transform.rotation, position = transform.position,
+                position = transform.position,
+                localScale = transform.localScale,
+                rotation = transform.rotation, 
             };
         }
     }

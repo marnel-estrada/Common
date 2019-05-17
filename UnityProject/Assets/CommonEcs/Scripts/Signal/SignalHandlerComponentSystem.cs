@@ -1,7 +1,6 @@
 using Unity.Entities;
 
 namespace CommonEcs {
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateBefore(typeof(DestroySignalsSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public abstract class SignalHandlerComponentSystem<T> : ComponentSystem where T : struct, IComponentData {

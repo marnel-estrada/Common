@@ -4,7 +4,6 @@ using Unity.Collections;
 using Unity.Entities;
 
 namespace CommonEcs {
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateAfter(typeof(SpriteManagerRendererSystem))]
     [UpdateAfter(typeof(UpdateChangedVerticesSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]

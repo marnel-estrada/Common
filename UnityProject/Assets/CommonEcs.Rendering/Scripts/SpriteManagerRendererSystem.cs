@@ -6,7 +6,6 @@ using Unity.Entities;
 using UnityEngine;
 
 namespace CommonEcs {
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateAfter(typeof(TransformVerticesSystem))]
     [UpdateAfter(typeof(SpriteManagerJobsFinisher))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]

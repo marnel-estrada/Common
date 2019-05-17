@@ -4,7 +4,6 @@ using Unity.Entities;
 
 namespace CommonEcs {
     [AlwaysUpdateSystem]
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateAfter(typeof(SpriteManagerRendererSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class ResetSpriteManagerFlagsSystem : ComponentSystem {

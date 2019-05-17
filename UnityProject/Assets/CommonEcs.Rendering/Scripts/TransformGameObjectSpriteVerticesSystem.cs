@@ -12,7 +12,6 @@ namespace CommonEcs {
     /// <summary>
     /// This is the same as SpriteManagerTransformSystem but for sprite made in GameObject world
     /// </summary>
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class TransformGameObjectSpriteVerticesSystem : JobComponentSystem {
         private EntityQuery query;

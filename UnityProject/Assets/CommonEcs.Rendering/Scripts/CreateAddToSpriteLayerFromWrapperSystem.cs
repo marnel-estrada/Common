@@ -5,7 +5,6 @@
     /// <summary>
     /// Adds the actual AddToSpriteLayer component to the GameObjectEntity
     /// </summary>
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateBefore(typeof(AddGameObjectSpriteToLayerSystem))]
     [UpdateBefore(typeof(AddGameObjectSpriteToManagerSystem))]
     [UpdateBefore(typeof(CreateSpriteFromWrapperSystem))]

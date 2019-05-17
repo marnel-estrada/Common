@@ -6,7 +6,6 @@ using Unity.Entities;
 using Unity.Jobs;
 
 namespace CommonEcs {
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateAfter(typeof(TransformVerticesSystem))]
     [UpdateAfter(typeof(TransformGameObjectSpriteVerticesSystem))]
     [UpdateAfter(typeof(UseYAsSortOrderSystem))]

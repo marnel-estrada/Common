@@ -7,7 +7,6 @@ namespace CommonEcs {
     /// We did this because in SpriteLayer, we are creating a SpriteManager through a command buffer
     /// in which we can't get an entity during creation.
     /// </summary>
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateBefore(typeof(AddSpriteManagerToLayerSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class SetOwnerToSpriteManagerSystem : ComponentSystem {

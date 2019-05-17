@@ -6,7 +6,6 @@ namespace CommonEcs {
     /// <summary>
     /// Adds sprites that are not yet added to the manager
     /// </summary>
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateBefore(typeof(TransformVerticesSystem))]
     [UpdateBefore(typeof(SpriteManagerRendererSystem))]
     [UpdateAfter(typeof(SpriteManagerInstancesSystem))]

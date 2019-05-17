@@ -9,7 +9,6 @@ using UnityEngine;
 using UnityEngine.Jobs;
 
 namespace CommonEcs {
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateBefore(typeof(TransformGameObjectSpriteVerticesSystem))]
     [UpdateBefore(typeof(EndPresentationEntityCommandBufferSystem))]
     [UpdateBefore(typeof(SortRenderOrderSystem))]

@@ -132,8 +132,8 @@ namespace CommonEcs {
             }
 
             private AStarNode CreateNode(int2 position, int parent, float g, float h) {
-                int index = this.allNodes.Length;
-                AStarNode node = new AStarNode(index, position, parent, g, h);
+                int nodeIndex = this.allNodes.Length;
+                AStarNode node = new AStarNode(nodeIndex, position, parent, g, h);
                 this.allNodes.Add(node);
 
                 return node;

@@ -56,7 +56,7 @@ namespace CommonEcs {
         }
 
         private void DoSearch() {
-            if (!this.reachability.IsReachable(this.goalPosition)) {
+            if (!this.reachability.IsReachable(0, this.goalPosition)) {
                 // Goal is not reachable
                 this.allPaths[this.owner] = new AStarPath(0, false);
 
@@ -153,12 +153,12 @@ namespace CommonEcs {
                     continue;
                 }
 
-                if (!this.reachability.IsReachable(current.position, neighborPosition)) {
+                if (!this.reachability.IsReachable(0, current.position, neighborPosition)) {
                     // Not reachable based from specified reachability
                     continue;
                 }
 
-                float tentativeG = current.G + this.reachability.GetWeight(current.position, neighborPosition);
+                float tentativeG = current.G + this.reachability.GetWeight(0, current.position, neighborPosition);
 
                 float h = this.heuristicCalculator.ComputeCost(neighborPosition, this.goalPosition);
 

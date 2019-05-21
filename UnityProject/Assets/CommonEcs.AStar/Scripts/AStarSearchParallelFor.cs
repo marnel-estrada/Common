@@ -39,6 +39,7 @@ namespace CommonEcs {
         // Execute search per entity in entities
         public void Execute(int index) {
             Search search = new Search() {
+                index = index,
                 entity = this.entities[index],
                 allParameters = this.allParameters,
                 allPaths = this.allPaths,
@@ -56,29 +57,17 @@ namespace CommonEcs {
         }
 
         private struct Search {
-            [ReadOnly]
+            public int index;
             public Entity entity;
 
-            [NativeDisableContainerSafetyRestriction]
             public ComponentDataFromEntity<AStarSearchParameters> allParameters;
-
-            [NativeDisableContainerSafetyRestriction]
             public ComponentDataFromEntity<AStarPath> allPaths;
-
-            [NativeDisableContainerSafetyRestriction]
             public BufferFromEntity<Int2BufferElement> allPathLists;
 
-            [ReadOnly]
             public ReachabilityType reachability;
-
-            [ReadOnly]
             public HeuristicCalculator heuristicCalculator;
-
-            // This will be specified by client on whether it wants to include diagonal neighbors
-            [ReadOnly]
             public NativeArray<int2> neighborOffsets;
 
-            [ReadOnly]
             public GridWrapper gridWrapper;
 
             // This is the master container for all AStarNodes. The key is the hash code of the position.
@@ -177,12 +166,12 @@ namespace CommonEcs {
                         continue;
                     }
 
-                    if (!this.reachability.IsReachable(current.position, neighborPosition)) {
+                    if (!this.reachability.IsReachable(this.index, current.position, neighborPosition)) {
                         // Not reachable based from specified reachability
                         continue;
                     }
 
-                    float tentativeG = current.G + this.reachability.GetWeight(current.position, neighborPosition);
+                    float tentativeG = current.G + this.reachability.GetWeight(this.index, current.position, neighborPosition);
 
                     float h = this.heuristicCalculator.ComputeCost(neighborPosition, this.goalPosition);
 

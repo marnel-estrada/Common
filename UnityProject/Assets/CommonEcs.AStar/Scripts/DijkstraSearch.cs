@@ -140,12 +140,12 @@ namespace CommonEcs {
                     continue;
                 }
         
-                if (!this.reachability.IsReachable(current.position, neighborPosition)) {
+                if (!this.reachability.IsReachable(0, current.position, neighborPosition)) {
                     // Not reachable based from specified reachability
                     continue;
                 }
                 
-                float tentativeG = current.G + this.reachability.GetWeight(current.position, neighborPosition);
+                float tentativeG = current.G + this.reachability.GetWeight(0, current.position, neighborPosition);
 
                 if (this.openSet.TryGet(neighborPosition, out AStarNode existingNode)) {
                     // This means that the node is already in the open set

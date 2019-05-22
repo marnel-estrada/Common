@@ -4,7 +4,7 @@ namespace CommonEcs {
     /// <summary>
     /// A common component that can be used as a filter to debug certain entities
     /// </summary>
-    public class DebugComponent : IComponentData {
-        public ByteBool isDebug = false;
+    public struct DebugComponent : IComponentData {
+        public ByteBool isDebug;
     }
 }

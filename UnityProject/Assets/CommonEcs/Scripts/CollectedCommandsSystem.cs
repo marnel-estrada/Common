@@ -2,7 +2,11 @@
 using Unity.Entities;
 
 namespace CommonEcs {
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    /// <summary>
+    /// We don't add this in PresentationSystemGroup so that new entities would be processed by the
+    /// transform system after playback of the buffer
+    /// </summary>
+    [UpdateInGroup(typeof(SimulationSystemGroup))]
     public class CollectedCommandsSystem : ComponentSystem {
         private EntityCommandBuffer? pendingBuffer;
 

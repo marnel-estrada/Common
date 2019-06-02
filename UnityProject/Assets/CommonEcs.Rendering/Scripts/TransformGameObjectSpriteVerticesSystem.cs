@@ -14,40 +14,52 @@ namespace CommonEcs {
     /// </summary>
     [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class TransformGameObjectSpriteVerticesSystem : ComponentSystem {
+    public class TransformGameObjectSpriteVerticesSystem : JobComponentSystem {
         private EntityQuery query;
-    
+
         protected override void OnCreateManager() {
             // All entities with Sprite and Transform, but without Static (non Static sprites)
             this.query = GetEntityQuery(typeof(Sprite), typeof(Transform), ComponentType.Exclude<Static>());
         }
-    
-        protected override void OnUpdate() {
-            NativeArray<Sprite> sprites = this.query.ToComponentDataArray<Sprite>(Allocator.TempJob, 
-                out JobHandle spritesJob);
+
+        protected override JobHandle OnUpdate(JobHandle inputDeps) {
+            TransformAccessArray transforms = this.query.GetTransformAccessArray();
+            NativeArray<TransformStash> stashes = new NativeArray<TransformStash>(transforms.length, Allocator.TempJob);
             
-            TransformJob transformJob = new TransformJob() {
-                sprites = sprites
+            // Job for copying to stashes
+            StashTransforms stashTransforms = new StashTransforms() {
+                stashes = stashes
             };
-            transformJob.Schedule(this.query.GetTransformAccessArray(), spritesJob).Complete();
+            JobHandle stashHandle = stashTransforms.Schedule(transforms, inputDeps);
             
-            this.query.CopyFromComponentDataArray(sprites);
-            
-            sprites.Dispose();
+            // Job for applying to sprites
+            ApplyTransforms applyTransforms = new ApplyTransforms() {
+                stashes = stashes
+            };
+
+            return applyTransforms.Schedule(this.query, stashHandle);
         }
-        
+
         [BurstCompile]
-        private struct TransformJob : IJobParallelForTransform {
-            public NativeArray<Sprite> sprites;
-            
+        struct StashTransforms : IJobParallelForTransform {
+            public NativeArray<TransformStash> stashes;
+
             public void Execute(int index, TransformAccess transform) {
-                Sprite sprite = this.sprites[index];
-                float4x4 rotationTranslationMatrix = new float4x4(transform.rotation, transform.position);
-                float4x4 scaleMatrix = float4x4.Scale(transform.localScale);
-                float4x4 matrix = math.mul(rotationTranslationMatrix, scaleMatrix);
-                sprite.Transform(ref matrix);
-        
-                this.sprites[index] = sprite; // Modify the data
+                this.stashes[index] = new TransformStash {
+                    rotation = transform.rotation, position = transform.position,
+                };
+            }
+        }
+
+        [BurstCompile]
+        struct ApplyTransforms : IJobForEachWithEntity<Sprite> {
+            [DeallocateOnJobCompletion]
+            public NativeArray<TransformStash> stashes;
+
+            public void Execute(Entity entity, int index, ref Sprite sprite) {
+                TransformStash stash = this.stashes[index];
+                float4x4 rotationTranslationMatrix = new float4x4(stash.rotation, stash.position);
+                sprite.Transform(ref rotationTranslationMatrix);
             }
         }
     }

@@ -27,7 +27,7 @@ namespace CommonEcs {
             NativeArray<TransformStash> stashes = new NativeArray<TransformStash>(transforms.length, Allocator.TempJob);
             
             // Job for copying to stashes
-            StashTransforms stashTransforms = new StashTransforms() {
+            StashTransformsJob stashTransforms = new StashTransformsJob() {
                 stashes = stashes
             };
             JobHandle stashHandle = stashTransforms.Schedule(transforms, inputDeps);
@@ -41,18 +41,7 @@ namespace CommonEcs {
         }
 
         [BurstCompile]
-        struct StashTransforms : IJobParallelForTransform {
-            public NativeArray<TransformStash> stashes;
-
-            public void Execute(int index, TransformAccess transform) {
-                this.stashes[index] = new TransformStash {
-                    rotation = transform.rotation, position = transform.position,
-                };
-            }
-        }
-
-        [BurstCompile]
-        struct ApplyTransforms : IJobForEachWithEntity<Sprite> {
+        private struct ApplyTransforms : IJobForEachWithEntity<Sprite> {
             [DeallocateOnJobCompletion]
             public NativeArray<TransformStash> stashes;
 

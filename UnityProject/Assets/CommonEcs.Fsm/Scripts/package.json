@@ -1,11 +1,15 @@
 {
-    "name": "com.squeakywheel.common.core",
-    "displayName": "Common.Core",
+    "name": "com.squeakywheel.common.ecs.fsm",
+    "displayName": "Common.ECS.FSM",
     "version": "1.0.0",
     "unity": "2019.1",
-    "description": "Common.Core",
+    "description": "Common.ECS.FSM",
     "dependencies": {
-        "com.unity.mathematics": "1.0.1"
+        "com.unity.entities": "0.0.12",
+        "com.unity.burst": "1.0.1",
+        "com.unity.mathematics": "1.0.1",
+        "com.squeakywheel.common.core": "1.0.0",
+        "com.squeakywheel.common.ecs": "1.0.0"
     },
     "keywords": [
         "unity"

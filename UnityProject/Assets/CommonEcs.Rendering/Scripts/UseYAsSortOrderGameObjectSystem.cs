@@ -2,6 +2,7 @@
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
 using Unity.Transforms;
 
 using UnityEngine;
@@ -13,7 +14,7 @@ namespace CommonEcs {
     [UpdateBefore(typeof(EndPresentationEntityCommandBufferSystem))]
     [UpdateBefore(typeof(SortRenderOrderSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class UseYAsSortOrderGameObjectSystem : ComponentSystem {
+    public class UseYAsSortOrderGameObjectSystem : JobComponentSystem {
         private EntityQuery query;
 
         protected override void OnCreateManager() {
@@ -24,40 +25,35 @@ namespace CommonEcs {
                 ComponentType.Exclude<Static>()
             );
         }
-
-        protected override void OnUpdate() {
-            NativeArray<Sprite> sprites = this.query.ToComponentDataArray<Sprite>(Allocator.TempJob, 
-                out JobHandle spritesHandle);
-            NativeArray<UseYAsSortOrder> sortOrders = this.query.ToComponentDataArray<UseYAsSortOrder>(Allocator.TempJob, 
-                out JobHandle sortOrdersHandle);
-            JobHandle combinedHandle = JobHandle.CombineDependencies(spritesHandle, sortOrdersHandle);
+        
+        protected override JobHandle OnUpdate(JobHandle inputDeps) {
+            TransformAccessArray transforms = this.query.GetTransformAccessArray();
+            NativeArray<TransformStash> stashes = new NativeArray<TransformStash>(transforms.length, Allocator.TempJob);
             
-            TransformJob job = new TransformJob() {
-                sprites = sprites,
-                sortOrders = sortOrders
+            // Job for copying to stashes
+            StashTransformsJob stashTransforms = new StashTransformsJob() {
+                stashes = stashes
             };
-            job.Schedule(this.query.GetTransformAccessArray(), combinedHandle).Complete();
+            JobHandle stashHandle = stashTransforms.Schedule(transforms, inputDeps);
             
-            this.query.CopyFromComponentDataArray(sprites);
-            
-            sprites.Dispose();
-            sortOrders.Dispose();
+            // Job for applying to sprites
+            UpdateSpritesJob updateSpritesJob = new UpdateSpritesJob() {
+                stashes = stashes
+            };
+
+            return updateSpritesJob.Schedule(this.query, stashHandle);
         }
         
         [BurstCompile]
-        private struct TransformJob : IJobParallelForTransform {
-            public NativeArray<Sprite> sprites;
+        private struct UpdateSpritesJob : IJobForEachWithEntity<Sprite, UseYAsSortOrder> {
+            [DeallocateOnJobCompletion]
+            public NativeArray<TransformStash> stashes;
 
-            [ReadOnly]
-            public NativeArray<UseYAsSortOrder> sortOrders;
-            
-            public void Execute(int index, TransformAccess transform) {
-                Vector3 position = transform.position;
+            public void Execute(Entity entity, int index, ref Sprite sprite, [ReadOnly] ref UseYAsSortOrder sortOrder) {
+                float3 position = this.stashes[index].position;
                 
                 // We use negative of z here because the higher z should be ordered first
-                Sprite sprite = this.sprites[index];
-                sprite.RenderOrder = -(position.y + this.sortOrders[index].offset);
-                this.sprites[index] = sprite; // Modify
+                sprite.RenderOrder = -(position.y + sortOrder.offset);
             }
         }
     }

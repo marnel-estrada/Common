@@ -1,0 +1,19 @@
+{
+    "name": "Common",
+    "references": [
+        "Swarm",
+        "UnityThreading",
+        "LeanTween",
+        "Unity.Mathematics",
+        "CommonCore"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}

@@ -8,7 +8,6 @@ namespace CommonEcs {
     /// <summary>
     /// This is the same as AddGameObjectSpriteToLayerSystem but for sprites in pure ECS
     /// </summary>
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateBefore(typeof(TransformVerticesSystem))]
     [UpdateBefore(typeof(SpriteManagerRendererSystem))]
     [UpdateAfter(typeof(SpriteManagerInstancesSystem))]

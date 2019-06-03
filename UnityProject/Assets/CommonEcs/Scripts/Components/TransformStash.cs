@@ -6,6 +6,7 @@ namespace CommonEcs {
     /// </summary>
     public struct TransformStash {
         public float3 position;
+        public float3 localScale;
         public quaternion rotation;
     }
 }

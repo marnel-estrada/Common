@@ -5,7 +5,6 @@ using Unity.Jobs;
 using Unity.Transforms;
 
 namespace CommonEcs {
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateBefore(typeof(TransformVerticesSystem))]
     [UpdateBefore(typeof(EndPresentationEntityCommandBufferSystem))]
     [UpdateBefore(typeof(SortRenderOrderSystem))]

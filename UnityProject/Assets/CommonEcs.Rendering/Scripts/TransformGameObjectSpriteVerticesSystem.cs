@@ -12,7 +12,6 @@ namespace CommonEcs {
     /// <summary>
     /// This is the same as SpriteManagerTransformSystem but for sprite made in GameObject world
     /// </summary>
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class TransformGameObjectSpriteVerticesSystem : JobComponentSystem {
         private EntityQuery query;
@@ -48,7 +47,9 @@ namespace CommonEcs {
             public void Execute(Entity entity, int index, ref Sprite sprite) {
                 TransformStash stash = this.stashes[index];
                 float4x4 rotationTranslationMatrix = new float4x4(stash.rotation, stash.position);
-                sprite.Transform(ref rotationTranslationMatrix);
+                float4x4 scaleMatrix = float4x4.Scale(stash.localScale);
+                float4x4 finalMatrix = math.mul(rotationTranslationMatrix, scaleMatrix);
+                sprite.Transform(ref finalMatrix);
             }
         }
     }

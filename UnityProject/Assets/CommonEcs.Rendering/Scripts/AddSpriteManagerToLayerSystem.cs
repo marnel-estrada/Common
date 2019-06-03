@@ -2,7 +2,6 @@
 using Unity.Entities;
 
 namespace CommonEcs {
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateAfter(typeof(SpriteLayerInstancesSystem))]
     [UpdateBefore(typeof(AddGameObjectSpriteToLayerSystem))]
     [UpdateBefore(typeof(AddSpritesToLayerSystem))]

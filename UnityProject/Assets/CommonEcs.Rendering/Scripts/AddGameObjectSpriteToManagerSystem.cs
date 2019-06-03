@@ -9,7 +9,6 @@ namespace CommonEcs {
     /// This is the same as AddSpriteToManagerSystem but adds the Sprite that are in GameObject world
     /// (Using Transform instead of TransformMatrix)
     /// </summary>
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateBefore(typeof(TransformVerticesSystem))]
     [UpdateBefore(typeof(SpriteManagerRendererSystem))]
     [UpdateAfter(typeof(SpriteManagerInstancesSystem))]

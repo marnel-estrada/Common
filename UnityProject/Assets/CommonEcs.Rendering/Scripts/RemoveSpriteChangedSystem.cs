@@ -5,7 +5,6 @@ namespace CommonEcs {
     /// Removes the Changed component
     /// Performed after rendering
     /// </summary>
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateAfter(typeof(SpriteManagerRendererSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class RemoveSpriteChangedSystem : ComponentSystem {

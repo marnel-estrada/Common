@@ -5,7 +5,6 @@ namespace CommonEcs {
     /// A system that collects SpriteManager instances in a Dictionary so that it can be injected in
     /// other systems.
     /// </summary>
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class SpriteManagerInstancesSystem : CollectSharedComponentsSystem<SpriteManager> {
         protected override EntityQuery ResolveQuery() {

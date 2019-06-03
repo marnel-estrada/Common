@@ -7,7 +7,6 @@ namespace CommonEcs {
     /// <summary>
     /// Common base class for systems that updates vertices
     /// </summary>
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateAfter(typeof(TransformGameObjectSpriteVerticesSystem))]
     [UpdateAfter(typeof(TransformVerticesSystem))]
     [UpdateAfter(typeof(IdentifySpriteManagerChangedSystem))]

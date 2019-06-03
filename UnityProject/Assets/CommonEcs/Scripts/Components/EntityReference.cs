@@ -7,11 +7,11 @@ namespace CommonEcs {
     /// </summary>
     public struct EntityReference : IComponentData {
         public readonly Entity owner;
-
+    
         public EntityReference(Entity owner) {
             this.owner = owner;
         }
-
+    
         /// <summary>
         /// Create an entity with the reference relationship using an EntityManager
         /// </summary>
@@ -21,7 +21,7 @@ namespace CommonEcs {
         public static void Create(Entity owner, Entity referred, EntityManager entityManager) {
             entityManager.AddComponentData(referred, new EntityReference(owner));
         }
-
+    
         /// <summary>
         /// Create an entity with the reference relationship using an EntityCommandBuffer
         /// </summary>

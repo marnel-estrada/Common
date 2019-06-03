@@ -2,7 +2,6 @@
 using Unity.Entities;
 
 namespace CommonEcs {
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateAfter(typeof(SpriteManagerRendererSystem))]
     [UpdateBefore(typeof(ResetSpriteManagerFlagsSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]

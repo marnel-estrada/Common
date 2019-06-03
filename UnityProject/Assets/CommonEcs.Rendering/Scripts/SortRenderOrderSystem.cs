@@ -6,7 +6,6 @@ using Unity.Entities;
 using Unity.Jobs;
 
 namespace CommonEcs {
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateBefore(typeof(UpdateChangedVerticesSystem))]
     [UpdateBefore(typeof(SpriteManagerRendererSystem))]
     [UpdateBefore(typeof(SpriteManagerJobsFinisher))]

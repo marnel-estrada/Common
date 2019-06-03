@@ -3,7 +3,6 @@ using Unity.Entities;
 using Unity.Transforms;
 
 namespace CommonEcs {
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateBefore(typeof(AddGameObjectSpriteToLayerSystem))]
     [UpdateBefore(typeof(AddGameObjectSpriteToManagerSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]

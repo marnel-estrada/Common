@@ -7,7 +7,6 @@ using Unity.Jobs;
 using Unity.Transforms;
 
 namespace CommonEcs {
-    [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class TransformVerticesSystem : JobComponentSystem {
         private EntityQuery query;

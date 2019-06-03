@@ -1,0 +1,17 @@
+{
+  "name": "com.squeakywheel.common.components",
+  "displayName": "Common.Components",
+  "version": "1.0.0",
+  "unity": "2019.1",
+  "description": "Common.Core",
+  "dependencies": {
+    "com.squeakywheel.common.swarm":  "1.0.0",
+    "com.squeakywheel.common.core": "1.0.0",
+    "com.squeakywheel.common.ecs": "1.0.0",
+    "com.unity.mathematics": "1.0.1"
+  },
+  "keywords": [
+    "unity"
+  ],
+  "category": "Unity"
+}

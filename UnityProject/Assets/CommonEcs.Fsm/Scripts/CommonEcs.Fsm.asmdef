@@ -4,9 +4,9 @@
         "CommonCore",
         "CommonEcs",
         "Unity.Entities",
-        "Unity.Entities.Hybrid",
         "Unity.Burst",
         "Unity.Mathematics",
+        "Unity.Entities.Hybrid",
         "Unity.Transforms"
     ],
     "optionalUnityReferences": [],

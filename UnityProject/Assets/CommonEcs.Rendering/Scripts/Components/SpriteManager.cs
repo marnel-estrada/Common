@@ -1,4 +1,6 @@
-﻿using Unity.Collections;
+﻿using System;
+
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -8,16 +10,20 @@ using UnityEngine;
 using Common;
 
 namespace CommonEcs {
-    public struct SpriteManager : ISharedComponentData {
-        private Internal internalInstance;
+    public struct SpriteManager : ISharedComponentData, IEquatable<SpriteManager> {
+        private readonly Internal internalInstance;
+        
+        private readonly int id;
+        private static readonly IdGenerator ID_GENERATOR = new IdGenerator(1);
 
         /// <summary>
         /// Initializes the sprite manager
         /// </summary>
         /// <param name="allocationCount"></param>
-        public void Init(int allocationCount) {
+        public SpriteManager(int allocationCount) {
             this.internalInstance = new Internal();
             this.internalInstance.Init(allocationCount);
+            this.id = ID_GENERATOR.Generate();
         }
 
         /// <summary>
@@ -25,9 +31,10 @@ namespace CommonEcs {
         /// </summary>
         /// <param name="allocationCount"></param>
         /// <param name="commands"></param>
-        public void Init(int allocationCount, EntityCommandBuffer commands) {
+        public SpriteManager(int allocationCount, EntityCommandBuffer commands) {
             this.internalInstance = new Internal();
             this.internalInstance.Init(allocationCount, commands);
+            this.id = ID_GENERATOR.Generate();
         }
 
         /// <summary>
@@ -275,6 +282,12 @@ namespace CommonEcs {
         public bool Prepared {
             get {
                 return this.internalInstance != null && this.internalInstance.owner != Entity.Null;
+            }
+        }
+
+        public bool HasInternalInstance {
+            get {
+                return this.internalInstance != null;
             }
         }
 
@@ -695,6 +708,30 @@ namespace CommonEcs {
 
                 return newArray;
             }
+        }
+
+        public bool Equals(SpriteManager other) {
+            return this.id == other.id;
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+
+            return obj is SpriteManager other && Equals(other);
+        }
+
+        public override int GetHashCode() {
+            return this.id;
+        }
+
+        public static bool operator ==(SpriteManager left, SpriteManager right) {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(SpriteManager left, SpriteManager right) {
+            return !left.Equals(right);
         }
     }
 }

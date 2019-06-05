@@ -90,8 +90,7 @@ namespace CommonEcs {
             this.PostUpdateCommands.CreateEntity();
 
             // Prepare a SpriteManager
-            SpriteManager spriteManager = new SpriteManager();
-            spriteManager.Init(spriteLayer.allocationCount, this.PostUpdateCommands);
+            SpriteManager spriteManager = new SpriteManager(spriteLayer.allocationCount, this.PostUpdateCommands);
             spriteManager.SpriteLayerEntity = spriteLayer.owner;
             spriteManager.SetMaterial(spriteLayer.material);
             spriteManager.Layer = spriteLayer.layer;

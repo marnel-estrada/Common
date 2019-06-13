@@ -31,7 +31,7 @@ namespace Common.Xml {
 
         private SimpleXmlNode FindFirstNodeInChildren(SimpleXmlNode node, string tagName) {
             for (int i = 0; i < node.Children.Count; ++i) {
-                if (node.Children[i].TagName.Equals(tagName)) {
+                if (node.Children[i].TagName.EqualsFast(tagName)) {
                     return node.Children[i];
                 }
             }

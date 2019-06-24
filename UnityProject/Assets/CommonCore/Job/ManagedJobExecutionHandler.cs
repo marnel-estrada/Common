@@ -26,10 +26,10 @@ namespace Common {
         }
         
         /// <summary>
-        /// Completes all added commands
+        /// Completes all added commands when they are completed
         /// This is usually invoked in LateUpdate()
         /// </summary>
-        public void Complete() {
+        public void CompleteIfCompleted() {
             Assertion.Assert(this.handles.Count == this.jobs.Count);
             for (int i = this.handles.Count - 1; i >= 0; --i) {
                 JobHandle handle = this.handles[i];
@@ -40,6 +40,27 @@ namespace Common {
                     this.handles.RemoveAt(i);
                     this.jobs.RemoveAt(i);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Forces each job to complete
+        /// </summary>
+        public void ForceComplete() {
+            Assertion.Assert(this.handles.Count == this.jobs.Count);
+            for (int i = this.handles.Count - 1; i >= 0; --i) {
+                JobHandle handle = this.handles[i];
+                handle.Complete();
+                this.jobs[i].Free();
+                
+                this.handles.RemoveAt(i);
+                this.jobs.RemoveAt(i);
+            }
+        }
+
+        public int Count {
+            get {
+                return this.jobs.Count;
             }
         }
     }

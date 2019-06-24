@@ -16,7 +16,7 @@ namespace CommonEcs {
         private readonly Internal internalInstance;
         
         private readonly int id;
-        private static readonly IdGenerator GENERATOR = new IdGenerator();
+        private static readonly IdGenerator GENERATOR = new IdGenerator(1);
 
         public MeshRendererVessel(Material material, int layer, int sortingLayerId) {
             this.internalInstance = new Internal();

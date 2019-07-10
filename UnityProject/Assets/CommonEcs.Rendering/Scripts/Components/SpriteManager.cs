@@ -73,6 +73,12 @@ namespace CommonEcs {
         /// <param name="material"></param>
         public void SetMaterial(Material material) {
             this.internalInstance.material = material;
+            
+            // We set these flags to true so it will be rendered in SpriteManagerRenderer
+            this.internalInstance.verticesChanged = true;
+            this.internalInstance.renderOrderChanged = true;
+            this.internalInstance.uvChanged = true;
+            this.internalInstance.colorsChanged = true;
         }
 
         public Mesh Mesh {

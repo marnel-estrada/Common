@@ -87,7 +87,7 @@ namespace CommonEcs {
         }
 
         private void CreateSpriteManagerEntity(SpriteLayer spriteLayer) {
-            this.PostUpdateCommands.CreateEntity();
+            Entity entity = this.PostUpdateCommands.CreateEntity();
 
             // Prepare a SpriteManager
             SpriteManager spriteManager = new SpriteManager();
@@ -99,13 +99,13 @@ namespace CommonEcs {
             spriteManager.SortingLayerId = spriteLayer.SortingLayerId;
             spriteManager.AlwaysUpdateMesh = spriteLayer.alwaysUpdateMesh;
             spriteManager.UseMeshRenderer = spriteLayer.useMeshRenderer;
-            this.PostUpdateCommands.AddSharedComponent(spriteManager);
+            this.PostUpdateCommands.AddSharedComponent(entity, spriteManager);
 
             if (spriteLayer.useMeshRenderer) {
                 // This means that the layer will use MeshRenderers in GameObjects to render the mesh
                 MeshRendererVessel vessel = new MeshRendererVessel(spriteLayer.material, spriteLayer.layer,
                     spriteLayer.SortingLayerId);
-                this.PostUpdateCommands.AddSharedComponent(vessel);
+                this.PostUpdateCommands.AddSharedComponent(entity, vessel);
             }
         }
 

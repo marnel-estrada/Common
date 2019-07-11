@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 
+using Common;
+
 using Unity.Collections;
 using Unity.Entities;
 
@@ -37,6 +39,7 @@ namespace CommonEcs {
         // Process per request
         private void Process(ArchetypeChunk chunk) {
             SetSpriteLayerMaterial setSpriteLayerMaterialRequest = this.setMaterialQuery.GetSharedComponent(ref chunk);
+            Assertion.Assert(setSpriteLayerMaterialRequest.layerEntity != Entity.Null); // Should not be null
             
             // Run through all SpriteManagers and set the material to those belonging to the specified layer
             // Note here that we start iteration from 1 because the first SpriteManager is the default value

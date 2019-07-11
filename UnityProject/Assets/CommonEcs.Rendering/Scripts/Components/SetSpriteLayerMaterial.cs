@@ -1,3 +1,5 @@
+using Common;
+
 using Unity.Entities;
 
 using UnityEngine;
@@ -9,6 +11,8 @@ namespace CommonEcs {
 
         public SetSpriteLayerMaterial(Entity layerEntity, Material newMaterial) {
             this.layerEntity = layerEntity;
+            Assertion.Assert(this.layerEntity != Entity.Null);
+            
             this.newMaterial = newMaterial;
         }
     }

@@ -40,6 +40,16 @@ namespace CommonEcs {
             }
         }
         
+        public bool Enabled {
+            get {
+                return this.internalInstance.Enabled;
+            }
+
+            set {
+                this.internalInstance.Enabled = value;
+            }
+        }
+        
         private class Internal {
             private Entity spriteLayerEntity; // the layer that owns this vessel
             private GameObject gameObject;
@@ -94,6 +104,16 @@ namespace CommonEcs {
 
                 set {
                     this.meshRenderer.material = value;
+                }
+            }
+
+            public bool Enabled {
+                get {
+                    return this.gameObject.activeSelf;
+                }
+
+                set {
+                    this.gameObject.SetActive(value);
                 }
             }
         }

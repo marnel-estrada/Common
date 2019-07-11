@@ -7,11 +7,11 @@ namespace CommonEcs {
     /// A shared component that holds a GameObject that has a MeshRenderer
     /// </summary>
     public struct MeshRendererVessel : ISharedComponentData {
-        private Internal internalInstance;
+        private readonly Internal internalInstance;
 
-        public MeshRendererVessel(Material material, int layer, int sortingLayerId) {
+        public MeshRendererVessel(Entity spriteLayerEntity, Material material, int layer, int sortingLayerId) {
             this.internalInstance = new Internal();
-            this.internalInstance.Init(material, layer, sortingLayerId);
+            this.internalInstance.Init(spriteLayerEntity, material, layer, sortingLayerId);
         }
         
         public Mesh Mesh {
@@ -23,14 +23,33 @@ namespace CommonEcs {
                 this.internalInstance.Mesh = value;
             }
         }
+
+        public Entity SpriteLayerEntity {
+            get {
+                return this.internalInstance.SpriteLayerEntity;
+            }
+        }
+
+        public Material Material {
+            get {
+                return this.internalInstance.Material;
+            }
+
+            set {
+                this.internalInstance.Material = value;
+            }
+        }
         
         private class Internal {
+            private Entity spriteLayerEntity; // the layer that owns this vessel
             private GameObject gameObject;
             private MeshFilter meshFilter;
             private MeshRenderer meshRenderer;
 
             // Initializer
-            public void Init(Material material, int layer, int sortingLayerId) {
+            public void Init(Entity spriteLayerEntity, Material material, int layer, int sortingLayerId) {
+                this.spriteLayerEntity = spriteLayerEntity;
+                
                 if (this.gameObject != null) {
                     // A current one exists. Let's destroy it first.
                     Clear();
@@ -59,6 +78,22 @@ namespace CommonEcs {
 
                 set {
                     this.meshFilter.mesh = value;
+                }
+            }
+
+            public Entity SpriteLayerEntity {
+                get {
+                    return this.spriteLayerEntity;
+                }
+            }
+
+            public Material Material {
+                get {
+                    return this.meshRenderer.material;
+                }
+
+                set {
+                    this.meshRenderer.material = value;
                 }
             }
         }

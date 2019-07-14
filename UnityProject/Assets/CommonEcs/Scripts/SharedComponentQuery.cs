@@ -45,7 +45,7 @@ namespace CommonEcs {
             int sharedComponentIndex = chunk.GetSharedComponentIndex(this.sharedComponentType);
             int uniqueIndex = this.indices.IndexOf(sharedComponentIndex);
             Assertion.Assert(uniqueIndex >= 0);
-            return this.SharedComponents[uniqueIndex];
+            return this.sharedComponents[uniqueIndex];
         }
         
         public IReadOnlyList<T> SharedComponents {

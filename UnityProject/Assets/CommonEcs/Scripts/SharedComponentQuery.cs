@@ -12,18 +12,18 @@ namespace CommonEcs {
     public class SharedComponentQuery<T> where T : struct, ISharedComponentData {
         private readonly ComponentSystemBase system;
         private readonly EntityManager entityManager;
-
+    
         [ReadOnly]
         private ArchetypeChunkSharedComponentType<T> sharedComponentType;
-
+    
         private readonly List<T> sharedComponents = new List<T>();
         private readonly List<int> indices = new List<int>();
-
+    
         public SharedComponentQuery(ComponentSystemBase system, EntityManager entityManager) {
             this.system = system;
             this.entityManager = entityManager;
         }
-
+    
         /// <summary>
         /// Common update routines
         /// </summary>
@@ -34,7 +34,7 @@ namespace CommonEcs {
             this.indices.Clear();
             this.entityManager.GetAllUniqueSharedComponentData(this.sharedComponents, this.indices);
         }
-
+    
         /// <summary>
         /// Returns the shared component for the specified ArchetypeChunk
         /// There should only be one
@@ -53,7 +53,7 @@ namespace CommonEcs {
                 return this.sharedComponents;
             }
         }
-
+    
         public IReadOnlyList<int> Indices {
             get {
                 return this.indices;

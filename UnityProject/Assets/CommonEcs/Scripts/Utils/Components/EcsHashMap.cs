@@ -44,7 +44,6 @@ namespace CommonEcs {
             // We can't add it to the DynamicBuffer right away
             for (int i = 0; i < BUCKET_COUNT; ++i) {
                 LIST_ENTITIES[i] = CreateValueList(entityManager);
-                //buckets.Add(new EntityBufferElement(listEntity));
             }
             
             DynamicBuffer<EntityBufferElement> buckets = entityManager.GetBuffer<EntityBufferElement>(entity);

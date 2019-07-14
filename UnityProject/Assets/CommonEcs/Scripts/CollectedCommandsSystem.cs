@@ -9,7 +9,7 @@ namespace CommonEcs {
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     public class CollectedCommandsSystem : ComponentSystem {
         private EntityCommandBuffer? pendingBuffer;
-
+    
         protected override void OnUpdate() {
             if (this.pendingBuffer != null) {
                 this.pendingBuffer.Value.Playback(this.EntityManager);
@@ -23,7 +23,7 @@ namespace CommonEcs {
                 if (this.pendingBuffer == null) {
                     this.pendingBuffer = new EntityCommandBuffer(Allocator.TempJob);
                 }
-
+    
                 return this.pendingBuffer.Value;
             }
         }

@@ -24,9 +24,9 @@ namespace CommonEcs {
         /// <param name="signalComponent"></param>
         /// <typeparam name="T"></typeparam>
         public static void Dispatch<T>(EntityCommandBuffer buffer, T signalComponent) where T : struct, IComponentData {
-            buffer.CreateEntity();
-            buffer.AddComponent(new Signal());
-            buffer.AddComponent(signalComponent);
+            Entity entity = buffer.CreateEntity();
+            buffer.AddComponent(entity, new Signal());
+            buffer.AddComponent(entity, signalComponent);
         }
     }
 }

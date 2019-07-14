@@ -78,7 +78,7 @@ namespace CommonEcs {
                 } else {
                     // At this point, it means that the layer doesn't have an available sprite manager
                     // We create a new one and skip the current frame
-                    CreateSpriteManagerEntity(spriteLayer);
+                    CreateSpriteManagerEntity(spriteLayer, addToLayer.layerEntity);
                     return false;
                 }
             }
@@ -86,11 +86,12 @@ namespace CommonEcs {
             return true;
         }
 
-        private void CreateSpriteManagerEntity(SpriteLayer spriteLayer) {
-            Entity spriteManagerEntity = this.PostUpdateCommands.CreateEntity();
+        private void CreateSpriteManagerEntity(SpriteLayer spriteLayer, Entity spriteLayerEntity) {
+            Entity entity = this.PostUpdateCommands.CreateEntity();
 
             // Prepare a SpriteManager
-            SpriteManager spriteManager = new SpriteManager(spriteLayer.allocationCount, this.PostUpdateCommands);
+            SpriteManager spriteManager = new SpriteManager();
+            spriteManager.Init(spriteLayer.allocationCount, this.PostUpdateCommands);
             spriteManager.SpriteLayerEntity = spriteLayer.owner;
             spriteManager.SetMaterial(spriteLayer.material);
             spriteManager.Layer = spriteLayer.layer;
@@ -98,13 +99,13 @@ namespace CommonEcs {
             spriteManager.SortingLayerId = spriteLayer.SortingLayerId;
             spriteManager.AlwaysUpdateMesh = spriteLayer.alwaysUpdateMesh;
             spriteManager.UseMeshRenderer = spriteLayer.useMeshRenderer;
-            this.PostUpdateCommands.AddSharedComponent(spriteManagerEntity, spriteManager);
+            this.PostUpdateCommands.AddSharedComponent(entity, spriteManager);
 
             if (spriteLayer.useMeshRenderer) {
                 // This means that the layer will use MeshRenderers in GameObjects to render the mesh
-                MeshRendererVessel vessel = new MeshRendererVessel(spriteLayer.material, spriteLayer.layer,
+                MeshRendererVessel vessel = new MeshRendererVessel(spriteLayerEntity, spriteLayer.material, spriteLayer.layer,
                     spriteLayer.SortingLayerId);
-                this.PostUpdateCommands.AddSharedComponent(spriteManagerEntity, vessel);
+                this.PostUpdateCommands.AddSharedComponent(entity, vessel);
             }
         }
 

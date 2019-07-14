@@ -46,9 +46,11 @@ namespace CommonEcs {
                 SpriteManager spriteManager = this.spriteManagerQuery.GetSharedComponent(ref chunk);
                 
                 // Note here that we only render if it was specified that it was not going to use a MeshRenderer
-                if (!spriteManager.UseMeshRenderer) {
-                    this.sortedList.Add(spriteManager);
+                if (spriteManager.UseMeshRenderer || !spriteManager.Enabled) {
+                    continue;
                 }
+                
+                this.sortedList.Add(spriteManager);
             }
 
             if (SORT_COMPARISON == null) {

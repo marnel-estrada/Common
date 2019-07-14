@@ -80,6 +80,12 @@ namespace CommonEcs {
         /// <param name="material"></param>
         public void SetMaterial(Material material) {
             this.internalInstance.material = material;
+            
+            // We set these flags to true so it will be rendered in SpriteManagerRenderer
+            this.internalInstance.verticesChanged = true;
+            this.internalInstance.renderOrderChanged = true;
+            this.internalInstance.uvChanged = true;
+            this.internalInstance.colorsChanged = true;
         }
 
         public Mesh Mesh {
@@ -275,6 +281,16 @@ namespace CommonEcs {
             }
         }
 
+        public bool Enabled {
+            get {
+                return this.internalInstance.enabled;
+            }
+
+            set {
+                this.internalInstance.enabled = value;
+            }
+        }
+
         public void ResetFlags() {
             this.internalInstance.ResetFlags();
         }
@@ -364,6 +380,8 @@ namespace CommonEcs {
 
             public bool alwaysUpdateMesh;
             public bool useMeshRenderer;
+
+            public bool enabled = true; // Enabled by default
 
             /// <summary>
             /// Initializes the sprite manager

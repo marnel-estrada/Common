@@ -5,7 +5,9 @@ namespace Common {
     /// A utility class that manages int IDs 
     /// </summary>
     public class IdGenerator {
-        private int counter;
+        private const int DEFAULT_STARTING_ID = 1;
+        
+        private int counter = DEFAULT_STARTING_ID;
 
         /// <summary>
         /// Constructor
@@ -44,7 +46,7 @@ namespace Common {
         /// Resets the generator
         /// </summary>
         public void Reset() {
-            this.counter = 0;
+            this.counter = DEFAULT_STARTING_ID;
         }
     }
 }

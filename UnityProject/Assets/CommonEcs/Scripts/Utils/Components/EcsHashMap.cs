@@ -14,7 +14,8 @@ namespace CommonEcs {
         /// <param name="commandBuffer"></param>
         public static void Create(Entity entity, EntityCommandBuffer commandBuffer) {
             commandBuffer.AddComponent(entity, new EcsHashMap<K, V>());
-            DynamicBuffer<EntityBufferElement> buckets = commandBuffer.AddBuffer<EntityBufferElement>(entity);
+            commandBuffer.AddBuffer<EntityBufferElement>(entity);
+            DynamicBuffer<EntityBufferElement> buckets = commandBuffer.SetBuffer<EntityBufferElement>(entity);
             
             // Prepare the buckets
             for (int i = 0; i < BUCKET_COUNT; ++i) {

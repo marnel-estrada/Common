@@ -30,7 +30,7 @@ namespace CommonEcs {
             return listEntity;
         }
         
-        private static Entity[] LIST_ENTITIES = new Entity[BUCKET_COUNT];
+        private static readonly Entity[] LIST_ENTITIES = new Entity[BUCKET_COUNT];
         
         /// <summary>
         /// Prepares the EcsHashMap components on the specified entity

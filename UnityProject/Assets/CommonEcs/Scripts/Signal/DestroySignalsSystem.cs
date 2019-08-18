@@ -7,7 +7,7 @@ namespace CommonEcs {
         private EntityQuery query;
     
         protected override void OnCreateManager() {
-            this.query = GetEntityQuery(typeof(Signal));
+            this.query = GetEntityQuery(typeof(Signal), typeof(SignalFramePassed));
         }
     
         protected override void OnUpdate() {

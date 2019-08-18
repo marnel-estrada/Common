@@ -18,15 +18,15 @@ namespace CommonEcs {
             base.OnUpdate();
         }
 
-        protected override void OnDispatch(Entity entity, SetSpriteLayerVesselsEnabled signalParameter) {
+        protected override void OnDispatch(Entity entity, SetSpriteLayerVesselsEnabled signalComponent) {
             // Traverse through all vessels
             IReadOnlyList<MeshRendererVessel> vessels = this.vesselQuery.SharedComponents;
             for (int i = 1; i < vessels.Count; ++i) {
                 MeshRendererVessel vessel = vessels[i];
-                if (vessel.SpriteLayerEntity == signalParameter.spriteLayerEntity) {
+                if (vessel.SpriteLayerEntity == signalComponent.spriteLayerEntity) {
                     // Found a vessel that is owned by the sprite layer
                     // We set enabled
-                    vessel.Enabled = signalParameter.enabled;
+                    vessel.Enabled = signalComponent.enabled;
                 }
             }
         }

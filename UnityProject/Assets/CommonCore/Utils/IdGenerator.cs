@@ -1,12 +1,16 @@
-﻿using UnityEngine;
+﻿using System;
+
+using UnityEngine;
 
 namespace Common {
     /// <summary>
     /// A utility class that manages int IDs 
     /// </summary>
+    [Serializable]
     public class IdGenerator {
         private const int DEFAULT_STARTING_ID = 1;
         
+        [SerializeField]
         private int counter = DEFAULT_STARTING_ID;
 
         /// <summary>

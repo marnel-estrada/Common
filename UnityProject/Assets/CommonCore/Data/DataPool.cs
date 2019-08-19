@@ -1,16 +1,21 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 
 using UnityEngine;
 
-namespace Common.Utils {
+namespace Common {
     /// <summary>
-    /// Maintains a pool of T instances
+    /// The same as DataClassPool but implemented as ScriptableObject
     /// </summary>
-    public class DataClassPool<T> : MonoBehaviour where T : Identifiable {
+    /// <typeparam name="T"></typeparam>
+    public class DataPool<T> : ScriptableObject where T : IntIdentifiable, new() {
         [SerializeField]
         private List<T> dataList = new List<T>();
 
-        private Dictionary<string, T> map = new Dictionary<string, T>();
+        [SerializeField]
+        private IdGenerator idGenerator = new IdGenerator();
+        
+        private Dictionary<int, T> map;
 
         /// <summary>
         /// Awake routines
@@ -27,7 +32,10 @@ namespace Common.Utils {
                 return;
             }
 
-            this.map = new Dictionary<string, T>();
+            if (this.map == null) {
+                this.map = new Dictionary<int, T>(10);
+            }
+
             for (int i = 0; i < this.dataList.Count; ++i) {
                 T data = this.dataList[i];
                 this.map[data.Id] = data;
@@ -39,12 +47,9 @@ namespace Common.Utils {
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public T Find(string id) {
+        public Maybe<T> Find(int id) {
             PopulateMap(); // We populate first because this may be invoked before Awake() (like in editor)
-
-            Assertion.Assert(this.map.TryGetValue(id, out T data), id); // data should exist
-
-            return data;
+            return new Maybe<T>(this.map.Find(id));
         }
 
         /// <summary>
@@ -52,7 +57,7 @@ namespace Common.Utils {
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public bool Contains(string id) {
+        public bool Contains(int id) {
             PopulateMap(); // We populate first because this may be invoked before Awake() (like in editor)
             return this.map.ContainsKey(id);
         }
@@ -87,8 +92,14 @@ namespace Common.Utils {
         /// Adds a new item
         /// </summary>
         /// <param name="item"></param>
-        public void Add(T item) {
-            this.dataList.Add(item);
+        public T AddNew() {
+            T data = new T();
+            data.Id = this.idGenerator.Generate();
+            
+            this.dataList.Add(data);
+            this.map[data.Id] = data;
+
+            return data;
         }
 
         private readonly SimpleList<T> removeList = new SimpleList<T>();
@@ -97,13 +108,13 @@ namespace Common.Utils {
         /// Removes the specified item
         /// </summary>
         /// <param name="id"></param>
-        public void Remove(string id) {
+        public void Remove(int id) {
             this.removeList.Clear();
 
             // We search through list because IDs may repeat
             for(int i = 0; i < this.dataList.Count; ++i) {
                 T item = this.dataList[i];
-                if(item.Id.Equals(id)) {
+                if(item.Id == id) {
                     this.removeList.Add(item);
                 }
             }
@@ -113,6 +124,10 @@ namespace Common.Utils {
             }
 
             this.removeList.Clear();
+        }
+
+        public void Sort(Comparison<T> comparison) {
+            this.dataList.Sort(comparison);
         }
     }
 }

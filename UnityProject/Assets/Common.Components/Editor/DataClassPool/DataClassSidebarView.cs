@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEditor;
 
-using Common;
 using Common.Utils;
 
 namespace Common {
     class DataClassSidebarView<T> where T : Identifiable, new() {
-
         private readonly Dictionary<string, T> filteredMap = new Dictionary<string, T>();
         private readonly List<string> filteredIds = new List<string>(); // Used to render list of action buttons
 
@@ -203,6 +198,5 @@ namespace Common {
         public void AddFilterStrategy(DataClassFilterStrategy<T> strategy) {
             this.filterStrategies.Add(strategy);
         }
-
     }
 }

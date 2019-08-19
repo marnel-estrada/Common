@@ -6,7 +6,6 @@ namespace Common {
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public abstract class DataClassPoolEditor<T> : UnityEditor.Editor where T : Identifiable, new() {
-
         private DataClassPool<T> dataPool;
 
         void OnEnable() {
@@ -19,6 +18,5 @@ namespace Common {
                 return (DataClassPool<T>)this.target;
             }
         }
-
     }
 }

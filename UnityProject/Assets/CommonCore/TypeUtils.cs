@@ -105,14 +105,5 @@ namespace Common {
             return attribute as T;
         }
 
-        /// <summary>
-        /// Returns whether or not the specified type is a list
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public static bool IsGenericList(Type type) {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>);
-        }
-
     }
 }

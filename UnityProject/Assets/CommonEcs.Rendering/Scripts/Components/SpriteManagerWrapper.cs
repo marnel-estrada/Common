@@ -35,8 +35,7 @@ namespace CommonEcs {
             this.entity = this.entityManager.CreateEntity();
 
             // Prepare a SpriteManager
-            SpriteManager spriteManager = new SpriteManager();
-            spriteManager.Init(this.allocationCount);
+            SpriteManager spriteManager = new SpriteManager(this.allocationCount);
             spriteManager.Owner = this.entity;
             spriteManager.SetMaterial(this.material);
             spriteManager.Layer = this.gameObject.layer;

@@ -1,4 +1,6 @@
-﻿using Unity.Entities;
+﻿using System;
+
+using Unity.Entities;
 
 using UnityEngine;
 
@@ -9,12 +11,12 @@ namespace CommonEcs {
     /// A sprite layer is just a collection of sprite managers
     /// It handles more than one sprite manager in case of overflow
     /// </summary>
-    public struct SpriteLayer : ISharedComponentData {
+    public struct SpriteLayer : ISharedComponentData, IEquatable<SpriteLayer> {
         public Entity owner;
         
         // Common sprite manager values
-        public Material material;
-        public int allocationCount;
+        public readonly Material material;
+        public readonly int allocationCount;
         public int layer; // This is the layer in Unity
         public bool alwaysUpdateMesh;
         public bool useMeshRenderer; // Generates a MeshRenderer instead of using SpriteManagerRendererSystem
@@ -23,6 +25,9 @@ namespace CommonEcs {
         private int sortingLayer; // Note that this is the value, not the ID
 
         public readonly SimpleList<Entity> spriteManagerEntities;
+        
+        private readonly int id;
+        private static readonly IdGenerator ID_GENERATOR = new IdGenerator(1);
 
         /// <summary>
         /// Initializer
@@ -40,6 +45,7 @@ namespace CommonEcs {
             this.sortingLayerId = 0;
             this.alwaysUpdateMesh = false;
             this.useMeshRenderer = false;
+            this.id = ID_GENERATOR.Generate();
         }
 
         public int SortingLayerId {
@@ -57,6 +63,30 @@ namespace CommonEcs {
         public void SetSortingLayerId(int sortingLayerId) {
             this.sortingLayerId = sortingLayerId;
             this.sortingLayer = UnityEngine.SortingLayer.GetLayerValueFromID(sortingLayerId);
+        }
+
+        public bool Equals(SpriteLayer other) {
+            return this.id == other.id;
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+
+            return obj is SpriteLayer other && Equals(other);
+        }
+
+        public override int GetHashCode() {
+            return this.id;
+        }
+
+        public static bool operator ==(SpriteLayer left, SpriteLayer right) {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(SpriteLayer left, SpriteLayer right) {
+            return !left.Equals(right);
         }
     }
 }

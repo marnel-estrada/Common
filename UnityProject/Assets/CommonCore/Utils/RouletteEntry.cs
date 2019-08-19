@@ -15,40 +15,23 @@ namespace Common {
 	/**
 	 * An entry in roulette selection
 	 */
-	public class RouletteEntry<T> {
-
-		private T item;
+	public struct RouletteEntry<T> {
+		private readonly T item;
 
 		// roulette interval
 		private float rouletteFrom;
 		private float rouletteTo;
 
-		/**
-		 * Constructor
-		 * We used an empty one so we could use it in a pool
-		 */
-		public RouletteEntry() {
+		public RouletteEntry(T item, float rouletteFrom, float rouletteTo) {
+			this.item = item;
+			this.rouletteFrom = rouletteFrom;
+			this.rouletteTo = rouletteTo;
 		}
 
 		public T Item {
 			get {
 				return item;
 			}
-
-			set {
-				item = value;
-			}
-		}
-
-		/**
-		 * Sets the roulette values for evolution selection.
-		 * 
-		 * @param from
-		 * @param to
-		 */
-		public void SetRoulette(float start, float end) {
-			rouletteFrom = start;
-			rouletteTo = end;
 		}
 
 		/**
@@ -69,12 +52,11 @@ namespace Common {
             get {
                 return rouletteTo;
             }
-
-            set {
-                this.rouletteTo = value;
-            }
         }
 
-    }
+        public void SetRoulette(float from, float to) {
+	        this.rouletteFrom = from;
+	        this.rouletteTo = to;
+        }
+	}
 }
-

@@ -65,6 +65,7 @@ namespace CommonEcs {
                 if (entry.hashCode == hashCode) {
                     // The HashMap already contains the specified key. We replace it.
                     valueList[i] = new EcsHashMapEntry<K, V>(entry.key, newValue);
+                    return;
                 }
             }
 

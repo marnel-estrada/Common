@@ -17,7 +17,7 @@ namespace CommonEcs {
         [ReadOnly]
         private ArchetypeChunkComponentType<UseYAsSortOrder> useYType;
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.query = GetEntityQuery(this.ConstructQuery(null, new ComponentType[] {
                 typeof(Static)
             }, new ComponentType[] {

@@ -8,7 +8,7 @@ namespace CommonEcs {
     public abstract class TemplateComponentSystem : ComponentSystem {
         private EntityQuery query;
         
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.query = ComposeQuery();
         }
 

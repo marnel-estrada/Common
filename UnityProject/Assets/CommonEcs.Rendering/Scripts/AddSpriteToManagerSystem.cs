@@ -39,7 +39,7 @@ namespace CommonEcs {
 
         private SpriteManagerInstancesSystem spriteManagers;
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             // Note here that we filter sprites that doesn't have a SpriteManager added to them
             this.query = GetEntityQuery(this.ConstructQuery(null, new ComponentType[] {
                 typeof(Added), typeof(SpriteManager)

@@ -19,7 +19,7 @@ namespace CommonEcs {
         private EntityQuery query;
         private ArchetypeChunkComponentType<Sprite> spriteType;
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.spriteManagerQuery = new SharedComponentQuery<SpriteManager>(this, this.EntityManager);
             this.query = ResolveQuery(); 
         }

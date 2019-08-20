@@ -23,7 +23,7 @@ namespace CommonEcs {
         private readonly List<SpriteManager> managers = new List<SpriteManager>(1);
         private readonly List<int> managerIndices = new List<int>(1);
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.query = GetEntityQuery(typeof(Sprite), typeof(Changed));
         }
 

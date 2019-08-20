@@ -15,7 +15,7 @@ namespace CommonEcs {
         
         private readonly List<SpriteManager> sortedList = new List<SpriteManager>(1);
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.query = GetEntityQuery(typeof(SpriteManager), ComponentType.Exclude<Sprite>(),
                 ComponentType.Exclude<MeshRendererVessel>());
             this.spriteManagerQuery = new SharedComponentQuery<SpriteManager>(this, this.EntityManager);

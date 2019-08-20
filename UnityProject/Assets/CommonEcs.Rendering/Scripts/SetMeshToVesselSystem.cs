@@ -10,7 +10,7 @@ namespace CommonEcs {
         private SharedComponentQuery<SpriteManager> spriteManagerQuery;
         private SharedComponentQuery<MeshRendererVessel> vesselQuery;
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.query = GetEntityQuery(typeof(SpriteManager), typeof(MeshRendererVessel));
             
             this.spriteManagerQuery = new SharedComponentQuery<SpriteManager>(this, this.EntityManager);

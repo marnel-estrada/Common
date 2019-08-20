@@ -37,7 +37,7 @@ namespace CommonEcs {
         private SpriteLayerInstancesSystem layers;
         private SpriteManagerInstancesSystem managers;
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.query = GetEntityQuery(this.ConstructQuery(new ComponentType[] {
                 typeof(Transform), typeof(AddToSpriteLayer), typeof(Sprite)
             }, new ComponentType[] {

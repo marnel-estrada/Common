@@ -13,13 +13,10 @@ namespace CommonEcs {
         private ArchetypeChunkComponentType<Sprite> spriteType;
         private ArchetypeChunkEntityType entityType;
 
-        protected override void OnCreateManager() {
-            this.query = GetEntityQuery(typeof(Sprite), typeof(ForRemoval));
-        }
-
         private SpriteManagerInstancesSystem spriteManagers;
 
         protected override void OnCreate() {
+            this.query = GetEntityQuery(typeof(Sprite), typeof(ForRemoval));
             this.spriteManagers = this.World.GetOrCreateSystem<SpriteManagerInstancesSystem>();
         }
 

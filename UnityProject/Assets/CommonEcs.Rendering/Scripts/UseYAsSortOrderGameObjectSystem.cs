@@ -16,7 +16,7 @@ namespace CommonEcs {
     public class UseYAsSortOrderGameObjectSystem : JobComponentSystem {
         private EntityQuery query;
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.query = GetEntityQuery(
                 typeof(Sprite), 
                 typeof(Transform),

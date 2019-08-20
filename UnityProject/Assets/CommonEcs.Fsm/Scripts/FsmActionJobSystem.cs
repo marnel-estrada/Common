@@ -23,6 +23,7 @@ namespace Common.Ecs.Fsm {
         protected override void OnCreate() {
             base.OnCreate();
             this.barrier = this.World.GetOrCreateSystem<FsmActionJobSystemBarrier>();
+            this.query = GetQuery();
         }
 
         /// <summary>
@@ -31,11 +32,6 @@ namespace Common.Ecs.Fsm {
         protected abstract ComposerType GetJobActionComposer();
 
         protected abstract EntityQuery GetQuery();
-
-        protected override void OnCreateManager() {
-            this.barrier = this.World.GetOrCreateSystem<FsmActionJobSystemBarrier>();
-            this.query = GetQuery();
-        }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             base.OnUpdate(inputDeps);

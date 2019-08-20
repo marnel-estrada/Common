@@ -16,7 +16,7 @@ namespace CommonEcs {
     public class TransformGameObjectSpriteVerticesSystem : JobComponentSystem {
         private EntityQuery query;
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             // All entities with Sprite and Transform, but without Static (non Static sprites)
             this.query = GetEntityQuery(typeof(Sprite), typeof(Transform), ComponentType.Exclude<Static>());
         }

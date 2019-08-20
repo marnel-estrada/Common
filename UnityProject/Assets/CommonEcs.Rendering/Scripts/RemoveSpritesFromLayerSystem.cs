@@ -17,7 +17,7 @@ namespace CommonEcs {
         
         private SpriteManagerInstancesSystem managers;
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.managers = World.Active.GetOrCreateSystem<SpriteManagerInstancesSystem>();
 
             this.query = GetEntityQuery(ComponentType.ReadOnly<AddSpritesToLayerSystem.Added>(),

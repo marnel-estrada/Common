@@ -11,7 +11,7 @@ namespace CommonEcs {
         public struct ProcessedBySystem : IComponentData {
         }
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.signalQuery = GetEntityQuery(typeof(Signal), typeof(T), ComponentType.Exclude<ProcessedBySystem>());
             this.signalHandler = new SignalHandler<T>(this, this.signalQuery);
             this.signalHandler.AddListener(OnDispatch);

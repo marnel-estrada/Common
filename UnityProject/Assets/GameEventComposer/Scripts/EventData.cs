@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace GameEvent {
     [Serializable]
-    public class EventData : IntIdentifiable {
+    public class EventData : Identifiable, IntIdentifiable {
         [SerializeField]
         private int id;
         
@@ -68,10 +68,20 @@ namespace GameEvent {
             }
         }
 
-        public int Id {
+        public string Id {
+            get {
+                return this.nameId;
+            }
+            set {
+                this.nameId = value;
+            }
+        }
+
+        public int IntId {
             get {
                 return this.id;
             }
+
             set {
                 this.id = value;
             }

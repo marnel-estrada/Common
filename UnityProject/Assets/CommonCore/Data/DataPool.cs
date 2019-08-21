@@ -8,14 +8,14 @@ namespace Common {
     /// The same as DataClassPool but implemented as ScriptableObject
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class DataPool<T> : ScriptableObject where T : IntIdentifiable, new() {
+    public class DataPool<T> : ScriptableObject where T : Identifiable, IntIdentifiable, new() {
         [SerializeField]
         private List<T> dataList = new List<T>();
 
         [SerializeField]
         private IdGenerator idGenerator = new IdGenerator();
         
-        private Dictionary<int, T> map;
+        private Dictionary<string, T> map;
 
         /// <summary>
         /// Awake routines
@@ -33,7 +33,7 @@ namespace Common {
             }
 
             if (this.map == null) {
-                this.map = new Dictionary<int, T>(10);
+                this.map = new Dictionary<string, T>(10);
             }
 
             for (int i = 0; i < this.dataList.Count; ++i) {
@@ -47,7 +47,7 @@ namespace Common {
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Maybe<T> Find(int id) {
+        public Maybe<T> Find(string id) {
             PopulateMap(); // We populate first because this may be invoked before Awake() (like in editor)
             return new Maybe<T>(this.map.Find(id));
         }
@@ -57,7 +57,7 @@ namespace Common {
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public bool Contains(int id) {
+        public bool Contains(string id) {
             PopulateMap(); // We populate first because this may be invoked before Awake() (like in editor)
             return this.map.ContainsKey(id);
         }
@@ -92,9 +92,10 @@ namespace Common {
         /// Adds a new item
         /// </summary>
         /// <param name="item"></param>
-        public T AddNew() {
+        public T AddNew(string id) {
             T data = new T();
-            data.Id = this.idGenerator.Generate();
+            data.IntId = this.idGenerator.Generate();
+            data.Id = id;
             
             this.dataList.Add(data);
             this.map[data.Id] = data;
@@ -108,13 +109,13 @@ namespace Common {
         /// Removes the specified item
         /// </summary>
         /// <param name="id"></param>
-        public void Remove(int id) {
+        public void Remove(string id) {
             this.removeList.Clear();
 
             // We search through list because IDs may repeat
             for(int i = 0; i < this.dataList.Count; ++i) {
                 T item = this.dataList[i];
-                if(item.Id == id) {
+                if(item.Id.EqualsFast(id)) {
                     this.removeList.Add(item);
                 }
             }

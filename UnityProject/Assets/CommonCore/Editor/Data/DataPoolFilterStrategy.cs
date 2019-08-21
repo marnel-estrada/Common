@@ -1,5 +1,5 @@
-﻿namespace Common {
-    public abstract class DataClassFilterStrategy<T> where T : Identifiable, new() {
+namespace Common {
+    public abstract class DataPoolFilterStrategy<T> where T : Identifiable, new() {
         private readonly string label;
         private readonly int labelWidth;
 
@@ -9,7 +9,7 @@
         /// Constructor with specified label
         /// </summary>
         /// <param name="label"></param>
-        public DataClassFilterStrategy(string label, int labelWidth) {
+        public DataPoolFilterStrategy(string label, int labelWidth) {
             this.label = label;
             this.labelWidth = labelWidth;
         }
@@ -46,5 +46,4 @@
         /// <returns></returns>
         public abstract bool IsFilterMet(T data);
     }
-    
 }

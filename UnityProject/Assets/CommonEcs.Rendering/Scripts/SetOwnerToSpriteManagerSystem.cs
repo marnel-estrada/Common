@@ -1,4 +1,6 @@
-﻿using Unity.Collections;
+﻿using Common;
+
+using Unity.Collections;
 using Unity.Entities;
 
 namespace CommonEcs {
@@ -48,6 +50,8 @@ namespace CommonEcs {
 
         private void Process(ref ArchetypeChunk chunk) {
             SpriteManager spriteManager = this.spriteManagerQuery.GetSharedComponent(ref chunk);
+            Assertion.Assert(spriteManager.HasInternalInstance);
+            
             NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
 
             if (chunk.Count > 0) {

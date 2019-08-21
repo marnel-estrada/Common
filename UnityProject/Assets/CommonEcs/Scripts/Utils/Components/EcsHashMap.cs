@@ -14,7 +14,8 @@ namespace CommonEcs {
         /// <param name="commandBuffer"></param>
         public static void Create(Entity entity, EntityCommandBuffer commandBuffer) {
             commandBuffer.AddComponent(entity, new EcsHashMap<K, V>());
-            DynamicBuffer<EntityBufferElement> buckets = commandBuffer.AddBuffer<EntityBufferElement>(entity);
+            commandBuffer.AddBuffer<EntityBufferElement>(entity);
+            DynamicBuffer<EntityBufferElement> buckets = commandBuffer.SetBuffer<EntityBufferElement>(entity);
             
             // Prepare the buckets
             for (int i = 0; i < BUCKET_COUNT; ++i) {
@@ -29,7 +30,7 @@ namespace CommonEcs {
             return listEntity;
         }
         
-        private static Entity[] LIST_ENTITIES = new Entity[BUCKET_COUNT];
+        private static readonly Entity[] LIST_ENTITIES = new Entity[BUCKET_COUNT];
         
         /// <summary>
         /// Prepares the EcsHashMap components on the specified entity
@@ -44,7 +45,6 @@ namespace CommonEcs {
             // We can't add it to the DynamicBuffer right away
             for (int i = 0; i < BUCKET_COUNT; ++i) {
                 LIST_ENTITIES[i] = CreateValueList(entityManager);
-                //buckets.Add(new EntityBufferElement(listEntity));
             }
             
             DynamicBuffer<EntityBufferElement> buckets = entityManager.GetBuffer<EntityBufferElement>(entity);

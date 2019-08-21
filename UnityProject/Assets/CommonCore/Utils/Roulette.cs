@@ -17,7 +17,6 @@ namespace Common {
 	 * A utility class for carrying out a weighted random selection
 	 */
 	public class Roulette<T> {
-
 		private List<RouletteEntry<T>> entries;
 
 		private float currentStartingInterval;
@@ -33,11 +32,6 @@ namespace Common {
 		 * Clears the roulette selection
 		 */
 		public void Clear() {
-			// recycle all entries first
-			for(int i = 0; i < this.entries.Count; ++i) {
-				Recycle(this.entries[i]);
-			}
-
 			this.entries.Clear();
 			this.currentStartingInterval = 0;
 		}
@@ -48,8 +42,7 @@ namespace Common {
 		public void Add(T item, float probability) {
             Assertion.Assert(probability > 0); // probability can't be zero or less than zero
 
-			RouletteEntry<T> entry = Request(item);
-			entry.SetRoulette(currentStartingInterval, currentStartingInterval + probability);
+			RouletteEntry<T> entry = new RouletteEntry<T>(item, this.currentStartingInterval, currentStartingInterval + probability);
 			this.entries.Add(entry);
 
 			currentStartingInterval += probability;
@@ -66,6 +59,7 @@ namespace Common {
 			// there are time when the generated random exceeds that of the last roulette interval
 			RouletteEntry<T> last = this.entries[this.entries.Count - 1];
 			last.SetRoulette(last.RouletteFrom, 1.0f);
+			this.entries[this.entries.Count - 1] = last; // Note that we set it here again because it's a struct
 
 			float random = UnityEngine.Random.value; // a number between 0 and 1
 
@@ -103,21 +97,5 @@ namespace Common {
 			Assertion.Assert(false, "Unable to select an item. Something is definitely wrong: " + random);
 			return default(T);
 		}
-
-		private static readonly Pool<RouletteEntry<T>> POOL = new Pool<RouletteEntry<T>>();
-
-		// Creates a RouletteEntry<T> instance with the specified item
-		private static RouletteEntry<T> Request(T item) {
-			RouletteEntry<T> instance = POOL.Request();
-			instance.Item = item;
-			return instance;
-		}
-
-		// Recycles the specified entry
-		private static void Recycle(RouletteEntry<T> entry) {
-			entry.Item = default(T);
-			POOL.Recycle(entry);
-		}
-
 	}
 }

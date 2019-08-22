@@ -46,7 +46,7 @@ namespace Common {
         void OnGUI() {
             if (this.target == null) {
                 GUILayout.BeginVertical();
-                GUILayout.Label("Data Class Pool Editor: (Missing DataClassPool target)", EditorStyles.largeLabel);
+                GUILayout.Label("Data Class Editor: (Missing DataClassPool target)", EditorStyles.largeLabel);
                 GUILayout.Space(10);
                 GUILayout.EndVertical();
                 return;
@@ -54,7 +54,7 @@ namespace Common {
 
             GUILayout.BeginVertical();
 
-            GUILayout.Label("Data Class Pool Editor: " + this.target.name, EditorStyles.largeLabel);
+            GUILayout.Label("Data Class Editor: " + this.target.name, EditorStyles.largeLabel);
             GUILayout.Space(10);
 
             // Buttons

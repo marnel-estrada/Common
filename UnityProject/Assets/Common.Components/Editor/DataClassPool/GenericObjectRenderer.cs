@@ -8,8 +8,7 @@ namespace Common {
     /// <summary>
     /// A generic object renderer for editor
     /// </summary>
-    class GenericObjectRenderer {
-
+    public class GenericObjectRenderer {
         private Type type;
         private readonly PropertyInfo[] properties;
 
@@ -99,12 +98,22 @@ namespace Common {
             // Render each property
             for(int i = 0; i < propertyList.Count; ++i) {
                 PropertyInfo property = propertyList[i];
-                RENDERER_MAP[property.PropertyType](property, instance); // Invoke the renderer
+                ReadOnlyFieldAttribute readOnlyAttribute = TypeUtils.GetCustomAttribute<ReadOnlyFieldAttribute>(property);
+
+                if (readOnlyAttribute == null) {
+                    // It's an editable field
+                    RENDERER_MAP[property.PropertyType](property, instance); // Invoke the renderer
+                } else {
+                    // It's readonly
+                    RenderReadOnly(property, instance);
+                }
+                
+                GUILayout.Space(5);
             }
         }
 
         private static int AscendingNameComparison(PropertyInfo a, PropertyInfo b) {
-            return a.Name.CompareTo(b.Name);
+            return String.Compare(a.Name, b.Name, StringComparison.Ordinal);
         }
 
         private List<PropertyInfo> ResolveGroupedList(string groupName) {
@@ -118,6 +127,16 @@ namespace Common {
             list = new List<PropertyInfo>();
             this.groupMap[groupName] = list;
             return list;
+        }
+
+        private static void RenderReadOnly(PropertyInfo property, object instance) {
+            string value = property.GetGetMethod().Invoke(instance, null).ToString();
+            value = string.IsNullOrEmpty(value) ? "" : value; // Prevent null
+            
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(property.Name + ":", GUILayout.Width(150));
+            GUILayout.Label(value, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
         }
 
         private static void RenderString(PropertyInfo property, object instance) {
@@ -192,6 +211,5 @@ namespace Common {
             // Set the value back
             property.GetSetMethod().Invoke(instance, new object[] { value });
         }
-
     }
 }

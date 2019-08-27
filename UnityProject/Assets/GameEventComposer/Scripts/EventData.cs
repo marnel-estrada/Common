@@ -26,6 +26,11 @@ namespace GameEvent {
         [SerializeField]
         private List<ClassData> requirements;
 
+        [SerializeField]
+        private List<OptionData> options;
+
+        [PropertyGroup("Id")]
+        [ReadOnlyField]
         public string NameId {
             get {
                 return this.nameId;
@@ -34,7 +39,20 @@ namespace GameEvent {
                 this.nameId = value;
             }
         }
+        
+        [PropertyGroup("Id")]
+        [ReadOnlyField]
+        public int IntId {
+            get {
+                return this.id;
+            }
 
+            set {
+                this.id = value;
+            }
+        }
+
+        [PropertyGroup("Properties")]
         public string DescriptionId {
             get {
                 return this.descriptionId;
@@ -44,6 +62,7 @@ namespace GameEvent {
             }
         }
 
+        [PropertyGroup("Properties")]
         public string IconId {
             get {
                 return this.iconId;
@@ -53,6 +72,7 @@ namespace GameEvent {
             }
         }
 
+        [PropertyGroup("Properties")]
         public bool Recurring {
             get {
                 return this.recurring;
@@ -77,13 +97,9 @@ namespace GameEvent {
             }
         }
 
-        public int IntId {
+        public List<OptionData> Options {
             get {
-                return this.id;
-            }
-
-            set {
-                this.id = value;
+                return this.options;
             }
         }
     }

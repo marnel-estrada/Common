@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f234f235a9164e26ac67f1c49bc8dc7a, type: 3}
   m_Name: TestEventsPool
   m_EditorClassIdentifier: 
+  guiSkin: {fileID: 11400000, guid: b94eadbe632e05e4fb90330300f52c00, type: 2}
   dataList:
   - id: 1
     nameId: Test
@@ -19,5 +20,13 @@ MonoBehaviour:
     iconId: 
     recurring: 0
     requirements: []
+    options: []
+  - id: 2
+    nameId: Sample
+    descriptionId: 
+    iconId: 
+    recurring: 0
+    requirements: []
+    options: []
   idGenerator:
-    counter: 2
+    counter: 3

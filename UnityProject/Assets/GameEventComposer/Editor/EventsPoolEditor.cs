@@ -12,7 +12,7 @@ namespace GameEvent {
             
             if (GUILayout.Button("Open Editor")) {
                 EventsEditorWindow window = EditorWindow.GetWindow<EventsEditorWindow>("Events Editor");
-                window.Init(this.DataPool, new EventDataRenderer());
+                window.Init(this.DataPool, new EventDataRenderer(window));
                 window.Repaint();
             }
         }

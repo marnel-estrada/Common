@@ -13,11 +13,9 @@ namespace Common {
         public static readonly Signal.Signal REPAINT = new Signal.Signal("Repaint");
 
         private readonly DataPoolSidebarView<T> sidebar = new DataPoolSidebarView<T>();
-        //private DataPoolInspectorView<T> inspector;
+        private DataPoolInspectorView<T> inspector;
 
         private Action<DataPool<T>> runAction;
-
-        //private string prefabPath;
 
         /// <summary>
         /// Initializer
@@ -25,8 +23,7 @@ namespace Common {
         /// <param name="target"></param>
         public void Init(DataPool<T> target, DataPoolItemRenderer<T> itemRenderer) {
             this.target = target;
-            //this.inspector = new DataPoolInspectorView<T>(itemRenderer);
-            //this.prefabPath = PrefabStageUtility.GetPrefabStage(this.target.gameObject)?.prefabAssetPath;
+            this.inspector = new DataPoolInspectorView<T>(itemRenderer);
             REPAINT.Dispatch(); // Force a repaint
         }
 
@@ -86,7 +83,7 @@ namespace Common {
 
             // Inspector
             if (this.sidebar.IsValidSelection) {
-                //this.inspector.Render(this.target, this.sidebar.SelectedItem);
+                this.inspector.Render(this.target, this.sidebar.SelectedItem);
             }
 
             GUILayout.EndHorizontal();

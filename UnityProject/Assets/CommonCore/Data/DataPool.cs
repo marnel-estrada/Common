@@ -9,6 +9,10 @@ namespace Common {
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class DataPool<T> : ScriptableObject where T : Identifiable, IntIdentifiable, new() {
+        // This is used for the editor such that we don't need to resolve it by path
+        [SerializeField]
+        private GUISkin guiSkin;
+        
         [SerializeField]
         private List<T> dataList = new List<T>();
 
@@ -68,6 +72,12 @@ namespace Common {
         public int Count {
             get {
                 return this.dataList.Count;
+            }
+        }
+
+        public GUISkin Skin {
+            get {
+                return this.guiSkin;
             }
         }
 

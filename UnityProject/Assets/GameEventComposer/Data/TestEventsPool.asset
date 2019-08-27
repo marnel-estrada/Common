@@ -12,6 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f234f235a9164e26ac67f1c49bc8dc7a, type: 3}
   m_Name: TestEventsPool
   m_EditorClassIdentifier: 
-  events: []
-  eventsIdGenerator:
-    counter: 1
+  dataList:
+  - id: 1
+    nameId: Test
+    descriptionId: 
+    iconId: 
+    recurring: 0
+    requirements: []
+  idGenerator:
+    counter: 2

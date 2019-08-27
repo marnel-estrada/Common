@@ -1,29 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Common.Utils;
 
-using UnityEngine;
 using UnityEditor;
 
-using Common;
-using Common.Utils;
-using System.Reflection;
+using UnityEngine;
 
 namespace Common {
-    class DataClassInspectorView<T> where T : Identifiable, new() {
-
+    internal class DataClassInspectorView<T> where T : Identifiable, new() {
         private readonly DataClassItemRenderer<T> itemRenderer;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public DataClassInspectorView(DataClassItemRenderer<T> itemRenderer) {
             this.itemRenderer = itemRenderer;
         }
 
         /// <summary>
-        /// Renders the UI
+        ///     Renders the UI
         /// </summary>
         /// <param name="pool"></param>
         public void Render(DataClassPool<T> pool, T item) {
@@ -33,22 +26,24 @@ namespace Common {
             GUILayout.Space(5);
 
             GUI.backgroundColor = ColorUtils.RED;
-            if(GUILayout.Button("Delete", GUILayout.Width(60))) {
+            if (GUILayout.Button("Delete", GUILayout.Width(60))) {
                 Delete(pool, item);
             }
+
             GUI.backgroundColor = ColorUtils.WHITE;
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("ID: " + item.Id);
             GUILayout.EndHorizontal();
-            
+
             this.itemRenderer.Render(pool, item);
 
             GUILayout.EndVertical();
         }
 
         private void Delete(DataClassPool<T> pool, T item) {
-            if(EditorUtility.DisplayDialogComplex("Delete Item", string.Format("Are you sure you want to delete {0}?", item.Id), "Yes", "No", "Cancel") != 0) {
+            if (EditorUtility.DisplayDialogComplex("Delete Item",
+                string.Format("Are you sure you want to delete {0}?", item.Id), "Yes", "No", "Cancel") != 0) {
                 // Cancelled or No
                 return;
             }
@@ -58,6 +53,5 @@ namespace Common {
             EditorUtility.SetDirty(pool);
             DataClassPoolEditorWindow<T>.REPAINT.Dispatch();
         }
-
     }
 }

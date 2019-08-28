@@ -19,6 +19,7 @@ MonoBehaviour:
     descriptionId: 
     iconId: 
     recurring: 0
+    rarity: 1
     requirements: []
     options: []
   - id: 2
@@ -26,6 +27,7 @@ MonoBehaviour:
     descriptionId: 
     iconId: 
     recurring: 0
+    rarity: 3
     requirements:
     - className: GameEvent.SampleRequirement
       variables:

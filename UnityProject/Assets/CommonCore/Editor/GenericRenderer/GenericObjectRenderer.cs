@@ -23,6 +23,8 @@ namespace Common {
         };
 
         private readonly Dictionary<string, List<PropertyInfo>> groupMap = new Dictionary<string, List<PropertyInfo>>();
+        
+        private readonly Dictionary<string, EditorPropertyRenderer> customRenderers = new Dictionary<string, EditorPropertyRenderer>(1);
 
         /// <summary>
         /// Constructor
@@ -56,9 +58,7 @@ namespace Common {
                 }
 
                 // Must have a renderer
-                PropertyRenderer renderer = RENDERER_MAP.Find(property.PropertyType);
-                if(renderer == null) {
-                    // No renderer
+                if (!HasRenderer(property)) {
                     return;
                 }
 
@@ -85,31 +85,83 @@ namespace Common {
             }
         }
 
+        private bool HasRenderer(PropertyInfo property) {
+            // Check if property has a custom renderer
+            Common.PropertyRenderer propertyRenderer = TypeUtils.GetCustomAttribute<Common.PropertyRenderer>(property);
+            
+            if (propertyRenderer == null || string.IsNullOrEmpty(propertyRenderer.RendererType)) {
+                // No custom renderer
+                PropertyRenderer renderer = RENDERER_MAP.Find(property.PropertyType);
+                return renderer != null;
+            }
+            
+            // Has a custom renderer
+            return true;
+        }
+
         private void ClearGroupedLists() {
             foreach (KeyValuePair<string, List<PropertyInfo>> entry in this.groupMap) {
                 entry.Value.Clear();
             }
         }
 
-        private static void RenderProperties(List<PropertyInfo> propertyList, object instance) {
+        private void RenderProperties(List<PropertyInfo> propertyList, object instance) {
             // Sort
             propertyList.Sort(AscendingNameComparison);
 
             // Render each property
             for(int i = 0; i < propertyList.Count; ++i) {
                 PropertyInfo property = propertyList[i];
-                ReadOnlyFieldAttribute readOnlyAttribute = TypeUtils.GetCustomAttribute<ReadOnlyFieldAttribute>(property);
-
-                if (readOnlyAttribute == null) {
-                    // It's an editable field
-                    RENDERER_MAP[property.PropertyType](property, instance); // Invoke the renderer
-                } else {
-                    // It's readonly
-                    RenderReadOnly(property, instance);
-                }
                 
+                // Check if it has a custom renderer
+                Common.PropertyRenderer propertyRenderer = TypeUtils.GetCustomAttribute<Common.PropertyRenderer>(property);
+                if (propertyRenderer == null || string.IsNullOrEmpty(propertyRenderer.RendererType)) {
+                    // No renderer type specified
+                    RenderAsDefault(property, instance);
+                } else {
+                    CustomRender(property, instance, propertyRenderer);
+                } 
+
                 GUILayout.Space(5);
             }
+        }
+
+        private static void RenderAsDefault(PropertyInfo property, object instance) {
+            ReadOnlyFieldAttribute readOnlyAttribute = TypeUtils.GetCustomAttribute<ReadOnlyFieldAttribute>(property);
+
+            if (readOnlyAttribute == null) {
+                // It's an editable field
+                RENDERER_MAP[property.PropertyType](property, instance); // Invoke the renderer
+            } else {
+                // It's readonly
+                RenderReadOnly(property, instance);
+            }
+        }
+        
+        private void CustomRender(PropertyInfo property, object instance, Common.PropertyRenderer propRenderer) {
+            EditorPropertyRenderer renderer = ResolveRenderer(propRenderer.RendererType);
+            Assertion.AssertNotNull(renderer);
+            renderer.Render(property, instance);
+        }
+
+        private EditorPropertyRenderer ResolveRenderer(string textType) {
+            EditorPropertyRenderer renderer = this.customRenderers.Find(textType);
+            if (renderer != null) {
+                // Already exists
+                return renderer;
+            }
+            
+            // At this point, renderer does not exist yet
+            // Let's make one
+            Type rendererType = TypeIdentifier.GetType(textType);
+            Assertion.AssertNotNull(rendererType, textType);
+            ConstructorInfo constructor = TypeUtils.ResolveEmptyConstructor(rendererType);
+            renderer = (EditorPropertyRenderer) constructor.Invoke(TypeUtils.EMPTY_PARAMETERS);
+            
+            // Maintain
+            this.customRenderers[textType] = renderer;
+
+            return renderer;
         }
 
         private static int AscendingNameComparison(PropertyInfo a, PropertyInfo b) {

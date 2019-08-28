@@ -3,7 +3,6 @@
 namespace Common {
     [AttributeUsage(AttributeTargets.Property)]
     public class PropertyGroup : Attribute {
-
         private readonly string name;
 
         /// <summary>
@@ -19,6 +18,5 @@ namespace Common {
                 return name;
             }
         }
-
     }
 }

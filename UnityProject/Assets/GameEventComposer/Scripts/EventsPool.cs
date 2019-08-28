@@ -10,7 +10,7 @@ namespace GameEvent {
         public void Sort(){
             base.Sort(SortByNameId);
         }
-
+        
         private int SortByNameId(EventData a, EventData b) {
             return String.Compare(a.NameId, b.NameId, StringComparison.Ordinal);
         }

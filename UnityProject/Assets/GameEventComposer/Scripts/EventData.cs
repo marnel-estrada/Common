@@ -24,6 +24,9 @@ namespace GameEvent {
         private bool recurring;
 
         [SerializeField]
+        private int rarity = 1;
+
+        [SerializeField]
         private List<ClassData> requirements;
 
         [SerializeField]
@@ -100,6 +103,17 @@ namespace GameEvent {
         public List<OptionData> Options {
             get {
                 return this.options;
+            }
+        }
+
+        [PropertyGroup("Properties")]
+        [PropertyRenderer("GameEvent.RarityRenderer")]
+        public int Rarity {
+            get {
+                return this.rarity;
+            }
+            set {
+                this.rarity = value;
             }
         }
     }

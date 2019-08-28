@@ -17,14 +17,30 @@ namespace GameEvent {
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static Rarity Convert(string name) {
+        public static Rarity ConvertFromName(string name) {
             for (int i = 0; i < ALL.Length; ++i) {
-                if (ALL[i].Equals(name)) {
+                if (ALL[i].name.Equals(name)) {
                     return ALL[i];
                 }
             }
 
-            Assertion.Assert(false, $"Can't convert rarity text {name}");
+            Assertion.Assert(false, $"Can't convert rarity text: {name}");
+            return NULL;
+        }
+
+        /// <summary>
+        /// Convert from ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static Rarity ConvertFromId(int id) {
+            for (int i = 0; i < ALL.Length; ++i) {
+                if (ALL[i].id == id) {
+                    return ALL[i];
+                }
+            }
+
+            Assertion.Assert(false, $"Can't convert rarity id: {id}");
             return NULL;
         }
         

@@ -1,11 +1,8 @@
-using System;
-
 namespace Common {
 	/**
 	 * A utility class for handling a list of values that can be displayed in a popup.
 	 */
 	public class PopupValueSet {
-		
         // we separate display and value because some fields expects an empty value but popup editor won't render it as selectable
 		private string[] displayList;
         private string[] valueList;
@@ -70,7 +67,6 @@ namespace Common {
             this.displayList = displayList;
             this.valueList = valueList;
         }
-		
 	}
 }
 

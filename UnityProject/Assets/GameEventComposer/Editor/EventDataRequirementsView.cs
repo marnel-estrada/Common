@@ -37,7 +37,7 @@ namespace GameEvent {
             if (item.Requirements.Count <= 0) {
                 GUILayout.Label("(no requirements yet)");
             } else {
-                //RenderRequirements(grantsData, grant);
+                RenderRequirements(pool, item);
             }
         }
         
@@ -65,6 +65,92 @@ namespace GameEvent {
 
             EditorUtility.SetDirty(this.pool);
             DataPoolEditorWindow<EventData>.REPAINT.Dispatch();
+        }
+        
+        private void RenderRequirements(DataPool<EventData> pool, EventData item) {
+            for (int i = 0; i < item.Requirements.Count; ++i) {
+                RenderRequirement(pool, item, item.Requirements[i], i);
+                GUILayout.Space(5);
+            }
+        }
+        
+        private void RenderRequirement(DataPool<EventData> pool, EventData item, ClassData data, int index) {
+            if (data.ClassType == null) {
+                // Cache
+                data.ClassType = TypeUtils.GetType(data.ClassName);
+                Assertion.AssertNotNull(data.ClassType);
+            }
+
+            GUILayout.BeginHorizontal();
+
+            // delete button
+            GUI.backgroundColor = ColorUtils.RED;
+            if (GUILayout.Button("X", GUILayout.Width(20), GUILayout.Height(20))) {
+                Remove(pool, item, data);
+            }
+
+            GUI.backgroundColor = ColorUtils.WHITE;
+
+            // up button 
+            if (GUILayout.Button("Up", GUILayout.Width(25), GUILayout.Height(20))) {
+                MoveUp(pool, item, index);
+            }
+
+            // down button
+            if (GUILayout.Button("Down", GUILayout.Width(45), GUILayout.Height(20))) {
+                MoveDown(pool, item, index);
+            }
+
+            GUILayout.Box(data.ClassType.Name);
+
+            GUILayout.EndHorizontal();
+
+            // Variables
+            Assertion.AssertNotNull(data.ClassType);
+            this.propertiesRenderer.RenderVariables(data.Variables, data.Variables, data.ClassType, data.ShowHints);
+        }
+        
+        private void Remove(DataPool<EventData> pool, EventData item, ClassData data) {
+            if (EditorUtility.DisplayDialogComplex("Remove Requirement",
+                "Are you sure you want to remove this requirement?", "Yes", "No", "Cancel") != 0) {
+                // Cancelled or No
+                return;
+            }
+
+            item.Requirements.Remove(data);
+
+            EditorUtility.SetDirty(pool);
+            DataPoolEditorWindow<EventData>.REPAINT.Dispatch();
+        }
+
+        private void MoveUp(DataPool<EventData> pool, EventData item, int index) {
+            if (index <= 0) {
+                // Can no longer move up
+                return;
+            }
+
+            Swap(item, index, index - 1);
+
+            EditorUtility.SetDirty(pool);
+            DataPoolEditorWindow<EventData>.REPAINT.Dispatch();
+        }
+
+        private void MoveDown(DataPool<EventData> pool, EventData item, int index) {
+            if (index + 1 >= item.Requirements.Count) {
+                // Can no longer move down
+                return;
+            }
+
+            Swap(item, index, index + 1);
+
+            EditorUtility.SetDirty(pool);
+            DataPoolEditorWindow<EventData>.REPAINT.Dispatch();
+        }
+
+        private static void Swap(EventData item, int a, int b) {
+            ClassData temp = item.Requirements[a];
+            item.Requirements[a] = item.Requirements[b];
+            item.Requirements[b] = temp;
         }
     }
 }

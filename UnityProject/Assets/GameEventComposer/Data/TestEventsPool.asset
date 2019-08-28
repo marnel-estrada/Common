@@ -26,7 +26,57 @@ MonoBehaviour:
     descriptionId: 
     iconId: 
     recurring: 0
-    requirements: []
+    requirements:
+    - className: GameEvent.SampleRequirement
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList: []
+        boolMap:
+          itemList:
+          - name: isTrue
+            varValue: 0
+            useOtherHolder: 0
+            otherHolderName: isTrue
+        vector3Map:
+          itemList: []
+        intVector2Map:
+          itemList: []
+      showHints: 0
+    - className: GameEvent.AllFieldTypesRequirement
+      variables:
+        stringMap:
+          itemList:
+          - name: text
+            varValue: Hello
+            useOtherHolder: 0
+            otherHolderName: 
+        intMap:
+          itemList:
+          - name: integer
+            varValue: 2
+            useOtherHolder: 0
+            otherHolderName: 
+        floatMap:
+          itemList:
+          - name: floatingNumber
+            varValue: 3.14
+            useOtherHolder: 0
+            otherHolderName: 
+        boolMap:
+          itemList:
+          - name: boolean
+            varValue: 1
+            useOtherHolder: 0
+            otherHolderName: 
+        vector3Map:
+          itemList: []
+        intVector2Map:
+          itemList: []
+      showHints: 0
     options: []
   idGenerator:
     counter: 3

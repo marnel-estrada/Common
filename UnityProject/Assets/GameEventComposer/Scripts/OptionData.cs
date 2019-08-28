@@ -7,8 +7,9 @@ using UnityEngine;
 
 namespace GameEvent {
     [Serializable]
-    public class OptionData {
-        private readonly int id;
+    public class OptionData : Identifiable, IntIdentifiable {
+        [SerializeField]
+        private int id;
 
         [SerializeField]
         private string nameId;
@@ -110,6 +111,26 @@ namespace GameEvent {
         public List<ClassData> Effects {
             get {
                 return this.effects;
+            }
+        }
+
+        public string Id {
+            get {
+                return this.nameId;
+            }
+
+            set {
+                this.nameId = value;
+            }
+        }
+
+        public int IntId {
+            get {
+                return this.id;
+            }
+
+            set {
+                this.id = value;
             }
         }
     }

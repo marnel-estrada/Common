@@ -34,7 +34,7 @@ namespace GameEvent {
             GUILayout.Space(5);
 
             // Render requirements
-            if (item.Requirements.Count <= 0) {
+            if (item.Requirements == null || item.Requirements.Count <= 0) {
                 GUILayout.Label("(no requirements yet)");
             } else {
                 RenderRequirements(pool, item);

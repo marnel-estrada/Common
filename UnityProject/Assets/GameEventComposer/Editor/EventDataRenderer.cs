@@ -15,7 +15,11 @@ namespace GameEvent {
             this.optionsView = new EventDataOptionsView(parent);
         }
         
+        private Vector2 scrollPos = new Vector2();
+        
         public void Render(DataPool<EventData> pool, EventData item) {
+            this.scrollPos = GUILayout.BeginScrollView(this.scrollPos);
+            
             this.renderer.Render(item);
             
             GUILayout.Space(10);
@@ -27,6 +31,8 @@ namespace GameEvent {
             
             GUILayout.Label("Options", EditorStyles.boldLabel);
             this.optionsView.Render(pool, item);
+            
+            GUILayout.EndScrollView();
         }
     }
 }

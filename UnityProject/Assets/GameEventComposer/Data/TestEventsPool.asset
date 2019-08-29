@@ -20,14 +20,60 @@ MonoBehaviour:
     iconId: 
     recurring: 0
     rarity: 1
-    requirements: []
-    options: []
+    optionIdGenerator:
+      counter: 2
+    requirements:
+    - className: GameEvent.AllFieldTypesRequirement
+      variables:
+        stringMap:
+          itemList:
+          - name: text
+            varValue: 
+            useOtherHolder: 0
+            otherHolderName: 
+        intMap:
+          itemList:
+          - name: integer
+            varValue: 0
+            useOtherHolder: 0
+            otherHolderName: 
+        floatMap:
+          itemList:
+          - name: floatingNumber
+            varValue: 0
+            useOtherHolder: 0
+            otherHolderName: 
+        boolMap:
+          itemList:
+          - name: boolean
+            varValue: 0
+            useOtherHolder: 0
+            otherHolderName: 
+        vector3Map:
+          itemList: []
+        intVector2Map:
+          itemList: []
+      showHints: 0
+    options:
+    - id: 1
+      nameId: Option1
+      descriptionId: Option1.Description
+      comment: This is option 1. The very basic option.
+      childEventId: 0
+      trueOutcomeProbability: 0
+      trueOutcomeTextId: 
+      falseOutcomeTextId: 
+      requirements: []
+      costs: []
+      effects: []
   - id: 2
     nameId: Sample
     descriptionId: 
     iconId: 
     recurring: 0
     rarity: 3
+    optionIdGenerator:
+      counter: 4
     requirements:
     - className: GameEvent.SampleRequirement
       variables:
@@ -79,6 +125,39 @@ MonoBehaviour:
         intVector2Map:
           itemList: []
       showHints: 0
-    options: []
+    options:
+    - id: 1
+      nameId: OptionA
+      descriptionId: This is option A
+      comment: 
+      childEventId: 0
+      trueOutcomeProbability: 0
+      trueOutcomeTextId: 
+      falseOutcomeTextId: 
+      requirements: []
+      costs: []
+      effects: []
+    - id: 2
+      nameId: OptionB
+      descriptionId: OptionB.Description
+      comment: This is option B. This is a comment about OptionB.
+      childEventId: 0
+      trueOutcomeProbability: 0
+      trueOutcomeTextId: 
+      falseOutcomeTextId: 
+      requirements: []
+      costs: []
+      effects: []
+    - id: 3
+      nameId: OptionC
+      descriptionId: OptionC.Description
+      comment: This is about option C. Option C is the most extreme choice.
+      childEventId: 0
+      trueOutcomeProbability: 0
+      trueOutcomeTextId: 
+      falseOutcomeTextId: 
+      requirements: []
+      costs: []
+      effects: []
   idGenerator:
-    counter: 3
+    counter: 4

@@ -27,10 +27,13 @@ namespace GameEvent {
         private int rarity = 1;
 
         [SerializeField]
-        private List<ClassData> requirements;
+        private IdGenerator optionIdGenerator = new IdGenerator(1);
 
         [SerializeField]
-        private List<OptionData> options;
+        private List<ClassData> requirements = new List<ClassData>();
+
+        [SerializeField]
+        private List<OptionData> options = new List<OptionData>();
 
         [PropertyGroup("Id")]
         [ReadOnlyField]
@@ -115,6 +118,10 @@ namespace GameEvent {
             set {
                 this.rarity = value;
             }
+        }
+
+        public int GenerateNewOptionId() {
+            return this.optionIdGenerator.Generate();
         }
     }
 }

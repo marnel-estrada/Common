@@ -1,23 +1,22 @@
-using System.Collections;
+using UnityEditor;
 
 using UnityEngine;
-using UnityEditor;
 
 [CustomEditor(typeof(Comment))]
 public class CommentEditor : Editor {
 
-	private Comment targetComponent;
+    private Comment targetComponent;
 
-	void OnEnable() {
-		this.targetComponent = (Comment)this.target;
-	}
+    private void OnEnable() {
+        this.targetComponent = (Comment) this.target;
+    }
 
-	public override void OnInspectorGUI() {
-		if(targetComponent.Text == null) {
-			targetComponent.Text = ""; // use an empty string so that it won't throw null pointer exception
-		}
+    public override void OnInspectorGUI() {
+        if (this.targetComponent.Text == null) {
+            this.targetComponent.Text = ""; // use an empty string so that it won't throw null pointer exception
+        }
 
-		targetComponent.Text = GUILayout.TextArea(targetComponent.Text, GUILayout.Height(100), GUILayout.MinWidth(200));
-	}
-
+        this.targetComponent.Text =
+            GUILayout.TextArea(this.targetComponent.Text, GUILayout.Height(100), GUILayout.MinWidth(200));
+    }
 }

@@ -16,6 +16,10 @@ namespace GameEvent {
         
         [SerializeField]
         private string descriptionId;
+
+        // A comment that can be shown in editor
+        [SerializeField]
+        private string comment;
         
         [SerializeField]
         private int childEventId;
@@ -30,13 +34,13 @@ namespace GameEvent {
         private string falseOutcomeTextId;
 
         [SerializeField]
-        private List<ClassData> requirements;
+        private List<ClassData> requirements = new List<ClassData>();
 
         [SerializeField]
-        private List<ClassData> costs;
+        private List<ClassData> costs = new List<ClassData>();
 
         [SerializeField]
-        private List<ClassData> effects;
+        private List<ClassData> effects = new List<ClassData>();
 
         public OptionData(int id) {
             this.id = id;
@@ -131,6 +135,15 @@ namespace GameEvent {
 
             set {
                 this.id = value;
+            }
+        }
+
+        public string Comment {
+            get {
+                return this.comment;
+            }
+            set {
+                this.comment = value;
             }
         }
     }

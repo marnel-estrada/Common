@@ -52,7 +52,6 @@ namespace CommonEcs {
 
             private void Process(ref ArchetypeChunk chunk) {
                 NativeArray<Sprite> sprites = chunk.GetNativeArray(this.spriteType);
-                NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
 
                 for (int i = 0; i < chunk.Count; ++i) {
                     Sprite sprite = sprites[i];

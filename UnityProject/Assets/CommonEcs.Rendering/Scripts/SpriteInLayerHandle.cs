@@ -88,6 +88,11 @@ namespace CommonEcs {
             // Can only push if sprite was indeed created
             Assertion.Assert(this.Exists);
             this.entityManager.SetComponentData(this.spriteEntity, sprite);
+            
+            // Marked Changed so that the changes would be applied
+            if (!this.entityManager.HasComponent<Changed>(this.spriteEntity)) {
+                this.entityManager.AddComponentData(this.spriteEntity, new Changed());
+            }
         }
 
         /// <summary>

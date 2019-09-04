@@ -18,7 +18,7 @@ namespace CommonEcs {
         [ReadOnly]
         private ArchetypeChunkComponentType<LocalToWorld> matrixType;
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             // All entities that has Sprite and LocalToWorld, but no Static
             // Note here that we specifically exclude entities with Transform
             // This system works with pure ECS entities only

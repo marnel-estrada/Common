@@ -22,7 +22,7 @@ namespace CommonEcs {
         private struct OwnerSet : ISystemStateComponentData {
         }
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             // We added sprite for subtractive here because we only want to process those manager entities
             // and not the sprite entities where the SpriteManager is added as shared component
             this.query = GetEntityQuery(this.ConstructQuery(null, new ComponentType[] {

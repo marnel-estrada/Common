@@ -24,7 +24,7 @@ namespace CommonEcs {
         private SpriteLayerInstancesSystem layers;
         private SpriteManagerInstancesSystem managers;
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.layers = this.World.GetOrCreateSystem<SpriteLayerInstancesSystem>();
             this.managers = this.World.GetOrCreateSystem<SpriteManagerInstancesSystem>();
             

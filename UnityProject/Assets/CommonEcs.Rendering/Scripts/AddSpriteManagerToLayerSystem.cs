@@ -15,7 +15,7 @@ namespace CommonEcs {
 
         private SpriteLayerInstancesSystem layers;
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.query = GetEntityQuery(typeof(SpriteManager), ComponentType.Exclude<Processed>(), 
                 ComponentType.Exclude<Sprite>());
             this.layers = this.World.GetExistingSystem<SpriteLayerInstancesSystem>();

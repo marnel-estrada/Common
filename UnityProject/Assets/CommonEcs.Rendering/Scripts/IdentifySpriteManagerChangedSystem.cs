@@ -23,7 +23,7 @@ namespace CommonEcs {
         private readonly List<SpriteManager> managers = new List<SpriteManager>(1);
         private readonly List<int> managerIndices = new List<int>(1);
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.query = GetEntityQuery(typeof(Sprite), typeof(Changed));
         }
 
@@ -52,7 +52,6 @@ namespace CommonEcs {
 
             private void Process(ref ArchetypeChunk chunk) {
                 NativeArray<Sprite> sprites = chunk.GetNativeArray(this.spriteType);
-                NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
 
                 for (int i = 0; i < chunk.Count; ++i) {
                     Sprite sprite = sprites[i];

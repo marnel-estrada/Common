@@ -15,7 +15,7 @@ namespace CommonEcs {
 
         private SharedComponentQuery<SpriteManager> managerQuery;
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.query = GetEntityQuery(ComponentType.ReadOnly<Sprite>(), ComponentType.ReadOnly<SpriteManager>());
             this.managerQuery = new SharedComponentQuery<SpriteManager>(this, this.EntityManager);
         }

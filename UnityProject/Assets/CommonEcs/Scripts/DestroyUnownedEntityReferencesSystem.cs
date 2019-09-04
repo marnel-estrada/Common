@@ -12,7 +12,7 @@ namespace CommonEcs {
     
         private EndPresentationEntityCommandBufferSystem barrier;
     
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.query = GetEntityQuery(typeof(EntityReference));
             this.barrier = this.World.GetOrCreateSystem<EndPresentationEntityCommandBufferSystem>();
         }

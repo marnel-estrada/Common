@@ -17,7 +17,7 @@ namespace CommonEcs {
     public class MoveByDurationSystem : JobComponentSystem {
         private EntityQuery query;
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.query = GetEntityQuery(typeof(Transform), typeof(Move), typeof(DurationTimer), 
                 typeof(Active));
         }

@@ -9,7 +9,7 @@ namespace CommonEcs {
     public class ResetSpriteManagerFlagsSystem : ComponentSystem {
         private SharedComponentQuery<SpriteManager> query;
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.query = new SharedComponentQuery<SpriteManager>(this, this.EntityManager);
         }
 

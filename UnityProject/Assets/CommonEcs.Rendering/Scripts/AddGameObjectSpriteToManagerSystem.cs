@@ -41,7 +41,7 @@ namespace CommonEcs {
 
         private SpriteManagerInstancesSystem spriteManagers;
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.addedQuery = GetEntityQuery(this.ConstructQuery(new ComponentType[] {
                 typeof(Transform), typeof(Sprite)
             }, new ComponentType[] {

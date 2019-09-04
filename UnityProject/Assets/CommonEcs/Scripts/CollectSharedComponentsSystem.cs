@@ -15,7 +15,7 @@ namespace CommonEcs {
         
         private readonly Dictionary<Entity, T> map = new Dictionary<Entity, T>(1);
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.query = ResolveQuery();
             
             this.sharedQuery = new SharedComponentQuery<T>(this, this.EntityManager);

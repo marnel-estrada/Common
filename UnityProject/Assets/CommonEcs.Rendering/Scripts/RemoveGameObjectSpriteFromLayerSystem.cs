@@ -20,7 +20,7 @@ namespace CommonEcs {
         
         private SpriteManagerInstancesSystem managers;
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.query = GetEntityQuery(
                 ComponentType.ReadOnly<AddGameObjectSpriteToLayerSystem.Added>(),
                 ComponentType.Exclude<Transform>(),

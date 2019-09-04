@@ -21,7 +21,7 @@ namespace Common.Ecs.Fsm {
 
         protected ComponentDataFromEntity<Fsm> allFsms;
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.barrier = this.World.GetOrCreateSystem<FsmStatePreparationJobSystemBarrier>();
             this.query = GetEntityQuery(typeof(FsmState), typeof(StateJustTransitioned), 
                 typeof(TTagType));

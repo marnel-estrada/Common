@@ -16,7 +16,7 @@ namespace CommonEcs {
 
         private SharedComponentQuery<TimeReference> timeReferenceQuery;
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.scaledQuery = GetEntityQuery(typeof(DurationTimer), typeof(TimeReference));
             this.nonScaledQuery = GetEntityQuery(typeof(DurationTimer), ComponentType.Exclude<TimeReference>());
             

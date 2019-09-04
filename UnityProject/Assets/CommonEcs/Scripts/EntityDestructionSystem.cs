@@ -6,7 +6,7 @@ namespace CommonEcs {
         private EntityQuery query;
         private ArchetypeChunkEntityType entityType;
 
-        protected override void OnCreateManager() {
+        protected override void OnCreate() {
             this.query = GetEntityQuery(typeof(ForDestruction));
         }
 

@@ -21,7 +21,7 @@ MonoBehaviour:
     recurring: 0
     rarity: 1
     optionIdGenerator:
-      counter: 2
+      counter: 6
     requirements:
     - className: GameEvent.AllFieldTypesRequirement
       variables:
@@ -54,18 +54,7 @@ MonoBehaviour:
         intVector2Map:
           itemList: []
       showHints: 0
-    options:
-    - id: 1
-      nameId: Option1
-      descriptionId: Option1.Description
-      comment: This is option 1. The very basic option.
-      childEventId: 0
-      trueOutcomeProbability: 0
-      trueOutcomeTextId: 
-      falseOutcomeTextId: 
-      requirements: []
-      costs: []
-      effects: []
+    options: []
   - id: 2
     nameId: Sample
     descriptionId: 

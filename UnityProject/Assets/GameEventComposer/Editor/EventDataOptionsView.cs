@@ -17,12 +17,12 @@ namespace GameEvent {
             this.parent = parent;
         }
 
-        public void Render(DataPool<EventData> pool, EventData item) {
-            RenderNewOptionSection(pool, item);
+        public void Render(DataPool<EventData> pool, EventData eventItem) {
+            RenderNewOptionSection(pool, eventItem);
 
             GUILayout.Space(30);
             
-            RenderOptions(pool, item);
+            RenderOptions(pool, eventItem);
         }
 
         private bool showNewOption = true; 
@@ -30,7 +30,7 @@ namespace GameEvent {
         private string descriptionId = "";
         private string comment = "";
 
-        private void RenderNewOptionSection(DataPool<EventData> pool, EventData item) {
+        private void RenderNewOptionSection(DataPool<EventData> pool, EventData eventItem) {
             this.showNewOption = EditorGUILayout.BeginFoldoutHeaderGroup(this.showNewOption, "New Option");
             
             GUILayout.Space(5);
@@ -63,7 +63,7 @@ namespace GameEvent {
                 // Add button
                 GUI.backgroundColor = ColorUtils.GREEN;
                 if (GUILayout.Button("Add", GUILayout.Width(80))) {
-                    AddNewOption(item);
+                    AddNewOption(eventItem);
                 }
                 GUI.backgroundColor = ColorUtils.WHITE;
             }
@@ -71,20 +71,20 @@ namespace GameEvent {
             EditorGUILayout.EndFoldoutHeaderGroup();
         }
 
-        private void AddNewOption(EventData item) {
+        private void AddNewOption(EventData eventItem) {
             // Must have a nameId
             if (string.IsNullOrEmpty(this.nameId)) {
                 EditorUtility.DisplayDialog("Add Option", "Option should have a Name ID", "OK");
                 return;
             }
             
-            int optionId = item.GenerateNewOptionId();
+            int optionId = eventItem.GenerateNewOptionId();
             OptionData option = new OptionData(optionId);
             option.NameId = this.nameId;
             option.DescriptionId = this.descriptionId;
             option.Comment = this.comment;
             
-            item.Options.Add(option);
+            eventItem.Options.Add(option);
             
             EditorUtility.DisplayDialog("Add Option", $"Option {this.nameId} was added!", "OK");
             
@@ -94,8 +94,8 @@ namespace GameEvent {
             this.comment = "";
         }
 
-        private void RenderOptions(DataPool<EventData> pool, EventData item) { 
-            List<OptionData> options = item.Options;
+        private void RenderOptions(DataPool<EventData> pool, EventData eventItem) { 
+            List<OptionData> options = eventItem.Options;
             
             if (options == null || options.Count == 0) {
                 GUILayout.Label("(no options)");
@@ -103,20 +103,20 @@ namespace GameEvent {
             }
 
             for (int i = 0; i < options.Count; ++i) {
-                RenderOption(pool, item, options[i]);
+                RenderOption(pool, eventItem, options[i]);
                 
                 GUILayout.Space(30);
             }
         }
 
-        private void RenderOption(DataPool<EventData> pool, EventData item, OptionData option) {
+        private void RenderOption(DataPool<EventData> pool, EventData eventItem, OptionData option) {
             GUI.backgroundColor = ColorUtils.YELLOW;
             GUILayout.Box(option.NameId, GUILayout.Width(400));
             GUI.backgroundColor = ColorUtils.WHITE;
             
             GUILayout.Space(5);
             
-            GUILayout.Label(option.DescriptionId);
+            GUILayout.Label(string.IsNullOrEmpty(option.DescriptionId) ? "(no Description ID)" : option.DescriptionId);
             
             GUILayout.Space(5);
 
@@ -133,11 +133,22 @@ namespace GameEvent {
 
             GUI.backgroundColor = ColorUtils.RED;
             if (GUILayout.Button("Delete", GUILayout.Width(80))) {
-                Debug.Log("Delete Option");
+                PromptDelete(eventItem, option);
             }
             GUI.backgroundColor = ColorUtils.WHITE;
             
             GUILayout.EndHorizontal();
+        }
+
+        private void PromptDelete(EventData item, OptionData option) {
+            if (!EditorUtility.DisplayDialog("Delete Option", $"Are you sure you want to delete {option.NameId}?",
+                "Yes", "No")) {
+                // User picked No
+                return;
+            }
+            
+            // Proceed with delete
+            item.Options.Remove(option);
         }
     }
 }

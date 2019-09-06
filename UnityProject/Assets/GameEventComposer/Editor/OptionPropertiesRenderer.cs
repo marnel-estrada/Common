@@ -1,5 +1,9 @@
 using Common;
 
+using UnityEditor.Experimental.Networking.PlayerConnection;
+
+using UnityEngine;
+
 namespace GameEvent {
     public class OptionPropertiesRenderer {
         private readonly DataPool<EventData> pool;

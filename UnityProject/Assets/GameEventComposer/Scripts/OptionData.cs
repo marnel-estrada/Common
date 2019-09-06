@@ -24,8 +24,9 @@ namespace GameEvent {
         [SerializeField]
         private int childEventId;
 
+        // We use integer here so it's easier when making the editor
         [SerializeField]
-        private float trueOutcomeProbability;
+        private int trueOutcomeProbability;
 
         [SerializeField]
         private string trueOutcomeTextId;
@@ -87,7 +88,8 @@ namespace GameEvent {
             }
         }
 
-        public float TrueOutcomeProbability {
+        [PropertyRenderer("Common.ProbabilityRenderer")]
+        public int TrueOutcomeProbability {
             get {
                 return this.trueOutcomeProbability;
             }

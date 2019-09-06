@@ -128,8 +128,10 @@ MonoBehaviour:
     options:
     - id: 1
       nameId: OptionA
-      descriptionId: This is option A
-      comment: 
+      descriptionId: OptionA.Description
+      comment: 'Hello comment
+
+        asdfsafasfdsdf'
       childEventId: 0
       trueOutcomeProbability: 0
       trueOutcomeTextId: 

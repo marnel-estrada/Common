@@ -46,6 +46,8 @@ namespace GameEvent {
             this.id = id;
         }
 
+        [PropertyGroup("Id")]
+        [ReadOnlyField]
         public string NameId {
             get {
                 return this.nameId;
@@ -94,6 +96,7 @@ namespace GameEvent {
             }
         }
 
+        [PropertyGroup("Outcome Text")]
         public string TrueOutcomeTextId {
             get {
                 return this.trueOutcomeTextId;
@@ -103,6 +106,7 @@ namespace GameEvent {
             }
         }
 
+        [PropertyGroup("Outcome Text")]
         public string FalseOutcomeTextId {
             get {
                 return this.falseOutcomeTextId;
@@ -118,6 +122,8 @@ namespace GameEvent {
             }
         }
 
+        [PropertyGroup("Id")]
+        [ReadOnlyField]
         public string Id {
             get {
                 return this.nameId;
@@ -128,6 +134,8 @@ namespace GameEvent {
             }
         }
 
+        [PropertyGroup("Id")]
+        [ReadOnlyField]
         public int IntId {
             get {
                 return this.id;
@@ -138,6 +146,7 @@ namespace GameEvent {
             }
         }
 
+        [PropertyRenderer("GameEvent.CommentRenderer")]
         public string Comment {
             get {
                 return this.comment;

@@ -10,6 +10,8 @@ namespace GameEvent {
         private DataPool<EventData> pool;
         private EventData eventItem;
         private OptionData option;
+
+        private OptionPropertiesRenderer propertiesRenderer;
         
         public static readonly Signal REPAINT = new Signal("Repaint");
 
@@ -26,14 +28,21 @@ namespace GameEvent {
             this.pool = pool;
             this.eventItem = eventItem;
             this.option = option;
+            
+            this.propertiesRenderer = new OptionPropertiesRenderer(pool, eventItem, option);
         }
-        
-        void OnEnable() {
+
+        private void OnEnable() {
             REPAINT.AddListener(Repaint);
         }
 
-        void OnDisable() {
+        private void OnDisable() {
             REPAINT.RemoveListener(Repaint);
+        }
+
+        private void OnDestroy() {
+            // Repaint the parent editor so that the changes will reflect
+            EventsEditorWindow.REPAINT.Dispatch();
         }
 
         private void Repaint(ISignalParameters parameters) {
@@ -64,19 +73,20 @@ namespace GameEvent {
 
             switch (this.tabSelected) {
                 case PROPERTIES_TAB:
-                    GUILayout.Label("Properties");
+                    GUILayout.Label("Properties", EditorStyles.boldLabel);
+                    this.propertiesRenderer.Render();
                     break;
                 
                 case REQUIREMENTS_TAB:
-                    GUILayout.Label("Requirements");
+                    GUILayout.Label("Requirements", EditorStyles.boldLabel);
                     break;
                 
                 case COSTS_TAB:
-                    GUILayout.Label("Costs");
+                    GUILayout.Label("Costs", EditorStyles.boldLabel);
                     break;
                 
                 case EFFECTS_TAB:
-                    GUILayout.Label("Effects");
+                    GUILayout.Label("Effects", EditorStyles.boldLabel);
                     break;
             }
             

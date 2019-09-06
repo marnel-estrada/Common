@@ -132,8 +132,8 @@ MonoBehaviour:
       comment: 'Hello comment
 
         asdfsafasfdsdf'
-      childEventId: 0
-      trueOutcomeProbability: 0
+      childEventId: 2
+      trueOutcomeProbability: 52
       trueOutcomeTextId: 
       falseOutcomeTextId: 
       requirements: []
@@ -143,7 +143,7 @@ MonoBehaviour:
       nameId: OptionB
       descriptionId: OptionB.Description
       comment: This is option B. This is a comment about OptionB.
-      childEventId: 0
+      childEventId: 1
       trueOutcomeProbability: 0
       trueOutcomeTextId: 
       falseOutcomeTextId: 
@@ -154,6 +154,38 @@ MonoBehaviour:
       nameId: OptionC
       descriptionId: OptionC.Description
       comment: This is about option C. Option C is the most extreme choice.
+      childEventId: 4
+      trueOutcomeProbability: 0
+      trueOutcomeTextId: 
+      falseOutcomeTextId: 
+      requirements: []
+      costs: []
+      effects: []
+  - id: 4
+    nameId: StudentRevolt
+    descriptionId: StudentRevolt.Description
+    iconId: StudentRevolt.Icon
+    recurring: 0
+    rarity: 2
+    optionIdGenerator:
+      counter: 3
+    requirements: []
+    options:
+    - id: 1
+      nameId: Address
+      descriptionId: StudentRevolt.Address
+      comment: 
+      childEventId: 0
+      trueOutcomeProbability: 0
+      trueOutcomeTextId: 
+      falseOutcomeTextId: 
+      requirements: []
+      costs: []
+      effects: []
+    - id: 2
+      nameId: Suppress
+      descriptionId: StudentRevolt.Suppress
+      comment: 
       childEventId: 0
       trueOutcomeProbability: 0
       trueOutcomeTextId: 
@@ -162,4 +194,4 @@ MonoBehaviour:
       costs: []
       effects: []
   idGenerator:
-    counter: 4
+    counter: 5

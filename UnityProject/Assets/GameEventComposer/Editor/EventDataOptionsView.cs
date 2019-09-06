@@ -9,9 +9,6 @@ using UnityEngine;
 namespace GameEvent {
     public class EventDataOptionsView {
         private readonly EditorWindow parent;
-        
-        private DataPool<EventData> pool;
-        private EventData item;
 
         public EventDataOptionsView(EditorWindow parent) {
             this.parent = parent;
@@ -39,7 +36,7 @@ namespace GameEvent {
                 // Name ID
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Name ID:", GUILayout.Width(200));
-                this.nameId = EditorGUILayout.TextField(this.nameId, GUILayout.Width(150));
+                this.nameId = EditorGUILayout.TextField(this.nameId, GUILayout.Width(300));
                 GUILayout.EndHorizontal();
                 
                 GUILayout.Space(5);
@@ -47,7 +44,7 @@ namespace GameEvent {
                 // Description ID
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Description ID:", GUILayout.Width(200));
-                this.descriptionId = EditorGUILayout.TextField(this.descriptionId, GUILayout.Width(150));
+                this.descriptionId = EditorGUILayout.TextField(this.descriptionId, GUILayout.Width(300));
                 GUILayout.EndHorizontal();
                 
                 GUILayout.Space(5);
@@ -114,9 +111,17 @@ namespace GameEvent {
             GUILayout.Box(option.NameId, GUILayout.Width(400));
             GUI.backgroundColor = ColorUtils.WHITE;
             
-            GUILayout.Space(5);
-            
+            // Description ID
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Description ID: ", GUILayout.Width(150));
             GUILayout.Label(string.IsNullOrEmpty(option.DescriptionId) ? "(no Description ID)" : option.DescriptionId);
+            GUILayout.EndHorizontal();
+            
+            // Child Event
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Child Event: ", GUILayout.Width(150));
+            GUILayout.Label(ResolveChildEventLabel(pool, option));
+            GUILayout.EndHorizontal();
             
             GUILayout.Space(5);
 
@@ -138,6 +143,15 @@ namespace GameEvent {
             GUI.backgroundColor = ColorUtils.WHITE;
             
             GUILayout.EndHorizontal();
+        }
+
+        private string ResolveChildEventLabel(DataPool<EventData> pool, OptionData option) {
+            Maybe<EventData> foundEvent = pool.Find(option.ChildEventId);
+            if (foundEvent.HasValue) {
+                return foundEvent.Value.NameId;
+            }
+            
+            return "(no child event)";
         }
 
         private void OpenOptionsWindow(DataPool<EventData> pool, EventData eventItem, OptionData option) {

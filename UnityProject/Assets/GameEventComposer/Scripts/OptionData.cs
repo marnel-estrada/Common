@@ -22,7 +22,7 @@ namespace GameEvent {
         private string comment;
         
         [SerializeField]
-        private int childEventId;
+        private int childEventId = -1;
 
         // We use integer here so it's easier when making the editor
         [SerializeField]

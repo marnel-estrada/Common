@@ -128,19 +128,35 @@ namespace GameEvent {
             // Buttons here
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Edit", GUILayout.Width(80))) {
-                Debug.Log("Edit Option");
+                OpenOptionsWindow(pool, eventItem, option);
             }
 
             GUI.backgroundColor = ColorUtils.RED;
             if (GUILayout.Button("Delete", GUILayout.Width(80))) {
-                PromptDelete(eventItem, option);
+                PromptDelete(pool, eventItem, option);
             }
             GUI.backgroundColor = ColorUtils.WHITE;
             
             GUILayout.EndHorizontal();
         }
 
-        private void PromptDelete(EventData item, OptionData option) {
+        private void OpenOptionsWindow(DataPool<EventData> pool, EventData eventItem, OptionData option) {
+            Rect position = this.parent.position;
+            position.x += this.parent.position.width * 0.5f - 200;
+            position.y += this.parent.position.height * 0.5f - 300;
+            position.width = 400;
+            position.height = 600;
+
+            OptionDetailsWindow optionDetailsWindow = ScriptableObject.CreateInstance<OptionDetailsWindow>();
+            string optionIdentifier = $"{eventItem.NameId}.{option.NameId}";
+            optionDetailsWindow.titleContent = new GUIContent($"Option: {optionIdentifier}");
+            optionDetailsWindow.Init(pool, eventItem, option);
+            optionDetailsWindow.position = position;
+            optionDetailsWindow.ShowUtility();
+            optionDetailsWindow.Focus();
+        }
+
+        private void PromptDelete(DataPool<EventData> pool, EventData item, OptionData option) {
             if (!EditorUtility.DisplayDialog("Delete Option", $"Are you sure you want to delete {option.NameId}?",
                 "Yes", "No")) {
                 // User picked No
@@ -149,6 +165,7 @@ namespace GameEvent {
             
             // Proceed with delete
             item.Options.Remove(option);
+            EditorUtility.SetDirty(pool);
         }
     }
 }

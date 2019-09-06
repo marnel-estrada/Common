@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Common {
     /**
@@ -9,21 +6,13 @@ namespace Common {
 	 */
     [AttributeUsage(AttributeTargets.Class)]
     public class Group : Attribute {
-
-        private readonly string name;
-
         /**
 		 * Constructor
 		 */
         public Group(string name) {
-            this.name = name;
+            this.Name = name;
         }
 
-        public string Name {
-            get {
-                return name;
-            }
-        }
-
+        public string Name { get; }
     }
 }

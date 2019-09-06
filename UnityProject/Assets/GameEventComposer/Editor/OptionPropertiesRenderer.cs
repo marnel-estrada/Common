@@ -1,6 +1,6 @@
 using Common;
 
-using UnityEditor.Experimental.Networking.PlayerConnection;
+using UnityEditor;
 
 using UnityEngine;
 
@@ -20,6 +20,20 @@ namespace GameEvent {
 
         public void Render() {
             this.renderer.Render(this.option);
+            
+            GUILayout.Space(10);
+            
+            // Child Event
+            GUILayout.Label("Child Event", EditorStyles.boldLabel);
+            
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Child Event:", GUILayout.Width(150));
+
+            if (GUILayout.Button("Choose Event...", GUILayout.Width(130))) {
+                Debug.Log("Choose Event");
+            }
+            
+            GUILayout.EndHorizontal();
         }
     }
 }

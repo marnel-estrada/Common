@@ -67,6 +67,7 @@ namespace GameEvent {
             }
         }
 
+        [Hidden]
         public int ChildEventId {
             get {
                 return this.childEventId;
@@ -124,8 +125,6 @@ namespace GameEvent {
             }
         }
 
-        [PropertyGroup("Id")]
-        [ReadOnlyField]
         public string Id {
             get {
                 return this.nameId;

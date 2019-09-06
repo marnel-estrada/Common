@@ -57,6 +57,11 @@ namespace Common {
                     continue;
                 }
 
+                if (TypeUtils.GetCustomAttribute<Hidden>(property) != null) {
+                    // Do not include properties with Hidden attribute 
+                    continue;
+                }
+
                 // Must have a renderer
                 if (!HasRenderer(property)) {
                     return;

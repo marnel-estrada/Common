@@ -149,7 +149,7 @@ namespace GameEvent {
 
             OptionDetailsWindow optionDetailsWindow = ScriptableObject.CreateInstance<OptionDetailsWindow>();
             string optionIdentifier = $"{eventItem.NameId}.{option.NameId}";
-            optionDetailsWindow.titleContent = new GUIContent($"Option: {optionIdentifier}");
+            optionDetailsWindow.titleContent = new GUIContent($"Event Option: {optionIdentifier}");
             optionDetailsWindow.Init(pool, eventItem, option);
             optionDetailsWindow.position = position;
             optionDetailsWindow.ShowUtility();

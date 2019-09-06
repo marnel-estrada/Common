@@ -144,7 +144,7 @@ MonoBehaviour:
       descriptionId: OptionB.Description
       comment: This is option B. This is a comment about OptionB.
       childEventId: 1
-      trueOutcomeProbability: 0
+      trueOutcomeProbability: 69
       trueOutcomeTextId: 
       falseOutcomeTextId: 
       requirements: []

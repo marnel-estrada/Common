@@ -7,11 +7,11 @@ using UnityEngine;
 namespace GameEvent {
     public class EventDataRenderer : DataPoolItemRenderer<EventData> {
         private readonly GenericObjectRenderer renderer = new GenericObjectRenderer(typeof(EventData));
-        private readonly EventDataRequirementsView requirementsView;
+        private readonly RequirementsView requirementsView;
         private readonly EventDataOptionsView optionsView;
 
         public EventDataRenderer(EditorWindow parent) {
-            this.requirementsView = new EventDataRequirementsView(parent);
+            this.requirementsView = new RequirementsView(parent, EventsEditorWindow.REPAINT);
             this.optionsView = new EventDataOptionsView(parent);
         }
         
@@ -25,7 +25,7 @@ namespace GameEvent {
             GUILayout.Space(10);
             
             GUILayout.Label("Requirements", EditorStyles.boldLabel);
-            this.requirementsView.Render(pool, item);
+            this.requirementsView.Render(pool, item.Requirements, pool.Skin);
             
             GUILayout.Space(10);
             

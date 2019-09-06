@@ -7,6 +7,8 @@ using UnityEngine;
 
 namespace GameEvent {
     public class OptionDetailsWindow : EditorWindow {
+        private EditorWindow parent;
+        
         private DataPool<EventData> pool;
         private EventData eventItem;
         private OptionData option;
@@ -24,12 +26,14 @@ namespace GameEvent {
         private const int COSTS_TAB = 2;
         private const int EFFECTS_TAB = 3;
 
-        public void Init(DataPool<EventData> pool, EventData eventItem, OptionData option) {
+        public void Init(EditorWindow parent, DataPool<EventData> pool, EventData eventItem, OptionData option) {
+            this.parent = parent;
+            
             this.pool = pool;
             this.eventItem = eventItem;
             this.option = option;
             
-            this.propertiesRenderer = new OptionPropertiesRenderer(pool, eventItem, option);
+            this.propertiesRenderer = new OptionPropertiesRenderer(this, pool, eventItem, option);
         }
 
         private void OnEnable() {

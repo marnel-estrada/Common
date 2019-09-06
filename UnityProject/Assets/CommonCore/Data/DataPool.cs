@@ -57,6 +57,23 @@ namespace Common {
         }
 
         /// <summary>
+        /// Searches for an item using the integer ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public Maybe<T> Find(int id) {
+            PopulateMap();
+            for (int i = 0; i < this.dataList.Count; ++i) {
+                T item = this.dataList[i];
+                if (item.IntId == id) {
+                    return new Maybe<T>(item);
+                }
+            }
+            
+            return Maybe<T>.Nothing;
+        }
+
+        /// <summary>
         /// Returns whether or not the data pool contains the specified item
         /// </summary>
         /// <param name="id"></param>

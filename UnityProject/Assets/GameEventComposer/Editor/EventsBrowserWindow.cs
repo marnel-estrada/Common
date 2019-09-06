@@ -148,5 +148,9 @@ namespace GameEvent {
                 Close();
             }
         }
+        
+        private void OnLostFocus() {
+            Close();
+        }
     }
 }

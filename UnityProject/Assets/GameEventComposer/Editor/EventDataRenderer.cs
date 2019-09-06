@@ -15,7 +15,7 @@ namespace GameEvent {
             this.optionsView = new EventDataOptionsView(parent);
         }
         
-        private Vector2 scrollPos = new Vector2();
+        private Vector2 scrollPos;
         
         public void Render(DataPool<EventData> pool, EventData item) {
             this.scrollPos = GUILayout.BeginScrollView(this.scrollPos);

@@ -136,7 +136,181 @@ MonoBehaviour:
       trueOutcomeProbability: 52
       trueOutcomeTextId: 
       falseOutcomeTextId: 
-      requirements: []
+      requirements:
+      - className: GameEvent.AllFieldTypesRequirement
+        variables:
+          stringMap:
+            itemList:
+            - name: text
+              varValue: 
+              useOtherHolder: 0
+              otherHolderName: 
+          intMap:
+            itemList:
+            - name: integer
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          floatMap:
+            itemList:
+            - name: floatingNumber
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          boolMap:
+            itemList:
+            - name: boolean
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          vector3Map:
+            itemList: []
+          intVector2Map:
+            itemList: []
+        showHints: 0
+      - className: GameEvent.SampleRequirement
+        variables:
+          stringMap:
+            itemList: []
+          intMap:
+            itemList: []
+          floatMap:
+            itemList: []
+          boolMap:
+            itemList:
+            - name: isTrue
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          vector3Map:
+            itemList: []
+          intVector2Map:
+            itemList: []
+        showHints: 0
+      - className: GameEvent.AllFieldTypesRequirement
+        variables:
+          stringMap:
+            itemList:
+            - name: text
+              varValue: 
+              useOtherHolder: 0
+              otherHolderName: 
+          intMap:
+            itemList:
+            - name: integer
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          floatMap:
+            itemList:
+            - name: floatingNumber
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          boolMap:
+            itemList:
+            - name: boolean
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          vector3Map:
+            itemList: []
+          intVector2Map:
+            itemList: []
+        showHints: 0
+      - className: GameEvent.AllFieldTypesRequirement
+        variables:
+          stringMap:
+            itemList:
+            - name: text
+              varValue: 
+              useOtherHolder: 0
+              otherHolderName: 
+          intMap:
+            itemList:
+            - name: integer
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          floatMap:
+            itemList:
+            - name: floatingNumber
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          boolMap:
+            itemList:
+            - name: boolean
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          vector3Map:
+            itemList: []
+          intVector2Map:
+            itemList: []
+        showHints: 0
+      - className: GameEvent.AllFieldTypesRequirement
+        variables:
+          stringMap:
+            itemList:
+            - name: text
+              varValue: 
+              useOtherHolder: 0
+              otherHolderName: 
+          intMap:
+            itemList:
+            - name: integer
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          floatMap:
+            itemList:
+            - name: floatingNumber
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          boolMap:
+            itemList:
+            - name: boolean
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          vector3Map:
+            itemList: []
+          intVector2Map:
+            itemList: []
+        showHints: 0
+      - className: GameEvent.AllFieldTypesRequirement
+        variables:
+          stringMap:
+            itemList:
+            - name: text
+              varValue: 
+              useOtherHolder: 0
+              otherHolderName: 
+          intMap:
+            itemList:
+            - name: integer
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          floatMap:
+            itemList:
+            - name: floatingNumber
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          boolMap:
+            itemList:
+            - name: boolean
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          vector3Map:
+            itemList: []
+          intVector2Map:
+            itemList: []
+        showHints: 0
       costs: []
       effects: []
     - id: 2
@@ -147,7 +321,26 @@ MonoBehaviour:
       trueOutcomeProbability: 69
       trueOutcomeTextId: 
       falseOutcomeTextId: 
-      requirements: []
+      requirements:
+      - className: GameEvent.SampleRequirement
+        variables:
+          stringMap:
+            itemList: []
+          intMap:
+            itemList: []
+          floatMap:
+            itemList: []
+          boolMap:
+            itemList:
+            - name: isTrue
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          vector3Map:
+            itemList: []
+          intVector2Map:
+            itemList: []
+        showHints: 0
       costs: []
       effects: []
     - id: 3

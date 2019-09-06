@@ -14,6 +14,7 @@ namespace GameEvent {
         private OptionData option;
 
         private OptionPropertiesRenderer propertiesRenderer;
+        private OptionRequirementsRenderer requirementsRenderer;
         
         public static readonly Signal REPAINT = new Signal("Repaint");
 
@@ -34,6 +35,7 @@ namespace GameEvent {
             this.option = option;
             
             this.propertiesRenderer = new OptionPropertiesRenderer(this, pool, eventItem, option);
+            this.requirementsRenderer = new OptionRequirementsRenderer(this, pool, eventItem, option);
         }
 
         private void OnEnable() {
@@ -83,6 +85,7 @@ namespace GameEvent {
                 
                 case REQUIREMENTS_TAB:
                     GUILayout.Label("Requirements", EditorStyles.boldLabel);
+                    this.requirementsRenderer.Render();
                     break;
                 
                 case COSTS_TAB:

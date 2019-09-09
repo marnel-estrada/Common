@@ -1,67 +1,69 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
+
+using Common.Math;
 
 using UnityEditor;
-using UnityEngine;
 
-using Common.Utils;
-using Common.Math;
+using UnityEngine;
 
 namespace Common {
     /// <summary>
-    /// Utility class that renders a certain named variable for use in editor
+    ///     Utility class that renders a certain named variable for use in editor
     /// </summary>
     public class VariableFieldRenderer {
 
-        private int fieldWidth;
-
         public delegate object FieldRenderer(ValueHolder holder);
 
-        private Dictionary<NamedValueType, FieldRenderer> fieldRendererMap;
+        private readonly Dictionary<NamedValueType, FieldRenderer> fieldRendererMap;
+
+        private readonly int fieldWidth;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public VariableFieldRenderer(int fieldWidth) {
             this.fieldWidth = fieldWidth;
 
             // populate
             this.fieldRendererMap = new Dictionary<NamedValueType, FieldRenderer>();
-            AddFieldRenderer(NamedValueType.STRING, delegate (ValueHolder holder) {
-                string value = (string)holder.Get();
+            AddFieldRenderer(NamedValueType.STRING, delegate(ValueHolder holder) {
+                string value = (string) holder.Get();
                 value = string.IsNullOrEmpty(value) ? "" : value; // avoid null value
                 value = EditorGUILayout.TextField(value, GUILayout.Width(this.fieldWidth)).Trim();
+
                 return value;
             });
 
-            AddFieldRenderer(NamedValueType.INT, delegate (ValueHolder holder) {
-                int value = (int)holder.Get();
+            AddFieldRenderer(NamedValueType.INT, delegate(ValueHolder holder) {
+                int value = (int) holder.Get();
                 value = EditorGUILayout.IntField(value, GUILayout.Width(this.fieldWidth));
+
                 return value;
             });
 
-            AddFieldRenderer(NamedValueType.FLOAT, delegate (ValueHolder holder) {
-                float value = (float)holder.Get();
+            AddFieldRenderer(NamedValueType.FLOAT, delegate(ValueHolder holder) {
+                float value = (float) holder.Get();
                 value = EditorGUILayout.FloatField(value, GUILayout.Width(this.fieldWidth));
+
                 return value;
             });
 
-            AddFieldRenderer(NamedValueType.BOOL, delegate (ValueHolder holder) {
-                bool value = (bool)holder.Get();
+            AddFieldRenderer(NamedValueType.BOOL, delegate(ValueHolder holder) {
+                bool value = (bool) holder.Get();
                 value = EditorGUILayout.Toggle(value, GUILayout.Width(20)); // Width of radio button is small
+
                 return value;
             });
 
-            AddFieldRenderer(NamedValueType.VECTOR3, delegate (ValueHolder holder) {
-                Vector3 value = (Vector3)holder.Get();
+            AddFieldRenderer(NamedValueType.VECTOR3, delegate(ValueHolder holder) {
+                Vector3 value = (Vector3) holder.Get();
                 value = EditorGUILayout.Vector3Field("", value, GUILayout.Width(this.fieldWidth));
+
                 return value;
             });
 
             AddFieldRenderer(NamedValueType.INT_VECTOR2, delegate(ValueHolder holder) {
-                IntVector2 value = (IntVector2)holder.Get();
+                IntVector2 value = (IntVector2) holder.Get();
 
                 EditorGUILayout.BeginHorizontal(GUILayout.Width(110));
 
@@ -82,7 +84,7 @@ namespace Common {
         }
 
         /// <summary>
-        /// Renders a field of a specified type
+        ///     Renders a field of a specified type
         /// </summary>
         /// <param name="namedType"></param>
         /// <param name="name"></param>
@@ -102,6 +104,5 @@ namespace Common {
         public FieldRenderer GetFieldRenderer(NamedValueType valueType) {
             return this.fieldRendererMap[valueType];
         }
-
     }
 }

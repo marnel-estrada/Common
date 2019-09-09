@@ -1,24 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Common;
-using Common.Utils;
+﻿using System.Collections.Generic;
 
 namespace Common {
     /// <summary>
-    /// A class that aggregates variable names for each type
-    /// Such names will then be used in dropdown lists
+    ///     A class that aggregates variable names for each type
+    ///     Such names will then be used in dropdown lists
     /// </summary>
     public class VariableNamesAggregator {
 
         // We use list internally
         // We'll just use ToArray() when needed
-        private Dictionary<NamedValueType, List<string>> namesMap;
+        private readonly Dictionary<NamedValueType, List<string>> namesMap;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public VariableNamesAggregator() {
             this.namesMap = new Dictionary<NamedValueType, List<string>>();
@@ -30,7 +24,7 @@ namespace Common {
         }
 
         /// <summary>
-        /// Updates the aggregated names
+        ///     Updates the aggregated names
         /// </summary>
         public void Update(NamedValueLibrary library) {
             foreach (KeyValuePair<NamedValueType, List<string>> entry in this.namesMap) {
@@ -49,13 +43,12 @@ namespace Common {
         }
 
         /// <summary>
-        /// Returns the set of names of the specified type
+        ///     Returns the set of names of the specified type
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
         public string[] GetVariablesNames(NamedValueType type) {
             return this.namesMap[type].ToArray();
         }
-
     }
 }

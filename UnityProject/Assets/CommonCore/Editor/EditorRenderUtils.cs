@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
-
-using Common.Utils;
 
 namespace Common {
     public static class EditorRenderUtils {
@@ -19,7 +12,7 @@ namespace Common {
         /// <param name="width"></param>
         /// <returns></returns>
         public static string Dropdown(string value, PopupValueSet valueSet, int width) {
-            string finalValue = value == null ? "" : value;
+            string finalValue = value ?? "";
 
             int index = valueSet.ResolveIndex(finalValue);
             if(index < 0) {

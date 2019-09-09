@@ -1,30 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
-using UnityEngine;
 using UnityEditor;
 
-using Common;
-using Common.Utils;
+using UnityEngine;
 
 namespace Common {
     /// <summary>
-    /// A utility class that renders the variables of an event
+    ///     A utility class that renders the variables of an event
     /// </summary>
     public class NamedValueLibraryRenderer {
-        
+
+        private const int LABEL_WIDTH = 200;
+        private const int VALUE_WIDTH = 200;
+
+        private readonly Dictionary<NamedValueType, VariableEntryRenderer> entryRendererMap =
+            new Dictionary<NamedValueType, VariableEntryRenderer>();
+
+        private readonly VariableFieldRenderer fieldRenderer;
+
+        // used for new variable
+        private string newVariableName = "";
+        private string newVariableType = "";
+
+        private readonly Dictionary<NamedValueType, SimpleList<string>> removalMap =
+            new Dictionary<NamedValueType, SimpleList<string>>();
+
         private PopupValueSet variableTypeValues;
 
-        private Dictionary<NamedValueType, SimpleList<string>> removalMap = new Dictionary<NamedValueType, SimpleList<string>>();
-
-        private VariableFieldRenderer fieldRenderer;
-
-        private Dictionary<NamedValueType, VariableEntryRenderer> entryRendererMap = new Dictionary<NamedValueType, VariableEntryRenderer>();
-
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public NamedValueLibraryRenderer() {
             PreparePopupValues();
@@ -34,7 +38,8 @@ namespace Common {
             // Populate removalMap and entryRendererMap
             for (int i = 0; i < NamedValueType.ALL_TYPES.Length; ++i) {
                 this.removalMap[NamedValueType.ALL_TYPES[i]] = new SimpleList<string>();
-                this.entryRendererMap[NamedValueType.ALL_TYPES[i]] = new VariableEntryRenderer(NamedValueType.ALL_TYPES[i], this.removalMap, this.fieldRenderer);
+                this.entryRendererMap[NamedValueType.ALL_TYPES[i]] =
+                    new VariableEntryRenderer(NamedValueType.ALL_TYPES[i], this.removalMap, this.fieldRenderer);
             }
         }
 
@@ -59,18 +64,18 @@ namespace Common {
         }
 
         /// <summary>
-        /// Renders the event's variables
+        ///     Renders the event's variables
         /// </summary>
         /// <param name="eventData"></param>
         public void Render(NamedValueLibrary library) {
             GUILayout.BeginVertical();
 
             RenderAddVariable(library);
-            
+
             GUILayout.Space(10);
-            
+
             // Existing variables
-            for(int i = 0; i < NamedValueType.ALL_TYPES.Length; ++i) {
+            for (int i = 0; i < NamedValueType.ALL_TYPES.Length; ++i) {
                 NamedValueType type = NamedValueType.ALL_TYPES[i];
                 RenderVariableList(library.GetContainer(type), type);
                 GUILayout.Space(5);
@@ -78,13 +83,6 @@ namespace Common {
 
             GUILayout.EndVertical();
         }
-
-        private const int LABEL_WIDTH = 200;
-        private const int VALUE_WIDTH = 200;
-
-        // used for new variable
-        private string newVariableName = "";
-        private string newVariableType = "";
 
         private void RenderAddVariable(NamedValueLibrary library) {
             // name
@@ -106,13 +104,16 @@ namespace Common {
 
         private void AddVariable(NamedValueLibrary library) {
             if (string.IsNullOrEmpty(this.newVariableType)) {
-                EditorUtility.DisplayDialog("Add Variable", string.Format("Can't add variable. No variable type was specified."), "OK");
+                EditorUtility.DisplayDialog("Add Variable", "Can't add variable. No variable type was specified.",
+                    "OK");
+
                 return;
             }
 
             NamedValueContainer container = library.GetContainer(ResolveTypeForNewVariable());
-            if(container.Contains(this.newVariableName)) {
-                EditorUtility.DisplayDialog("Add Variable", string.Format("Can't add variable. Variable already exists."), "OK");
+            if (container.Contains(this.newVariableName)) {
+                EditorUtility.DisplayDialog("Add Variable", "Can't add variable. Variable already exists.", "OK");
+
                 return;
             }
 
@@ -122,14 +123,15 @@ namespace Common {
         }
 
         private NamedValueType ResolveTypeForNewVariable() {
-            for(int i = 0; i < NamedValueType.ALL_TYPES.Length; ++i) {
-                if(NamedValueType.ALL_TYPES[i].ValueTypeLabel.Equals(this.newVariableType)) {
+            for (int i = 0; i < NamedValueType.ALL_TYPES.Length; ++i) {
+                if (NamedValueType.ALL_TYPES[i].ValueTypeLabel.Equals(this.newVariableType)) {
                     return NamedValueType.ALL_TYPES[i];
                 }
             }
 
             Assertion.Assert(false, "Can't resolve type for " + this.newVariableType);
-            return default(NamedValueType);
+
+            return default;
         }
 
         private void RenderVariableList(NamedValueContainer container, NamedValueType type) {
@@ -141,9 +143,9 @@ namespace Common {
             } else {
                 SimpleList<string> removalList = this.removalMap[type];
                 removalList.Clear();
-                
+
                 VariableEntryRenderer entryRenderer = this.entryRendererMap[type];
-                for(int i = 0; i < container.Count; ++i) {
+                for (int i = 0; i < container.Count; ++i) {
                     entryRenderer.Render(container.GetNamedValueHolderAt(i), type);
                 }
 
@@ -151,9 +153,9 @@ namespace Common {
                 for (int i = 0; i < removalList.Count; ++i) {
                     container.Remove(removalList[i]);
                 }
+
                 removalList.Clear();
             }
         }
-
     }
 }

@@ -102,12 +102,12 @@ namespace Common {
 
             GUI.backgroundColor = ColorUtils.WHITE;
 
-            // up button 
+            // Up button 
             if (GUILayout.Button("Up", GUILayout.Width(25), GUILayout.Height(20))) {
                 MoveUp(index);
             }
 
-            // down button
+            // Down button
             if (GUILayout.Button("Down", GUILayout.Width(45), GUILayout.Height(20))) {
                 MoveDown(index);
             }

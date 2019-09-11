@@ -100,17 +100,15 @@ namespace GameEvent {
             }
 
             for (int i = 0; i < options.Count; ++i) {
-                RenderOption(pool, eventItem, options[i]);
+                RenderOption(pool, eventItem, options[i], i);
                 
                 GUILayout.Space(30);
             }
         }
 
-        private void RenderOption(DataPool<EventData> pool, EventData eventItem, OptionData option) {
-            GUI.backgroundColor = ColorUtils.YELLOW;
-            GUILayout.Box(option.NameId, GUILayout.Width(400));
-            GUI.backgroundColor = ColorUtils.WHITE;
-            
+        private void RenderOption(DataPool<EventData> pool, EventData eventItem, OptionData option, int index) {
+            RenderOptionHeader(pool, eventItem, option, index);
+
             // Description ID
             GUILayout.BeginHorizontal();
             GUILayout.Label("Description ID: ", GUILayout.Width(150));
@@ -143,6 +141,57 @@ namespace GameEvent {
             GUI.backgroundColor = ColorUtils.WHITE;
             
             GUILayout.EndHorizontal();
+        }
+
+        private static void RenderOptionHeader(DataPool<EventData> pool, EventData eventItem, OptionData option, int index) {
+            GUILayout.BeginHorizontal();
+            
+            // Up button 
+            if (GUILayout.Button("Up", GUILayout.Width(25), GUILayout.Height(20))) {
+                MoveUp(pool, eventItem, index);
+            }
+
+            // Down button
+            if (GUILayout.Button("Down", GUILayout.Width(45), GUILayout.Height(20))) {
+                MoveDown(pool, eventItem, index);
+            }
+
+            // Option name (header)
+            GUI.backgroundColor = ColorUtils.YELLOW;
+            GUILayout.Box(option.NameId, GUILayout.Width(400));
+            GUI.backgroundColor = ColorUtils.WHITE;
+
+            GUILayout.EndHorizontal();
+        }
+        
+        private static void MoveUp(DataPool<EventData> pool, EventData eventItem, int index) {
+            if (index <= 0) {
+                // Can no longer move up
+                return;
+            }
+
+            Swap(eventItem, index, index - 1);
+
+            EditorUtility.SetDirty(pool);
+            EventsEditorWindow.REPAINT.Dispatch();
+        }
+
+        private static void MoveDown(DataPool<EventData> pool, EventData eventItem, int index) {
+            if (index + 1 >= eventItem.Options.Count) {
+                // Can no longer move down
+                return;
+            }
+
+            Swap(eventItem, index, index + 1);
+
+            EditorUtility.SetDirty(pool);
+            EventsEditorWindow.REPAINT.Dispatch();
+        }
+
+        private static void Swap(EventData eventItem, int a, int b) {
+            OptionData temp = eventItem.Options[a];
+            eventItem.Options[a] = eventItem.Options[b];
+            eventItem.Options[b] = temp;
         }
 
         private string ResolveChildEventLabel(DataPool<EventData> pool, OptionData option) {

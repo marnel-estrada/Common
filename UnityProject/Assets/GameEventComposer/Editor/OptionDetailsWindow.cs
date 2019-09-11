@@ -15,8 +15,11 @@ namespace GameEvent {
 
         private OptionPropertiesRenderer propertiesRenderer;
         private OptionRequirementsRenderer requirementsRenderer;
-        
+        private OptionCostsRenderer costsRenderer;
+        private OptionEffectsRenderer effectsRenderer;
+
         public static readonly Signal REPAINT = new Signal("Repaint");
+        public static readonly Signal CLOSE = new Signal("Close");
 
         private static readonly string[] TABS = {
             "Properties", "Requirements", "Costs", "Effects"
@@ -36,14 +39,18 @@ namespace GameEvent {
             
             this.propertiesRenderer = new OptionPropertiesRenderer(this, pool, eventItem, option);
             this.requirementsRenderer = new OptionRequirementsRenderer(this, pool, eventItem, option);
+            this.costsRenderer = new OptionCostsRenderer(this, pool, eventItem, option);
+            this.effectsRenderer = new OptionEffectsRenderer(this, pool, eventItem, option);
         }
 
         private void OnEnable() {
             REPAINT.AddListener(Repaint);
+            CLOSE.AddListener(Close);
         }
 
         private void OnDisable() {
             REPAINT.RemoveListener(Repaint);
+            CLOSE.RemoveListener(Close);
         }
 
         private void OnDestroy() {
@@ -53,6 +60,10 @@ namespace GameEvent {
 
         private void Repaint(ISignalParameters parameters) {
             Repaint();
+        }
+
+        private void Close(ISignalParameters parameters) {
+            Close();
         }
 
         private int tabSelected;
@@ -90,10 +101,12 @@ namespace GameEvent {
                 
                 case COSTS_TAB:
                     GUILayout.Label("Costs", EditorStyles.boldLabel);
+                    this.costsRenderer.Render();
                     break;
                 
                 case EFFECTS_TAB:
                     GUILayout.Label("Effects", EditorStyles.boldLabel);
+                    this.effectsRenderer.Render();
                     break;
             }
             

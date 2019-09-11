@@ -40,8 +40,7 @@ namespace Common {
         }
 
         private void Delete(DataPool<T> pool, T item) {
-            if (EditorUtility.DisplayDialogComplex("Delete Item",
-                string.Format("Are you sure you want to delete {0}?", item.Id), "Yes", "No", "Cancel") != 0) {
+            if (EditorUtility.DisplayDialogComplex("Delete Item", $"Are you sure you want to delete {item.Id}?", "Yes", "No", "Cancel") != 0) {
                 // Cancelled or No
                 return;
             }

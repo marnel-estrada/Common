@@ -125,6 +125,25 @@ MonoBehaviour:
         intVector2Map:
           itemList: []
       showHints: 0
+    - className: GameEvent.SampleRequirement
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList: []
+        boolMap:
+          itemList:
+          - name: isTrue
+            varValue: 0
+            useOtherHolder: 0
+            otherHolderName: 
+        vector3Map:
+          itemList: []
+        intVector2Map:
+          itemList: []
+      showHints: 0
     options:
     - id: 1
       nameId: OptionA
@@ -311,8 +330,122 @@ MonoBehaviour:
           intVector2Map:
             itemList: []
         showHints: 0
-      costs: []
-      effects: []
+      - className: GameEvent.SampleRequirement
+        variables:
+          stringMap:
+            itemList: []
+          intMap:
+            itemList: []
+          floatMap:
+            itemList: []
+          boolMap:
+            itemList:
+            - name: isTrue
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          vector3Map:
+            itemList: []
+          intVector2Map:
+            itemList: []
+        showHints: 0
+      - className: GameEvent.AllFieldTypesRequirement
+        variables:
+          stringMap:
+            itemList:
+            - name: text
+              varValue: 
+              useOtherHolder: 0
+              otherHolderName: 
+          intMap:
+            itemList:
+            - name: integer
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          floatMap:
+            itemList:
+            - name: floatingNumber
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          boolMap:
+            itemList:
+            - name: boolean
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          vector3Map:
+            itemList: []
+          intVector2Map:
+            itemList: []
+        showHints: 0
+      costs:
+      - className: GameEvent.SampleFundsCost
+        variables:
+          stringMap:
+            itemList: []
+          intMap:
+            itemList: []
+          floatMap:
+            itemList: []
+          boolMap:
+            itemList: []
+          vector3Map:
+            itemList: []
+          intVector2Map:
+            itemList: []
+        showHints: 0
+      - className: GameEvent.SampleStaffCost
+        variables:
+          stringMap:
+            itemList: []
+          intMap:
+            itemList: []
+          floatMap:
+            itemList: []
+          boolMap:
+            itemList: []
+          vector3Map:
+            itemList: []
+          intVector2Map:
+            itemList: []
+        showHints: 0
+      effects:
+      - className: GameEvent.SampleFundsEffect
+        variables:
+          stringMap:
+            itemList: []
+          intMap:
+            itemList:
+            - name: amount
+              varValue: 0
+              useOtherHolder: 0
+              otherHolderName: 
+          floatMap:
+            itemList: []
+          boolMap:
+            itemList: []
+          vector3Map:
+            itemList: []
+          intVector2Map:
+            itemList: []
+        showHints: 0
+      - className: GameEvent.SamplePrestigeEffect
+        variables:
+          stringMap:
+            itemList: []
+          intMap:
+            itemList: []
+          floatMap:
+            itemList: []
+          boolMap:
+            itemList: []
+          vector3Map:
+            itemList: []
+          intVector2Map:
+            itemList: []
+        showHints: 0
     - id: 2
       nameId: OptionB
       descriptionId: OptionB.Description

@@ -3,10 +3,10 @@ using Common;
 namespace GameEvent {
     // Enum implemented as a struct
     public readonly struct Rarity {
-        public static readonly Rarity NULL = new Rarity(0, "Null");
-        public static readonly Rarity COMMON = new Rarity(1, "Common");
-        public static readonly Rarity UNCOMMON = new Rarity(2, "Uncommon");
-        public static readonly Rarity RARE = new Rarity(3, "Rare");
+        public static readonly Rarity NULL = new Rarity(0, 0, "Null");
+        public static readonly Rarity COMMON = new Rarity(1, 4, "Common");
+        public static readonly Rarity UNCOMMON = new Rarity(2, 2, "Uncommon");
+        public static readonly Rarity RARE = new Rarity(3, 1, "Rare");
 
         public static readonly Rarity[] ALL = {
             COMMON, UNCOMMON, RARE
@@ -45,10 +45,12 @@ namespace GameEvent {
         }
         
         public readonly int id;
+        public readonly int weight;
         public readonly string name;
 
-        private Rarity(int id, string name) {
+        private Rarity(int id, int weight, string name) {
             this.id = id;
+            this.weight = weight;
             this.name = name;
         }
     }

@@ -519,5 +519,45 @@ MonoBehaviour:
       requirements: []
       costs: []
       effects: []
+  - id: 5
+    nameId: StaffSick
+    descriptionId: 
+    iconId: 
+    recurring: 0
+    rarity: 1
+    optionIdGenerator:
+      counter: 1
+    requirements: []
+    options: []
+  - id: 6
+    nameId: InspectorEntry
+    descriptionId: 
+    iconId: 
+    recurring: 0
+    rarity: 1
+    optionIdGenerator:
+      counter: 1
+    requirements: []
+    options: []
+  - id: 7
+    nameId: StudentSick
+    descriptionId: 
+    iconId: 
+    recurring: 0
+    rarity: 1
+    optionIdGenerator:
+      counter: 1
+    requirements: []
+    options: []
+  - id: 8
+    nameId: NewPet
+    descriptionId: 
+    iconId: 
+    recurring: 0
+    rarity: 1
+    optionIdGenerator:
+      counter: 1
+    requirements: []
+    options: []
   idGenerator:
-    counter: 5
+    counter: 9

@@ -1,0 +1,17 @@
+{
+    "name": "GameEvent.Tests",
+    "references": [
+        "GUID:9cc80ffd7495eff4f9e93d755cfe1699",
+        "GUID:5b360229dc7100c45915912fee4dbd7f"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}

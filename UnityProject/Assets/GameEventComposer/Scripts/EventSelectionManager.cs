@@ -1,24 +1,27 @@
 namespace GameEvent {
     public class EventSelectionManager {
         private readonly EventsPool pool; // The main pool of events
-        private readonly EventSelectionStrategy selectionStrategy;
+        private readonly EventSelectionStrategy defaultSelectionStrategy;
+        private readonly EventSelectionStrategy customSelectionStrategy;
         
         private readonly EventDeck deck = new EventDeck();
 
         public EventSelectionManager(EventsPool pool, EventSelectionStrategy selectionStrategy) {
             this.pool = pool;
-            this.selectionStrategy = selectionStrategy ?? new DefaultSelectionStrategy(this.deck);
+            this.defaultSelectionStrategy = new DefaultSelectionStrategy(this.deck);
+            this.customSelectionStrategy = selectionStrategy ?? this.defaultSelectionStrategy;
         }
 
-        public EventDeck Deck {
+        public EventSelectionStrategy DefaultSelectionStrategy {
             get {
-                return this.deck;
+                return this.defaultSelectionStrategy;
             }
         }
 
         public void Reset() {
             this.deck.Clear();
-            this.selectionStrategy.Reset();
+            this.defaultSelectionStrategy.Reset();
+            this.customSelectionStrategy.Reset();
 
             foreach (EventData eventData in this.pool.GetAll()) {
                 PopulateDeck(eventData);
@@ -35,7 +38,7 @@ namespace GameEvent {
         }
 
         public int ResolveNextEvent() {
-            return this.selectionStrategy.SelectNextEvent();
+            return this.customSelectionStrategy.SelectNextEvent();
         }
     }
 }

@@ -1,5 +1,7 @@
 using Common;
 
+using UnityEngine;
+
 namespace GameEvent {
     [Group("GameEvent.Sample")]
     public class SampleFundsEffect : Effect {
@@ -7,6 +9,7 @@ namespace GameEvent {
 
         public override void Apply() {
             // Just a sample
+            Debug.Log("SampleFundsEffect");
         }
     }
 }

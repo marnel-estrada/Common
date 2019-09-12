@@ -11,7 +11,7 @@ using UnityEngine;
 namespace GameEvent {
     [TestFixture]
     [Category("GameEvent")]
-    public class EventSelectionManagerTest {
+    public class GameEventTests {
         [Test]
         public void EventSelectionTest() {
             string path = "Assets/GameEventComposer/Data/TestEventsPool.asset";
@@ -29,6 +29,19 @@ namespace GameEvent {
                 
                 Debug.Log($"Event: {found.Value.NameId}");
             }
+        }
+
+        [Test]
+        public void EventInstanceTest() {
+            string path = "Assets/GameEventComposer/Data/TestEventsPool.asset";
+            EventsPool pool = AssetDatabase.LoadAssetAtPath(path, typeof(EventsPool)) as EventsPool;
+            Assert.NotNull(pool);
+            
+            EventInstanceManager instanceManager = new EventInstanceManager(pool);
+            
+            // Try to execute an event option
+            EventInstance instance = instanceManager.Get(2);
+            instance.Options[0].ApplyEffects();
         }
     }
 }

@@ -33,15 +33,48 @@ namespace GameEvent {
             }
         }
 
+        public bool PassedRequirements {
+            get {
+                for (int i = 0; i < this.requirements.Count; ++i) {
+                    if (!this.requirements[i].IsMet()) {
+                        // One of the requirements is not met
+                        // Option does not pass
+                        return false;
+                    }
+                }
+                
+                return true;
+            }
+        }
+
         public IReadOnlyList<Cost> Costs {
             get {
                 return this.costs;
             }
         }
 
-        public IReadOnlyList<Effect> Effects {
+        public bool CanAfford {
             get {
-                return this.effects;
+                for (int i = 0; i < this.costs.Count; ++i) {
+                    if (!this.costs[i].CanAfford) {
+                        // Can't afford one of the costs 
+                        return false;
+                    }
+                }
+                
+                return true;
+            }
+        }
+
+        public void PayCosts() {
+            for (int i = 0; i < this.costs.Count; ++i) {
+                this.costs[i].Pay();
+            }
+        }
+
+        public void ApplyEffects() {
+            for (int i = 0; i < this.effects.Count; ++i) {
+                this.effects[i].Apply();
             }
         }
 

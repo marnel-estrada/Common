@@ -1,14 +1,9 @@
 {
-    "name": "Common.Editor",
+    "name": "DataPoolTest",
     "references": [
-        "Common",
-        "CommonCore",
-        "Swarm",
-        "CommonCore.Editor"
+        "CommonCore"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

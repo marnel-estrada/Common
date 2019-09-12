@@ -9,7 +9,7 @@ namespace Test {
     public class TestDataPoolEditor : DataPoolEditor<TestData> {
         public override void OnInspectorGUI() {
             base.OnInspectorGUI();
-
+        
             if (GUILayout.Button("Open Editor")) {
                 TestDataPoolEditorWindow window = EditorWindow.GetWindow<TestDataPoolEditorWindow>("Test Data Editor");
                 window.Init(this.DataPool, new TestDataItemRenderer());

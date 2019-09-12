@@ -1,14 +1,11 @@
 {
-    "name": "Common.Editor",
+    "name": "GameEvent.Editor",
     "references": [
-        "Common",
         "CommonCore",
-        "Swarm",
-        "CommonCore.Editor"
+        "CommonCore.Editor",
+        "GameEventComposer"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

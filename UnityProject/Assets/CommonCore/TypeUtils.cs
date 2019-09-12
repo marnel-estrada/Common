@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Reflection;
 
 namespace Common {
@@ -105,5 +102,22 @@ namespace Common {
             return attribute as T;
         }
 
+        /// <summary>
+        /// Instantiates an instance from a class name
+        /// </summary>
+        /// <param name="className"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T Instantiate<T>(ClassData data, NamedValueLibrary parentVariables) {
+            Type type = TypeIdentifier.GetType(data.ClassName);
+            Assertion.AssertNotNull(type, data.ClassName);
+            ConstructorInfo constructor = ResolveEmptyConstructor(type);
+            T instance = (T) constructor.Invoke(EMPTY_PARAMETERS);
+            
+            // Inject variables
+            NamedValueUtils.InjectNamedProperties(parentVariables, data.Variables, type, instance);
+
+            return instance;
+        }
     }
 }

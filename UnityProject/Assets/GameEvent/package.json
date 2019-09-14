@@ -1,0 +1,14 @@
+{
+  "name": "com.squeakywheel.common.gameevent",
+  "displayName": "Common.GameEvent",
+  "version": "1.0.0",
+  "unity": "2019.2",
+  "description": "Common.GameEvent",
+  "dependencies": {
+    "com.squeakywheel.common.core": "1.0.0"
+  },
+  "keywords": [
+    "unity"
+  ],
+  "category": "Unity"
+}

@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Common {
     /// <summary>
     /// Contains text related utility methods
     /// </summary>
     public static class TextUtils {
-
         /// <summary>
         /// Returns comma separated number on the thousands
         /// </summary>
@@ -149,5 +147,17 @@ namespace Common {
             return string.Format(CultureInfo.CurrentCulture, "{0}", date);
         }
 
+        /// <summary>
+        /// Cleans the specified string of unsafe characters for file names
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static string RemoveFileNameUnsafeCharacters(string s) {
+            string unsafeCharacters = Regex.Escape("<>:\"\\/|?*");
+            string pattern = "[" + unsafeCharacters + "]";
+
+            // Replace with empty string
+            return Regex.Replace(s, pattern, "");
+        }
     }
 }

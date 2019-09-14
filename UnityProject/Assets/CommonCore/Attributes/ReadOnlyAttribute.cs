@@ -3,7 +3,7 @@
 using UnityEngine;
 
 namespace Common {
-    [AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class ReadOnlyFieldAttribute : PropertyAttribute {
     }
 }

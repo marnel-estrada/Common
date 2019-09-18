@@ -45,7 +45,7 @@ namespace CommonEcs {
                     scaledDeltaTime = UnityEngine.Time.deltaTime * timeReference.TimeScale
                 };
 
-                lastHandle = JobChunkExtensions.Schedule(job, this.scaledQuery, lastHandle);
+                lastHandle = job.Schedule(this.scaledQuery, lastHandle);
             }
             
             return lastHandle;
@@ -57,7 +57,7 @@ namespace CommonEcs {
                 deltaTime = UnityEngine.Time.deltaTime
             };
 
-            return JobChunkExtensions.Schedule(job, this.nonScaledQuery, dependency);
+            return job.Schedule(this.nonScaledQuery, dependency);
         }
 
         [BurstCompile]

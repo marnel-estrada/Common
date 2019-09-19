@@ -84,7 +84,16 @@ namespace GameEvent {
             }
             
             // Render tabs
-            this.tabSelected = GUILayout.Toolbar(this.tabSelected, TABS, GUILayout.Width(400));
+            int newSelectedTab = GUILayout.Toolbar(this.tabSelected, TABS, GUILayout.Width(400));
+            if (newSelectedTab != this.tabSelected) {
+                // A new tab was selected
+                this.tabSelected = newSelectedTab;
+                
+                // We do this so that focus on text fields would be removed
+                // Note that there's a bug that the value of the text field is retained
+                // even when another text field is already selected
+                GUI.FocusControl(null);
+            }
             
             GUILayout.Space(10);
 

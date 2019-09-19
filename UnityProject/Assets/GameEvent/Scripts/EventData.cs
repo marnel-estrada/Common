@@ -22,6 +22,10 @@ namespace GameEvent {
         
         [SerializeField]
         private bool recurring;
+        
+        // We added this so we can disable some events
+        [SerializeField]
+        private bool enabled = true; // enabled by default
 
         [SerializeField]
         private int rarity = 1;
@@ -85,6 +89,16 @@ namespace GameEvent {
             }
             set {
                 this.recurring = value;
+            }
+        }
+        
+        [PropertyGroup("Properties")]
+        public bool Enabled {
+            get {
+                return this.enabled;
+            }
+            set {
+                this.enabled = value;
             }
         }
 

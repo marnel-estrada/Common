@@ -33,5 +33,11 @@ namespace GameEvent {
                 this.cards.Swap(a, b);
             }
         }
+
+        public int Count {
+            get {
+                return this.cards.Count;
+            }
+        }
     }
 }

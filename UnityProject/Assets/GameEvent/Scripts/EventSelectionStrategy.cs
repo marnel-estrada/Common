@@ -1,7 +1,9 @@
+using Common;
+
 namespace GameEvent {
-    public interface EventSelectionStrategy {
+    public interface IEventSelectionStrategy {
         void Reset();
         
-        int SelectNextEvent(EventDeck deck);
+        Maybe<int> SelectNextEvent(EventDeck deck);
     }
 }

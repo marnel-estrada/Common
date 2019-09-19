@@ -42,9 +42,15 @@ namespace GameEvent {
             }
         }
 
-        public IReadOnlyList<Requirement> Requirements {
+        public bool AreAllRequirementsMet {
             get {
-                return this.requirements;
+                for (int i = 0; i < this.requirements.Count; ++i) {
+                    if (!this.requirements[i].IsMet()) {
+                        return false;
+                    }
+                }
+
+                return true;
             }
         }
 

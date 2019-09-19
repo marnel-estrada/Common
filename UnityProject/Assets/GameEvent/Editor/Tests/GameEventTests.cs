@@ -23,8 +23,8 @@ namespace GameEvent {
             selectionManager.Reset();
 
             for (int i = 0; i < 3; ++i) {
-                int eventId = selectionManager.ResolveNextEvent();
-                Maybe<EventData> found = pool.Find(eventId);
+                Maybe<int> eventId = selectionManager.ResolveNextEvent();
+                Maybe<EventData> found = pool.Find(eventId.Value);
                 Assert.True(found.HasValue);
                 
                 Debug.Log($"Event: {found.Value.NameId}");

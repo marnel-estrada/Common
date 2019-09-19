@@ -8,7 +8,7 @@ namespace GameEvent {
 
         public EventSelectionManager(EventsPool pool, EventSelectionStrategy selectionStrategy) {
             this.pool = pool;
-            this.defaultSelectionStrategy = new DefaultSelectionStrategy(this.deck);
+            this.defaultSelectionStrategy = new DefaultSelectionStrategy();
             this.customSelectionStrategy = selectionStrategy ?? this.defaultSelectionStrategy;
         }
 
@@ -38,7 +38,7 @@ namespace GameEvent {
         }
 
         public int ResolveNextEvent() {
-            return this.customSelectionStrategy.SelectNextEvent();
+            return this.customSelectionStrategy.SelectNextEvent(this.deck);
         }
     }
 }

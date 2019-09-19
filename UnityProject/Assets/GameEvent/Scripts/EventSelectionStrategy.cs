@@ -2,6 +2,6 @@ namespace GameEvent {
     public interface EventSelectionStrategy {
         void Reset();
         
-        int SelectNextEvent();
+        int SelectNextEvent(EventDeck deck);
     }
 }

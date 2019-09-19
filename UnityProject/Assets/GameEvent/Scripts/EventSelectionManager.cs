@@ -24,6 +24,11 @@ namespace GameEvent {
         }
 
         private void PopulateDeck(EventData eventData) {
+            if (!eventData.Enabled) {
+                // Do not add disabled events
+                return;
+            }
+            
             int weight = Rarity.ConvertFromId(eventData.Rarity).weight;
             for (int i = 0; i < weight; ++i) {
                 this.deck.Add(new EventCard(eventData.IntId));

@@ -14,6 +14,11 @@ namespace GameEvent {
 
         private void Parse() {
             foreach (EventData eventData in pool.GetAll()) {
+                if (!eventData.Enabled) {
+                    // Skip disabled events
+                    continue;
+                }
+                
                 EventInstance instance = new EventInstance(eventData);
                 this.map[instance.IntId] = instance;
             }

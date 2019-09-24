@@ -48,7 +48,6 @@ namespace GameEvent {
         }
 
         [PropertyGroup("Id")]
-        [ReadOnlyField]
         public string NameId {
             get {
                 return this.nameId;

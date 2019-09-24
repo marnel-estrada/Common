@@ -66,7 +66,7 @@ namespace GameEvent {
             Close();
         }
 
-        private int tabSelected;
+        private Vector2 scrollPos;
 
         private void OnGUI() {
             GUILayout.BeginVertical();
@@ -83,45 +83,33 @@ namespace GameEvent {
                 EditorUtility.DisplayDialog("Save", "Save Successful", "OK");
             }
             
-            // Render tabs
-            int newSelectedTab = GUILayout.Toolbar(this.tabSelected, TABS, GUILayout.Width(400));
-            if (newSelectedTab != this.tabSelected) {
-                // A new tab was selected
-                this.tabSelected = newSelectedTab;
-                
-                // We do this so that focus on text fields would be removed
-                // Note that there's a bug that the value of the text field is retained
-                // even when another text field is already selected
-                GUI.FocusControl(null);
-            }
-            
             GUILayout.Space(10);
 
-            switch (this.tabSelected) {
-                case PROPERTIES_TAB:
-                    GUILayout.Label("Properties", EditorStyles.boldLabel);
-                    this.propertiesRenderer.Render();
-                    break;
-                
-                case REQUIREMENTS_TAB:
-                    GUILayout.Label("Requirements", EditorStyles.boldLabel);
-                    this.requirementsRenderer.Render();
-                    break;
-                
-                case COSTS_TAB:
-                    GUILayout.Label("Costs", EditorStyles.boldLabel);
-                    this.costsRenderer.Render();
-                    break;
-                
-                case EFFECTS_TAB:
-                    GUILayout.Label("Effects", EditorStyles.boldLabel);
-                    this.effectsRenderer.Render();
-                    break;
-            }
+            this.scrollPos = GUILayout.BeginScrollView(this.scrollPos);
             
+            GUILayout.Label("Properties", EditorStyles.boldLabel);
+            this.propertiesRenderer.Render();
+
+            GUILayout.Space(20);
+            
+            GUILayout.Label("Requirements", EditorStyles.boldLabel);
+            this.requirementsRenderer.Render();
+
+            GUILayout.Space(20);
+            
+            GUILayout.Label("Costs", EditorStyles.boldLabel);
+            this.costsRenderer.Render();
+
+            GUILayout.Space(20);
+            
+            GUILayout.Label("Effects", EditorStyles.boldLabel);
+            this.effectsRenderer.Render();
+            
+            GUILayout.EndScrollView();
+
             GUILayout.EndVertical();
         }
-        
+
         private void Update() {
             // close the window if editor is compiling
             if (EditorApplication.isCompiling) {

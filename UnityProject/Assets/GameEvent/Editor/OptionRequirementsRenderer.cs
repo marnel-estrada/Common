@@ -27,11 +27,7 @@ namespace GameEvent {
         private Vector2 scrollPos;
 
         public void Render() {
-            this.scrollPos = GUILayout.BeginScrollView(this.scrollPos);
-            
             this.requirementsView.Render(this.pool, this.option.Requirements, this.pool.Skin);
-            
-            GUILayout.EndScrollView();
         }
     }
 }

@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace GameEvent {
     /// <summary>
     /// Generic class for all costs
@@ -24,6 +26,10 @@ namespace GameEvent {
         /// The text to display the cost with
         /// </summary>
         public virtual string Text {
+            get;
+        }
+
+        public virtual Color TextColor {
             get;
         }
     }

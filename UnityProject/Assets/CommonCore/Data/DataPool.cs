@@ -149,6 +149,7 @@ namespace Common {
 
             for(int i = 0; i < this.removeList.Count; ++i) {
                 this.dataList.Remove(this.removeList[i]);
+                this.map.Remove(this.removeList[i].Id); // Remove from dictionary as well
             }
 
             this.removeList.Clear();

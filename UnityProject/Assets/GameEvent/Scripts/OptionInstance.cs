@@ -53,6 +53,12 @@ namespace GameEvent {
             }
         }
 
+        public IReadOnlyList<Effect> Effects {
+            get {
+                return this.effects;
+            }
+        }
+
         public bool CanAfford {
             get {
                 for (int i = 0; i < this.costs.Count; ++i) {

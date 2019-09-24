@@ -12,5 +12,19 @@ namespace GameEvent {
         /// Routines to pay the cost
         /// </summary>
         public abstract void Pay();
+
+        /// <summary>
+        /// The icon to display the cost with
+        /// </summary>
+        public virtual string Icon {
+            get;
+        }
+
+        /// <summary>
+        /// The text to display the cost with
+        /// </summary>
+        public virtual string Text {
+            get;
+        }
     }
 }

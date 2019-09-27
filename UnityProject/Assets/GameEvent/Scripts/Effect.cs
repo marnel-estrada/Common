@@ -9,7 +9,7 @@ namespace GameEvent {
 
         public virtual string Icon { get; }
 
-        public virtual string Text { get; }
+        public abstract string Text { get; }
         
         public virtual Color TextColor { get; }
     }

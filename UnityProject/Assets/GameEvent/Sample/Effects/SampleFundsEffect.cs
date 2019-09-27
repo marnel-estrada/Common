@@ -11,5 +11,9 @@ namespace GameEvent {
             // Just a sample
             Debug.Log("SampleFundsEffect");
         }
+        
+        public override string Text {
+            get;
+        }
     }
 }

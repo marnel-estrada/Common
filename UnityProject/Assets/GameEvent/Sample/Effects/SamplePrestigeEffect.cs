@@ -9,5 +9,9 @@ namespace GameEvent {
             // Just a sample
             Debug.Log("SamplePrestigeEffect");
         }
+        
+        public override string Text {
+            get;
+        }
     }
 }

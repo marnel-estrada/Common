@@ -78,20 +78,6 @@ namespace GameEvent {
             }
         }
 
-        public bool CanApplyEffects {
-            get {
-                for (int i = 0; i < this.effects.Count; ++i) {
-                    if (!this.effects[i].CanBeApplied) {
-                        // One of the effects can no longer be applied
-                        // Options effects can't be applied
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-        }
-
         public void ApplyEffects() {
             for (int i = 0; i < this.effects.Count; ++i) {
                 this.effects[i].Apply();

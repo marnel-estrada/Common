@@ -12,12 +12,5 @@ namespace GameEvent {
         public abstract string Text { get; }
         
         public virtual Color TextColor { get; }
-
-        // There may be effects that can't execute because some precondition is not met
-        public virtual bool CanBeApplied {
-            get {
-                return true;
-            }
-        }
     }
 }

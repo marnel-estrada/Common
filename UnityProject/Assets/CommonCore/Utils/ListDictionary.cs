@@ -121,7 +121,7 @@ namespace Common {
         public int Count {
             get {
                 Assertion.Assert(this.keyList.Count == this.valueList.Count && this.valueList.Count == this.dictionary.Count);
-                return this.valueList.Count;
+                return this.dictionary.Count;
             }
         }
 

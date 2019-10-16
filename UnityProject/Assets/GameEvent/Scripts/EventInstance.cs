@@ -54,6 +54,20 @@ namespace GameEvent {
             }
         }
 
+        public bool HasSelectableOption {
+            get {
+                for (int i = 0; i < this.options.Count; ++i) {
+                    OptionInstance option = this.options[i];
+                    if (option.CanAfford && option.PassedRequirements) {
+                        // Found at least one option that can be selectable
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
         public IReadOnlyList<OptionInstance> Options {
             get {
                 return this.options;

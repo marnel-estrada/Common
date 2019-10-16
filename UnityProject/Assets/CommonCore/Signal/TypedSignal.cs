@@ -4,7 +4,6 @@
     /// This is to avoid boxing
     /// </summary>
     public class TypedSignal<TParameter> where TParameter : struct {
-
         public delegate void SignalListener(TParameter parameter);
         
         private readonly SimpleList<SignalListener> listeners = new SimpleList<SignalListener>(1);
@@ -27,6 +26,5 @@
                 this.listeners[i](parameter); // Invoke the delegate
             }
         }
-
     }
 }

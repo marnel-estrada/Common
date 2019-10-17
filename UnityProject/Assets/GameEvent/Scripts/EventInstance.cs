@@ -58,7 +58,7 @@ namespace GameEvent {
             get {
                 for (int i = 0; i < this.options.Count; ++i) {
                     OptionInstance option = this.options[i];
-                    if (option.CanAfford && option.PassedRequirements) {
+                    if (option.IsSelectable) {
                         // Found at least one option that can be selectable
                         return true;
                     }

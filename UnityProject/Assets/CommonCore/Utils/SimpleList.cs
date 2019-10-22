@@ -268,5 +268,12 @@ namespace Common {
 
             return -1;
         }
+
+        public ReadOnlySimpleList<T> AsReadOnly {
+            get {
+                // Note this is not garbage as ReadOnlySimpleList is a struct
+                return new ReadOnlySimpleList<T>(this);
+            }
+        }
     }
 }

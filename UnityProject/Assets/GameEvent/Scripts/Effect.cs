@@ -2,6 +2,12 @@ using UnityEngine;
 
 namespace GameEvent {
     public abstract class Effect {
+        public virtual bool CanApply {
+            get {
+                return true;
+            }
+        }
+        
         /// <summary>
         /// Applies the effect
         /// </summary>

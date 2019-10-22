@@ -26,7 +26,7 @@ namespace GameEvent {
 
         // We use integer here so it's easier when making the editor
         [SerializeField]
-        private int trueOutcomeProbability;
+        private int trueOutcomeProbability = 100;
 
         [SerializeField]
         private string trueOutcomeTextId;

@@ -78,6 +78,20 @@ namespace GameEvent {
             }
         }
 
+        public bool CanApplyEffects {
+            get {
+                for (int i = 0; i < this.effects.Count; ++i) {
+                    if (!this.effects[i].CanApply) {
+                        // One of the effects can't be applied
+                        // The whole option can't be applicable
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+
         public void ApplyEffects() {
             for (int i = 0; i < this.effects.Count; ++i) {
                 this.effects[i].Apply();
@@ -87,6 +101,12 @@ namespace GameEvent {
         public OptionData Data {
             get {
                 return this.data;
+            }
+        }
+
+        public bool IsSelectable {
+            get {
+                return this.CanAfford && this.PassedRequirements && this.CanApplyEffects;
             }
         }
     }

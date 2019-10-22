@@ -12,37 +12,17 @@
     public struct Sprite : IComponentData {
         public Entity spriteManagerEntity;
         
-        public float width;
-        public float height;
+        // Note here that we rearrange the variables from high number of bytes to low
+        // This is so that memory is properly compacted
 
-        public float2 lowerLeftUv;
-        public float2 uvDimension;
+        // We only maintain one color for all vertices (save memory)
+        public Color color;
         
-        public float2 lowerLeftUv2;
-        public float2 uvDimension2;
-
         // The vertices in local space
         public float3 v1;
         public float3 v2;
         public float3 v3;
         public float3 v4;
-        
-        // Transformed vertices
-        // Used as temporary variable to hold the result when computed in a system
-        // We can't easily assign directly to a mesh while in system
-        public float3 transformedV1;
-        public float3 transformedV2;
-        public float3 transformedV3;
-        public float3 transformedV4;
-
-        // We only maintain one color for all vertices (save memory)
-        public Color color;
-        
-        // Indices of the vertex to the central mesh
-        public int index1;
-        public int index2;
-        public int index3;
-        public int index4;
 
         public Vector2 uv_1;
         public Vector2 uv_2;
@@ -53,6 +33,31 @@
         public Vector2 uv2_2;
         public Vector2 uv2_3;
         public Vector2 uv2_4;
+        
+        // Transformed vertices
+        // Used as temporary variable to hold the result when computed in a system
+        // We can't easily assign directly to a mesh while in system
+        public float3 transformedV1;
+        public float3 transformedV2;
+        public float3 transformedV3;
+        public float3 transformedV4;
+
+        public float2 lowerLeftUv;
+        public float2 uvDimension;
+        
+        public float2 lowerLeftUv2;
+        public float2 uvDimension2;
+        
+        public float width;
+        public float height;
+
+        private float renderOrder;
+        
+        // Indices of the vertex to the central mesh
+        public int index1;
+        public int index2;
+        public int index3;
+        public int index4;
 
         // The index of the sprite in SpriteManager
         public int managerIndex;
@@ -61,7 +66,6 @@
         // Layer order has higher precedence than renderOrder
         // renderOrder is used for things like sorting by z position
         private int layerOrder;
-        private float renderOrder;
 
         public ByteBool active;
 
@@ -195,6 +199,5 @@
 
             this.verticesChanged.Value = true;
         }
-        
     }
 }

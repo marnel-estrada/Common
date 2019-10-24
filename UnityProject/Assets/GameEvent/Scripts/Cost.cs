@@ -25,9 +25,7 @@ namespace GameEvent {
         /// <summary>
         /// The text to display the cost with
         /// </summary>
-        public virtual string Text {
-            get;
-        }
+        public abstract string Text { get; }
 
         public virtual Color TextColor {
             get;

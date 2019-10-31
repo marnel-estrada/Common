@@ -8,5 +8,10 @@ namespace GameEvent {
         /// </summary>
         /// <returns></returns>
         public abstract bool IsMet();
+
+        /// <summary>
+        /// The text to display if requirement was not met
+        /// </summary>
+        public abstract string UnmetText { get; }
     }
 }

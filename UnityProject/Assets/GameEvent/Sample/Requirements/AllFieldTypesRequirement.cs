@@ -11,5 +11,11 @@ namespace GameEvent {
         public override bool IsMet() {
             return false;
         }
+
+        public override string UnmetText {
+            get {
+                return string.Empty;
+            }
+        }
     }
 }

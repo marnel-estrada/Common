@@ -6,7 +6,6 @@
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public struct Resolve<T> {
-
         private T value;
         private bool resolved;
 
@@ -65,6 +64,5 @@
         public void UnmarkResolved() {
             this.resolved = false;
         }
-
     }
 }

@@ -9,11 +9,20 @@ namespace Common {
     /// <typeparam name="T"></typeparam>
     public struct Option<T> where T : class {
         public static readonly Option<T> NONE = new Option<T>();
+
+        /// <summary>
+        /// Returns an option with a value
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static Option<T> Some(T value) {
+            return new Option<T>(value);
+        }
         
         private readonly bool hasValue;
         private readonly T value;
 
-        public Option(T value) {
+        private Option(T value) {
             this.value = value;
             Assertion.AssertNotNull(this.value); // Can't be null
             

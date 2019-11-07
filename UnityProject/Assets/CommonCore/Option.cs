@@ -49,6 +49,10 @@ namespace Common {
             }
         }
 
+        public TReturnType Match<TReturnType>(IFuncOptionMatcher<T, TReturnType> matcher) {
+            return this.hasValue ? matcher.OnSome(this.value) : matcher.OnNone();
+        }
+
         public bool ReferenceEquals(T other) {
             return this.value == other;
         }

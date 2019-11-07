@@ -48,5 +48,9 @@ namespace Common {
                 matcher.OnNone();
             }
         }
+
+        public bool ReferenceEquals(T other) {
+            return this.value == other;
+        }
     }
 }

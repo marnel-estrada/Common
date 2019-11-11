@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Common {
     /// <summary>
     /// Contains extensions to the Dictionary class
     /// </summary>
     public static class DictionaryExtensions {
-
         /// <summary>
         /// Looks for the value of the specified key. Returns default value if none was found.
         /// </summary>
@@ -24,6 +20,5 @@ namespace Common {
             // May return null so client code should check or it
             return value;
         }
-
     }
 }

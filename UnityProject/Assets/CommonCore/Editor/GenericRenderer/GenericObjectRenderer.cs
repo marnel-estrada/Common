@@ -202,7 +202,7 @@ namespace Common {
 
             GUILayout.BeginHorizontal();
             GUILayout.Label(property.Name + ":", GUILayout.Width(150));
-            value = EditorGUILayout.TextField(value, GUILayout.Width(300));
+            value = EditorGUILayout.TextField(value, GUILayout.Width(300)).Trim();
             GUILayout.EndHorizontal();
 
             // Set the value back

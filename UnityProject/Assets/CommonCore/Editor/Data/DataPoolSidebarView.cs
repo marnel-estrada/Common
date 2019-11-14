@@ -145,6 +145,10 @@ namespace Common {
         private void Filter(DataPool<T> pool) {
             this.filteredMap.Clear();
             this.filteredIds.Clear();
+
+            if (pool == null) {
+                return;
+            }
             
             for (int i = 0; i < pool.Count; ++i) {
                 T item = pool.GetAt(i);

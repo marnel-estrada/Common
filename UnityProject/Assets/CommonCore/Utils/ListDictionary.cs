@@ -80,8 +80,7 @@ namespace Common {
         /// <param name="key"></param>
         /// <returns></returns>
         public V GetWithKey(K key) {
-            V value = default(V);
-            Assertion.Assert(this.dictionary.TryGetValue(key, out value));
+            Assertion.Assert(this.dictionary.TryGetValue(key, out V value));
             return value;
         }
 

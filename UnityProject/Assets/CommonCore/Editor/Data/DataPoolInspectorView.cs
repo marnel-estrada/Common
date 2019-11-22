@@ -4,12 +4,16 @@ using UnityEngine;
 
 namespace Common {
     public class DataPoolInspectorView<T> where T : IDataPoolItem, IDuplicable<T>, new() {
+        private readonly EditorWindow parentWindow;
+        private readonly DataPoolSidebarView<T> sidebarView;
         private readonly DataPoolItemRenderer<T> itemRenderer;
         
         /// <summary>
         ///     Constructor
         /// </summary>
-        public DataPoolInspectorView(DataPoolItemRenderer<T> itemRenderer) {
+        public DataPoolInspectorView(EditorWindow parentWindow, DataPoolSidebarView<T> sidebarView, DataPoolItemRenderer<T> itemRenderer) {
+            this.parentWindow = parentWindow;
+            this.sidebarView = sidebarView;
             this.itemRenderer = itemRenderer;
         }
 
@@ -82,10 +86,14 @@ namespace Common {
             
             EditorUtility.SetDirty(pool);
             
-            // TODO Select the duplicate (render duplicate in inspector view)
+            // Select the duplicate (show the duplicate in inspector view)
+            this.sidebarView.SelectItem(this.duplicateId);
+            this.parentWindow.Repaint();
+            
+            this.duplicateId = string.Empty;
         }
 
-        private void Delete(DataPool<T> pool, T item) {
+        private static void Delete(DataPool<T> pool, T item) {
             if (EditorUtility.DisplayDialogComplex("Delete Item", $"Are you sure you want to delete {item.Id}?", "Yes", "No", "Cancel") != 0) {
                 // Cancelled or No
                 return;

@@ -85,12 +85,8 @@ namespace Common {
             // The filters
             GUILayout.BeginHorizontal();
             GUILayout.Label("ID:", GUILayout.Width(40));
-            string newFilter = EditorGUILayout.TextField(this.filterText);
-            if(newFilter != this.filterText) {
-                // There's a new filter. Apply the filter
-                this.filterText = newFilter;
-                Filter(pool);
-            }
+            this.filterText = EditorGUILayout.TextField(this.filterText);
+            Filter(pool);
             GUILayout.EndHorizontal();
 
             RenderFilterStrategies(pool);

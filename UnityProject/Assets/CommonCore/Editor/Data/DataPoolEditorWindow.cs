@@ -23,7 +23,7 @@ namespace Common {
         /// <param name="target"></param>
         public void Init(DataPool<T> target, DataPoolItemRenderer<T> itemRenderer) {
             this.target = target;
-            this.inspector = new DataPoolInspectorView<T>(itemRenderer);
+            this.inspector = new DataPoolInspectorView<T>(this, this.sidebar, itemRenderer);
             REPAINT.Dispatch(); // Force a repaint
         }
 

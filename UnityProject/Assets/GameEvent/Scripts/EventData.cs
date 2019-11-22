@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace GameEvent {
     [Serializable]
-    public class EventData : IDataPoolItem {
+    public class EventData : IDataPoolItem, IDuplicable<EventData> {
         [SerializeField]
         private int id;
         
@@ -136,6 +136,10 @@ namespace GameEvent {
 
         public int GenerateNewOptionId() {
             return this.optionIdGenerator.Generate();
+        }
+
+        public EventData Duplicate() {
+            return null;
         }
     }
 }

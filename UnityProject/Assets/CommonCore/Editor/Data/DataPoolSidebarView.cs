@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Common {
-    public class DataPoolSidebarView<T> where T : IDataPoolItem, new() {
+    public class DataPoolSidebarView<T> where T : IDataPoolItem, IDuplicable<T>, new() {
         private readonly Dictionary<string, T> filteredMap = new Dictionary<string, T>();
         private readonly List<string> filteredIds = new List<string>(); // Used to render list of action buttons
 

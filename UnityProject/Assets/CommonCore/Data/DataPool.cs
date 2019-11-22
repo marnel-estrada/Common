@@ -53,7 +53,8 @@ namespace Common {
         /// <returns></returns>
         public Maybe<T> Find(string id) {
             PopulateMap(); // We populate first because this may be invoked before Awake() (like in editor)
-            return new Maybe<T>(this.map.Find(id));
+            T found = this.map.Find(id);
+            return found == null ? Maybe<T>.Nothing : new Maybe<T>(found);
         }
 
         /// <summary>
@@ -128,6 +129,19 @@ namespace Common {
             this.map[data.Id] = data;
 
             return data;
+        }
+
+        /// <summary>
+        /// Adds an instantiated item
+        /// We did it this way so we can maintain the int id
+        /// </summary>
+        /// <param name="item"></param>
+        public void Add(T item) {
+            Assertion.Assert(!this.map.ContainsKey(item.Id)); // Should not contain the same ID
+            
+            item.IntId = this.idGenerator.Generate();
+            this.dataList.Add(item);
+            this.map[item.Id] = item;
         }
 
         private readonly SimpleList<T> removeList = new SimpleList<T>();

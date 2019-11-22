@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 using UnityEngine;
 
@@ -11,7 +9,6 @@ namespace Common {
     /// </summary>
     [Serializable]
     public class ClassData {
-
         [SerializeField]
         private string className;
 
@@ -82,6 +79,21 @@ namespace Common {
             // not important but let's copy anyway to optimize editor
             other.ClassType = this.ClassType;
         }
+        
+        /// <summary>
+        /// Copies a list of ClassData
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
+        public static void Copy(List<ClassData> source, List<ClassData> destination) {
+            destination.Clear();
 
+            for (int i = 0; i < source.Count; ++i) {
+                ClassData dataCopy = new ClassData();
+                source[i].CopyTo(dataCopy);
+                
+                destination.Add(dataCopy);
+            }
+        }
     }
 }

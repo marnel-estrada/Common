@@ -7,7 +7,7 @@ namespace Common {
     /// A utility class that manages int IDs 
     /// </summary>
     [Serializable]
-    public class IdGenerator {
+    public class IdGenerator : IDuplicable<IdGenerator> {
         private const int DEFAULT_STARTING_ID = 1;
         
         [SerializeField]
@@ -51,6 +51,10 @@ namespace Common {
         /// </summary>
         public void Reset() {
             this.counter = DEFAULT_STARTING_ID;
+        }
+
+        public IdGenerator Duplicate() {
+            return new IdGenerator(this.counter);
         }
     }
 }

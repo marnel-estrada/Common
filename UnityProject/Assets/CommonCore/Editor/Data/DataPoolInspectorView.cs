@@ -29,6 +29,10 @@ namespace Common {
             }
 
             GUI.backgroundColor = ColorUtils.WHITE;
+            
+            RenderDuplicateSection(pool, item);
+            
+            GUILayout.Space(5);
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("ID: " + item.Id);
@@ -37,6 +41,48 @@ namespace Common {
             this.itemRenderer.Render(pool, item);
 
             GUILayout.EndVertical();
+        }
+
+        private string duplicateId = "";
+
+        private void RenderDuplicateSection(DataPool<T> pool, T item) {
+            GUILayout.Label("Duplicate", EditorStyles.boldLabel);
+            
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Duplicate ID:", GUILayout.Width(150));
+            this.duplicateId = EditorGUILayout.TextField(this.duplicateId, GUILayout.Width(300));
+            
+            GUI.backgroundColor = ColorUtils.YELLOW;
+            if (GUILayout.Button("Duplicate", GUILayout.Width(100))) {
+                Duplicate(pool, item);
+            }
+            GUI.backgroundColor = ColorUtils.WHITE;
+            GUILayout.EndHorizontal();
+        }
+
+        private void Duplicate(DataPool<T> pool, T item) {
+            // Check that duplicate ID is specified
+            if (string.IsNullOrEmpty(this.duplicateId)) {
+                EditorUtility.DisplayDialog("Duplicate", "Duplicate ID must not be empty", "OK");
+                return;
+            }
+            
+            // Check that duplicate ID should not exist yet
+            Maybe<T> existingItem = pool.Find(this.duplicateId);
+            if (existingItem.HasValue) {
+                // This means that there's an existing item with the same id
+                EditorUtility.DisplayDialog("Duplicate", $"An item with ID \"{this.duplicateId}\" already exists. Choose a new ID.", "OK");
+                return;
+            }
+            
+            // Add the duplicate item
+            T duplicateItem = item.Duplicate();
+            duplicateItem.Id = this.duplicateId; // Don't forget to override. Can't add if it's the same ID.
+            pool.Add(duplicateItem); // New integer ID is assigned here
+            
+            EditorUtility.SetDirty(pool);
+            
+            // TODO Select the duplicate (render duplicate in inspector view)
         }
 
         private void Delete(DataPool<T> pool, T item) {

@@ -6,7 +6,6 @@ namespace Common {
     /// Contains type related utility methods
     /// </summary>
     public static class TypeUtils {
-
         /// <summary>
         /// This is used to instantiate classes with empty constructors using reflection
         /// </summary>
@@ -59,6 +58,10 @@ namespace Common {
 		 * Returns whether or not the specified property can be rendered as a variable
 		 */
         public static bool IsVariableProperty(PropertyInfo property) {
+            return CanReadAndWrite(property);
+        }
+
+        public static bool CanReadAndWrite(PropertyInfo property) {
             // should be writable and readable
             if(!(property.CanRead && property.CanWrite)) {
                 return false;
@@ -76,6 +79,21 @@ namespace Common {
             }
 
             return true;
+        }
+
+        public static void CopyProperties<T>(T source, T destination) {
+            Type type = typeof(T);
+            PropertyInfo[] properties = type.GetProperties();
+            for (int i = 0; i < properties.Length; ++i) {
+                if (CanReadAndWrite(properties[i])) {
+                    Copy(properties[i], source, destination);
+                }
+            }
+        }
+
+        private static void Copy<T>(PropertyInfo property, T source, T destination) {
+            object value = property.GetGetMethod(false).Invoke(source, EMPTY_PARAMETERS);
+            property.GetSetMethod(false).Invoke(destination, new object[] { value });
         }
 
         public static ConstructorInfo ResolveEmptyConstructor(Type type) {

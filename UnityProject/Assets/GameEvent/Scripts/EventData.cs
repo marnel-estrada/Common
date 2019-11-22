@@ -139,7 +139,35 @@ namespace GameEvent {
         }
 
         public EventData Duplicate() {
-            return null;
+            EventData copy = new EventData();
+            TypeUtils.CopyProperties(this, copy);
+
+            // Copy the generator
+            copy.optionIdGenerator = this.optionIdGenerator.Duplicate();
+            
+            // Copy requirements
+            copy.requirements = CopyRequirements();
+            
+            // Copy options
+            copy.options = CopyOptions();
+            
+            return copy;
+        }
+
+        private List<ClassData> CopyRequirements() {
+            List<ClassData> listCopy = new List<ClassData>(this.requirements.Count);
+            ClassData.Copy(this.requirements, listCopy);
+            return listCopy;
+        }
+
+        private List<OptionData> CopyOptions() {
+            List<OptionData> optionsListCopy = new List<OptionData>(this.options.Count);
+            for (int i = 0; i < this.options.Count; ++i) {
+                OptionData instanceCopy = this.options[i].Duplicate();
+                optionsListCopy.Add(instanceCopy);
+            }
+
+            return optionsListCopy;
         }
     }
 }

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace GameEvent {
     [Serializable]
-    public class OptionData : Identifiable, IntIdentifiable {
+    public class OptionData : Identifiable, IntIdentifiable, IDuplicable<OptionData> {
         [SerializeField]
         private int id;
 
@@ -154,6 +154,25 @@ namespace GameEvent {
             set {
                 this.comment = value;
             }
+        }
+
+        public OptionData Duplicate() {
+            OptionData copy = new OptionData(this.id);
+            TypeUtils.CopyProperties(this, copy);
+            
+            // Copy requirements
+            copy.requirements = new List<ClassData>(this.requirements.Count);
+            ClassData.Copy(this.requirements, copy.requirements);
+            
+            // Copy costs
+            copy.costs = new List<ClassData>(this.costs.Count);
+            ClassData.Copy(this.costs, copy.costs);
+            
+            // Copy effects
+            copy.effects = new List<ClassData>(this.effects.Count);
+            ClassData.Copy(this.effects, copy.effects);
+
+            return copy;
         }
     }
 }

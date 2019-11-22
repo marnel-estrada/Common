@@ -38,7 +38,7 @@ namespace Common {
         }
 
         private string newItemId = "";
-        private Option<string> newlyAdded;
+        private Option<string> itemToSelect;
 
         private void RenderNewItemUi(DataPool<T> pool) {
             GUILayout.BeginHorizontal();
@@ -61,7 +61,7 @@ namespace Common {
                     AddToFiltered(newItem);
                     
                     // This will trigger a custom selection when selection grid is rendered
-                    this.newlyAdded = Option<string>.Some(this.newItemId);
+                    this.itemToSelect = Option<string>.Some(this.newItemId);
                     
                     this.newItemId = "";
 
@@ -126,10 +126,10 @@ namespace Common {
                 });
             }
 
-            this.newlyAdded.Match(this.resolveSelectionMatcher);
+            this.itemToSelect.Match(this.resolveSelectionMatcher);
             
             // We always set it to none to mark that the value has been "processed" already
-            this.newlyAdded = Option<string>.NONE;
+            this.itemToSelect = Option<string>.NONE;
         }
 
         // Render the other filtering strategies
@@ -217,6 +217,10 @@ namespace Common {
         /// <param name="strategy"></param>
         public void AddFilterStrategy(DataPoolFilterStrategy<T> strategy) {
             this.filterStrategies.Add(strategy);
+        }
+
+        public void SelectItem(string itemId) {
+            this.itemToSelect = Option<string>.Some(itemId);
         }
     }
 }

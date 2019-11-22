@@ -1,5 +1,5 @@
 namespace Common {
-    public interface DataPoolItemRenderer<T> where T : Identifiable, IntIdentifiable, new() {
+    public interface DataPoolItemRenderer<T> where T : IDataPoolItem, new() {
         /// <summary>
         /// Renders the item
         /// </summary>

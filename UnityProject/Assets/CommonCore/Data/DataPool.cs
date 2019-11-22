@@ -8,7 +8,7 @@ namespace Common {
     /// The same as DataClassPool but implemented as ScriptableObject
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class DataPool<T> : ScriptableObject where T : Identifiable, IntIdentifiable, new() {
+    public abstract class DataPool<T> : ScriptableObject where T : IDataPoolItem, new() {
         // This is used for the editor such that we don't need to resolve it by path
         [SerializeField]
         private GUISkin guiSkin;

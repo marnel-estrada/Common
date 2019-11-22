@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace GameEvent {
     [Serializable]
-    public class EventData : Identifiable, IntIdentifiable {
+    public class EventData : IDataPoolItem {
         [SerializeField]
         private int id;
         

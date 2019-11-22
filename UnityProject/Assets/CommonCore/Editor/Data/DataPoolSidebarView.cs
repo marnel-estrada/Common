@@ -38,6 +38,7 @@ namespace Common {
         }
 
         private string newItemId = "";
+        private Option<string> newlyAdded;
 
         private void RenderNewItemUi(DataPool<T> pool) {
             GUILayout.BeginHorizontal();
@@ -58,11 +59,13 @@ namespace Common {
 
                     // Add to filtered and select it
                     AddToFiltered(newItem);
-                    this.selection = this.filteredIds.Count - 1;
+                    
+                    // This will trigger a custom selection when selection grid is rendered
+                    this.newlyAdded = Option<string>.Some(this.newItemId);
+                    
                     this.newItemId = "";
 
                     EditorUtility.SetDirty(pool);
-                    //DataPoolEditorWindow<T>.REPAINT.Dispatch();
                 }
             }
 
@@ -108,8 +111,25 @@ namespace Common {
             }
 
             this.scrollPos = GUILayout.BeginScrollView(this.scrollPos);
+            ResolveSelection();
             this.selection = GUILayout.SelectionGrid(this.selection, this.filteredIds.ToArray(), 1);
             GUILayout.EndScrollView();
+        }
+
+        private IOptionMatcher<string> resolveSelectionMatcher;
+
+        private void ResolveSelection() {
+            if (this.resolveSelectionMatcher == null) {
+                this.resolveSelectionMatcher = new DelegateOptionMatcher<string>(delegate(string newlyAddedItemId) {
+                    this.selection = this.filteredIds.IndexOf(newlyAddedItemId);
+                    this.selection = Mathf.Clamp(this.selection, 0, this.filteredIds.Count - 1);
+                });
+            }
+
+            this.newlyAdded.Match(this.resolveSelectionMatcher);
+            
+            // We always set it to none to mark that the value has been "processed" already
+            this.newlyAdded = Option<string>.NONE;
         }
 
         // Render the other filtering strategies
@@ -177,7 +197,7 @@ namespace Common {
                     return this.filteredMap[selectedId];
                 }
 
-                return default(T);
+                return default;
             }
         }
 

@@ -40,7 +40,7 @@ namespace Common {
             Repaint();
         }
 
-        void OnGUI() {
+        private void OnGUI() {
             if (this.target == null) {
                 GUILayout.BeginVertical();
                 GUILayout.Label("Data Class Editor: (Missing DataClassPool target)", EditorStyles.largeLabel);

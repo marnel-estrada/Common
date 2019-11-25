@@ -14,11 +14,23 @@ namespace Common {
         /// <param name="key"></param>
         /// <returns></returns>
         public static V Find<K, V>(this Dictionary<K, V> dictionary, K key) {
-            V value = default(V);
-            dictionary.TryGetValue(key, out value);
+            dictionary.TryGetValue(key, out V value);
 
             // May return null so client code should check or it
             return value;
+        }
+
+        /// <summary>
+        /// A more safe version of Find()
+        /// </summary>
+        /// <param name="dictionary"></param>
+        /// <param name="key"></param>
+        /// <typeparam name="K"></typeparam>
+        /// <typeparam name="V"></typeparam>
+        /// <returns></returns>
+        public static Option<V> FindAsOption<K, V>(this Dictionary<K, V> dictionary, K key) 
+            where V : class {
+            return dictionary.TryGetValue(key, out V value) ? Option<V>.Some(value) : Option<V>.NONE;
         }
     }
 }

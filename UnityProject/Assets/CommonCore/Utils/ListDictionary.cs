@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 
+using UnityEngine;
+
 namespace Common {
     /// <summary>
     /// A container that manages items both in a list and dictionary
@@ -52,6 +54,11 @@ namespace Common {
         /// <param name="key"></param>
         public void Remove(K key) {
             int listIndex = this.keyList.IndexOf(key);
+            if (listIndex < 0) {
+                Debug.LogError("Key not found: " + key);
+                return;
+            }
+            
             this.keyList.RemoveAt(listIndex);
             this.valueList.RemoveAt(listIndex);
 

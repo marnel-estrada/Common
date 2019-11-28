@@ -76,6 +76,12 @@ namespace GameEvent {
             }
         }
 
+        public bool HasChildEvent {
+            get {
+                return this.childEventId >= 0;
+            }
+        }
+
         public List<ClassData> Requirements {
             get {
                 return this.requirements;

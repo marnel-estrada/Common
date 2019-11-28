@@ -7,8 +7,6 @@ using UnityEditor;
 
 using UnityEngine;
 
-using EditorGUILayout = UnityEditor.Experimental.Networking.PlayerConnection.EditorGUILayout;
-
 namespace GameEvent {
     public class EventsBrowserWindow : EditorWindow {
         private EditorWindow parent;
@@ -85,13 +83,18 @@ namespace GameEvent {
             if (string.IsNullOrEmpty(this.filterText)) {
                 // No filter. Add all.
                 AddAll();
-
+                this.filteredEvents.Sort(IdComparison);
                 return;
             }
             
             // At this point, it means there's a filter text
             // We search
             AddFilteredEvents();
+            this.filteredEvents.Sort(IdComparison);
+        }
+
+        private static int IdComparison(EventData a, EventData b) {
+            return String.Compare(a.Id, b.Id, StringComparison.Ordinal);
         }
 
         private void AddFilteredEvents() {

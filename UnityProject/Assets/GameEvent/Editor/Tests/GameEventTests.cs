@@ -1,5 +1,3 @@
-using System.IO;
-
 using Common;
 
 using NUnit.Framework;
@@ -31,6 +29,8 @@ namespace GameEvent {
             }
         }
 
+        private IOptionMatcher<EventInstance> applyEffectsMatcher;
+
         [Test]
         public void EventInstanceTest() {
             string path = "Assets/GameEventComposer/Data/TestEventsPool.asset";
@@ -38,10 +38,16 @@ namespace GameEvent {
             Assert.NotNull(pool);
             
             EventInstanceManager instanceManager = new EventInstanceManager(pool);
+
+            if (this.applyEffectsMatcher == null) {
+                this.applyEffectsMatcher = new DelegateOptionMatcher<EventInstance>(delegate(EventInstance eventInstance) {
+                    eventInstance.Options[0].ApplyEffects();        
+                });
+            }
             
             // Try to execute an event option
-            EventInstance instance = instanceManager.Get(2);
-            instance.Options[0].ApplyEffects();
+            Option<EventInstance> instance = instanceManager.Get(2);
+            instance.Match(this.applyEffectsMatcher);
         }
     }
 }

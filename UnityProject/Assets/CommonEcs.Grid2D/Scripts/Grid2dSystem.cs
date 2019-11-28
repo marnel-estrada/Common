@@ -21,7 +21,7 @@ namespace CommonEcs {
             this.query = GetEntityQuery(typeof(Grid2D), ComponentType.ReadWrite<EntityBufferElement>());
         }
 
-        protected override void OnDestroyManager() {
+        protected override void OnDestroy() {
             if (this.cellEntities.HasValue) {
                 this.cellEntities.Value.Dispose();
             }

@@ -14,7 +14,7 @@
         protected override void OnUpdate() {
         }
 
-        protected override void OnDestroyManager() {
+        protected override void OnDestroy() {
             this.managers.Clear();
             this.managerIndices.Clear();
             this.EntityManager.GetAllUniqueSharedComponentData(this.managers, this.managerIndices);

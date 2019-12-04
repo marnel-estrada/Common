@@ -18,7 +18,7 @@ namespace CommonEcs {
         private GridWrapper gridWrapper;
 
         protected override void OnCreate() {
-            this.query = GetEntityQuery(typeof(Grid2D), ComponentType.Create<EntityBufferElement>());
+            this.query = GetEntityQuery(typeof(Grid2D), ComponentType.ReadWrite<EntityBufferElement>());
         }
 
         protected override void OnDestroyManager() {

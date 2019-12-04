@@ -11,5 +11,9 @@ namespace GameEvent {
         public override void Pay() {
             // Just a sample
         }
+
+        public override string Text {
+            get;
+        }
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Test {
     [Serializable]
-    public class TestData : Identifiable, IntIdentifiable {
+    public class TestData : IDataPoolItem, IDuplicable<TestData> {
         [SerializeField]
         private int intId;
         
@@ -42,6 +42,14 @@ namespace Test {
             set {
                 this.textProperty = value;
             }
+        }
+
+        public TestData Duplicate() {
+            return new TestData() {
+                intId = this.intId,
+                textId = this.textId,
+                textProperty = this.textProperty
+            };
         }
     }
 }

@@ -28,7 +28,7 @@ namespace Common.Ecs.Fsm {
             fsm.currentEvent = Fsm.NULL_EVENT;
             this.entityManager.AddComponentData(entity, fsm);
 
-            this.entityManager.AddComponent(entity, ComponentType.Create<FsmTransition>());
+            this.entityManager.AddComponent(entity, ComponentType.ReadWrite<FsmTransition>());
 
             return entity;
         }

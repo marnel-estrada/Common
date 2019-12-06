@@ -50,19 +50,21 @@ namespace CommonEcs {
                     continue;
                 }
 
-                if (ShouldProcess(ref manager)) {
-                    this.query.SetFilter(manager);
-    
-                    UpdateVerticesJob job = new UpdateVerticesJob() {
-                        spriteType = this.spriteType,
-                        vertices = manager.NativeVertices,
-                        uv = manager.NativeUv,
-                        uv2 = manager.NativeUv2,
-                        colors = manager.NativeColors
-                    };
-
-                    lastHandle = JobChunkExtensions.Schedule(job, this.query, lastHandle);
+                if (!ShouldProcess(ref manager)) {
+                    continue;
                 }
+
+                this.query.SetFilter(manager);
+    
+                UpdateVerticesJob job = new UpdateVerticesJob() {
+                    spriteType = this.spriteType,
+                    vertices = manager.NativeVertices,
+                    uv = manager.NativeUv,
+                    uv2 = manager.NativeUv2,
+                    colors = manager.NativeColors
+                };
+
+                lastHandle = job.Schedule(this.query, lastHandle);
             }
             
             return lastHandle;

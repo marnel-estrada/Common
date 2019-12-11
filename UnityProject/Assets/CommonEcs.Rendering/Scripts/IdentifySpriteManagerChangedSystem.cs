@@ -13,78 +13,19 @@ namespace CommonEcs {
     [UpdateBefore(typeof(SortRenderOrderSystem))]
     [UpdateBefore(typeof(UpdateChangedVerticesSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class IdentifySpriteManagerChangedSystem : ComponentSystem {
+    public class IdentifySpriteManagerChangedSystem : JobComponentSystem {
         private EntityQuery query;
         private ArchetypeChunkComponentType<Sprite> spriteType;
-        
-        [ReadOnly]
-        private ArchetypeChunkEntityType entityType;
 
         private readonly List<SpriteManager> managers = new List<SpriteManager>(1);
         private readonly List<int> managerIndices = new List<int>(1);
 
         protected override void OnCreate() {
-            this.query = GetEntityQuery(typeof(Sprite), typeof(Changed));
+            this.query = GetEntityQuery(typeof(Sprite));
         }
 
-        [BurstCompile]
-        private struct Job : IJob {
-            public ArchetypeChunkComponentType<Sprite> spriteType;
-
-            [ReadOnly]
-            public ArchetypeChunkEntityType entityType;
-
-            [ReadOnly]
-            [DeallocateOnJobCompletion]
-            public NativeArray<ArchetypeChunk> chunks;
-
-            public NativeHashMap<Entity, byte> verticesChangedMap;
-            public NativeHashMap<Entity, byte> trianglesChangedMap;
-            public NativeHashMap<Entity, byte> uvChangedMap;
-            public NativeHashMap<Entity, byte> colorChangedMap;
-
-            public void Execute() {
-                for (int i = 0; i < this.chunks.Length; ++i) {
-                    ArchetypeChunk chunk = this.chunks[i];
-                    Process(ref chunk);
-                }
-            }
-
-            private void Process(ref ArchetypeChunk chunk) {
-                NativeArray<Sprite> sprites = chunk.GetNativeArray(this.spriteType);
-
-                for (int i = 0; i < chunk.Count; ++i) {
-                    Sprite sprite = sprites[i];
-                    if (sprite.verticesChanged.Value) {
-                        this.verticesChangedMap.TryAdd(sprite.spriteManagerEntity, 0);
-                        sprite.verticesChanged.Value = false; // Consume the changed flag
-                    }
-    
-                    if (sprite.renderOrderChanged.Value) {
-                        this.trianglesChangedMap.TryAdd(sprite.spriteManagerEntity, 0);
-                        sprite.renderOrderChanged.Value = false;
-                    }
-    
-                    if (sprite.uvChanged.Value) {
-                        this.uvChangedMap.TryAdd(sprite.spriteManagerEntity, 0);
-                        sprite.uvChanged.Value = false;
-                    }
-    
-                    if (sprite.colorChanged.Value) {
-                        this.colorChangedMap.TryAdd(sprite.spriteManagerEntity, 0);
-                        sprite.colorChanged.Value = false;
-                    }
-    
-                    sprites[i] = sprite; // modify the data
-                }
-            }
-        }
-
-        protected override void OnUpdate() {
+        protected override JobHandle OnUpdate(JobHandle inputDeps) {
             this.spriteType = GetArchetypeChunkComponentType<Sprite>();
-            this.entityType = GetArchetypeChunkEntityType();
-
-            NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
             
             this.managers.Clear();
             this.managerIndices.Clear();
@@ -102,15 +43,13 @@ namespace CommonEcs {
 
             Job job = new Job() {
                 spriteType = this.spriteType,
-                entityType = this.entityType,
-                chunks = chunks,
                 verticesChangedMap = verticesChangedMap,
                 trianglesChangedMap = trianglesChangedMap,
                 uvChangedMap = uvChangedMap,
                 colorChangedMap = colorChangedMap
             };
 
-            job.Schedule().Complete();
+            job.Schedule(this.query).Complete();
 
             // Process the result
             for (int i = 1; i < this.managers.Count; ++i) {
@@ -142,7 +81,54 @@ namespace CommonEcs {
             trianglesChangedMap.Dispose();
             uvChangedMap.Dispose();
             colorChangedMap.Dispose();
-        }
 
+            return inputDeps;
+        }
+        
+        [BurstCompile]
+        private struct Job : IJobChunk {
+            public ArchetypeChunkComponentType<Sprite> spriteType;
+
+            [NativeDisableParallelForRestriction]
+            public NativeHashMap<Entity, byte> verticesChangedMap;
+            
+            [NativeDisableParallelForRestriction]
+            public NativeHashMap<Entity, byte> trianglesChangedMap;
+            
+            [NativeDisableParallelForRestriction]
+            public NativeHashMap<Entity, byte> uvChangedMap;
+            
+            [NativeDisableParallelForRestriction]
+            public NativeHashMap<Entity, byte> colorChangedMap;
+
+            public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {
+                NativeArray<Sprite> sprites = chunk.GetNativeArray(this.spriteType);
+
+                for (int i = 0; i < chunk.Count; ++i) {
+                    Sprite sprite = sprites[i];
+                    if (sprite.verticesChanged.Value) {
+                        this.verticesChangedMap.TryAdd(sprite.spriteManagerEntity, 0);
+                        sprite.verticesChanged.Value = false; // Consume the changed flag
+                    }
+    
+                    if (sprite.renderOrderChanged.Value) {
+                        this.trianglesChangedMap.TryAdd(sprite.spriteManagerEntity, 0);
+                        sprite.renderOrderChanged.Value = false;
+                    }
+    
+                    if (sprite.uvChanged.Value) {
+                        this.uvChangedMap.TryAdd(sprite.spriteManagerEntity, 0);
+                        sprite.uvChanged.Value = false;
+                    }
+    
+                    if (sprite.colorChanged.Value) {
+                        this.colorChangedMap.TryAdd(sprite.spriteManagerEntity, 0);
+                        sprite.colorChanged.Value = false;
+                    }
+    
+                    sprites[i] = sprite; // modify the data
+                }
+            }
+        }
     }
 }

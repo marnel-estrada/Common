@@ -43,13 +43,14 @@ namespace CommonEcs {
 
             Job job = new Job() {
                 spriteType = this.spriteType,
+                chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob),
                 verticesChangedMap = verticesChangedMap,
                 trianglesChangedMap = trianglesChangedMap,
                 uvChangedMap = uvChangedMap,
                 colorChangedMap = colorChangedMap
             };
 
-            job.Schedule(this.query).Complete();
+            job.Schedule(inputDeps).Complete();
 
             // Process the result
             for (int i = 1; i < this.managers.Count; ++i) {
@@ -85,48 +86,47 @@ namespace CommonEcs {
             return inputDeps;
         }
         
-        [BurstCompile]
-        private struct Job : IJobChunk {
+        //[BurstCompile]
+        private struct Job : IJob {
+            [ReadOnly]
             public ArchetypeChunkComponentType<Sprite> spriteType;
+            
+            [ReadOnly]
+            [DeallocateOnJobCompletion]
+            public NativeArray<ArchetypeChunk> chunks;
 
-            [NativeDisableParallelForRestriction]
             public NativeHashMap<Entity, byte> verticesChangedMap;
-            
-            [NativeDisableParallelForRestriction]
             public NativeHashMap<Entity, byte> trianglesChangedMap;
-            
-            [NativeDisableParallelForRestriction]
             public NativeHashMap<Entity, byte> uvChangedMap;
-            
-            [NativeDisableParallelForRestriction]
             public NativeHashMap<Entity, byte> colorChangedMap;
+            
+            public void Execute() {
+                for (int i = 0; i < this.chunks.Length; ++i) {
+                    ArchetypeChunk chunk = this.chunks[i];
+                    Process(ref chunk);
+                }
+            }
 
-            public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {
+            private void Process(ref ArchetypeChunk chunk) {
                 NativeArray<Sprite> sprites = chunk.GetNativeArray(this.spriteType);
 
                 for (int i = 0; i < chunk.Count; ++i) {
                     Sprite sprite = sprites[i];
                     if (sprite.verticesChanged.Value) {
                         this.verticesChangedMap.TryAdd(sprite.spriteManagerEntity, 0);
-                        sprite.verticesChanged.Value = false; // Consume the changed flag
                     }
     
                     if (sprite.renderOrderChanged.Value) {
                         this.trianglesChangedMap.TryAdd(sprite.spriteManagerEntity, 0);
-                        sprite.renderOrderChanged.Value = false;
                     }
     
                     if (sprite.uvChanged.Value) {
                         this.uvChangedMap.TryAdd(sprite.spriteManagerEntity, 0);
-                        sprite.uvChanged.Value = false;
                     }
     
                     if (sprite.colorChanged.Value) {
                         this.colorChangedMap.TryAdd(sprite.spriteManagerEntity, 0);
-                        sprite.colorChanged.Value = false;
                     }
-    
-                    sprites[i] = sprite; // modify the data
                 }
             }
         }

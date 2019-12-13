@@ -86,7 +86,7 @@ namespace CommonEcs {
             return inputDeps;
         }
         
-        //[BurstCompile]
+        [BurstCompile]
         private struct Job : IJob {
             [ReadOnly]
             public ArchetypeChunkComponentType<Sprite> spriteType;

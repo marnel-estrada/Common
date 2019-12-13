@@ -469,8 +469,7 @@ namespace CommonEcs {
                 // Set array values only if any of the values changed
                 // We don't use NativeArray.ToArray() since it throws garbage. We just copy instead.
                 if (forceUpdate || this.verticesChanged) {
-                    this.nativeVertices.CopyToFast(this.vertices);
-                    this.mesh.vertices = this.vertices;
+                    this.mesh.SetVertices(this.nativeVertices);
                     this.mesh.RecalculateBounds();
                 }
 
@@ -480,16 +479,12 @@ namespace CommonEcs {
                 }
 
                 if (forceUpdate || this.uvChanged) {
-                    this.nativeUv.CopyToFast(this.uv);
-                    this.mesh.uv = this.uv;
-
-                    this.nativeUv2.CopyToFast(this.uv2);
-                    this.mesh.uv2 = this.uv2;
+                    this.mesh.SetUVs(0, this.nativeUv);
+                    this.mesh.SetUVs(1, this.nativeUv2);
                 }
 
                 if (forceUpdate || this.colorsChanged) {
-                    this.nativeColors.CopyToFast(this.colors);
-                    this.mesh.colors = this.colors;
+                    this.mesh.SetColors(this.nativeColors);
                 }
 
                 // Resetting of flags is done in ResetSpriteManagerFlagsSystem

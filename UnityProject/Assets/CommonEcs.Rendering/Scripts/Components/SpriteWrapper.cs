@@ -129,8 +129,6 @@ namespace CommonEcs {
             if (entity != Entity.Null && this.entityManager.HasComponent<Sprite>(entity)) {
                 this.entityManager.SetComponentData(entity, this.sprite);
             }
-            
-            this.entityManager.AddComponentData(entity, new Changed());
         }
     }
 }

@@ -474,8 +474,7 @@ namespace CommonEcs {
                 }
 
                 if (forceUpdate || this.renderOrderChanged) {
-                    this.nativeTriangles.CopyToFast(this.triangles);
-                    this.mesh.triangles = this.triangles;
+                    this.mesh.SetIndices(this.nativeTriangles, MeshTopology.Triangles, 0);
                 }
 
                 if (forceUpdate || this.uvChanged) {

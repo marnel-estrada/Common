@@ -24,7 +24,6 @@ namespace CommonEcs {
 
         public ComponentDataFromEntity<AStarPath> allPaths;
 
-        [ReadOnly]
         public BufferFromEntity<Int2BufferElement> allPathLists;
 
         public ComponentDataFromEntity<Waiting> allWaiting;

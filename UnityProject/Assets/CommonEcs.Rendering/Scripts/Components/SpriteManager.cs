@@ -337,19 +337,10 @@ namespace CommonEcs {
             // We maintain an array and a native one so we don't need to use ToArray() which throws garbage
             // We copy into the normal array instead
             public NativeArray<Vector3> nativeVertices;
-            public Vector3[] vertices;
-
             public NativeArray<int> nativeTriangles;
-            public int[] triangles;
-
             public NativeArray<Vector2> nativeUv;
-            public Vector2[] uv;
-
             public NativeArray<Vector2> nativeUv2;
-            public Vector2[] uv2;
-
             public NativeArray<Color> nativeColors;
-            public Color[] colors;
 
             // This is the amount of sprites to expand whenever the current capacity is reached
             public int allocationCount;
@@ -415,21 +406,16 @@ namespace CommonEcs {
                 // We multiply by 4 because each sprite has 4 vertices
                 int vertexCount = this.capacity * 4;
                 this.nativeVertices = new NativeArray<Vector3>(vertexCount, Allocator.Persistent);
-                this.vertices = new Vector3[vertexCount];
 
                 this.nativeUv = new NativeArray<Vector2>(vertexCount, Allocator.Persistent);
-                this.uv = new Vector2[vertexCount];
 
                 this.nativeUv2 = new NativeArray<Vector2>(vertexCount, Allocator.Persistent);
-                this.uv2 = new Vector2[vertexCount];
 
                 this.nativeColors = new NativeArray<Color>(vertexCount, Allocator.Persistent);
-                this.colors = new Color[vertexCount];
 
                 // Multiply by 6 because there are 6 indeces per quad (2 triangles)
                 int trianglesLength = this.capacity * 6;
                 this.nativeTriangles = new NativeArray<int>(trianglesLength, Allocator.Persistent);
-                this.triangles = new int[trianglesLength];
 
                 this.mesh = new Mesh();
 
@@ -680,7 +666,6 @@ namespace CommonEcs {
                 NativeArray<Vector3> newVertices = CopyAndExpand(this.nativeVertices, vertexCount);
                 this.nativeVertices.Dispose();
                 this.nativeVertices = newVertices;
-                this.vertices = new Vector3[vertexCount];
 
                 // We wrap in a block so we don't do a mistake of assigning the wrong NativeArray
                 // for a certain UV
@@ -688,26 +673,22 @@ namespace CommonEcs {
                     NativeArray<Vector2> newUv = CopyAndExpand(this.nativeUv, vertexCount);
                     this.nativeUv.Dispose();
                     this.nativeUv = newUv;
-                    this.uv = new Vector2[vertexCount];
                 }
 
                 {
                     NativeArray<Vector2> newUv2 = CopyAndExpand(this.nativeUv2, vertexCount);
                     this.nativeUv2.Dispose();
                     this.nativeUv2 = newUv2;
-                    this.uv2 = new Vector2[vertexCount];
                 }
 
                 NativeArray<Color> newColors = CopyAndExpand(this.nativeColors, vertexCount);
                 this.nativeColors.Dispose();
                 this.nativeColors = newColors;
-                this.colors = new Color[vertexCount];
 
                 // Multiply by 6 because there are 6 indeces per quad (2 triangles)
                 NativeArray<int> newTriangles = CopyAndExpand(this.nativeTriangles, this.capacity * 6);
                 this.nativeTriangles.Dispose();
                 this.nativeTriangles = newTriangles;
-                this.triangles = new int[this.nativeTriangles.Length];
             }
 
             private static NativeArray<T> CopyAndExpand<T>(NativeArray<T> original, int newLength) where T : struct {

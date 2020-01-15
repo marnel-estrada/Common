@@ -37,12 +37,14 @@ namespace Common {
             }
 
             if (this.map == null) {
-                this.map = new Dictionary<string, T>(10);
+                this.map = new Dictionary<string, T>(10, System.StringComparer.Ordinal);
             }
 
             for (int i = 0; i < this.dataList.Count; ++i) {
                 T data = this.dataList[i];
-                this.map[data.Id] = data;
+                
+                // We trim here because data entry from designers might have spaces
+                this.map[data.Id.Trim()] = data;
             }
         }
 

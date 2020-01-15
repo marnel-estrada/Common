@@ -43,7 +43,7 @@ namespace Common {
         private void RenderNewItemUi(DataPool<T> pool) {
             GUILayout.BeginHorizontal();
             GUILayout.Label("New: ", GUILayout.Width(40));
-            this.newItemId = EditorGUILayout.TextField(this.newItemId);
+            this.newItemId = EditorGUILayout.TextField(this.newItemId).Trim();
 
             if(GUILayout.Button("Add", GUILayout.Width(40), GUILayout.Height(15))) {
                 if(!string.IsNullOrEmpty(this.newItemId)) {

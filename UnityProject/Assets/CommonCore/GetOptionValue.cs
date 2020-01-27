@@ -1,4 +1,7 @@
+using System;
+
 namespace Common {
+    [Obsolete]
     public class GetOptionValue<T> : IFuncOptionMatcher<T, T> where T : class {
         public T OnSome(T value) {
             return value;

@@ -1,7 +1,7 @@
 using System;
 
 namespace Common {
-    [Obsolete]
+    [Obsolete("Should no longer be used. Will remove this soon.")]
     public class GetOptionValue<T> : IFuncOptionMatcher<T, T> where T : class {
         public T OnSome(T value) {
             return value;

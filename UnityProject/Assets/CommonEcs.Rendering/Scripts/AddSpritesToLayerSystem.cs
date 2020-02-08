@@ -91,6 +91,7 @@ namespace CommonEcs {
 
             // Prepare a SpriteManager
             SpriteManager spriteManager = new SpriteManager(spriteLayer.allocationCount, this.PostUpdateCommands);
+            spriteManager.Name = spriteLayer.Name; // Copy name for debugging purposes
             spriteManager.SpriteLayerEntity = spriteLayer.owner;
             spriteManager.SetMaterial(spriteLayer.material);
             spriteManager.Layer = spriteLayer.layer;

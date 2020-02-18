@@ -34,7 +34,7 @@ namespace CommonEcs {
         /// Creates the sprite entity with the specified sprite data
         /// </summary>
         /// <param name="sprite"></param>
-        public void Create(ref Sprite sprite, float3 translation, quaternion rotation, bool isStatic) {
+        public void Create(ref Sprite sprite, float3 translation, quaternion rotation, bool isStatic, float sortOrderOffset = 0) {
             // Avoid creating a new sprite entity when another one exists
             Assertion.Assert(!this.Exists);
             Assertion.Assert(this.spriteLayerEntity != Entity.Null);
@@ -55,7 +55,7 @@ namespace CommonEcs {
             
             buffer.AddComponent(this.spriteEntity, new LocalToWorld());
 
-            buffer.AddComponent(this.spriteEntity, new UseYAsSortOrder());
+            buffer.AddComponent(this.spriteEntity, new UseYAsSortOrder(sortOrderOffset));
 
             buffer.AddComponent(this.spriteEntity, new AddToSpriteLayer() {
                 layerEntity = this.spriteLayerEntity

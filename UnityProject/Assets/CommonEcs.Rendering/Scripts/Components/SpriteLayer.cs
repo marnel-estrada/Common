@@ -29,6 +29,9 @@ namespace CommonEcs {
         private readonly int id;
         private static readonly IdGenerator ID_GENERATOR = new IdGenerator(1);
 
+        // Can be optionally be set
+        private string name;
+
         /// <summary>
         /// Initializer
         /// </summary>
@@ -46,6 +49,7 @@ namespace CommonEcs {
             this.alwaysUpdateMesh = false;
             this.useMeshRenderer = false;
             this.id = ID_GENERATOR.Generate();
+            this.name = "(no name)";
         }
 
         public int SortingLayerId {
@@ -57,6 +61,15 @@ namespace CommonEcs {
         public int SortingLayer {
             get {
                 return this.sortingLayer;
+            }
+        }
+
+        public string Name {
+            get {
+                return this.name;
+            }
+            set {
+                this.name = value;
             }
         }
 

@@ -183,7 +183,6 @@
         /// <param name="color"></param>
         public void SetColor(Color color) {
             this.color = color;
-
             this.colorChanged.Value = true;
         }
 

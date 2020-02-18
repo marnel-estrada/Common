@@ -100,7 +100,7 @@ namespace Common.Xml {
                 attributeValue = attributeValue.ToLower();
             }
 
-            return TRUE.Equals(attributeValue) || YES.Equals(attributeValue);
+            return TRUE.EqualsFast(attributeValue) || YES.EqualsFast(attributeValue);
         }
 
         /**

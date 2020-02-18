@@ -142,5 +142,11 @@ namespace Common {
                 return this.dictionary;
             }
         }
+
+        public int IndexOfKey(K key) {
+            Assertion.Assert(this.keyList.Count == this.valueList.Count && this.valueList.Count == this.dictionary.Count);
+
+            return this.keyList.IndexOf(key);
+        }
     }
 }

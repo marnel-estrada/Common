@@ -16,7 +16,6 @@ namespace Common {
 	 * Contains GameObject extensions
 	 */
 	public static class GameObjectExtensions {
-
 		/**
 		 * Queries for a component
 		 * Throws assertion error if component is not found
@@ -25,6 +24,11 @@ namespace Common {
 			T component = self.GetComponent<T>();
 			Assertion.AssertNotNull(component);
 			return component;
+		}
+		
+		public static Option<T> GetComponentAsOption<T>(this GameObject self) where T : Component {
+			T component = self.GetComponent<T>();
+			return component == null ? Option<T>.NONE : Option<T>.Some(component);
 		}
 		
 		/**
@@ -40,7 +44,6 @@ namespace Common {
 		public static void Activate(this GameObject self) {
 			self.SetActive(true);
 		}
-
 	}
 }
 

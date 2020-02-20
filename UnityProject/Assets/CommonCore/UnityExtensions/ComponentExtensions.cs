@@ -5,7 +5,6 @@ namespace Common {
     /// Extension methods related to Components
     /// </summary>
     public static class ComponentExtensions {
-
         /// <summary>
         /// Retrieves a required component
         /// </summary>
@@ -18,5 +17,9 @@ namespace Common {
             return componentInstance;
         }
 
+        public static Option<T> GetComponentAsOption<T>(this Component self) where T : Component {
+            T component = self.GetComponent<T>();
+            return component == null ? Option<T>.NONE : Option<T>.Some(component);
+        }
     }
 }

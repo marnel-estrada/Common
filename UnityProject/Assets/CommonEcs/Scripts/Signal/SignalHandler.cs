@@ -44,6 +44,9 @@ namespace CommonEcs {
 
             int count = chunk.Count;
             for (int i = 0; i < count; ++i) {
+                // Remember not to use EntityManager on the signal handler as it will alter the
+                // NativeArrays that are acquired here. It will cause array is already deallocated
+                // error.
                 Publish(entities[i], components[i]);
                 
                 // Note here that we don't destroy the signal entity right away

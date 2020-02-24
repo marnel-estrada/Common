@@ -11,7 +11,7 @@ namespace CommonEcs {
         private EntityQuery signalQuery;
         private JobSignalHandler<T> signalHandler;
 
-        private EndPresentationEntityCommandBufferSystem barrier;
+        private EndInitializationEntityCommandBufferSystem barrier;
         
         // Tag that identifies a signal entity that it has been already processed
         public struct ProcessedBySystem : IComponentData {
@@ -22,7 +22,7 @@ namespace CommonEcs {
             this.signalHandler = new JobSignalHandler<T>(this, this.signalQuery);
             this.signalHandler.AddListener(OnDispatch);
 
-            this.barrier = this.World.GetOrCreateSystem<EndPresentationEntityCommandBufferSystem>();
+            this.barrier = this.World.GetOrCreateSystem<EndInitializationEntityCommandBufferSystem>();
         }
 
         protected abstract JobHandle OnDispatch(Entity entity, T signalComponent, JobHandle inputDeps);

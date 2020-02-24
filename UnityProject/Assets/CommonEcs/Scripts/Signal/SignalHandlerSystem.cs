@@ -21,7 +21,7 @@ namespace CommonEcs {
             this.signalHandler.AddListener(OnDispatch);
         }
 
-        protected abstract void OnDispatch(Entity entity, T signalComponent);
+        protected abstract void OnDispatch(Entity entity, T parameter);
 
         protected override void OnUpdate() {
             this.signalHandler.Update();

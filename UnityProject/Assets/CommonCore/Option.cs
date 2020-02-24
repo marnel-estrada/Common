@@ -49,9 +49,34 @@ namespace Common {
             }
         }
 
+        /// <summary>
+        /// This is used for matching using a struct without incurring garbage
+        /// </summary>
+        /// <param name="matcher"></param>
+        /// <typeparam name="TMatcher"></typeparam>
+        public void Match<TMatcher>(TMatcher matcher) where TMatcher : struct, IOptionMatcher<T> {
+            if (this.hasValue) {
+                matcher.OnSome(this.value);
+            } else {
+                matcher.OnNone();
+            }
+        }
+
         public TReturnType Match<TReturnType>(IFuncOptionMatcher<T, TReturnType> matcher) {
             return this.hasValue ? matcher.OnSome(this.value) : matcher.OnNone();
         }
+
+        /// <summary>
+        /// This is used for matching using a struct without incurring garbage
+        /// </summary>
+        /// <param name="matcher"></param>
+        /// <typeparam name="TMatcher"></typeparam>
+        /// <typeparam name="TReturnType"></typeparam>
+        /// <returns></returns>
+        public TReturnType Match<TMatcher, TReturnType>(TMatcher matcher)
+            where TMatcher : struct, IFuncOptionMatcher<T, TReturnType> {
+            return this.hasValue ? matcher.OnSome(this.value) : matcher.OnNone();
+        } 
 
         public bool ReferenceEquals(T other) {
             return this.value == other;

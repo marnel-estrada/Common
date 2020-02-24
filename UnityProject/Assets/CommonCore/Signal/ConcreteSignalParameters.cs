@@ -13,7 +13,6 @@ using Common;
 
 namespace Common.Signal {
     class ConcreteSignalParameters : ISignalParameters {
-
         private Stack<Dictionary<string, object>> parameterStack = new Stack<Dictionary<string, object>>();
 
 	    /**
@@ -71,6 +70,5 @@ namespace Common.Signal {
             newInstance.Clear();
             return newInstance;
         }
-
     }
 }

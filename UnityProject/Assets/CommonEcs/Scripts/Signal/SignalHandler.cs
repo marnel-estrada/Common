@@ -29,11 +29,13 @@ namespace CommonEcs {
             this.componentType = this.system.GetArchetypeChunkComponentType<T>();
 
             NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
-            for (int i = 0; i < chunks.Length; ++i) {
-                Process(chunks[i]);
+            try {
+                for (int i = 0; i < chunks.Length; ++i) {
+                    Process(chunks[i]);
+                }
+            } finally {
+                chunks.Dispose();
             }
-            
-            chunks.Dispose();
         }
 
         private void Process(ArchetypeChunk chunk) {
@@ -42,6 +44,9 @@ namespace CommonEcs {
 
             int count = chunk.Count;
             for (int i = 0; i < count; ++i) {
+                // Remember not to use EntityManager on the signal handler as it will alter the
+                // NativeArrays that are acquired here. It will cause array is already deallocated
+                // error.
                 Publish(entities[i], components[i]);
                 
                 // Note here that we don't destroy the signal entity right away

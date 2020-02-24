@@ -29,11 +29,13 @@ namespace CommonEcs {
             this.componentType = this.system.GetArchetypeChunkComponentType<T>();
 
             NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
-            for (int i = 0; i < chunks.Length; ++i) {
-                Process(chunks[i]);
+            try {
+                for (int i = 0; i < chunks.Length; ++i) {
+                    Process(chunks[i]);
+                }
+            } finally {
+                chunks.Dispose();
             }
-            
-            chunks.Dispose();
         }
 
         private void Process(ArchetypeChunk chunk) {

@@ -6,7 +6,6 @@ using Unity.Mathematics;
 using UnityEngine;
 
 namespace CommonEcs {
-    
     /// <summary>
     /// A component that we can use in GameObject to create ECS Sprite instances
     /// </summary>

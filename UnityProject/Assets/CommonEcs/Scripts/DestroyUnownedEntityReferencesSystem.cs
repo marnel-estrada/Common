@@ -3,18 +3,18 @@ using Unity.Entities;
 
 namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    [UpdateBefore(typeof(EndPresentationEntityCommandBufferSystem))]
+    [UpdateBefore(typeof(EndInitializationEntityCommandBufferSystem))]
     public class DestroyUnownedEntityReferencesSystem : ComponentSystem {
         private EntityQuery query;
         
         private ArchetypeChunkEntityType entityType;
         private ArchetypeChunkComponentType<EntityReference> referenceType;
     
-        private EndPresentationEntityCommandBufferSystem barrier;
+        private EndInitializationEntityCommandBufferSystem barrier;
     
         protected override void OnCreate() {
             this.query = GetEntityQuery(typeof(EntityReference));
-            this.barrier = this.World.GetOrCreateSystem<EndPresentationEntityCommandBufferSystem>();
+            this.barrier = this.World.GetOrCreateSystem<EndInitializationEntityCommandBufferSystem>();
         }
     
         protected override void OnUpdate() {

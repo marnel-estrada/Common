@@ -38,7 +38,7 @@ namespace CommonEcs {
             for (int i = 1; i < timeReferences.Count; ++i) {
                 TimeReference timeReference = timeReferences[i];
                 
-                this.scaledQuery.SetFilter(timeReference);
+                this.scaledQuery.SetSharedComponentFilter(timeReference);
 
                 ScaledJob job = new ScaledJob() {
                     timerType = timerType,

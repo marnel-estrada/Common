@@ -55,15 +55,19 @@ namespace Common.Ecs.Fsm {
 
         /// <summary>
         /// Adds an action to the specified state
+        /// Returns the action entity
         /// </summary>
         /// <param name="stateOwnerEntity"></param>
         /// <returns></returns>
-        public void AddAction(EntityCommandBuffer postCommandBuffer, Entity stateOwnerEntity) {
-            postCommandBuffer.CreateEntity();
+        public Entity AddAction(EntityCommandBuffer postCommandBuffer, Entity stateOwnerEntity) {
+            Entity actionEntity = postCommandBuffer.CreateEntity();
 
-            FsmAction action = new FsmAction();
-            action.stateOwner = stateOwnerEntity;
-            postCommandBuffer.AddComponent(action);
+            FsmAction action = new FsmAction {
+                stateOwner = stateOwnerEntity
+            };
+            postCommandBuffer.AddComponent(actionEntity, action);
+
+            return actionEntity;
         }
 
         /// <summary>

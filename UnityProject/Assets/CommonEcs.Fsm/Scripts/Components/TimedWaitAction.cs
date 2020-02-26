@@ -4,7 +4,6 @@ using Unity.Entities;
 
 namespace Common.Ecs.Fsm {
     public struct TimedWaitAction : IComponentData {
-
         public float duration;
         public uint finishEvent;
 
@@ -24,12 +23,12 @@ namespace Common.Ecs.Fsm {
         /// <param name="actionEntity"></param>
         /// <param name="duration"></param>
         /// <param name="finishEvent"></param>
-        public static void AddAsAction(EntityCommandBuffer postCommandBuffer, float duration, uint finishEvent) {
+        public static void AddAsAction(EntityCommandBuffer postCommandBuffer, Entity actionEntity, float duration, uint finishEvent) {
             DurationTimer timer = new DurationTimer();
-            postCommandBuffer.AddComponent(timer);
+            postCommandBuffer.AddComponent(actionEntity, timer);
 
             TimedWaitAction waitAction = new TimedWaitAction(duration, finishEvent);
-            postCommandBuffer.AddComponent(waitAction);
+            postCommandBuffer.AddComponent(actionEntity, waitAction);
         }
 
     }

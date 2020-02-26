@@ -8,10 +8,10 @@ namespace Common.Ecs.Fsm {
     /// </summary>
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class FsmActionEndSystem : JobComponentSystem {
-        private EndPresentationEntityCommandBufferSystem barrier;
+        private EndInitializationEntityCommandBufferSystem barrier;
 
         protected override void OnCreate() {
-            this.barrier = this.World.GetOrCreateSystem<EndPresentationEntityCommandBufferSystem>();
+            this.barrier = this.World.GetOrCreateSystem<EndInitializationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {

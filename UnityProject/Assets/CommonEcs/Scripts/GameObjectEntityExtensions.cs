@@ -31,11 +31,10 @@ namespace CommonEcs {
             Entity entity = goEntity.Entity;
 
             // Get entity manager.
-            EntityManager manager = World.Active.EntityManager;
+            EntityManager manager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
             // Add component to associated entity.
             manager.AddComponent(entity, newComponent.GetType());
-
 
             return newComponent;
         }
@@ -63,7 +62,7 @@ namespace CommonEcs {
             Entity entity = goEntity.Entity;
 
             // Get entity manager.
-            EntityManager manager = World.Active.EntityManager;
+            EntityManager manager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
             // Remove component from associated entity.
             manager.RemoveComponent(entity, componentToRemove.GetType());

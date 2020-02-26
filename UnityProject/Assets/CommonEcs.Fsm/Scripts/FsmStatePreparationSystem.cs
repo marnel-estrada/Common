@@ -64,15 +64,6 @@ namespace Common.Ecs.Fsm {
             this.FsmBuilder.AddAction(this.PostUpdateCommands, stateEntity);
         }
 
-        /// <summary>
-        /// Utility method for adding components to the recently added action
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="component"></param>
-        protected void AddComponent<T>(T component) where T : struct, IComponentData {
-            this.PostUpdateCommands.AddComponent(component);
-        }
-
         protected override EntityQuery ComposeQuery() {
             return GetEntityQuery(typeof(FsmState), typeof(StateJustTransitioned), typeof(T));            
         }

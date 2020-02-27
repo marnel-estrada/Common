@@ -54,7 +54,7 @@ namespace CommonEcs {
                     continue;
                 }
 
-                this.query.SetFilter(manager);
+                this.query.SetSharedComponentFilter(manager);
     
                 UpdateVerticesJob job = new UpdateVerticesJob() {
                     spriteType = this.spriteType,

@@ -40,7 +40,7 @@ namespace CommonEcs {
                     continue;
                 }
                 
-                this.query.SetFilter(spriteManager);
+                this.query.SetSharedComponentFilter(spriteManager);
 
                 AddJob addJob = new AddJob() {
                     chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob),

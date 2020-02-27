@@ -23,9 +23,9 @@ namespace CommonEcs {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            NativeArray<Move> moves = this.query.ToComponentDataArray<Move>(Allocator.TempJob, out JobHandle movesHandle);
+            NativeArray<Move> moves = this.query.ToComponentDataArrayAsync<Move>(Allocator.TempJob, out JobHandle movesHandle);
             NativeArray<DurationTimer> timers =
-                this.query.ToComponentDataArray<DurationTimer>(Allocator.TempJob, out JobHandle timersHandle);
+                this.query.ToComponentDataArrayAsync<DurationTimer>(Allocator.TempJob, out JobHandle timersHandle);
             JobHandle combinedHandle = JobHandle.CombineDependencies(movesHandle, timersHandle, inputDeps);
             
             Job job = new Job() {

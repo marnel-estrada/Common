@@ -6,7 +6,6 @@ using Unity.Transforms;
 
 namespace CommonEcs {
     [UpdateBefore(typeof(TransformVerticesSystem))]
-    [UpdateBefore(typeof(EndPresentationEntityCommandBufferSystem))]
     [UpdateBefore(typeof(SortRenderOrderSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class UseYAsSortOrderSystem : JobComponentSystem {

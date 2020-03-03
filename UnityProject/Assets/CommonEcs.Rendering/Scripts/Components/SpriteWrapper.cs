@@ -26,7 +26,7 @@ namespace CommonEcs {
         private void Awake() {
             this.goEntity = this.GetRequiredComponent<GameObjectEntity>();
             
-            this.entityManager = World.Active.EntityManager;
+            this.entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             Assertion.AssertNotNull(this.entityManager);
         }
 

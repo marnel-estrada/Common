@@ -425,7 +425,7 @@ namespace CommonEcs {
             }
 
             private void AddInvisibleSprite() {
-                EntityManager entityManager = World.Active.EntityManager;
+                EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
                 Entity spriteEntity = entityManager.CreateEntity();
                 
                 Sprite sprite = new Sprite();

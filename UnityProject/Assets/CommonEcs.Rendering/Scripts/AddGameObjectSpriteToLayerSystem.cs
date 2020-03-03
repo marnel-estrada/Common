@@ -1,5 +1,4 @@
-﻿using Unity.Collections;
-using Unity.Entities;
+﻿using Unity.Entities;
 using Unity.Mathematics;
 
 using UnityEngine;
@@ -29,10 +28,6 @@ namespace CommonEcs {
         }
 
         private EntityQuery query;
-        private ArchetypeChunkComponentType<Sprite> spriteType;
-        private ArchetypeChunkComponentType<AddToSpriteLayer> addToLayerType;
-        private ArchetypeChunkComponentType<Transform> transformType;
-        private ArchetypeChunkEntityType entityType;
 
         private SpriteLayerInstancesSystem layers;
         private SpriteManagerInstancesSystem managers;
@@ -49,44 +44,18 @@ namespace CommonEcs {
         }
 
         protected override void OnUpdate() {
-            this.spriteType = GetArchetypeChunkComponentType<Sprite>();
-            this.addToLayerType = GetArchetypeChunkComponentType<AddToSpriteLayer>();
-            this.transformType = GetArchetypeChunkComponentType<Transform>();
-            this.entityType = GetArchetypeChunkEntityType();
-            
-            NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
-            for (int i = 0; i < chunks.Length; ++i) {
-                if (!Process(chunks[i])) {
-                    break;
+            bool hasManager = true;
+            this.Entities.With(this.query).ForEach(delegate(Entity entity, Transform transform, ref Sprite sprite, ref AddToSpriteLayer addToLayer) {
+                if (!hasManager) {
+                    // Do not process anymore if it already returned false in a previous entity
+                    return;
                 }
-            }
-            
-            chunks.Dispose();
+
+                hasManager = ProcessThenReturnIfSuccess(entity, transform, ref sprite, ref addToLayer);
+            });
         }
 
-        private NativeArray<AddToSpriteLayer> addToLayers;
-        private NativeArray<Sprite> sprites;
-        private ArchetypeChunkComponentObjects<Transform> transforms;
-        private NativeArray<Entity> entities;
-
-        private bool Process(ArchetypeChunk chunk) {
-            this.addToLayers = chunk.GetNativeArray(this.addToLayerType);
-            this.sprites = chunk.GetNativeArray(this.spriteType);
-            this.transforms = chunk.GetComponentObjects(this.transformType, this.EntityManager);
-            this.entities = chunk.GetNativeArray(this.entityType);
-
-            for (int i = 0; i < chunk.Count; ++i) {
-                if (!ProcessThenReturnIfSuccess(i)) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private bool ProcessThenReturnIfSuccess(int index) {
-            AddToSpriteLayer addToLayer = this.addToLayers[index];
-            
+        private bool ProcessThenReturnIfSuccess(Entity spriteEntity, Transform transform, ref Sprite sprite, ref AddToSpriteLayer addToLayer) {
             Maybe<SpriteLayer> layer = this.layers.Get(addToLayer.layerEntity);
             Assertion.Assert(layer.HasValue);
             SpriteLayer spriteLayer = layer.Value;
@@ -96,14 +65,14 @@ namespace CommonEcs {
             if (manager.HasValue) {
                 // This means that the layer has an available manager
                 // We directly add the sprite to the said manager
-                AddSpriteToManager(manager.Value, index);
+                AddSpriteToManager(manager.Value, spriteEntity, transform, ref sprite);
 
                 return true;
             }
 
             // At this point, it means that the layer doesn't have an available sprite manager
             // We create a new one and skip the current frame
-            Entity entity = this.PostUpdateCommands.CreateEntity();
+            Entity spriteManagerEntity = this.PostUpdateCommands.CreateEntity();
 
             // Prepare a SpriteManager
             SpriteManager spriteManager = new SpriteManager(spriteLayer.allocationCount, this.PostUpdateCommands);
@@ -113,29 +82,25 @@ namespace CommonEcs {
             spriteManager.SortingLayerId = spriteLayer.SortingLayerId;
             spriteManager.SortingLayer = spriteLayer.SortingLayer;
             spriteManager.AlwaysUpdateMesh = spriteLayer.alwaysUpdateMesh;
-            this.PostUpdateCommands.AddSharedComponent(entity, spriteManager);
+            this.PostUpdateCommands.AddSharedComponent(spriteManagerEntity, spriteManager);
 
             return false;
         }
 
-        private void AddSpriteToManager(SpriteManager manager, int index) {
-            Sprite sprite = this.sprites[index];
-
+        private void AddSpriteToManager(SpriteManager manager, Entity entity, Transform transform, ref Sprite sprite) {
             Assertion.Assert(manager.Owner != Entity.Null); // Should have been set already
             sprite.spriteManagerEntity = manager.Owner;
 
-            Transform transform = this.transforms[index];
             float4x4 matrix = new float4x4(transform.rotation, transform.position);
             manager.Add(ref sprite, matrix);
-            this.sprites[index] = sprite; // Modify the data
 
             // We add this component so it will be skipped by this system on the next frame
-            this.PostUpdateCommands.AddComponent(this.entities[index],
+            this.PostUpdateCommands.AddComponent(entity,
                 new Added(manager.Owner, sprite.managerIndex));
             
             // We add the shared component so that it can be filtered using such shared component
             // in other systems. For example, in SortRenderOrderSystem.
-            this.PostUpdateCommands.AddSharedComponent(this.entities[index], manager);
+            this.PostUpdateCommands.AddSharedComponent(entity, manager);
         }
 
         private Maybe<SpriteManager> ResolveAvailable(ref SpriteLayer layer) {

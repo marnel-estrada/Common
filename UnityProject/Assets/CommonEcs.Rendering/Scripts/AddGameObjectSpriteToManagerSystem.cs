@@ -1,5 +1,4 @@
-﻿using Unity.Collections;
-using Unity.Entities;
+﻿using Unity.Entities;
 using Unity.Mathematics;
 
 using UnityEngine;
@@ -34,11 +33,6 @@ namespace CommonEcs {
         private EntityQuery addedQuery;
         private EntityQuery removedQuery;
 
-        private ArchetypeChunkComponentType<Transform> transformType;
-        private ArchetypeChunkComponentType<Sprite> spriteType;
-        private ArchetypeChunkComponentType<Added> addedType;
-        private ArchetypeChunkEntityType entityType;
-
         private SpriteManagerInstancesSystem spriteManagers;
 
         protected override void OnCreate() {
@@ -58,93 +52,44 @@ namespace CommonEcs {
         }
 
         protected override void OnUpdate() {
-            this.transformType = GetArchetypeChunkComponentType<Transform>();
-            this.spriteType = GetArchetypeChunkComponentType<Sprite>();
-            this.addedType = GetArchetypeChunkComponentType<Added>();
-            this.entityType = GetArchetypeChunkEntityType();
-
             ProcessAdded();
             ProcessRemoved();
         }
 
         private void ProcessAdded() {
-            NativeArray<ArchetypeChunk> chunks = this.addedQuery.CreateArchetypeChunkArray(Allocator.TempJob);
-            for (int i = 0; i < chunks.Length; ++i) {
-                ProcessAdded(chunks[i]);
-            }
+            this.Entities.With(this.addedQuery).ForEach(
+                delegate(Entity entity, Transform transform, ref Sprite sprite) {
+                    if (sprite.spriteManagerEntity == Entity.Null) {
+                        // The sprite manager entity might not have been set yet
+                        // For example, when a prefab with SpriteWrapper is instantiated, it probably
+                        // doesn't have its spriteManagerEntity value set yet.
+                        // We skip it for now and process them in the next frame.
+                        return;
+                    }
             
-            chunks.Dispose();
-        }
+                    Maybe<SpriteManager> maybeManager = this.spriteManagers.Get(sprite.spriteManagerEntity);
+                    float4x4 matrix = new float4x4(transform.rotation, transform.position);
+                    maybeManager.Value.Add(ref sprite, matrix);
 
-        private NativeArray<Sprite> sprites;
-        private ArchetypeChunkComponentObjects<Transform> transforms;
-        private NativeArray<Entity> addedEntities;
-
-        private void ProcessAdded(ArchetypeChunk chunk) {
-            this.sprites = chunk.GetNativeArray(this.spriteType);
-            this.transforms = chunk.GetComponentObjects(this.transformType, this.EntityManager);
-            this.addedEntities = chunk.GetNativeArray(this.entityType);
-
-            for (int i = 0; i < chunk.Count; ++i) {
-                ProcessAdded(i);
-            }
-        }
-
-        private void ProcessAdded(int index) {
-            Sprite sprite = this.sprites[index];
-
-            if (sprite.spriteManagerEntity == Entity.Null) {
-                // The sprite manager entity might not have been set yet
-                // For example, when a prefab with SpriteWrapper is instantiated, it probably
-                // doesn't have its spriteManagerEntity value set yet.
-                // We skip it for now and process them in the next frame.
-                return;
-            }
+                    // Add this component so it will no longer be processed by this system
+                    this.PostUpdateCommands.AddComponent(entity,
+                        new Added(sprite.spriteManagerEntity, sprite.managerIndex));
             
-            Transform transform = this.transforms[index];
-            Maybe<SpriteManager> maybeManager = this.spriteManagers.Get(sprite.spriteManagerEntity);
-            float4x4 matrix = new float4x4(transform.rotation, transform.position);
-            maybeManager.Value.Add(ref sprite, matrix);
-            this.sprites[index] = sprite; // Modify the sprite data
-
-            // Add this component so it will no longer be processed by this system
-            this.PostUpdateCommands.AddComponent(this.addedEntities[index],
-                new Added(sprite.spriteManagerEntity, sprite.managerIndex));
-            
-            // We add the shared component so that it can be filtered using such shared component
-            // in other systems. For example, in SortRenderOrderSystem.
-            this.PostUpdateCommands.AddSharedComponent(this.addedEntities[index], maybeManager.Value);
+                    // We add the shared component so that it can be filtered using such shared component
+                    // in other systems. For example, in SortRenderOrderSystem.
+                    this.PostUpdateCommands.AddSharedComponent(entity, maybeManager.Value);
+                });
         }
 
         private void ProcessRemoved() {
-            NativeArray<ArchetypeChunk> chunks = this.removedQuery.CreateArchetypeChunkArray(Allocator.TempJob);
-            for (int i = 0; i < chunks.Length; ++i) {
-                ProcessRemoved(chunks[i]);
-            }
-            
-            chunks.Dispose();
-        }
+            this.Entities.With(this.removedQuery).ForEach(delegate(Entity entity, ref Added added) {
+                Maybe<SpriteManager> maybeManager = this.spriteManagers.Get(added.spriteManagerEntity);
+                if (maybeManager.HasValue) {
+                    maybeManager.Value.Remove(added.managerIndex);
+                }
 
-        private NativeArray<Added> addedArray;
-        private NativeArray<Entity> removedEntities;
-
-        private void ProcessRemoved(ArchetypeChunk chunk) {
-            this.addedArray = chunk.GetNativeArray(this.addedType);
-            this.removedEntities = chunk.GetNativeArray(this.entityType);
-
-            for (int i = 0; i < chunk.Count; ++i) {
-                ProcessRemoved(i);
-            }
-        }
-
-        private void ProcessRemoved(int index) {
-            Added added = this.addedArray[index];
-            Maybe<SpriteManager> maybeManager = this.spriteManagers.Get(added.spriteManagerEntity);
-            if (maybeManager.HasValue) {
-                maybeManager.Value.Remove(added.managerIndex);
-            }
-
-            this.PostUpdateCommands.RemoveComponent<Added>(this.removedEntities[index]);
+                this.PostUpdateCommands.RemoveComponent<Added>(entity);
+            });
         }
     }
 }

@@ -1,8 +1,10 @@
+using System;
+
 using Common;
 
 namespace GameEvent {
     // Enum implemented as a struct
-    public readonly struct Rarity {
+    public readonly struct Rarity : IEquatable<Rarity> {
         public static readonly Rarity NULL = new Rarity(0, 0, "Null");
         public static readonly Rarity COMMON = new Rarity(1, 4, "Common");
         public static readonly Rarity UNCOMMON = new Rarity(2, 2, "Uncommon");
@@ -52,6 +54,26 @@ namespace GameEvent {
             this.id = id;
             this.weight = weight;
             this.name = name;
+        }
+
+        public bool Equals(Rarity other) {
+            return this.id == other.id;
+        }
+
+        public override bool Equals(object obj) {
+            return obj is Rarity other && Equals(other);
+        }
+
+        public override int GetHashCode() {
+            return this.id;
+        }
+
+        public static bool operator ==(Rarity left, Rarity right) {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Rarity left, Rarity right) {
+            return !left.Equals(right);
         }
     }
 }

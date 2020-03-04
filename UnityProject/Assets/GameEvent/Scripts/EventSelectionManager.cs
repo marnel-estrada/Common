@@ -9,9 +9,12 @@ namespace GameEvent {
         
         private readonly EventDeck deck = new EventDeck();
 
-        public EventSelectionManager(EventsPool pool, IEventSelectionStrategy selectionStrategy) {
+        private readonly Rarity forcedRarity;
+
+        public EventSelectionManager(EventsPool pool, IEventSelectionStrategy selectionStrategy, Rarity forcedRarity) {
             this.pool = pool;
             this.selectionStrategy = selectionStrategy ?? new DefaultSelectionStrategy();
+            this.forcedRarity = forcedRarity;
         }
         
         private readonly Dictionary<int, EventData> tempMap = new Dictionary<int, EventData>(100);
@@ -53,8 +56,12 @@ namespace GameEvent {
                 // Do not add disabled events
                 return;
             }
+
+            // Use forcedRarity if it was specified
+            Rarity rarity = this.forcedRarity == Rarity.NULL ? Rarity.ConvertFromId(eventData.Rarity) :
+                this.forcedRarity; 
             
-            int weight = Rarity.ConvertFromId(eventData.Rarity).weight;
+            int weight = rarity.weight;
             for (int i = 0; i < weight; ++i) {
                 this.deck.Add(new EventCard(eventData.IntId));
             }

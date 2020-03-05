@@ -17,7 +17,7 @@ namespace GameEvent {
             Assert.NotNull(pool);
             
             // Specify null to use the default selection strategy
-            EventSelectionManager selectionManager = new EventSelectionManager(pool, null);
+            EventSelectionManager selectionManager = new EventSelectionManager(pool, null, Rarity.NULL);
             selectionManager.Reset();
 
             for (int i = 0; i < 3; ++i) {

@@ -27,14 +27,16 @@ namespace GameEvent {
             
             // Check if it already exists in map
             EventInstance instance = this.map.Find(id);
-            if (instance == null) {
-                // Not yet in map. We instantiate a new one.
-                // We did it this way to save memory since not all events would be resolve
-                // in a single game
-                instance = new EventInstance(foundData.Value);
-                this.map[instance.IntId] = instance;
+            if (instance != null) {
+                return Option<EventInstance>.Some(instance);
             }
-            
+
+            // Not yet in map. We instantiate a new one.
+            // We did it this way to save memory since not all events would be resolve
+            // in a single game
+            instance = new EventInstance(foundData.Value);
+            this.map[instance.IntId] = instance;
+
             return Option<EventInstance>.Some(instance);
         }
     }

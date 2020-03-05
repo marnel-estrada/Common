@@ -11,7 +11,7 @@ namespace Common {
         /// <summary>
         /// Returns comma separated number on the thousands
         /// </summary>
-        /// <param name="number"></param>
+        /// <param name="intValue"></param>
         /// <returns></returns>
         public static string AsCommaSeparated(int intValue) {
             return $"{intValue:n0}";
@@ -20,7 +20,7 @@ namespace Common {
         /// <summary>
         /// Returns comma separated number on the thousands
         /// </summary>
-        /// <param name="number"></param>
+        /// <param name="uintValue"></param>
         /// <returns></returns>
         public static string AsCommaSeparated(uint uintValue) {
             return $"{uintValue:n0}";
@@ -29,7 +29,7 @@ namespace Common {
         /// <summary>
         /// Returns comma separated number on the thousands with 2 decimal places
         /// </summary>
-        /// <param name="number"></param>
+        /// <param name="value"></param>
         /// <returns></returns>
         public static string AsCommaSeparated(float value) {
             return $"{value:n2}";
@@ -158,6 +158,24 @@ namespace Common {
 
             // Replace with empty string
             return Regex.Replace(s, pattern, "");
+        }
+
+        /// <summary>
+        /// Returns the text in a dollar format. The output is already comma-separated.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string AsDollarText(int value) {
+            return value < 0 ? $"-${-value}" : $"${value}";
+        }
+
+        /// <summary>
+        /// Returns the comma-separated, dollar format which is signed before the dollar sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string AsSignedDollarText(int value) {
+            return value >= 0 ? ("+" + AsDollarText(value)) : AsDollarText(value); // note that negative values already have negative sign
         }
     }
 }

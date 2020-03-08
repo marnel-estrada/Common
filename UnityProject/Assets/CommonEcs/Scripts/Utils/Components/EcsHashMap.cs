@@ -1,5 +1,6 @@
 using System;
 
+using Unity.Collections;
 using Unity.Entities;
 
 namespace CommonEcs {
@@ -30,8 +31,6 @@ namespace CommonEcs {
             return listEntity;
         }
         
-        private static readonly Entity[] LIST_ENTITIES = new Entity[BUCKET_COUNT];
-        
         /// <summary>
         /// Prepares the EcsHashMap components on the specified entity
         /// </summary>
@@ -40,17 +39,21 @@ namespace CommonEcs {
             entityManager.AddComponentData(entity, new EcsHashMap<K, V>());
             entityManager.AddBuffer<EntityBufferElement>(entity);
             
+            NativeArray<Entity> tempList = new NativeArray<Entity>(BUCKET_COUNT, Allocator.TempJob);
+            
             // Prepare the buckets
             // We add in a temporary array first because EntityManager is disrupted on the call to CreateValueList()
             // We can't add it to the DynamicBuffer right away
             for (int i = 0; i < BUCKET_COUNT; ++i) {
-                LIST_ENTITIES[i] = CreateValueList(entityManager);
+                tempList[i] = CreateValueList(entityManager);
             }
             
             DynamicBuffer<EntityBufferElement> buckets = entityManager.GetBuffer<EntityBufferElement>(entity);
             for (int i = 0; i < BUCKET_COUNT; ++i) {
-                buckets.Add(new EntityBufferElement(LIST_ENTITIES[i]));
+                buckets.Add(new EntityBufferElement(tempList[i]));
             }
+
+            tempList.Dispose();
         }
 
         private static Entity CreateValueList(EntityManager entityManager) {

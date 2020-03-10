@@ -43,10 +43,10 @@ namespace GameEvent {
         [ReadOnlyField]
         public string NameId {
             get {
-                return this.nameId;
+                return this.nameId.Trim();
             }
             set {
-                this.nameId = value;
+                this.nameId = value?.Trim();
             }
         }
         

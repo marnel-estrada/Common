@@ -1,3 +1,5 @@
+using System.Diagnostics.Contracts;
+
 namespace Common {
     /// <summary>
     /// This is copied from Rust's Option feature. This could be another way to handle
@@ -7,7 +9,7 @@ namespace Common {
     /// Match().
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public struct Option<T> where T : class {
+    public readonly struct Option<T> where T : class {
         public static readonly Option<T> NONE = new Option<T>();
 
         /// <summary>
@@ -62,6 +64,7 @@ namespace Common {
             }
         }
 
+        [Pure]
         public TReturnType Match<TReturnType>(IFuncOptionMatcher<T, TReturnType> matcher) {
             return this.hasValue ? matcher.OnSome(this.value) : matcher.OnNone();
         }

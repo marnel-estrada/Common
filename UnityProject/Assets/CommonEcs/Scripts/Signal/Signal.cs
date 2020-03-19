@@ -12,9 +12,8 @@ namespace CommonEcs {
         /// <param name="signalComponent"></param>
         /// <typeparam name="T"></typeparam>
         public static void Dispatch<T>(EntityManager entityManager, T signalComponent) where T : struct, IComponentData {
-            Entity entity = entityManager.CreateEntity();
-            entityManager.AddComponentData(entity, new Signal());
-            entityManager.AddComponentData(entity, signalComponent);
+            Entity entity = entityManager.CreateEntity(typeof(Signal), typeof(T));
+            entityManager.SetComponentData(entity, signalComponent);
         }
 
         /// <summary>

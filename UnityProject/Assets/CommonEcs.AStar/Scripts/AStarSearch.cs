@@ -4,8 +4,10 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 
+using UnityEngine;
+
 namespace CommonEcs {
-    [BurstCompile]
+    //[BurstCompile]
     public struct AStarSearch<HeuristicCalculator, ReachabilityType> : IJob
         where HeuristicCalculator : struct, HeuristicCostCalculator where ReachabilityType : struct, Reachability {
         public Entity owner;
@@ -48,9 +50,15 @@ namespace CommonEcs {
 
             DoSearch();
 
+            Waiting waiting = this.allWaiting[this.owner];
+            if (waiting.special) {
+                Debug.Log($"Done {this.startPosition} to {this.goalPosition}");
+            }
+            
             // Mark as done waiting for the agent to respond
             this.allWaiting[this.owner] = new Waiting {
-                done = true
+                done = true,
+                special = waiting.special
             };
         }
 

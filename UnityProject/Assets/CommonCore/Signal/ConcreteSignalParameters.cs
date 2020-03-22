@@ -32,6 +32,11 @@ namespace Common.Signal {
 		    return this.parameterStack.Peek()[key];
 	    }
 
+	    public Option<T> GetParameterAsOption<T>(string key) where T : class {
+		    T value = GetParameter(key) as T;
+		    return value == null ? Option<T>.NONE : Option<T>.Some(value);
+	    }
+
 	    public bool HasParameter(string key) {
 		    return this.parameterStack.Peek().ContainsKey(key);
 	    }

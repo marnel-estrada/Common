@@ -166,7 +166,7 @@ namespace Common {
         /// <param name="value"></param>
         /// <returns></returns>
         public static string AsDollarText(int value) {
-            return value < 0 ? $"-${-value}" : $"${value}";
+            return value < 0 ? $"-${AsCommaSeparated(-value)}" : $"${AsCommaSeparated(value)}";
         }
 
         /// <summary>

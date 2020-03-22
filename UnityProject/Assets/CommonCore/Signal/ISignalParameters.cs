@@ -23,6 +23,8 @@ namespace Common.Signal {
 		 */
 		object GetParameter(string key);
 
+		Option<T> GetParameterAsOption<T>(string key) where T : class;
+
 		/**
 		 * Returns whether or not it has a parameter with the specified key
 		 */

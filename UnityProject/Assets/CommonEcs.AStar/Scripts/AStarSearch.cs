@@ -51,9 +51,6 @@ namespace CommonEcs {
             DoSearch();
 
             Waiting waiting = this.allWaiting[this.owner];
-            if (waiting.special) {
-                Debug.Log($"Done {this.startPosition} to {this.goalPosition}");
-            }
             
             // Mark as done waiting for the agent to respond
             this.allWaiting[this.owner] = new Waiting {

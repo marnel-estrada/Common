@@ -85,8 +85,13 @@ namespace CommonEcs {
             public void Execute() {
                 // Instantiate containers
                 this.allNodes = new NativeList<AStarNode>(10, Allocator.Temp);
-                GrowingHeap heap = new GrowingHeap(new NativeList<HeapNode>(10, Allocator.Temp));
-                this.openSet = new OpenSet(heap, new NativeHashMap<int2, AStarNode>(10, Allocator.Temp));
+                
+                NativeList<HeapNode> heapList = new NativeList<HeapNode>(10, Allocator.Temp);
+                GrowingHeap heap = new GrowingHeap(heapList);
+
+                NativeHashMap<int2,AStarNode> openSetMap = new NativeHashMap<int2, AStarNode>(10, Allocator.Temp);
+                this.openSet = new OpenSet(heap, openSetMap);
+                
                 this.closeSet = new NativeHashMap<int2, byte>(10, Allocator.Temp);
 
                 AStarSearchParameters parameters = this.allParameters[this.entity];
@@ -129,6 +134,13 @@ namespace CommonEcs {
                 } else {
                     this.allPaths[this.entity] = new AStarPath(0, false);
                 }
+
+                // Unity says to Dispose() Temp collections:
+                // https://forum.unity.com/threads/allocator-temp-container-need-dispose.852082/
+                this.allNodes.Dispose();
+                heapList.Dispose();
+                openSetMap.Dispose();
+                this.closeSet.Dispose();
             }
 
             private AStarNode CreateNode(int2 position, int parent, float g, float h) {

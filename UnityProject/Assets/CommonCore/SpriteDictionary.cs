@@ -21,7 +21,8 @@ namespace Common {
 
         public Sprite Get(string id) {
             Populate();
-            return this.map[id];
+            Assertion.Assert(this.map.TryGetValue(id, out Sprite sprite), id);
+            return sprite;
         }
 
         private void Populate() {

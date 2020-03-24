@@ -4,10 +4,8 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 
-using UnityEngine;
-
 namespace CommonEcs {
-    //[BurstCompile]
+    [BurstCompile]
     public struct AStarSearch<HeuristicCalculator, ReachabilityType> : IJob
         where HeuristicCalculator : struct, HeuristicCostCalculator where ReachabilityType : struct, Reachability {
         public Entity owner;

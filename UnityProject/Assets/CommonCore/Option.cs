@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.Contracts;
 
 namespace Common {
@@ -40,6 +41,19 @@ namespace Common {
         public bool IsNone {
             get {
                 return !this.hasValue;
+            }
+        }
+
+        /// <summary>
+        /// A utility matcher that only requires an Action<T>
+        /// It only gets invoked if the option has a value
+        /// This is just a shorthand so we don't have to make verbose
+        /// DelegationOptionMatcher instances.
+        /// </summary>
+        /// <param name="matcher"></param>
+        public void Match(Action<T> matcher) {
+            if (this.hasValue) {
+                matcher.Invoke(this.value);
             }
         }
 

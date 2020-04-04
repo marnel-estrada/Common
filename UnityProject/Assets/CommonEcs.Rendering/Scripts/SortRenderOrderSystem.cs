@@ -12,7 +12,6 @@ namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class SortRenderOrderSystem : JobComponentSystem {
         private EntityQuery query;
-
         private SharedComponentQuery<SpriteManager> managerQuery;
 
         protected override void OnCreate() {

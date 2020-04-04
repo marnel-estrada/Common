@@ -4,35 +4,75 @@ using Unity.Mathematics;
 namespace CommonEcs {
     public struct ComputeBufferSprite : IComponentData {
         // xy is the uv dimension and zw is the texture offset
-        public float4 uv;
+        private float4 uv;
 
-        public float4 color;
+        private float4 color;
+
+        // This will be set by a system
+        public float4 transform;
         
         // This will be combined in a float4
         public float2 size;
-        public float2 anchor;
+        public float2 pivot;
 
+        public int layerOrder; // This has more precedence
         public float renderOrder;
+
+        // This will be set by a system
+        public float rotation;
 
         public bool uvChanged;
         public bool colorChanged;
         public bool renderOrderChanged;
 
-        public ComputeBufferSprite(float2 size, float2 anchor) {
+        public ComputeBufferSprite(float2 size, float2 pivot) {
             this.uv = new float4(1.0f, 1.0f, 0.0f, 0.0f);
             this.color = new float4(1.0f, 1.0f, 1.0f, 1.0f);
             this.size = size;
-            this.anchor = anchor;
+            this.pivot = pivot;
+            this.transform = new float4();
 
+            this.layerOrder = 0;
             this.renderOrder = 0;
+
+            this.rotation = 0;
 
             this.uvChanged = false;
             this.colorChanged = false;
             this.renderOrderChanged = false;
         }
 
+        public float4 Uv {
+            get {
+                return this.uv;
+            }
+        }
+
+        public float4 Color {
+            get {
+                return this.color;
+            }
+            
+            set {
+                this.color = value;
+                this.colorChanged = true;
+            }
+        }
+
+        public float RenderOrder {
+            get {
+                return this.renderOrder;
+            }
+            
+            set {
+                this.renderOrder = value;
+                this.renderOrderChanged = true;
+            }
+        }
+
         public void SetUv(float2 uvSize, float2 uvOffset) {
             this.uv = new float4(uvSize, uvOffset);
+            this.uvChanged = true;
         }
     }
 }

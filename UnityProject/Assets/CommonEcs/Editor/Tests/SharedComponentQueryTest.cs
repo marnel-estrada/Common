@@ -26,7 +26,7 @@ namespace CommonEcs.Test {
                 }
             }
 
-            protected override void OnCreateManager() {
+            protected override void OnCreate() {
                 this.query = GetEntityQuery(typeof(TestSharedComponent));
                 this.sharedComponentQuery = new SharedComponentQuery<TestSharedComponent>(this, this.EntityManager);
             }

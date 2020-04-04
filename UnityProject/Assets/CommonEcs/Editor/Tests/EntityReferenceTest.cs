@@ -2,8 +2,6 @@ using NUnit.Framework;
 
 using Unity.Entities;
 
-using UnityEngine;
-
 using Assert = UnityEngine.Assertions.Assert;
 
 namespace CommonEcs {
@@ -20,7 +18,7 @@ namespace CommonEcs {
             
             this.EntityManager.DestroyEntity(a);
             this.World.GetOrCreateSystem<DestroyUnownedEntityReferencesSystem>().Update();
-            this.World.GetOrCreateSystem<EndPresentationEntityCommandBufferSystem>().Update(); // We invoke the barrier to flush the EntityCommandBuffer
+            this.World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>().Update(); // We invoke the barrier to flush the EntityCommandBuffer
             
             // b should be destroyed after DestroyUnownedEntityReferencesSystem executes
             Assert.IsFalse(this.EntityManager.Exists(b));
@@ -36,7 +34,7 @@ namespace CommonEcs {
             
             this.EntityManager.DestroyEntity(a);
             this.World.GetOrCreateSystem<DestroyUnownedEntityReferencesSystem>().Update();
-            this.World.GetOrCreateSystem<EndPresentationEntityCommandBufferSystem>().Update();
+            this.World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>().Update();
             
             // Both should no longer exist when one of them is destroyed since the other has nothing 
             // pointing to it
@@ -58,14 +56,14 @@ namespace CommonEcs {
             
             this.EntityManager.DestroyEntity(a);
             this.World.GetOrCreateSystem<DestroyUnownedEntityReferencesSystem>().Update();
-            this.World.GetOrCreateSystem<EndPresentationEntityCommandBufferSystem>().Update();
+            this.World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>().Update();
             
             // c should still exist because b is still referencing it
             Assert.IsTrue(this.EntityManager.Exists(c));
             
             this.EntityManager.DestroyEntity(b);
             this.World.GetOrCreateSystem<DestroyUnownedEntityReferencesSystem>().Update();
-            this.World.GetOrCreateSystem<EndPresentationEntityCommandBufferSystem>().Update();
+            this.World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>().Update();
             
             // At this point, c should also be removed as well
             Assert.IsFalse(this.EntityManager.Exists(c));
@@ -85,7 +83,7 @@ namespace CommonEcs {
             
             this.EntityManager.DestroyEntity(a);
             this.World.GetOrCreateSystem<DestroyUnownedEntityReferencesSystem>().Update();
-            this.World.GetOrCreateSystem<EndPresentationEntityCommandBufferSystem>().Update();
+            this.World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>().Update();
             
             // a should no longer exist but b should remain as it is still referenced from c
             Assert.IsFalse(this.EntityManager.Exists(a));
@@ -93,7 +91,7 @@ namespace CommonEcs {
             
             this.EntityManager.DestroyEntity(c);
             this.World.GetOrCreateSystem<DestroyUnownedEntityReferencesSystem>().Update();
-            this.World.GetOrCreateSystem<EndPresentationEntityCommandBufferSystem>().Update();
+            this.World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>().Update();
             
             // But when c is destroyed, b should have been destroyed as well
             Assert.IsFalse(this.EntityManager.Exists(b));

@@ -49,12 +49,11 @@ namespace CommonEcs {
             drawInstance.Expand(count);
             
             handle = new SetValuesJob() {
+                matrices = drawInstance.Matrices,
                 sprites = drawInstance.Sprites,
                 sizePivots = drawInstance.SizePivots,
                 uvs = drawInstance.Uvs,
-                colors = drawInstance.Colors,
-                transforms = drawInstance.Transforms,
-                rotations = drawInstance.Rotations
+                colors = drawInstance.Colors
             }.Schedule(count, 64, handle);
 
             return handle;
@@ -65,21 +64,18 @@ namespace CommonEcs {
             [NativeDisableParallelForRestriction]
             public NativeList<ComputeBufferSprite> sprites;
             
+            public NativeArray<float4x4> matrices;
             public NativeArray<float4> sizePivots;
             public NativeArray<float4> uvs;
             public NativeArray<float4> colors;
             
-            public NativeArray<float4> transforms;
-            public NativeArray<float> rotations;
-            
             public void Execute(int index) {
                 ComputeBufferSprite sprite = this.sprites[index];
                 
+                this.matrices[index] = sprite.localToWorld;
                 this.sizePivots[index] = new float4(sprite.size, sprite.pivot);
                 this.uvs[index] = sprite.Uv;
                 this.colors[index] = sprite.Color;
-                this.transforms[index] = sprite.transform;
-                this.rotations[index] = sprite.rotation;
             }
         }
     }

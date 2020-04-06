@@ -46,15 +46,9 @@ namespace CommonEcs {
             }
         }
 
-        public NativeArray<float4> Transforms {
+        public NativeArray<float4x4> Matrices {
             get {
-                return this.internalInstance.transforms;
-            }
-        }
-
-        public NativeArray<float> Rotations {
-            get {
-                return this.internalInstance.rotations;
+                return this.internalInstance.matrices;
             }
         }
 
@@ -78,17 +72,16 @@ namespace CommonEcs {
             public NativeList<ComputeBufferSprite> sprites;
 
             // Buffers
-            private ComputeBuffer sizeAnchorBuffer;
+            private ComputeBuffer sizePivotBuffer;
             private ComputeBuffer uvBuffer;
-            private ComputeBuffer transformBuffer;
-            private ComputeBuffer rotationBuffer;
+            private ComputeBuffer matricesBuffer;
             private ComputeBuffer colorBuffer;
             
             // Arrays
+            public NativeArray<float4x4> matrices;
+            
             public NativeArray<float4> sizePivots;
             public NativeArray<float4> uvs;
-            public NativeArray<float4> transforms;
-            public NativeArray<float> rotations;
             public NativeArray<float4> colors;
 
             private NativeArray<uint> args;
@@ -105,10 +98,9 @@ namespace CommonEcs {
 
                 this.sprites = new NativeList<ComputeBufferSprite>(Allocator.Persistent);
 
-                this.sizeAnchorBuffer = new ComputeBuffer(MAX_SPRITE_COUNT, 16);
+                this.matricesBuffer = new ComputeBuffer(MAX_SPRITE_COUNT, sizeof(float));
+                this.sizePivotBuffer = new ComputeBuffer(MAX_SPRITE_COUNT, 16);
                 this.uvBuffer = new ComputeBuffer(MAX_SPRITE_COUNT, 16);
-                this.transformBuffer = new ComputeBuffer(MAX_SPRITE_COUNT, 16);
-                this.rotationBuffer = new ComputeBuffer(MAX_SPRITE_COUNT, sizeof(float));
                 this.colorBuffer = new ComputeBuffer(MAX_SPRITE_COUNT, 16);
 
                 // Prepare args
@@ -127,17 +119,15 @@ namespace CommonEcs {
                 
                 // Dispose old
                 if (this.uvs.IsCreated) {
+                    this.matrices.Dispose();
                     this.sizePivots.Dispose();
                     this.uvs.Dispose();
-                    this.transforms.Dispose();
-                    this.rotations.Dispose();
                     this.colors.Dispose();
                 }
                 
                 this.sizePivots = new NativeArray<float4>(count, Allocator.Persistent);
                 this.uvs = new NativeArray<float4>(count, Allocator.Persistent);
-                this.transforms = new NativeArray<float4>(count, Allocator.Persistent);
-                this.rotations = new NativeArray<float>(count, Allocator.Persistent);
+                this.matrices = new NativeArray<float4x4>(count, Allocator.Persistent);
                 this.colors = new NativeArray<float4>(count, Allocator.Persistent);
             }
 

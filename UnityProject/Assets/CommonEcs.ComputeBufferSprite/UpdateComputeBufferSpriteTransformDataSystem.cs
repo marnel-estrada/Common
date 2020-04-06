@@ -1,11 +1,15 @@
 using Unity.Entities;
+using Unity.Transforms;
 
 namespace CommonEcs {
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateAfter(typeof(TRSToLocalToWorldSystem))]
+    [UpdateAfter(typeof(TRSToLocalToParentSystem))]
     [UpdateBefore(typeof(PopulateSpriteListSystem))]
     public class UpdateComputeBufferSpriteTransformDataSystem : SystemBase {
         protected override void OnUpdate() {
-            // TODO Set sprite transform and rotation here based on Translation and Rotation components
+            this.Entities.ForEach(delegate(ref ComputeBufferSprite sprite, ref LocalToWorld transform) {
+                sprite.localToWorld = transform.Value;
+            }).ScheduleParallel();
         }
     }
 }

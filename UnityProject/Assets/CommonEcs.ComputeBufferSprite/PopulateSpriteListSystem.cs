@@ -46,6 +46,7 @@ namespace CommonEcs {
             JobHandle handle = inputDeps;
             
             handle = new AddToListJob() {
+                spriteType = this.spriteType,
                 list = drawInstance.Sprites
             }.ScheduleParallel(this.query, handle);
 

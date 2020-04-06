@@ -9,7 +9,7 @@ namespace CommonEcs {
         private float4 color;
 
         // This will be set by a system
-        public float4 transform;
+        public float4x4 localToWorld;
         
         // This will be combined in a float4
         public float2 size;
@@ -17,9 +17,6 @@ namespace CommonEcs {
 
         public int layerOrder; // This has more precedence
         public float renderOrder;
-
-        // This will be set by a system
-        public float rotation;
 
         public bool uvChanged;
         public bool colorChanged;
@@ -30,12 +27,10 @@ namespace CommonEcs {
             this.color = new float4(1.0f, 1.0f, 1.0f, 1.0f);
             this.size = size;
             this.pivot = pivot;
-            this.transform = new float4();
+            this.localToWorld = new float4x4();
 
             this.layerOrder = 0;
             this.renderOrder = 0;
-
-            this.rotation = 0;
 
             this.uvChanged = false;
             this.colorChanged = false;

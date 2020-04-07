@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -7,6 +8,7 @@ using Unity.Mathematics;
 
 namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateBefore(typeof(RenderComputeBufferSpritesSystem))]
     public class UpdateDrawInstanceArraysSystem : SystemBase {
         private EntityQuery query;
         private SharedComponentQuery<ComputeBufferDrawInstance> managerQuery;
@@ -19,6 +21,8 @@ namespace CommonEcs {
         }
 
         protected override void OnUpdate() {
+            this.EntityManager.CompleteAllJobs();
+            
             // We did it this way so it looks like the old way
             this.Dependency = OnUpdate(this.Dependency);
         }
@@ -45,24 +49,25 @@ namespace CommonEcs {
             
             JobHandle handle = inputDeps;
 
-            int count = this.query.CalculateEntityCount();
-            drawInstance.Expand(count);
-            
+            NativeArray<ComputeBufferSprite> sprites = drawInstance.Sprites;
+            drawInstance.Expand(sprites.Length);
+
             handle = new SetValuesJob() {
+                sprites = sprites,
                 matrices = drawInstance.Matrices,
-                sprites = drawInstance.Sprites,
                 sizePivots = drawInstance.SizePivots,
                 uvs = drawInstance.Uvs,
                 colors = drawInstance.Colors
-            }.Schedule(count, 64, handle);
+            }.Schedule(sprites.Length, 64, handle);
 
             return handle;
         }
         
+        [BurstCompile]
         private struct SetValuesJob : IJobParallelFor {
             [ReadOnly]
             [NativeDisableParallelForRestriction]
-            public NativeList<ComputeBufferSprite> sprites;
+            public NativeArray<ComputeBufferSprite> sprites;
             
             public NativeArray<float4x4> matrices;
             public NativeArray<float4> sizePivots;

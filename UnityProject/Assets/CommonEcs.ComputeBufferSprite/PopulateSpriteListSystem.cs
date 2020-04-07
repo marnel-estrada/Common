@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -42,28 +43,29 @@ namespace CommonEcs {
 
         private JobHandle PopulateList(JobHandle inputDeps, ComputeBufferDrawInstance drawInstance) {
             this.query.SetSharedComponentFilter(drawInstance);
+            drawInstance.ExpandSpritesArray(this.query.CalculateEntityCount());
             
             JobHandle handle = inputDeps;
-            
             handle = new AddToListJob() {
                 spriteType = this.spriteType,
-                list = drawInstance.Sprites
+                sprites = drawInstance.Sprites
             }.ScheduleParallel(this.query, handle);
 
             return handle;
         }
 
+        [BurstCompile]
         private struct AddToListJob : IJobChunk {
             [ReadOnly]
             public ArchetypeChunkComponentType<ComputeBufferSprite> spriteType;
             
             [NativeDisableParallelForRestriction]
-            public NativeList<ComputeBufferSprite> list;
+            public NativeArray<ComputeBufferSprite> sprites;
             
             public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {
                 NativeArray<ComputeBufferSprite> sprites = chunk.GetNativeArray(this.spriteType);
                 for (int i = 0; i < sprites.Length; ++i) {
-                    this.list.Add(sprites[i]);
+                    this.sprites[firstEntityIndex + i] = sprites[i];
                 }
             }
         }

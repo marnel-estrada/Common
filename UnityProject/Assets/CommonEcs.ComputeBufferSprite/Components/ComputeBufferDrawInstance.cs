@@ -20,6 +20,10 @@ namespace CommonEcs {
             this.internalInstance = new InternalImplementation(material);
         }
 
+        public void ExpandSpritesArray(int count) {
+            this.internalInstance.ExpandSpritesArray(count);
+        }
+
         /// <summary>
         /// Expands the arrays if the current length can no longer accommodate the specified count
         /// </summary>
@@ -28,7 +32,7 @@ namespace CommonEcs {
             this.internalInstance.Expand(count);
         }
 
-        public NativeList<ComputeBufferSprite> Sprites {
+        public NativeArray<ComputeBufferSprite> Sprites {
             get {
                 return this.internalInstance.sprites;
             }
@@ -61,47 +65,59 @@ namespace CommonEcs {
         /// <summary>
         /// We pass in mesh here because it's a common mesh
         /// </summary>
-        /// <param name="mesh"></param>
-        public void Draw(Mesh mesh, uint drawCount) {
-            this.internalInstance.Draw(mesh, drawCount);
+        /// <param name="quad"></param>
+        public void Draw(Mesh quad) {
+            this.internalInstance.Draw(quad);
+        }
+        
+        public void Dispose() {
+            this.internalInstance.Dispose();
         }
 
         public class InternalImplementation {
+            // We don't set as readonly as it should be able to be changed at runtime
             private Material material;
 
-            public NativeList<ComputeBufferSprite> sprites;
+            public NativeArray<ComputeBufferSprite> sprites;
 
             // Buffers
-            private ComputeBuffer sizePivotBuffer;
-            private ComputeBuffer uvBuffer;
-            private ComputeBuffer matricesBuffer;
-            private ComputeBuffer colorBuffer;
+            private readonly ComputeBuffer sizePivotBuffer;
+            private readonly ComputeBuffer uvBuffer;
+            private readonly ComputeBuffer matricesBuffer;
+            private readonly ComputeBuffer colorBuffer;
             
             // Arrays
             public NativeArray<float4x4> matrices;
-            
             public NativeArray<float4> sizePivots;
             public NativeArray<float4> uvs;
             public NativeArray<float4> colors;
 
             private NativeArray<uint> args;
-            private ComputeBuffer argsBuffer;
+            private readonly ComputeBuffer argsBuffer;
 
             public const int MAX_SPRITE_COUNT = 300000;
 
             public bool uvChanged;
             public bool colorChanged;
             public bool renderOrderChanged;
+            
+            private readonly int matricesBufferId;
+            private readonly int uvBufferId;
+            private readonly int colorsBufferId;
+            private readonly int sizePivotBufferId;
 
             public InternalImplementation(Material material) {
                 this.material = material;
 
-                this.sprites = new NativeList<ComputeBufferSprite>(Allocator.Persistent);
-
-                this.matricesBuffer = new ComputeBuffer(MAX_SPRITE_COUNT, sizeof(float));
+                this.matricesBuffer = new ComputeBuffer(MAX_SPRITE_COUNT, 64);
                 this.sizePivotBuffer = new ComputeBuffer(MAX_SPRITE_COUNT, 16);
                 this.uvBuffer = new ComputeBuffer(MAX_SPRITE_COUNT, 16);
                 this.colorBuffer = new ComputeBuffer(MAX_SPRITE_COUNT, 16);
+                
+                this.matricesBufferId = Shader.PropertyToID("matricesBuffer");
+                this.uvBufferId = Shader.PropertyToID("uvBuffer");
+                this.colorsBufferId = Shader.PropertyToID("colorsBuffer");
+                this.sizePivotBufferId = Shader.PropertyToID("sizePivotBuffer");
 
                 // Prepare args
                 this.args = new NativeArray<uint>(new uint[] {
@@ -110,25 +126,38 @@ namespace CommonEcs {
                 this.argsBuffer = new ComputeBuffer(1, this.args.Length * sizeof(uint),
                     ComputeBufferType.IndirectArguments);
             }
+
+            public void ExpandSpritesArray(int count) {
+                if (this.sprites.IsCreated && this.sprites.Length >= count) {
+                    // Current arrays can still accommodate the specified number of sprites
+                    return;
+                }
+
+                if (this.sprites.IsCreated) {
+                    this.sprites.Dispose();
+                }
+                
+                this.sprites = new NativeArray<ComputeBufferSprite>(count * 2, Allocator.Persistent);
+            }
             
             public void Expand(int count) {
-                if (this.uvs.IsCreated && this.uvs.Length >= count) {
+                if (this.matrices.IsCreated && this.matrices.Length >= count) {
                     // Current arrays can still accommodate the specified number of sprites
                     return;
                 }
                 
                 // Dispose old
-                if (this.uvs.IsCreated) {
+                if (this.matrices.IsCreated) {
                     this.matrices.Dispose();
                     this.sizePivots.Dispose();
                     this.uvs.Dispose();
                     this.colors.Dispose();
                 }
                 
-                this.sizePivots = new NativeArray<float4>(count, Allocator.Persistent);
-                this.uvs = new NativeArray<float4>(count, Allocator.Persistent);
-                this.matrices = new NativeArray<float4x4>(count, Allocator.Persistent);
-                this.colors = new NativeArray<float4>(count, Allocator.Persistent);
+                this.sizePivots = new NativeArray<float4>(count * 2, Allocator.Persistent);
+                this.uvs = new NativeArray<float4>(count * 2, Allocator.Persistent);
+                this.matrices = new NativeArray<float4x4>(count * 2, Allocator.Persistent);
+                this.colors = new NativeArray<float4>(count * 2, Allocator.Persistent);
             }
 
             private static readonly Bounds BOUNDS = new Bounds(Vector2.zero, Vector3.one);
@@ -136,12 +165,39 @@ namespace CommonEcs {
             /// <summary>
             /// We pass in mesh here because it's a common mesh
             /// </summary>
-            /// <param name="mesh"></param>
-            public void Draw(Mesh mesh, uint drawCount) {
-                this.args[1] = drawCount;
+            /// <param name="quad"></param>
+            public void Draw(Mesh quad) {
+                // Update the buffers
+                this.matricesBuffer.SetData(this.matrices);
+                this.material.SetBuffer(this.matricesBufferId, this.matricesBuffer);
+
+                this.uvBuffer.SetData(this.uvs);
+                this.material.SetBuffer(this.uvBufferId, this.uvBuffer);
+
+                this.colorBuffer.SetData(this.colors);
+                this.material.SetBuffer(this.colorsBufferId, this.colorBuffer);
+            
+                this.sizePivotBuffer.SetData(this.sizePivots);
+                this.material.SetBuffer(this.sizePivotBufferId, this.sizePivotBuffer);
+                
+                this.args[1] = (uint) this.sprites.Length;
                 this.argsBuffer.SetData(this.args);
 
-                Graphics.DrawMeshInstancedIndirect(mesh, 0, this.material, BOUNDS, this.argsBuffer);
+                Graphics.DrawMeshInstancedIndirect(quad, 0, this.material, BOUNDS, this.argsBuffer);
+            }
+            
+            public void Dispose() {
+                this.sprites.Dispose();
+                this.matrices.Dispose();
+                this.sizePivots.Dispose();
+                this.uvs.Dispose();
+                this.colors.Dispose();
+                this.args.Dispose();
+                
+                this.matricesBuffer.Release();
+                this.sizePivotBuffer.Release();
+                this.uvBuffer.Release();
+                this.colorBuffer.Release();
             }
         }
 

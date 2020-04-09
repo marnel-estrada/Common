@@ -5,7 +5,7 @@
     "unity": "2019.3",
     "description": "A 2D sprite rendering system that uses Compute Buffers.",
     "dependencies": {
-        "com.unity.entities": "0.8.0",
+        "com.unity.entities": "0.8.0-preview.8",
         "com.unity.burst": "1.0.1",
         "com.squeakywheel.common.core": "1.0.0",
         "com.squeakywheel.common.ecs": "1.0.0"

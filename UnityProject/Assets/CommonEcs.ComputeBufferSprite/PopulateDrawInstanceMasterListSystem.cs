@@ -8,7 +8,7 @@ using Unity.Jobs;
 namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     [UpdateBefore(typeof(UpdateDrawInstanceArraysSystem))]
-    public class PopulateSpriteListSystem : SystemBase {
+    public class PopulateDrawInstanceMasterListSystem : SystemBase {
         private EntityQuery query;
         private SharedComponentQuery<ComputeBufferDrawInstance> managerQuery;
 
@@ -43,12 +43,12 @@ namespace CommonEcs {
 
         private JobHandle PopulateList(JobHandle inputDeps, ComputeBufferDrawInstance drawInstance) {
             this.query.SetSharedComponentFilter(drawInstance);
-            drawInstance.ExpandSpritesArray(this.query.CalculateEntityCount());
+            drawInstance.ExpandSpritesMasterList(this.query.CalculateEntityCount());
             
             JobHandle handle = inputDeps;
             handle = new AddToListJob() {
                 spriteType = this.spriteType,
-                sprites = drawInstance.Sprites
+                sprites = drawInstance.SpritesMasterList
             }.ScheduleParallel(this.query, handle);
 
             return handle;

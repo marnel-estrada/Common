@@ -65,8 +65,6 @@ namespace CommonEcs {
             this.query.SetSharedComponentFilter(drawInstance);
             
             JobHandle handle = inputDeps;
-
-            NativeArray<ComputeBufferSprite> sprites = drawInstance.SpritesMasterList;
             drawInstance.ExpandArrays(drawInstance.SpriteCount);
 
             handle = new SetValuesJob() {

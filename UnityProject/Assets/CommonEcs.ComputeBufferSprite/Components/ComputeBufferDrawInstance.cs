@@ -152,10 +152,13 @@ namespace CommonEcs {
 
                 if (this.spritesMasterList.IsCreated) {
                     this.spritesMasterList.Dispose();
+                    this.sortedEntries.Dispose();
                 }
                 
                 this.spritesMasterList = new NativeArray<ComputeBufferSprite>(count * 2, Allocator.Persistent);
-                this.sortedEntries = new NativeArray<SortedEntry>(count * 2, Allocator.Persistent);
+                
+                // We don't double the sortedEntries here so that there would be no gaps when it's sorted
+                this.sortedEntries = new NativeArray<SortedEntry>(count, Allocator.Persistent);
             }
             
             public void ExpandArrays(int count) {

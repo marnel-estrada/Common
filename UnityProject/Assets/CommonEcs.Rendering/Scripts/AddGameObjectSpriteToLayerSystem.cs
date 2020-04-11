@@ -45,8 +45,8 @@ namespace CommonEcs {
                 if (!hasManager) {
                     // Do not process anymore if it already returned false in a previous entity
                     return;
-                }
-
+                } 
+ 
                 hasManager = ProcessThenReturnIfSuccess(entity, transform, ref sprite, ref addToLayer, commandBuffer);
             }).WithoutBurst().Run();
         }

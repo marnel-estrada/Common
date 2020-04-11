@@ -10,13 +10,9 @@ namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     [UpdateBefore(typeof(RenderComputeBufferSpritesSystem))]
     public class UpdateDrawInstanceArraysSystem : SystemBase {
-        private EntityQuery query;
         private SharedComponentQuery<ComputeBufferDrawInstance> managerQuery;
 
-        private ArchetypeChunkComponentType<ComputeBufferSprite> spriteType;
-
         protected override void OnCreate() {
-            this.query = GetEntityQuery(ComponentType.ReadOnly<ComputeBufferSprite>(), ComponentType.ReadOnly<ComputeBufferDrawInstance>());
             this.managerQuery = new SharedComponentQuery<ComputeBufferDrawInstance>(this, this.EntityManager);
         }
 
@@ -30,53 +26,38 @@ namespace CommonEcs {
         private JobHandle OnUpdate(JobHandle inputDeps) {
             this.managerQuery.Update();
 
+            IReadOnlyList<ComputeBufferDrawInstance> drawInstances = this.managerQuery.SharedComponents;
             JobHandle lastHandle = inputDeps;
             
-            this.spriteType = GetArchetypeChunkComponentType<ComputeBufferSprite>();
-            IReadOnlyList<ComputeBufferDrawInstance> drawInstances = this.managerQuery.SharedComponents;
-            
-            // Reset sort entries
-            for (int i = 1; i < drawInstances.Count; ++i) {
-                ComputeBufferDrawInstance drawInstance = drawInstances[i];
-                lastHandle = new ResetSortEntriesJob() {
-                    spriteMasterList = drawInstance.SpritesMasterList,
-                    sortEntries = drawInstance.SortedEntries
-                }.Schedule(drawInstance.SpriteCount, 64, lastHandle);
-            }
-            
-            // Sort the entries
-            for (int i = 1; i < drawInstances.Count; ++i) {
-                ComputeBufferDrawInstance drawInstance = drawInstances[i];
-                lastHandle = new SortJob() {
-                    sortEntries = drawInstance.SortedEntries
-                }.Schedule(lastHandle);
-            }
-
             // Note here that we start iteration from 1 because the first value is the default value
             for (int i = 1; i < drawInstances.Count; ++i) {
                 ComputeBufferDrawInstance drawInstance = drawInstances[i];
-                lastHandle = UpdateArrays(lastHandle, drawInstance);
+                NativeArray<SortedEntry> sortEntries = new NativeArray<SortedEntry>(drawInstance.SpriteCount, Allocator.TempJob);
+                
+                // Reset
+                lastHandle = new ResetSortEntriesJob() {
+                    spriteMasterList = drawInstance.SpritesMasterList,
+                    sortEntries = sortEntries
+                }.Schedule(drawInstance.SpriteCount, 64, lastHandle);
+                
+                // Sort
+                lastHandle = new SortJob() {
+                    sortEntries = sortEntries
+                }.Schedule(lastHandle);
+                
+                // Update arrays
+                // sortEntries will be deallocated on this job
+                lastHandle = new SetValuesJob() {
+                    spriteMasterList = drawInstance.SpritesMasterList,
+                    sortEntries = sortEntries,
+                    matrices = drawInstance.Matrices,
+                    sizePivots = drawInstance.SizePivots,
+                    uvs = drawInstance.Uvs,
+                    colors = drawInstance.Colors
+                }.Schedule(sortEntries.Length, 64, lastHandle);
             }
 
             return lastHandle;
-        }
-
-        private JobHandle UpdateArrays(JobHandle inputDeps, ComputeBufferDrawInstance drawInstance) {
-            this.query.SetSharedComponentFilter(drawInstance);
-            
-            JobHandle handle = inputDeps;
-            drawInstance.ExpandArrays(drawInstance.SpriteCount);
-
-            handle = new SetValuesJob() {
-                spriteMasterList = drawInstance.SpritesMasterList,
-                sortEntries = drawInstance.SortedEntries,
-                matrices = drawInstance.Matrices,
-                sizePivots = drawInstance.SizePivots,
-                uvs = drawInstance.Uvs,
-                colors = drawInstance.Colors
-            }.Schedule(drawInstance.SpriteCount, 64, handle);
-
-            return handle;
         }
 
         [BurstCompile]
@@ -173,6 +154,7 @@ namespace CommonEcs {
 
             [ReadOnly]
             [NativeDisableParallelForRestriction]
+            [DeallocateOnJobCompletion]
             public NativeArray<SortedEntry> sortEntries;
             
             public NativeArray<float4x4> matrices;

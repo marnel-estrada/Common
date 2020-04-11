@@ -20,27 +20,13 @@ namespace CommonEcs {
             this.internalInstance = new InternalImplementation(material);
         }
 
-        public void ExpandSpritesMasterList(int count) {
-            this.internalInstance.ExpandSpritesMasterList(count);
-        }
-
-        /// <summary>
-        /// Expands the arrays if the current length can no longer accommodate the specified count
-        /// </summary>
-        /// <param name="count"></param>
-        public void ExpandArrays(int count) {
-            this.internalInstance.ExpandArrays(count);
+        public void Add(ref ComputeBufferSprite sprite) {
+            this.internalInstance.Add(ref sprite);
         }
 
         public NativeArray<ComputeBufferSprite> SpritesMasterList {
             get {
                 return this.internalInstance.spritesMasterList;
-            }
-        }
-
-        public NativeArray<SortedEntry> SortedEntries {
-            get {
-                return this.internalInstance.sortedEntries;
             }
         }
 
@@ -70,7 +56,7 @@ namespace CommonEcs {
 
         public int SpriteCount {
             get {
-                return this.internalInstance.spriteCount;
+                return this.internalInstance.SpriteCount;
             }
         } 
 
@@ -90,8 +76,7 @@ namespace CommonEcs {
             // We don't set as readonly as it should be able to be changed at runtime
             private Material material;
 
-            public NativeArray<ComputeBufferSprite> spritesMasterList;
-            public NativeArray<SortedEntry> sortedEntries;
+            public NativeList<ComputeBufferSprite> spritesMasterList;
 
             // Buffers
             private readonly ComputeBuffer sizePivotBuffer;
@@ -119,10 +104,15 @@ namespace CommonEcs {
             private readonly int colorsBufferId;
             private readonly int sizePivotBufferId;
 
-            public int spriteCount;
+            public int capacity;
+            private int spriteCount;
 
             public InternalImplementation(Material material) {
                 this.material = material;
+
+                this.capacity = 1000;
+                this.spritesMasterList = new NativeList<ComputeBufferSprite>(this.capacity, Allocator.Persistent);
+                ExpandArrays(this.capacity);
 
                 this.matricesBuffer = new ComputeBuffer(MAX_SPRITE_COUNT, 64);
                 this.sizePivotBuffer = new ComputeBuffer(MAX_SPRITE_COUNT, 16);
@@ -142,26 +132,36 @@ namespace CommonEcs {
                     ComputeBufferType.IndirectArguments);
             }
 
-            public void ExpandSpritesMasterList(int count) {
-                this.spriteCount = count;
-                
-                if (this.spritesMasterList.IsCreated && this.spritesMasterList.Length >= count) {
-                    // Current arrays can still accommodate the specified number of sprites
-                    return;
+            public int SpriteCount {
+                get {
+                    return this.spriteCount;
+                }
+            }
+
+            public void Add(ref ComputeBufferSprite sprite) {
+                if (this.spriteCount + 1 > MAX_SPRITE_COUNT) {
+                    // The ultimate maximum has been reached
+                    throw new Exception("MAX_SPRITE_COUNT has been reached");
                 }
 
-                if (this.spritesMasterList.IsCreated) {
-                    this.spritesMasterList.Dispose();
-                    this.sortedEntries.Dispose();
+                if (this.spriteCount >= this.capacity) {
+                    // Current sprites have exceeded capacity.
+                    // We expand
+                    ExpandArrays();
                 }
                 
-                this.spritesMasterList = new NativeArray<ComputeBufferSprite>(count * 2, Allocator.Persistent);
-                
-                // We don't double the sortedEntries here so that there would be no gaps when it's sorted
-                this.sortedEntries = new NativeArray<SortedEntry>(count, Allocator.Persistent);
+                sprite.masterListIndex = this.spriteCount;
+                this.spritesMasterList.Add(sprite);
+
+                ++this.spriteCount;
+            }
+
+            private void ExpandArrays() {
+                this.capacity *= 2;
+                ExpandArrays(this.capacity);
             }
             
-            public void ExpandArrays(int count) {
+            private void ExpandArrays(int count) {
                 if (this.matrices.IsCreated && this.matrices.Length >= count) {
                     // Current arrays can still accommodate the specified number of sprites
                     return;
@@ -175,10 +175,10 @@ namespace CommonEcs {
                     this.colors.Dispose();
                 }
                 
-                this.sizePivots = new NativeArray<float4>(count * 2, Allocator.Persistent);
-                this.uvs = new NativeArray<float4>(count * 2, Allocator.Persistent);
-                this.matrices = new NativeArray<float4x4>(count * 2, Allocator.Persistent);
-                this.colors = new NativeArray<float4>(count * 2, Allocator.Persistent);
+                this.sizePivots = new NativeArray<float4>(count, Allocator.Persistent);
+                this.uvs = new NativeArray<float4>(count, Allocator.Persistent);
+                this.matrices = new NativeArray<float4x4>(count, Allocator.Persistent);
+                this.colors = new NativeArray<float4>(count, Allocator.Persistent);
             }
 
             private static readonly Bounds BOUNDS = new Bounds(Vector2.zero, Vector3.one);
@@ -209,7 +209,6 @@ namespace CommonEcs {
             
             public void Dispose() {
                 this.spritesMasterList.Dispose();
-                this.sortedEntries.Dispose();
                 
                 this.matrices.Dispose();
                 this.sizePivots.Dispose();

@@ -4,7 +4,6 @@ using Unity.Collections;
 using Unity.Entities;
 
 namespace CommonEcs {    
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
     public abstract class CollectSharedComponentsSystem<T> : SystemBase where T : struct, ISharedComponentData {
         public struct Collected : ISystemStateComponentData {
         } 

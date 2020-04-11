@@ -15,6 +15,9 @@ namespace CommonEcs {
         public float2 size;
         public float2 pivot;
 
+        public Entity drawInstanceEntity;
+        public int masterListIndex;
+
         public int layerOrder; // This has more precedence
         public float renderOrder;
 
@@ -22,7 +25,12 @@ namespace CommonEcs {
         public bool colorChanged;
         public bool renderOrderChanged;
 
-        public ComputeBufferSprite(float2 size, float2 pivot) {
+        private const int INVALID = -1;
+
+        public ComputeBufferSprite(Entity drawInstanceEntity, float2 size, float2 pivot) {
+            this.drawInstanceEntity = drawInstanceEntity;
+            this.masterListIndex = INVALID;
+            
             this.uv = new float4(1.0f, 1.0f, 0.0f, 0.0f);
             this.color = new float4(1.0f, 1.0f, 1.0f, 1.0f);
             this.size = size;

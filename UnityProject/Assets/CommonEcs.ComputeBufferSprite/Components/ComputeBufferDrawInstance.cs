@@ -1,9 +1,11 @@
 using System;
+using System.Runtime.InteropServices;
 
 using Common;
 
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Jobs;
 using Unity.Mathematics;
 
 using UnityEngine;
@@ -68,6 +70,14 @@ namespace CommonEcs {
             get {
                 return this.internalInstance.renderOrderChanged;
             }
+
+            set {
+                this.internalInstance.renderOrderChanged = false;
+            }
+        }
+        
+        public void SetDataToBuffers() {
+            this.internalInstance.SetDataToBuffers();
         }
 
         /// <summary>
@@ -103,7 +113,11 @@ namespace CommonEcs {
             private NativeArray<uint> args;
             private readonly ComputeBuffer argsBuffer;
 
-            public const int MAX_SPRITE_COUNT = 300000;
+            // We set only to this number as there's a certain limit to the ComputeBuffer
+            // Might need to use separate position, scale, rotation values to allow more sprites 
+            // ArgumentException: ComputeBuffer.SetData() : Accessing 32768000 bytes at offset 0 for
+            // Compute Buffer of size 19200000 bytes is not possible.
+            public const int MAX_SPRITE_COUNT = 256000;
 
             public bool uvChanged;
             public bool colorChanged;
@@ -207,6 +221,7 @@ namespace CommonEcs {
                 this.inactiveList.Add(masterListIndex);
 
                 --this.spriteCount;
+                this.renderOrderChanged = true;
             }
 
             private void ExpandArrays() {
@@ -234,13 +249,7 @@ namespace CommonEcs {
                 this.colors = new NativeArray<float4>(count, Allocator.Persistent);
             }
 
-            private static readonly Bounds BOUNDS = new Bounds(Vector2.zero, Vector3.one);
-
-            /// <summary>
-            /// We pass in mesh here because it's a common mesh
-            /// </summary>
-            /// <param name="quad"></param>
-            public void Draw(Mesh quad) {
+            public void SetDataToBuffers() {
                 // Update the buffers
                 this.matricesBuffer.SetData(this.matrices);
                 this.material.SetBuffer(this.matricesBufferId, this.matricesBuffer);
@@ -254,9 +263,19 @@ namespace CommonEcs {
                 this.sizePivotBuffer.SetData(this.sizePivots);
                 this.material.SetBuffer(this.sizePivotBufferId, this.sizePivotBuffer);
                 
-                this.args[1] = (uint) this.spriteCount;
+                // Note here that we use the masterList's length as the draw count as their may be
+                // sprites in between the masterlist that are already destroyed
+                this.args[1] = (uint) this.spritesMasterList.Length;
                 this.argsBuffer.SetData(this.args);
+            }
 
+            private static readonly Bounds BOUNDS = new Bounds(Vector2.zero, Vector3.one);
+
+            /// <summary>
+            /// We pass in mesh here because it's a common mesh
+            /// </summary>
+            /// <param name="quad"></param>
+            public void Draw(Mesh quad) {
                 Graphics.DrawMeshInstancedIndirect(quad, 0, this.material, BOUNDS, this.argsBuffer);
             }
             

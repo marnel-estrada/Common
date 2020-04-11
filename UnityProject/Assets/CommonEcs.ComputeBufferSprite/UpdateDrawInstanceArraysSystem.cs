@@ -32,13 +32,20 @@ namespace CommonEcs {
             // Note here that we start iteration from 1 because the first value is the default value
             for (int i = 1; i < drawInstances.Count; ++i) {
                 ComputeBufferDrawInstance drawInstance = drawInstances[i];
-                NativeArray<SortedEntry> sortEntries = new NativeArray<SortedEntry>(drawInstance.SpriteCount, Allocator.TempJob);
+
+                // Sort only if render order changed
+                if (!drawInstance.RenderOrderChanged) {
+                    continue;
+                }
+                
+                NativeArray<ComputeBufferSprite> masterList = drawInstance.SpritesMasterList;
+                NativeArray<SortedEntry> sortEntries = new NativeArray<SortedEntry>(masterList.Length, Allocator.TempJob);
                 
                 // Reset
                 lastHandle = new ResetSortEntriesJob() {
-                    spriteMasterList = drawInstance.SpritesMasterList,
+                    spriteMasterList = masterList,
                     sortEntries = sortEntries
-                }.Schedule(drawInstance.SpriteCount, 64, lastHandle);
+                }.Schedule(masterList.Length, 64, lastHandle);
                 
                 // Sort
                 lastHandle = new SortJob() {
@@ -48,13 +55,13 @@ namespace CommonEcs {
                 // Update arrays
                 // sortEntries will be deallocated on this job
                 lastHandle = new SetValuesJob() {
-                    spriteMasterList = drawInstance.SpritesMasterList,
+                    spriteMasterList = masterList,
                     sortEntries = sortEntries,
                     matrices = drawInstance.Matrices,
                     sizePivots = drawInstance.SizePivots,
                     uvs = drawInstance.Uvs,
                     colors = drawInstance.Colors
-                }.Schedule(sortEntries.Length, 64, lastHandle);
+                }.Schedule(masterList.Length, 64, lastHandle);
             }
 
             return lastHandle;

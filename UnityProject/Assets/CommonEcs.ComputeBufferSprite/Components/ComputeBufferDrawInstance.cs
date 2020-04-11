@@ -24,6 +24,10 @@ namespace CommonEcs {
             this.internalInstance.Add(ref sprite);
         }
 
+        public void Remove(int masterListIndex) {
+            this.internalInstance.Remove(masterListIndex);
+        }
+
         public NativeArray<ComputeBufferSprite> SpritesMasterList {
             get {
                 return this.internalInstance.spritesMasterList;
@@ -58,7 +62,13 @@ namespace CommonEcs {
             get {
                 return this.internalInstance.SpriteCount;
             }
-        } 
+        }
+
+        public bool RenderOrderChanged {
+            get {
+                return this.internalInstance.renderOrderChanged;
+            }
+        }
 
         /// <summary>
         /// We pass in mesh here because it's a common mesh
@@ -106,6 +116,9 @@ namespace CommonEcs {
 
             public int capacity;
             private int spriteCount;
+            
+            // We're only managing the removed manager indeces here instead of the whole Sprite values
+            private readonly SimpleList<int> inactiveList = new SimpleList<int>(100);
 
             public InternalImplementation(Material material) {
                 this.material = material;
@@ -150,10 +163,50 @@ namespace CommonEcs {
                     ExpandArrays();
                 }
                 
+                if (this.inactiveList.Count > 0) {
+                    AddByReusingInactive(ref sprite);
+                    return;
+                }
+                
+                // At this point, we add by using a new entry in the list
                 sprite.masterListIndex = this.spriteCount;
                 this.spritesMasterList.Add(sprite);
 
                 ++this.spriteCount;
+                this.renderOrderChanged = true;
+            }
+            
+            // Adds a new sprite by reusing an existing index in the master list
+            private void AddByReusingInactive(ref ComputeBufferSprite sprite) {
+                Assertion.Assert(this.inactiveList.Count > 0);
+
+                // We really only need the manager index from the removed sprites
+                int lastIndex = this.inactiveList.Count - 1;
+                int reusedIndex = this.inactiveList[lastIndex];
+                this.inactiveList.RemoveAt(lastIndex);
+                sprite.masterListIndex = reusedIndex;
+                this.spritesMasterList[reusedIndex] = sprite;
+                
+                ++this.spriteCount;
+                this.renderOrderChanged = true;
+            }
+
+            /// <summary>
+            /// We only provide remove by master list index because systems may not always have a
+            /// reference to the ComputeBufferSprite of the destroyed entity.
+            /// An AddRegistry may remember the master list index, though.
+            /// </summary>
+            /// <param name="masterListIndex"></param>
+            public void Remove(int masterListIndex) {
+                // The inactive list should not have this index yet
+                Assertion.Assert(!this.inactiveList.Contains(masterListIndex));
+                
+                // We empty out the sprite in the specified index so that nothing will be rendered
+                this.spritesMasterList[masterListIndex] = new ComputeBufferSprite();
+                
+                this.inactiveList.Add(masterListIndex);
+
+                --this.spriteCount;
             }
 
             private void ExpandArrays() {

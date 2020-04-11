@@ -154,7 +154,9 @@ namespace Common {
             if (this.buffer != null && index < this.size) {
                 --this.size;
                 this.buffer[index] = default(T);
-                for (int b = index; b < this.size; ++b) this.buffer[b] = this.buffer[b + 1];
+                for (int b = index; b < this.size; ++b) {
+                    this.buffer[b] = this.buffer[b + 1];
+                }
             }
         }
 

@@ -114,11 +114,10 @@ namespace CommonEcs {
             private NativeArray<uint> args;
             private readonly ComputeBuffer argsBuffer;
 
-            // We set only to this number as there's a certain limit to the ComputeBuffer
-            // Might need to use separate position, scale, rotation values to allow more sprites 
-            // ArgumentException: ComputeBuffer.SetData() : Accessing 32768000 bytes at offset 0 for
-            // Compute Buffer of size 19200000 bytes is not possible.
-            public const int MAX_SPRITE_COUNT = 1000000;
+            // We set only to this number as there's a certain limit to the ComputeBuffer 
+            // ArgumentException: ComputeBuffer.SetData() : Accessing 16384000 bytes at offset 0
+            // for Compute Buffer of size 16000000 bytes is not possible.
+            public const int MAX_SPRITE_COUNT = 512000;
 
             public bool uvChanged;
             public bool colorChanged;
@@ -132,6 +131,10 @@ namespace CommonEcs {
 
             public int capacity;
             private int spriteCount;
+
+            // We chose this number because this will be use by Academia which has 81900
+            // ground sprites from the beginning
+            private const int INITIAL_CAPACITY = 128000;
             
             // We're only managing the removed manager indeces here instead of the whole Sprite values
             private readonly SimpleList<int> inactiveList = new SimpleList<int>(100);
@@ -139,7 +142,7 @@ namespace CommonEcs {
             public InternalImplementation(Material material) {
                 this.material = material;
 
-                this.capacity = 1000;
+                this.capacity = INITIAL_CAPACITY;
                 this.spritesMasterList = new NativeList<ComputeBufferSprite>(this.capacity, Allocator.Persistent);
                 ExpandArrays(this.capacity);
 

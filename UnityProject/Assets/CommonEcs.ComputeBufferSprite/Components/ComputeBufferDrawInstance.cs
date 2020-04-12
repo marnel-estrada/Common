@@ -1,11 +1,9 @@
 using System;
-using System.Runtime.InteropServices;
 
 using Common;
 
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Jobs;
 using Unity.Mathematics;
 
 using UnityEngine;
@@ -48,21 +46,21 @@ namespace CommonEcs {
             }
         }
 
-        public NativeArray<float4x4> Matrices {
+        public NativeArray<float4> Transforms {
             get {
-                return this.internalInstance.matrices;
+                return this.internalInstance.transforms;
+            }
+        }
+
+        public NativeArray<float> Rotations {
+            get {
+                return this.internalInstance.rotations;
             }
         }
 
         public NativeArray<float4> Colors {
             get {
                 return this.internalInstance.colors;
-            }
-        }
-
-        public int SpriteCount {
-            get {
-                return this.internalInstance.SpriteCount;
             }
         }
 
@@ -99,13 +97,16 @@ namespace CommonEcs {
             public NativeList<ComputeBufferSprite> spritesMasterList;
 
             // Buffers
+            private readonly ComputeBuffer transformBuffer;
+            private readonly ComputeBuffer rotationBuffer; 
+            
             private readonly ComputeBuffer sizePivotBuffer;
             private readonly ComputeBuffer uvBuffer;
-            private readonly ComputeBuffer matricesBuffer;
             private readonly ComputeBuffer colorBuffer;
             
             // Arrays
-            public NativeArray<float4x4> matrices;
+            public NativeArray<float4> transforms;
+            public NativeArray<float> rotations;
             public NativeArray<float4> sizePivots;
             public NativeArray<float4> uvs;
             public NativeArray<float4> colors;
@@ -117,13 +118,14 @@ namespace CommonEcs {
             // Might need to use separate position, scale, rotation values to allow more sprites 
             // ArgumentException: ComputeBuffer.SetData() : Accessing 32768000 bytes at offset 0 for
             // Compute Buffer of size 19200000 bytes is not possible.
-            public const int MAX_SPRITE_COUNT = 256000;
+            public const int MAX_SPRITE_COUNT = 1000000;
 
             public bool uvChanged;
             public bool colorChanged;
             public bool renderOrderChanged;
             
-            private readonly int matricesBufferId;
+            private readonly int transformBufferId;
+            private readonly int rotationBufferId;
             private readonly int uvBufferId;
             private readonly int colorsBufferId;
             private readonly int sizePivotBufferId;
@@ -141,12 +143,14 @@ namespace CommonEcs {
                 this.spritesMasterList = new NativeList<ComputeBufferSprite>(this.capacity, Allocator.Persistent);
                 ExpandArrays(this.capacity);
 
-                this.matricesBuffer = new ComputeBuffer(MAX_SPRITE_COUNT, 64);
+                this.transformBuffer = new ComputeBuffer(MAX_SPRITE_COUNT, 16);
+                this.rotationBuffer = new ComputeBuffer(MAX_SPRITE_COUNT, sizeof(float));
                 this.sizePivotBuffer = new ComputeBuffer(MAX_SPRITE_COUNT, 16);
                 this.uvBuffer = new ComputeBuffer(MAX_SPRITE_COUNT, 16);
                 this.colorBuffer = new ComputeBuffer(MAX_SPRITE_COUNT, 16);
                 
-                this.matricesBufferId = Shader.PropertyToID("matricesBuffer");
+                this.transformBufferId = Shader.PropertyToID("transformBuffer");
+                this.rotationBufferId = Shader.PropertyToID("rotationBuffer");
                 this.uvBufferId = Shader.PropertyToID("uvBuffer");
                 this.colorsBufferId = Shader.PropertyToID("colorsBuffer");
                 this.sizePivotBufferId = Shader.PropertyToID("sizePivotBuffer");
@@ -230,29 +234,34 @@ namespace CommonEcs {
             }
             
             private void ExpandArrays(int count) {
-                if (this.matrices.IsCreated && this.matrices.Length >= count) {
+                if (this.transforms.IsCreated && this.transforms.Length >= count) {
                     // Current arrays can still accommodate the specified number of sprites
                     return;
                 }
                 
                 // Dispose old
-                if (this.matrices.IsCreated) {
-                    this.matrices.Dispose();
+                if (this.transforms.IsCreated) {
+                    this.transforms.Dispose();
+                    this.rotations.Dispose();
                     this.sizePivots.Dispose();
                     this.uvs.Dispose();
                     this.colors.Dispose();
                 }
                 
+                this.transforms = new NativeArray<float4>(count, Allocator.Persistent);
+                this.rotations = new NativeArray<float>(count, Allocator.Persistent);
                 this.sizePivots = new NativeArray<float4>(count, Allocator.Persistent);
                 this.uvs = new NativeArray<float4>(count, Allocator.Persistent);
-                this.matrices = new NativeArray<float4x4>(count, Allocator.Persistent);
                 this.colors = new NativeArray<float4>(count, Allocator.Persistent);
             }
 
             public void SetDataToBuffers() {
                 // Update the buffers
-                this.matricesBuffer.SetData(this.matrices);
-                this.material.SetBuffer(this.matricesBufferId, this.matricesBuffer);
+                this.transformBuffer.SetData(this.transforms);
+                this.material.SetBuffer(this.transformBufferId, this.transformBuffer);
+                
+                this.rotationBuffer.SetData(this.rotations);
+                this.material.SetBuffer(this.rotationBufferId, this.rotationBuffer);
 
                 this.uvBuffer.SetData(this.uvs);
                 this.material.SetBuffer(this.uvBufferId, this.uvBuffer);
@@ -282,16 +291,19 @@ namespace CommonEcs {
             public void Dispose() {
                 this.spritesMasterList.Dispose();
                 
-                this.matrices.Dispose();
+                this.transforms.Dispose();
+                this.rotations.Dispose();
                 this.sizePivots.Dispose();
                 this.uvs.Dispose();
                 this.colors.Dispose();
                 this.args.Dispose();
                 
-                this.matricesBuffer.Release();
+                this.transformBuffer.Release();
+                this.rotationBuffer.Release();
                 this.sizePivotBuffer.Release();
                 this.uvBuffer.Release();
                 this.colorBuffer.Release();
+                this.argsBuffer.Release();
             }
         }
 

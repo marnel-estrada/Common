@@ -55,9 +55,10 @@ namespace CommonEcs {
                 // Update arrays
                 // sortEntries will be deallocated on this job
                 lastHandle = new SetValuesJob() {
+                    transforms = drawInstance.Transforms,
+                    rotations = drawInstance.Rotations,
                     spriteMasterList = masterList,
                     sortEntries = sortEntries,
-                    matrices = drawInstance.Matrices,
                     sizePivots = drawInstance.SizePivots,
                     uvs = drawInstance.Uvs,
                     colors = drawInstance.Colors
@@ -164,7 +165,8 @@ namespace CommonEcs {
             [DeallocateOnJobCompletion]
             public NativeArray<SortedEntry> sortEntries;
             
-            public NativeArray<float4x4> matrices;
+            public NativeArray<float4> transforms;
+            public NativeArray<float> rotations;
             public NativeArray<float4> sizePivots;
             public NativeArray<float4> uvs;
             public NativeArray<float4> colors;
@@ -173,7 +175,8 @@ namespace CommonEcs {
                 int spriteIndex = this.sortEntries[index].index;
                 ComputeBufferSprite sprite = this.spriteMasterList[spriteIndex];
                 
-                this.matrices[index] = sprite.localToWorld;
+                this.transforms[index] = sprite.transform;
+                this.rotations[index] = sprite.rotation;
                 this.sizePivots[index] = new float4(sprite.size, sprite.pivot);
                 this.uvs[index] = sprite.Uv;
                 this.colors[index] = sprite.Color;

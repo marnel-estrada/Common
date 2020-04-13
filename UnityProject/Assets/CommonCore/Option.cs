@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
 namespace Common {
@@ -10,7 +11,7 @@ namespace Common {
     /// Match().
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public readonly struct Option<T> where T : class {
+    public readonly struct Option<T> : IEquatable<Option<T>> where T : class {
         public static readonly Option<T> NONE = new Option<T>();
 
         /// <summary>
@@ -97,6 +98,28 @@ namespace Common {
 
         public bool ReferenceEquals(T other) {
             return this.value == other;
+        }
+
+        public bool Equals(Option<T> other) {
+            return this.hasValue == other.hasValue && EqualityComparer<T>.Default.Equals(this.value, other.value);
+        }
+
+        public override bool Equals(object obj) {
+            return obj is Option<T> other && Equals(other);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                return (this.hasValue.GetHashCode() * 397) ^ EqualityComparer<T>.Default.GetHashCode(this.value);
+            }
+        }
+
+        public static bool operator ==(Option<T> left, Option<T> right) {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Option<T> left, Option<T> right) {
+            return !left.Equals(right);
         }
     }
 }

@@ -7,7 +7,8 @@
         "CommonCore",
         "CommonEcs",
         "Unity.Transforms",
-        "Unity.Burst"
+        "Unity.Burst",
+        "Unity.Entities.Hybrid"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -15,9 +15,9 @@ namespace CommonEcs {
         
         private readonly InternalImplementation internalInstance;
 
-        public ComputeBufferDrawInstance(Material material) {
+        public ComputeBufferDrawInstance(Entity owner, Material material) {
             this.id = ID_GENERATOR.Generate();
-            this.internalInstance = new InternalImplementation(material);
+            this.internalInstance = new InternalImplementation(owner, material);
         }
 
         public void Add(ref ComputeBufferSprite sprite) {
@@ -26,6 +26,12 @@ namespace CommonEcs {
 
         public void Remove(int masterListIndex) {
             this.internalInstance.Remove(masterListIndex);
+        }
+
+        public Entity Owner {
+            get {
+                return this.internalInstance.owner;
+            }
         }
 
         public NativeArray<ComputeBufferSprite> SpritesMasterList {
@@ -64,6 +70,14 @@ namespace CommonEcs {
             }
         }
 
+        public bool SomethingChanged {
+            get {
+                return this.internalInstance.renderOrderChanged || this.internalInstance.transformChanged ||
+                    this.internalInstance.uvChanged || this.internalInstance.colorChanged ||
+                    this.internalInstance.sizePivotChanged;
+            }
+        }
+
         public bool RenderOrderChanged {
             get {
                 return this.internalInstance.renderOrderChanged;
@@ -73,9 +87,19 @@ namespace CommonEcs {
                 this.internalInstance.renderOrderChanged = false;
             }
         }
+
+        public bool TransformChanged {
+            get {
+                return this.internalInstance.transformChanged;
+            }
+
+            set {
+                this.internalInstance.transformChanged = true;
+            }
+        }
         
-        public void SetDataToBuffers() {
-            this.internalInstance.SetDataToBuffers();
+        public void UpdateBuffers() {
+            this.internalInstance.UpdateBuffers();
         }
 
         /// <summary>
@@ -91,6 +115,9 @@ namespace CommonEcs {
         }
 
         public class InternalImplementation {
+            // The entity where this draw instance is associated with
+            public readonly Entity owner;
+            
             // We don't set as readonly as it should be able to be changed at runtime
             private Material material;
 
@@ -119,8 +146,10 @@ namespace CommonEcs {
             // for Compute Buffer of size 16000000 bytes is not possible.
             public const int MAX_SPRITE_COUNT = 512000;
 
+            public bool transformChanged;
             public bool uvChanged;
             public bool colorChanged;
+            public bool sizePivotChanged;
             public bool renderOrderChanged;
             
             private readonly int transformBufferId;
@@ -139,7 +168,8 @@ namespace CommonEcs {
             // We're only managing the removed manager indeces here instead of the whole Sprite values
             private readonly SimpleList<int> inactiveList = new SimpleList<int>(100);
 
-            public InternalImplementation(Material material) {
+            public InternalImplementation(Entity owner, Material material) {
+                this.owner = owner;
                 this.material = material;
 
                 this.capacity = INITIAL_CAPACITY;
@@ -258,27 +288,62 @@ namespace CommonEcs {
                 this.colors = new NativeArray<float4>(count, Allocator.Persistent);
             }
 
-            public void SetDataToBuffers() {
-                // Update the buffers
-                this.transformBuffer.SetData(this.transforms);
-                this.material.SetBuffer(this.transformBufferId, this.transformBuffer);
-                
-                this.rotationBuffer.SetData(this.rotations);
-                this.material.SetBuffer(this.rotationBufferId, this.rotationBuffer);
+            public void UpdateBuffers() {
+                // We update all buffers if render order is changed because the values for each sprite
+                // might have moved
+                if (this.renderOrderChanged) {
+                    UpdateAllBuffers();
+                    this.renderOrderChanged = false;
+                    return;
+                }
 
-                this.uvBuffer.SetData(this.uvs);
-                this.material.SetBuffer(this.uvBufferId, this.uvBuffer);
+                // Update transform only if it has changed
+                if (this.transformChanged) {
+                    UpdateTransformsBuffer();
+                }
+            }
 
-                this.colorBuffer.SetData(this.colors);
-                this.material.SetBuffer(this.colorsBufferId, this.colorBuffer);
-            
-                this.sizePivotBuffer.SetData(this.sizePivots);
-                this.material.SetBuffer(this.sizePivotBufferId, this.sizePivotBuffer);
-                
+            private void UpdateAllBuffers() {
+                UpdateTransformsBuffer();
+                UpdateUvBuffer();
+                UpdateColorBuffer();
+                UpdateSizePivotBuffer();
+
                 // Note here that we use the masterList's length as the draw count as their may be
                 // sprites in between the masterlist that are already destroyed
                 this.args[1] = (uint) this.spritesMasterList.Length;
                 this.argsBuffer.SetData(this.args);
+            }
+
+            private void UpdateSizePivotBuffer() {
+                this.sizePivotBuffer.SetData(this.sizePivots);
+                this.material.SetBuffer(this.sizePivotBufferId, this.sizePivotBuffer);
+
+                this.sizePivotChanged = false;
+            }
+
+            private void UpdateColorBuffer() {
+                this.colorBuffer.SetData(this.colors);
+                this.material.SetBuffer(this.colorsBufferId, this.colorBuffer);
+
+                this.colorChanged = false;
+            }
+
+            private void UpdateUvBuffer() {
+                this.uvBuffer.SetData(this.uvs);
+                this.material.SetBuffer(this.uvBufferId, this.uvBuffer);
+
+                this.uvChanged = false;
+            }
+
+            private void UpdateTransformsBuffer() {
+                this.transformBuffer.SetData(this.transforms);
+                this.material.SetBuffer(this.transformBufferId, this.transformBuffer);
+
+                this.rotationBuffer.SetData(this.rotations);
+                this.material.SetBuffer(this.rotationBufferId, this.rotationBuffer);
+
+                this.transformChanged = false;
             }
 
             private static readonly Bounds BOUNDS = new Bounds(Vector2.zero, Vector3.one);

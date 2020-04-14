@@ -71,7 +71,7 @@ namespace CommonEcs {
                     TransformForSpriteStash stash = this.stashes[stashIndex];
                     ComputeBufferSprite sprite = sprites[i];
                     sprite.SetTransform(stash.position, stash.scale);
-                    sprite.rotation = stash.rotation;
+                    sprite.SetRotation(stash.rotation);
                     
                     // Modify
                     sprites[i] = sprite;

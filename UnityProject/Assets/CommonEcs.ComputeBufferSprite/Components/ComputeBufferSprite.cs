@@ -23,6 +23,7 @@ namespace CommonEcs {
 
         public float rotation;
 
+        public bool transformChanged;
         public bool uvChanged;
         public bool colorChanged;
         public bool renderOrderChanged;
@@ -41,6 +42,7 @@ namespace CommonEcs {
             this.layerOrder = 0;
             this.renderOrder = 0;
 
+            this.transformChanged = false;
             this.uvChanged = false;
             this.colorChanged = false;
             this.renderOrderChanged = false;
@@ -84,6 +86,18 @@ namespace CommonEcs {
 
         public void SetTransform(float2 position, float2 scale) {
             this.transform = new float4(position, scale);
+            this.transformChanged = true;
+        }
+
+        public void SetRotation(float rotation) {
+            this.rotation = rotation;
+            this.transformChanged = true;
+        }
+
+        public bool SomethingChanged {
+            get {
+                return this.transformChanged || this.uvChanged || this.colorChanged || this.renderOrderChanged;
+            }
         }
     }
 }

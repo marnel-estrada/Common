@@ -24,13 +24,7 @@ namespace CommonEcs {
             // Note here that we start iteration from 1 because the first value is the default value
             for (int i = 1; i < drawInstances.Count; ++i) {
                 ComputeBufferDrawInstance drawInstance = drawInstances[i];
-                if (drawInstance.RenderOrderChanged) {
-                    // We set this to false so it won't be sorted and set to the buffer on the next frame
-                    // if there were no changes to the render order
-                    drawInstance.SetDataToBuffers();
-                    drawInstance.RenderOrderChanged = false;
-                }
-                
+                drawInstance.UpdateBuffers();   
                 drawInstance.Draw(this.quad);
             }
         }

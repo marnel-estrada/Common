@@ -33,8 +33,8 @@ namespace CommonEcs {
             for (int i = 1; i < drawInstances.Count; ++i) {
                 ComputeBufferDrawInstance drawInstance = drawInstances[i];
 
-                // Sort only if render order changed
-                if (!drawInstance.RenderOrderChanged) {
+                // Continue only if something changed
+                if (!drawInstance.SomethingChanged) {
                     continue;
                 }
                 

@@ -26,60 +26,66 @@ namespace CommonEcs {
             this.drawInstanceQuery.Update();
             IReadOnlyList<ComputeBufferDrawInstance> drawInstances = this.drawInstanceQuery.SharedComponents;
             
+            // Populate index map
+            // This is a mapping of the drawInstance entity to its index in the NativeArray that will 
+            // represent if something changed to sprites belonging to a draw instance.
+            // This used to be implemented as a NativeHashMap. We changed it to NativeArray so we can
+            // run it in parallel
+            NativeHashMap<Entity, int> ownerToIndexMap = new NativeHashMap<Entity, int>(4, Allocator.Persistent);
+            for (int i = 1; i < drawInstances.Count; ++i) {
+                ownerToIndexMap.TryAdd(drawInstances[i].Owner, i - 1);
+            }
+            
             // We minus 1 because the first entry is always the default entry
             int drawInstancesCount = drawInstances.Count - 1;
-            NativeHashMap<Entity, byte> transformChangedMap =
-                new NativeHashMap<Entity, byte>(drawInstancesCount, Allocator.TempJob);
+            NativeArray<bool> transformChangedMap =
+                new NativeArray<bool>(drawInstancesCount, Allocator.TempJob);
             
             Job job = new Job() {
                 spriteType = GetArchetypeChunkComponentType<ComputeBufferSprite>(),
-                chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob),
+                ownerToIndexMap = ownerToIndexMap,
                 transformChangedMap = transformChangedMap
             };
             
-            job.Schedule(inputDeps).Complete();
+            job.Schedule(this.query, inputDeps).Complete();
             
             // Process the results
             for (int i = 1; i < drawInstances.Count; ++i) {
                 ComputeBufferDrawInstance drawInstance = drawInstances[i];
                 
-                // Note that we're only checking for existence here
                 // We used OR here because the flags might have been already set to true prior to
                 // calling this system
-                drawInstance.TransformChanged = drawInstance.TransformChanged || transformChangedMap.TryGetValue(drawInstance.Owner, out byte _);
+                int changedIndex = ownerToIndexMap[drawInstance.Owner];
+                drawInstance.TransformChanged = drawInstance.TransformChanged || transformChangedMap[changedIndex];
             }
             
             // Dispose
+            ownerToIndexMap.Dispose();
             transformChangedMap.Dispose();
 
             return inputDeps;
         }
         
         [BurstCompile]
-        private struct Job : IJob {
+        private struct Job : IJobChunk {
             [ReadOnly]
             public ArchetypeChunkComponentType<ComputeBufferSprite> spriteType;
-            
+
             [ReadOnly]
-            [DeallocateOnJobCompletion]
-            public NativeArray<ArchetypeChunk> chunks;
+            public NativeHashMap<Entity, int> ownerToIndexMap;
 
-            public NativeHashMap<Entity, byte> transformChangedMap;
-            
-            public void Execute() {
-                for (int i = 0; i < this.chunks.Length; ++i) {
-                    ArchetypeChunk chunk = this.chunks[i];
-                    Process(ref chunk);
-                }
-            }
+            [NativeDisableParallelForRestriction]
+            public NativeArray<bool> transformChangedMap;
 
-            private void Process(ref ArchetypeChunk chunk) {
+            public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {
                 NativeArray<ComputeBufferSprite> sprites = chunk.GetNativeArray(this.spriteType);
 
                 for (int i = 0; i < chunk.Count; ++i) {
                     ComputeBufferSprite sprite = sprites[i];
+                    int changedIndex = this.ownerToIndexMap[sprite.drawInstanceEntity];
+                    
                     if (sprite.transformChanged) {
-                        this.transformChangedMap.TryAdd(sprite.drawInstanceEntity, 0);
+                        this.transformChangedMap[changedIndex] = true;
                     }
                 }
             }

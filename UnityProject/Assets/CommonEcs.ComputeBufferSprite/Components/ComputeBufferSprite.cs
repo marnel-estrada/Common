@@ -99,5 +99,12 @@ namespace CommonEcs {
                 return this.transformChanged || this.uvChanged || this.colorChanged || this.renderOrderChanged;
             }
         }
+
+        public void ResetChangedFlags() {
+            this.transformChanged = false;
+            this.uvChanged = false;
+            this.colorChanged = false;
+            this.renderOrderChanged = false;
+        }
     }
 }

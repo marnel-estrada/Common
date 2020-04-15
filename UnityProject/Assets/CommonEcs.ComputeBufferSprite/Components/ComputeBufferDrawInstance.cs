@@ -84,7 +84,7 @@ namespace CommonEcs {
             }
 
             set {
-                this.internalInstance.renderOrderChanged = false;
+                this.internalInstance.renderOrderChanged = value;
             }
         }
 
@@ -94,7 +94,7 @@ namespace CommonEcs {
             }
 
             set {
-                this.internalInstance.transformChanged = true;
+                this.internalInstance.transformChanged = value;
             }
         }
         

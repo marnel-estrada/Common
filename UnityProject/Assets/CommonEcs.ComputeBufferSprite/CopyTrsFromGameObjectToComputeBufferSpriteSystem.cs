@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -45,6 +46,7 @@ namespace CommonEcs {
             public float rotation;
         }
         
+        [BurstCompile]
         private struct StashSpriteTransformsJob : IJobParallelForTransform {
             public NativeArray<TransformForSpriteStash> stashes;
             
@@ -57,6 +59,7 @@ namespace CommonEcs {
             }
         }
         
+        [BurstCompile]
         private struct SetStashToSpriteJob : IJobChunk {
             public ArchetypeChunkComponentType<ComputeBufferSprite> spriteType;
 

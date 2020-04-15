@@ -3,7 +3,6 @@ using UnityEditor;
 
 namespace Common {
     public static class EditorRenderUtils {
-
         /// <summary>
         /// Renders a dropdown list or popup
         /// </summary>
@@ -24,6 +23,5 @@ namespace Common {
             index = EditorGUILayout.Popup(index, valueSet.DisplayList, GUILayout.Width(width));
             return valueSet.GetValue(index);
         }
-
     }
 }

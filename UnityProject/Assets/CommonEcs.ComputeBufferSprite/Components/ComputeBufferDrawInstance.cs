@@ -262,7 +262,8 @@ namespace CommonEcs {
             }
 
             private void ExpandArrays() {
-                this.capacity *= 2;
+                // Cap capacity to MAX_SPRITE_COUNT
+                this.capacity = math.min(this.capacity * 2, MAX_SPRITE_COUNT);
                 ExpandArrays(this.capacity);
             }
             

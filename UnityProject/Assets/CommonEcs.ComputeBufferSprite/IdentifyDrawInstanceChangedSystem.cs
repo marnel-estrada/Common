@@ -38,8 +38,7 @@ namespace CommonEcs {
             
             // We minus 1 because the first entry is always the default entry
             int drawInstancesCount = drawInstances.Count - 1;
-            NativeArray<bool> transformChangedMap =
-                new NativeArray<bool>(drawInstancesCount, Allocator.TempJob);
+            NativeArray<bool> transformChangedMap = new NativeArray<bool>(drawInstancesCount, Allocator.TempJob);
             
             Job job = new Job() {
                 spriteType = GetArchetypeChunkComponentType<ComputeBufferSprite>(),

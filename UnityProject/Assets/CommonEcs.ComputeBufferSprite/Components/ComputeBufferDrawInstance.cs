@@ -14,10 +14,14 @@ namespace CommonEcs {
         private static readonly IdGenerator ID_GENERATOR = new IdGenerator(1);
         
         private readonly InternalImplementation internalInstance;
+        
+        // We chose this number because this will be use by Academia which has 81900
+        // ground sprites from the beginning
+        public const int INITIAL_CAPACITY = 128000;
 
-        public ComputeBufferDrawInstance(Entity owner, Material material) {
+        public ComputeBufferDrawInstance(Entity owner, Material material, int initialCapacity = INITIAL_CAPACITY) {
             this.id = ID_GENERATOR.Generate();
-            this.internalInstance = new InternalImplementation(owner, material);
+            this.internalInstance = new InternalImplementation(owner, material, initialCapacity);
         }
 
         public void Add(ref ComputeBufferSprite sprite) {
@@ -160,19 +164,15 @@ namespace CommonEcs {
 
             public int capacity;
             private int spriteCount;
-
-            // We chose this number because this will be use by Academia which has 81900
-            // ground sprites from the beginning
-            private const int INITIAL_CAPACITY = 128000;
             
             // We're only managing the removed manager indeces here instead of the whole Sprite values
             private readonly SimpleList<int> inactiveList = new SimpleList<int>(100);
 
-            public InternalImplementation(Entity owner, Material material) {
+            public InternalImplementation(Entity owner, Material material, int initialCapacity = INITIAL_CAPACITY) {
                 this.owner = owner;
                 this.material = material;
 
-                this.capacity = INITIAL_CAPACITY;
+                this.capacity = initialCapacity;
                 this.spritesMasterList = new NativeList<ComputeBufferSprite>(this.capacity, Allocator.Persistent);
                 ExpandArrays(this.capacity);
 

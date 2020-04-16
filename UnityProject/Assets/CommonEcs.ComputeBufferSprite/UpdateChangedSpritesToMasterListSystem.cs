@@ -7,7 +7,7 @@ using Unity.Jobs;
 
 namespace CommonEcs {
     [UpdateAfter(typeof(IdentifyDrawInstanceChangedSystem))]
-    public class UpdateChangedSpritesMasterListSystem : SystemBase {
+    public class UpdateChangedSpritesToMasterListSystem : SystemBase {
         private EntityQuery query;
         private SharedComponentQuery<ComputeBufferDrawInstance> drawInstanceQuery;
         
@@ -31,8 +31,10 @@ namespace CommonEcs {
             // The first one is always blank
             for (int i = 1; i < drawInstances.Count; ++i) {
                 ComputeBufferDrawInstance drawInstance = drawInstances[i];
-                if (!drawInstance.SomethingChanged) {
+                if (!(drawInstance.SomethingChanged || drawInstance.AlwaysUpdateBuffers)) {
                     // We can skip because nothing changed
+                    // Skip only if it's not AlwaysUpdateBuffers
+                    // If it is, we should always update the master list
                     continue;
                 }
                 

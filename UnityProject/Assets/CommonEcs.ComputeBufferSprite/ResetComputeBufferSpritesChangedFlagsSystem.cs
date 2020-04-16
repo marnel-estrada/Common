@@ -26,8 +26,8 @@ namespace CommonEcs {
 
             for (int i = 1; i < drawInstances.Count; ++i) {
                 ComputeBufferDrawInstance drawInstance = drawInstances[i];
-                if (!drawInstance.SomethingChanged) {
-                    // Nothing changed
+                if (!drawInstance.SomethingChanged || drawInstance.AlwaysUpdateBuffers) {
+                    // Nothing changed or buffers will always be updated anyway
                     // No need to reset sprites under this drawInstance
                     continue;
                 }

@@ -33,8 +33,8 @@ namespace CommonEcs {
             for (int i = 1; i < drawInstances.Count; ++i) {
                 ComputeBufferDrawInstance drawInstance = drawInstances[i];
 
-                // Continue only if something changed
-                if (!drawInstance.SomethingChanged) {
+                // Continue only if something changed and it's not always updating the buffers
+                if (!(drawInstance.SomethingChanged || drawInstance.AlwaysUpdateBuffers)) {
                     continue;
                 }
                 

@@ -19,9 +19,9 @@ namespace CommonEcs {
         // ground sprites from the beginning
         public const int INITIAL_CAPACITY = 128000;
 
-        public ComputeBufferDrawInstance(Entity owner, Material material, int initialCapacity = INITIAL_CAPACITY) {
+        public ComputeBufferDrawInstance(Entity owner, Material material, int initialCapacity = INITIAL_CAPACITY, bool alwaysUpdate = false) {
             this.id = ID_GENERATOR.Generate();
-            this.internalInstance = new InternalImplementation(owner, material, initialCapacity);
+            this.internalInstance = new InternalImplementation(owner, material, initialCapacity, alwaysUpdate);
         }
 
         public void Add(ref ComputeBufferSprite sprite) {
@@ -79,6 +79,12 @@ namespace CommonEcs {
                 return this.internalInstance.renderOrderChanged || this.internalInstance.transformChanged ||
                     this.internalInstance.uvChanged || this.internalInstance.colorChanged ||
                     this.internalInstance.sizePivotChanged;
+            }
+        }
+
+        public bool AlwaysUpdateBuffers {
+            get {
+                return this.internalInstance.alwaysUpdate;
             }
         }
 
@@ -156,6 +162,10 @@ namespace CommonEcs {
             public bool sizePivotChanged;
             public bool renderOrderChanged;
             
+            // This is used for layers that always moves
+            // If set to true, it will no longer run IdentifyDrawInstanceChangedSystem
+            public readonly bool alwaysUpdate;
+            
             private readonly int transformBufferId;
             private readonly int rotationBufferId;
             private readonly int uvBufferId;
@@ -168,9 +178,11 @@ namespace CommonEcs {
             // We're only managing the removed manager indeces here instead of the whole Sprite values
             private readonly SimpleList<int> inactiveList = new SimpleList<int>(100);
 
-            public InternalImplementation(Entity owner, Material material, int initialCapacity = INITIAL_CAPACITY) {
+            public InternalImplementation(Entity owner, Material material, int initialCapacity, bool alwaysUpdate) {
                 this.owner = owner;
                 this.material = material;
+
+                this.alwaysUpdate = alwaysUpdate;
 
                 this.capacity = initialCapacity;
                 this.spritesMasterList = new NativeList<ComputeBufferSprite>(this.capacity, Allocator.Persistent);
@@ -194,12 +206,6 @@ namespace CommonEcs {
                 }, Allocator.Persistent);
                 this.argsBuffer = new ComputeBuffer(1, this.args.Length * sizeof(uint),
                     ComputeBufferType.IndirectArguments);
-            }
-
-            public int SpriteCount {
-                get {
-                    return this.spriteCount;
-                }
             }
 
             public void Add(ref ComputeBufferSprite sprite) {
@@ -292,7 +298,7 @@ namespace CommonEcs {
             public void UpdateBuffers() {
                 // We update all buffers if render order is changed because the values for each sprite
                 // might have moved
-                if (this.renderOrderChanged) {
+                if (this.renderOrderChanged || this.alwaysUpdate) {
                     UpdateAllBuffers();
                     this.renderOrderChanged = false;
                     return;

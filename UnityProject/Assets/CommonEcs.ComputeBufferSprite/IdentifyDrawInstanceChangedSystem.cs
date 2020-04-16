@@ -40,17 +40,36 @@ namespace CommonEcs {
             int drawInstancesCount = drawInstances.Count - 1;
             NativeArray<bool> transformChangedMap = new NativeArray<bool>(drawInstancesCount, Allocator.TempJob);
             
-            Job job = new Job() {
-                spriteType = GetArchetypeChunkComponentType<ComputeBufferSprite>(),
-                ownerToIndexMap = ownerToIndexMap,
-                transformChangedMap = transformChangedMap
-            };
-            
-            job.Schedule(this.query, inputDeps).Complete();
+            // Schedule jobs for each draw instance
+            NativeList<JobHandle> jobList = new NativeList<JobHandle>(drawInstancesCount, Allocator.TempJob); 
+            for (int i = 1; i < drawInstances.Count; ++i) {
+                ComputeBufferDrawInstance drawInstance = drawInstances[i];
+                if (drawInstance.AlwaysUpdateBuffers) {
+                    // No need to identify since it always updates the buffers anyway
+                    continue;
+                }
+                
+                this.query.SetSharedComponentFilter(drawInstance);
+                
+                Job job = new Job() {
+                    spriteType = GetArchetypeChunkComponentType<ComputeBufferSprite>(),
+                    ownerToIndexMap = ownerToIndexMap,
+                    transformChangedMap = transformChangedMap
+                };
+                
+                jobList.Add(job.Schedule(this.query, inputDeps));
+            }
+            JobHandle.CompleteAll(jobList);
+            jobList.Dispose();
             
             // Process the results
             for (int i = 1; i < drawInstances.Count; ++i) {
                 ComputeBufferDrawInstance drawInstance = drawInstances[i];
+
+                if (drawInstance.AlwaysUpdateBuffers) {
+                    // Skip since it always updates the buffers anyways
+                    continue;
+                }
                 
                 // We used OR here because the flags might have been already set to true prior to
                 // calling this system

@@ -14,7 +14,8 @@ namespace CommonEcs {
         private SharedComponentQuery<ComputeBufferDrawInstance> drawInstanceQuery;
 
         protected override void OnCreate() {
-            this.query = GetEntityQuery(typeof(ComputeBufferSprite), typeof(ComputeBufferDrawInstance));
+            this.query = GetEntityQuery(typeof(ComputeBufferSprite), typeof(ComputeBufferDrawInstance),
+                ComponentType.Exclude<AlwaysUpdateBuffers>());
             this.drawInstanceQuery = new SharedComponentQuery<ComputeBufferDrawInstance>(this, this.EntityManager);
         }
 
@@ -40,27 +41,12 @@ namespace CommonEcs {
             int drawInstancesCount = drawInstances.Count - 1;
             NativeArray<bool> transformChangedMap = new NativeArray<bool>(drawInstancesCount, Allocator.TempJob);
             
-            // Schedule jobs for each draw instance
-            NativeList<JobHandle> jobList = new NativeList<JobHandle>(drawInstancesCount, Allocator.TempJob); 
-            for (int i = 1; i < drawInstances.Count; ++i) {
-                ComputeBufferDrawInstance drawInstance = drawInstances[i];
-                if (drawInstance.AlwaysUpdateBuffers) {
-                    // No need to identify since it always updates the buffers anyway
-                    continue;
-                }
-                
-                this.query.SetSharedComponentFilter(drawInstance);
-                
-                Job job = new Job() {
-                    spriteType = GetArchetypeChunkComponentType<ComputeBufferSprite>(),
-                    ownerToIndexMap = ownerToIndexMap,
-                    transformChangedMap = transformChangedMap
-                };
-                
-                jobList.Add(job.Schedule(this.query, inputDeps));
-            }
-            JobHandle.CompleteAll(jobList);
-            jobList.Dispose();
+            Job job = new Job() {
+                spriteType = GetArchetypeChunkComponentType<ComputeBufferSprite>(),
+                ownerToIndexMap = ownerToIndexMap,
+                transformChangedMap = transformChangedMap
+            };
+            job.ScheduleParallel(this.query, inputDeps).Complete();
             
             // Process the results
             for (int i = 1; i < drawInstances.Count; ++i) {

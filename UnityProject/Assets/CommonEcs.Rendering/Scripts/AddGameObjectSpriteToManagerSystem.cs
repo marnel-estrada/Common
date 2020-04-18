@@ -64,7 +64,8 @@ namespace CommonEcs {
             
                 Maybe<SpriteManager> maybeManager = this.spriteManagers.Get(sprite.spriteManagerEntity);
                 float4x4 matrix = new float4x4(transform.rotation, transform.position);
-                maybeManager.Value.Add(ref sprite, matrix);
+                SpriteManager spriteManager = maybeManager.Value;
+                spriteManager.Add(ref sprite, matrix);
 
                 // Add this component so it will no longer be processed by this system
                 this.PostUpdateCommands.AddComponent(entity,
@@ -72,7 +73,12 @@ namespace CommonEcs {
             
                 // We add the shared component so that it can be filtered using such shared component
                 // in other systems. For example, in SortRenderOrderSystem.
-                this.PostUpdateCommands.AddSharedComponent(entity, maybeManager.Value);
+                this.PostUpdateCommands.AddSharedComponent(entity, spriteManager);
+                
+                if (spriteManager.AlwaysUpdateMesh) {
+                    // We add this component so it will be excluded in IdentifySpriteManagerChangedSystem
+                    this.PostUpdateCommands.AddComponent(entity, new AlwaysUpdateMesh());
+                }
             };
 
             this.removedForEach = delegate(Entity entity, ref Added added) {

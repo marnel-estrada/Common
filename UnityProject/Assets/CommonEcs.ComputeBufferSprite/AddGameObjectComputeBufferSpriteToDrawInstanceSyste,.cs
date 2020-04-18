@@ -25,12 +25,13 @@ namespace CommonEcs {
                     return;
                 }
 
-                Maybe<ComputeBufferDrawInstance> drawInstance = this.drawInstances.Get(sprite.drawInstanceEntity);
+                Maybe<ComputeBufferDrawInstance> getResult = this.drawInstances.Get(sprite.drawInstanceEntity);
                     
                 // Note here that we already set the sprite's transform prior to adding
                 sprite.SetTransform(new float2(transform.position.x, transform.position.y), 
                     new float2(transform.localScale.x, transform.localScale.y));
-                drawInstance.Value.Add(ref sprite);
+                ComputeBufferDrawInstance drawInstance = getResult.Value;
+                drawInstance.Add(ref sprite);
                     
                 // Add this component so it will no longer be processed by this system
                 AddRegistry registry = new AddRegistry(sprite.drawInstanceEntity, sprite.masterListIndex);
@@ -38,7 +39,12 @@ namespace CommonEcs {
                     
                 // We add the shared component so that it can be filtered using such shared component
                 // in other systems.
-                commandBuffer.AddSharedComponent(entity, drawInstance.Value);
+                commandBuffer.AddSharedComponent(entity, drawInstance);
+
+                if (drawInstance.AlwaysUpdateBuffers) {
+                    // Automatically add this component so it will be excluded in IdentifyDrawInstanceChangedSystem
+                    commandBuffer.AddComponent(entity, new AlwaysUpdateBuffers());
+                }
             }).WithoutBurst().Run();
         }
     }

@@ -19,9 +19,13 @@ namespace CommonEcs {
         // ground sprites from the beginning
         public const int INITIAL_CAPACITY = 128000;
 
-        public ComputeBufferDrawInstance(Entity owner, Material material, int initialCapacity = INITIAL_CAPACITY, bool alwaysUpdate = false) {
+        public ComputeBufferDrawInstance(Entity owner, Material material, int initialCapacity = INITIAL_CAPACITY, bool alwaysUpdate = false) : 
+            this(owner, material, new Bounds(VectorUtils.ZERO, VectorUtils.ONE * 1000), initialCapacity, alwaysUpdate) {
+        }
+        
+        public ComputeBufferDrawInstance(Entity owner, Material material, Bounds boundingBox, int initialCapacity = INITIAL_CAPACITY, bool alwaysUpdate = false) {
             this.id = ID_GENERATOR.Generate();
-            this.internalInstance = new InternalImplementation(owner, material, initialCapacity, alwaysUpdate);
+            this.internalInstance = new InternalImplementation(owner, material, boundingBox, initialCapacity, alwaysUpdate);
         }
 
         public void Add(ref ComputeBufferSprite sprite) {
@@ -131,6 +135,9 @@ namespace CommonEcs {
             // We don't set as readonly as it should be able to be changed at runtime
             private Material material;
 
+            // The bounding box of the whole draw instance
+            private Bounds boundingBox;
+
             public NativeList<ComputeBufferSprite> spritesMasterList;
 
             // Buffers
@@ -178,11 +185,12 @@ namespace CommonEcs {
             // We're only managing the removed manager indeces here instead of the whole Sprite values
             private readonly SimpleList<int> inactiveList = new SimpleList<int>(100);
 
-            public InternalImplementation(Entity owner, Material material, int initialCapacity, bool alwaysUpdate) {
+            public InternalImplementation(Entity owner, Material material, Bounds boundingBox, int initialCapacity, bool alwaysUpdate) {
                 this.owner = owner;
                 this.material = material;
 
                 this.alwaysUpdate = alwaysUpdate;
+                this.boundingBox = boundingBox;
 
                 this.capacity = initialCapacity;
                 this.spritesMasterList = new NativeList<ComputeBufferSprite>(this.capacity, Allocator.Persistent);
@@ -353,14 +361,12 @@ namespace CommonEcs {
                 this.transformChanged = false;
             }
 
-            private static readonly Bounds BOUNDS = new Bounds(Vector2.zero, Vector3.one);
-
             /// <summary>
             /// We pass in mesh here because it's a common mesh
             /// </summary>
             /// <param name="quad"></param>
             public void Draw(Mesh quad) {
-                Graphics.DrawMeshInstancedIndirect(quad, 0, this.material, BOUNDS, this.argsBuffer);
+                Graphics.DrawMeshInstancedIndirect(quad, 0, this.material, this.boundingBox, this.argsBuffer);
             }
             
             public void Dispose() {

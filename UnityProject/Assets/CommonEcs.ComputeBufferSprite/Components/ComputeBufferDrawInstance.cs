@@ -7,6 +7,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace CommonEcs {
     public struct ComputeBufferDrawInstance : ISharedComponentData, IEquatable<ComputeBufferDrawInstance> {
@@ -366,7 +367,8 @@ namespace CommonEcs {
             /// </summary>
             /// <param name="quad"></param>
             public void Draw(Mesh quad) {
-                Graphics.DrawMeshInstancedIndirect(quad, 0, this.material, this.boundingBox, this.argsBuffer);
+                Graphics.DrawMeshInstancedIndirect(quad, 0, this.material, this.boundingBox, this.argsBuffer, 
+                    0, null, ShadowCastingMode.Off, false, 0, null, LightProbeUsage.Off, null);
             }
             
             public void Dispose() {

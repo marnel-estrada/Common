@@ -112,6 +112,19 @@ namespace CommonEcs {
                 this.internalInstance.transformChanged = value;
             }
         }
+
+        /// <summary>
+        /// The camera where the draw instance would be rendered to
+        /// </summary>
+        public Camera Camera {
+            get {
+                return this.internalInstance.camera;
+            }
+
+            set {
+                this.internalInstance.camera = value;
+            }
+        }
         
         public void UpdateBuffers() {
             this.internalInstance.UpdateBuffers();
@@ -185,6 +198,9 @@ namespace CommonEcs {
             
             // We're only managing the removed manager indeces here instead of the whole Sprite values
             private readonly SimpleList<int> inactiveList = new SimpleList<int>(100);
+
+            // Camera to where the draw instance would be rendered to
+            public Camera camera;
 
             public InternalImplementation(Entity owner, Material material, Bounds boundingBox, int initialCapacity, bool alwaysUpdate) {
                 this.owner = owner;
@@ -368,7 +384,7 @@ namespace CommonEcs {
             /// <param name="quad"></param>
             public void Draw(Mesh quad) {
                 Graphics.DrawMeshInstancedIndirect(quad, 0, this.material, this.boundingBox, this.argsBuffer, 
-                    0, null, ShadowCastingMode.Off, false, 0, null, LightProbeUsage.Off, null);
+                    0, null, ShadowCastingMode.Off, false, 0, this.camera, LightProbeUsage.Off, null);
             }
             
             public void Dispose() {

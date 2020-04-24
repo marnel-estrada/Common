@@ -1,7 +1,5 @@
 using Unity.Entities;
 
-using UnityEngine;
-
 namespace CommonEcs {
     public class RemoveDestroyedComputeBufferSpriteFromDrawInstanceSystem : SystemBase {
         // This is a collection of draw instances that can be referenced using their Entity

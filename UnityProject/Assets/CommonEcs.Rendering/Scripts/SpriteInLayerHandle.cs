@@ -76,7 +76,6 @@ namespace CommonEcs {
         public Sprite Pull() {
             // Can only pull if sprite was indeed created
             Assertion.Assert(this.Exists);
-
             return this.entityManager.GetComponentData<Sprite>(this.spriteEntity);
         }
 

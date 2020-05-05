@@ -1,4 +1,6 @@
-﻿namespace Common {
+﻿using System;
+
+namespace Common {
     /// <summary>
     /// The "maybe" monad, enforced by Unity assertions
     /// </summary>
@@ -100,6 +102,10 @@
         public T Value {
             get {
                 Assertion.Assert(this.hasValue, "Can't get Maybe<T> value when not set");
+                if (!this.hasValue) {
+                    // Force throw exception since Assert() does not throw exception in production
+                    throw new Exception("Invalid Maybe usage. Trying to access a value that does not exits.");
+                }
                 return this.value;
             }
         }

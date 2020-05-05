@@ -137,7 +137,7 @@ namespace Common {
         }
 
         public T SelectRandom() {
-            int randomIndex = Random.Range(0, this.Count - 1);
+            int randomIndex = Random.Range(0, this.Count);
             
             Select(randomIndex);
             

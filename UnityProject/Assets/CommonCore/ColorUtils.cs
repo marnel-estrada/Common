@@ -16,7 +16,6 @@ namespace Common {
 	 * Contains color related utility methods.
 	 */
 	public static class ColorUtils {
-
 		// we provide these static colors because color variables from Color are instantiated instead of static
 		public static readonly Color BLACK = new Color(0, 0, 0, 1);
 		public static readonly Color WHITE = new Color(1, 1, 1, 1);
@@ -45,7 +44,5 @@ namespace Common {
 
             return color;
         }
-
 	}
 }
-

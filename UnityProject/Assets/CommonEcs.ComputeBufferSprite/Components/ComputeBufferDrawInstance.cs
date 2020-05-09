@@ -20,13 +20,13 @@ namespace CommonEcs {
         // ground sprites from the beginning
         public const int INITIAL_CAPACITY = 128000;
 
-        public ComputeBufferDrawInstance(Entity owner, Material material, int initialCapacity = INITIAL_CAPACITY, bool alwaysUpdate = false) : 
-            this(owner, material, new Bounds(VectorUtils.ZERO, VectorUtils.ONE * 1000), initialCapacity, alwaysUpdate) {
+        public ComputeBufferDrawInstance(Entity owner, Mesh mesh, Material material, int initialCapacity = INITIAL_CAPACITY, bool alwaysUpdate = false) : 
+            this(owner, mesh, material, new Bounds(VectorUtils.ZERO, VectorUtils.ONE * 1000), initialCapacity, alwaysUpdate) {
         }
         
-        public ComputeBufferDrawInstance(Entity owner, Material material, Bounds boundingBox, int initialCapacity = INITIAL_CAPACITY, bool alwaysUpdate = false) {
+        public ComputeBufferDrawInstance(Entity owner, Mesh mesh, Material material, Bounds boundingBox, int initialCapacity = INITIAL_CAPACITY, bool alwaysUpdate = false) {
             this.id = ID_GENERATOR.Generate();
-            this.internalInstance = new InternalImplementation(owner, material, boundingBox, initialCapacity, alwaysUpdate);
+            this.internalInstance = new InternalImplementation(owner, mesh, material, boundingBox, initialCapacity, alwaysUpdate);
         }
 
         public void Add(ref ComputeBufferSprite sprite) {
@@ -134,8 +134,8 @@ namespace CommonEcs {
         /// We pass in mesh here because it's a common mesh
         /// </summary>
         /// <param name="quad"></param>
-        public void Draw(Mesh quad) {
-            this.internalInstance.Draw(quad);
+        public void Draw() {
+            this.internalInstance.Draw();
         }
         
         public void Dispose() {
@@ -145,6 +145,10 @@ namespace CommonEcs {
         public class InternalImplementation {
             // The entity where this draw instance is associated with
             public readonly Entity owner;
+
+            // This is the mesh used by the draw instance
+            // It could be different like square sprites or diamond sprites for isometric
+            private Mesh mesh;
             
             // We don't set as readonly as it should be able to be changed at runtime
             private Material material;
@@ -202,8 +206,9 @@ namespace CommonEcs {
             // Camera to where the draw instance would be rendered to
             public Camera camera;
 
-            public InternalImplementation(Entity owner, Material material, Bounds boundingBox, int initialCapacity, bool alwaysUpdate) {
+            public InternalImplementation(Entity owner, Mesh mesh, Material material, Bounds boundingBox, int initialCapacity, bool alwaysUpdate) {
                 this.owner = owner;
+                this.mesh = mesh;
                 this.material = material;
 
                 this.alwaysUpdate = alwaysUpdate;
@@ -382,8 +387,8 @@ namespace CommonEcs {
             /// We pass in mesh here because it's a common mesh
             /// </summary>
             /// <param name="quad"></param>
-            public void Draw(Mesh quad) {
-                Graphics.DrawMeshInstancedIndirect(quad, 0, this.material, this.boundingBox, this.argsBuffer, 
+            public void Draw() {
+                Graphics.DrawMeshInstancedIndirect(this.mesh, 0, this.material, this.boundingBox, this.argsBuffer, 
                     0, null, ShadowCastingMode.Off, false, 0, this.camera, LightProbeUsage.Off, null);
             }
             

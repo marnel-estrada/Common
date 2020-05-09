@@ -21,7 +21,7 @@ namespace GameEvent {
         /// <returns></returns>
         public static Rarity ConvertFromName(string name) {
             for (int i = 0; i < ALL.Length; ++i) {
-                if (ALL[i].name.Equals(name)) {
+                if (ALL[i].name.EqualsFast(name)) {
                     return ALL[i];
                 }
             }

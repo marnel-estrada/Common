@@ -11,7 +11,6 @@ namespace Common {
     ///     Utility class that renders a certain named variable for use in editor
     /// </summary>
     public class VariableFieldRenderer {
-
         public delegate object FieldRenderer(ValueHolder holder);
 
         private readonly Dictionary<NamedValueType, FieldRenderer> fieldRendererMap;
@@ -94,9 +93,10 @@ namespace Common {
 
             EditorGUILayout.LabelField(name + ": ", GUILayout.Width(this.fieldWidth));
 
-            FieldRenderer fieldRenderer = null;
-            Assertion.Assert(this.fieldRendererMap.TryGetValue(namedType, out fieldRenderer));
-            holder.Set(fieldRenderer(holder));
+            Assertion.Assert(this.fieldRendererMap.TryGetValue(namedType, out FieldRenderer fieldRenderer));
+            if (fieldRenderer != null) {
+                holder.Set(fieldRenderer(holder));
+            }
 
             EditorGUILayout.EndHorizontal();
         }

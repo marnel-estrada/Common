@@ -11,8 +11,8 @@ namespace GameEvent {
             base.Sort(SortByNameId);
         }
         
-        private int SortByNameId(EventData a, EventData b) {
-            return String.Compare(a.NameId, b.NameId, StringComparison.Ordinal);
+        private static int SortByNameId(EventData a, EventData b) {
+            return string.Compare(a.NameId, b.NameId, StringComparison.Ordinal);
         }
     }
 }

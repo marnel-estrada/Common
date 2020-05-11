@@ -39,6 +39,10 @@ namespace Common.Math {
 		 * Sets the values of this vector using the specified one.
 		 */
 		public void Set(IntVector2 other) {
+			if (other == null) {
+				return;
+			}
+			
 			this.x = other.x;
 			this.y = other.y;
 		}

@@ -2,8 +2,6 @@ using System.Collections.Generic;
 
 using Unity.Entities;
 
-using UnityEngine;
-
 namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class RenderComputeBufferSpritesSystem : SystemBase {
@@ -20,6 +18,8 @@ namespace CommonEcs {
             IReadOnlyList<ComputeBufferDrawInstance> drawInstances = this.managerQuery.SharedComponents;
             
             // Note here that we start iteration from 1 because the first value is the default value
+            // Sorting the draw instances won't matter here. Sort the rendering using the Render Queue of the
+            // material instead
             for (int i = 1; i < drawInstances.Count; ++i) {
                 ComputeBufferDrawInstance drawInstance = drawInstances[i];
                 drawInstance.UpdateBuffers();   

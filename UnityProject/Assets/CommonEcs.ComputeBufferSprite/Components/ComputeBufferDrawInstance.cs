@@ -125,6 +125,16 @@ namespace CommonEcs {
                 this.internalInstance.camera = value;
             }
         }
+
+        public string Name {
+            get {
+                return this.internalInstance.name;
+            }
+
+            set {
+                this.internalInstance.name = value;
+            }
+        }
         
         public void UpdateBuffers() {
             this.internalInstance.UpdateBuffers();
@@ -205,6 +215,9 @@ namespace CommonEcs {
 
             // Camera to where the draw instance would be rendered to
             public Camera camera;
+
+            // Optional name used for debugging
+            public string name;
 
             public InternalImplementation(Entity owner, Mesh mesh, Material material, Bounds boundingBox, int initialCapacity, bool alwaysUpdate) {
                 this.owner = owner;

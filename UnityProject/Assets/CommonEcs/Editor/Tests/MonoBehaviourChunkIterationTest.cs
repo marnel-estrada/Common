@@ -1,6 +1,5 @@
 using NUnit.Framework;
 
-using Unity.Collections;
 using Unity.Entities;
 using Unity.Entities.Tests;
 
@@ -23,32 +22,15 @@ namespace CommonEcs.Test {
             system.Update();
         }
         
-        private class TestSystem : ComponentSystem {
-            private EntityQuery query;
-            private ArchetypeChunkComponentType<Transform> transformType;
-            
-            protected override void OnCreateManager() {
-                this.query = GetEntityQuery(typeof(Transform));
+        private class TestSystem : SystemBase {
+            protected override void OnCreate() {
                 this.Enabled = false;
             }
 
             protected override void OnUpdate() {
-                this.transformType = GetArchetypeChunkComponentType<Transform>();
-                
-                NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
-                for (int i = 0; i < chunks.Length; ++i) {
-                    Process(chunks[i]);
-                }
-                
-                chunks.Dispose();
-            }
-
-            private void Process(ArchetypeChunk chunk) {
-                ArchetypeChunkComponentObjects<Transform> transforms = chunk.GetComponentObjects(this.transformType, this.EntityManager);
-                for (int i = 0; i < transforms.Length; ++i) {
-                    Transform transform = transforms[i];
-                    Debug.Log($"{i}: {transform.position.x}");
-                }
+                this.Entities.ForEach(delegate(Transform transform) {
+                    Debug.Log($"{transform.gameObject.name}: {transform.position.x.ToString()}");
+                }).WithoutBurst().Run();
             }
         }
     }

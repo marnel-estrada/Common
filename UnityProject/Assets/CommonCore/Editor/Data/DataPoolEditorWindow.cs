@@ -27,11 +27,11 @@ namespace Common {
             REPAINT.Dispatch(); // Force a repaint
         }
 
-        void OnEnable() {
+        private void OnEnable() {
             REPAINT.AddListener(Repaint);
         }
 
-        void OnDisable() {
+        private void OnDisable() {
             REPAINT.RemoveListener(Repaint);
         }
 

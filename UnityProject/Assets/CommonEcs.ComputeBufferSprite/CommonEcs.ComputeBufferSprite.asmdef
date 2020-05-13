@@ -5,7 +5,10 @@
         "Unity.Collections",
         "Unity.Mathematics",
         "CommonCore",
-        "CommonEcs"
+        "CommonEcs",
+        "Unity.Transforms",
+        "Unity.Burst",
+        "Unity.Entities.Hybrid"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

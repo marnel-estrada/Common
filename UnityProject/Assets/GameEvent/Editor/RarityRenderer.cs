@@ -23,7 +23,7 @@ namespace GameEvent {
             property.GetSetMethod().Invoke(instance, new object[] { Rarity.ConvertFromName(name).id });
         }
 
-        private void PrepareOptions() {
+        private static void PrepareOptions() {
             if (VALUE_SET != null) {
                 // Already prepared
                 return;

@@ -45,8 +45,8 @@ namespace CommonEcs {
                 if (!hasManager) {
                     // Do not process anymore if it already returned false in a previous entity
                     return;
-                }
-
+                } 
+ 
                 hasManager = ProcessThenReturnIfSuccess(entity, transform, ref sprite, ref addToLayer, commandBuffer);
             }).WithoutBurst().Run();
         }
@@ -83,7 +83,7 @@ namespace CommonEcs {
             return false;
         }
 
-        private static void AddSpriteToManager(SpriteManager manager, Entity entity, Transform transform, ref Sprite sprite, EntityCommandBuffer commandBuffer) {
+        private static void AddSpriteToManager(SpriteManager manager, Entity spriteEntity, Transform transform, ref Sprite sprite, EntityCommandBuffer commandBuffer) {
             Assertion.Assert(manager.Owner != Entity.Null); // Should have been set already
             sprite.spriteManagerEntity = manager.Owner;
 
@@ -91,12 +91,17 @@ namespace CommonEcs {
             manager.Add(ref sprite, matrix);
 
             // We add this component so it will be skipped by this system on the next frame
-            commandBuffer.AddComponent(entity,
+            commandBuffer.AddComponent(spriteEntity,
                 new Added(manager.Owner, sprite.managerIndex));
             
             // We add the shared component so that it can be filtered using such shared component
             // in other systems. For example, in SortRenderOrderSystem.
-            commandBuffer.AddSharedComponent(entity, manager);
+            commandBuffer.AddSharedComponent(spriteEntity, manager);
+
+            if (manager.AlwaysUpdateMesh) {
+                // We add this component so it will be excluded in IdentifySpriteManagerChangedSystem
+                commandBuffer.AddComponent(spriteEntity, new AlwaysUpdateMesh());
+            }
         }
 
         private Maybe<SpriteManager> ResolveAvailable(ref SpriteLayer layer) {

@@ -41,12 +41,6 @@
         public float3 transformedV2;
         public float3 transformedV3;
         public float3 transformedV4;
-
-        public float2 lowerLeftUv;
-        public float2 uvDimension;
-        
-        public float2 lowerLeftUv2;
-        public float2 uvDimension2;
         
         public float width;
         public float height;
@@ -149,9 +143,6 @@
         /// <param name="lowerLeftUv"></param>
         /// <param name="uvDimension"></param>
         public void SetUv(float2 lowerLeftUv, float2 uvDimension) {
-            this.lowerLeftUv = lowerLeftUv;
-            this.uvDimension = uvDimension;
-            
             this.uv_1 = lowerLeftUv; // Lower left
             this.uv_2 = lowerLeftUv + new float2(uvDimension.x, 0); // Lower right
             this.uv_3 = lowerLeftUv + new float2(0, uvDimension.y); // Upper left
@@ -166,9 +157,6 @@
         /// <param name="lowerLeftUv2"></param>
         /// <param name="uvDimension2"></param>
         public void SetUv2(float2 lowerLeftUv2, float2 uvDimension2) {
-            this.lowerLeftUv2 = lowerLeftUv2;
-            this.uvDimension2 = uvDimension2;
-            
             this.uv2_1 = lowerLeftUv2; // Lower left
             this.uv2_2 = lowerLeftUv2 + new float2(uvDimension2.x, 0); // Lower right
             this.uv2_3 = lowerLeftUv2 + new float2(0, uvDimension2.y); // Upper left

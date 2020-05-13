@@ -21,7 +21,8 @@ namespace CommonEcs {
         private readonly List<int> managerIndices = new List<int>(1);
 
         protected override void OnCreate() {
-            this.query = GetEntityQuery(typeof(Sprite));
+            this.query = GetEntityQuery(typeof(Sprite), typeof(SpriteManager), 
+                ComponentType.Exclude<AlwaysUpdateMesh>());
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
@@ -31,26 +32,33 @@ namespace CommonEcs {
             this.managerIndices.Clear();
             this.EntityManager.GetAllUniqueSharedComponentData(this.managers, this.managerIndices);
             
+            // Populate index map
+            // This is a mapping of the SpriteManager entity to its index in the NativeArray that will 
+            // represent if something changed to sprites belonging to a draw instance.
+            // This used to be implemented as a NativeHashMap. We changed it to NativeArray so we can
+            // run it in parallel
+            NativeHashMap<Entity, int> managerToIndexMap = new NativeHashMap<Entity, int>(4, Allocator.TempJob);
+            for (int i = 1; i < this.managers.Count; ++i) {
+                managerToIndexMap.TryAdd(this.managers[i].Owner, i - 1);
+            }
+            
             // We minus 1 because the first entry is always the default entry
             int managerLength = this.managers.Count - 1;
-            NativeHashMap<Entity, byte> verticesChangedMap =
-                new NativeHashMap<Entity, byte>(managerLength, Allocator.TempJob);
-            NativeHashMap<Entity, byte> trianglesChangedMap =
-                new NativeHashMap<Entity, byte>(managerLength, Allocator.TempJob);
-            NativeHashMap<Entity, byte> uvChangedMap = new NativeHashMap<Entity, byte>(managerLength, Allocator.TempJob);
-            NativeHashMap<Entity, byte> colorChangedMap =
-                new NativeHashMap<Entity, byte>(managerLength, Allocator.TempJob);
+            NativeArray<bool> verticesChangedMap = new NativeArray<bool>(managerLength, Allocator.TempJob);
+            NativeArray<bool> trianglesChangedMap = new NativeArray<bool>(managerLength, Allocator.TempJob);
+            NativeArray<bool> uvChangedMap = new NativeArray<bool>(managerLength, Allocator.TempJob);
+            NativeArray<bool> colorChangedMap = new NativeArray<bool>(managerLength, Allocator.TempJob);
 
             Job job = new Job() {
                 spriteType = this.spriteType,
-                chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob),
+                managerToIndexMap = managerToIndexMap,
                 verticesChangedMap = verticesChangedMap,
                 trianglesChangedMap = trianglesChangedMap,
                 uvChangedMap = uvChangedMap,
                 colorChangedMap = colorChangedMap
             };
 
-            job.Schedule(inputDeps).Complete();
+            job.Schedule(this.query, inputDeps).Complete();
 
             // Process the result
             for (int i = 1; i < this.managers.Count; ++i) {
@@ -62,22 +70,19 @@ namespace CommonEcs {
                     continue;
                 }
 
-                if (manager.AlwaysUpdateMesh) {
-                    // Skip this since it was set as always update
-                    // The other flags don't matter
-                    continue;
-                }
+                int changedIndex = managerToIndexMap[manager.Owner];
 
                 // Note that we're only checking for existence here
                 // We used OR here because the flags might have been already set to true prior to
                 // calling this system
-                manager.VerticesChanged = manager.VerticesChanged || verticesChangedMap.TryGetValue(manager.Owner, out byte _);
-                manager.RenderOrderChanged = manager.RenderOrderChanged || trianglesChangedMap.TryGetValue(manager.Owner, out byte _);
-                manager.UvChanged = manager.UvChanged || uvChangedMap.TryGetValue(manager.Owner, out byte _);
-                manager.ColorsChanged = manager.ColorsChanged || colorChangedMap.TryGetValue(manager.Owner, out byte _);
+                manager.VerticesChanged = manager.VerticesChanged || verticesChangedMap[changedIndex];
+                manager.RenderOrderChanged = manager.RenderOrderChanged || trianglesChangedMap[changedIndex];
+                manager.UvChanged = manager.UvChanged || uvChangedMap[changedIndex];
+                manager.ColorsChanged = manager.ColorsChanged || colorChangedMap[changedIndex];
             }
 
             // Dispose
+            managerToIndexMap.Dispose();
             verticesChangedMap.Dispose();
             trianglesChangedMap.Dispose();
             uvChangedMap.Dispose();
@@ -87,45 +92,39 @@ namespace CommonEcs {
         }
         
         [BurstCompile]
-        private struct Job : IJob {
+        private struct Job : IJobChunk {
             [ReadOnly]
             public ArchetypeChunkComponentType<Sprite> spriteType;
             
             [ReadOnly]
-            [DeallocateOnJobCompletion]
-            public NativeArray<ArchetypeChunk> chunks;
+            public NativeHashMap<Entity, int> managerToIndexMap;
 
-            public NativeHashMap<Entity, byte> verticesChangedMap;
-            public NativeHashMap<Entity, byte> trianglesChangedMap;
-            public NativeHashMap<Entity, byte> uvChangedMap;
-            public NativeHashMap<Entity, byte> colorChangedMap;
-            
-            public void Execute() {
-                for (int i = 0; i < this.chunks.Length; ++i) {
-                    ArchetypeChunk chunk = this.chunks[i];
-                    Process(ref chunk);
-                }
-            }
+            public NativeArray<bool> verticesChangedMap;
+            public NativeArray<bool> trianglesChangedMap;
+            public NativeArray<bool> uvChangedMap;
+            public NativeArray<bool> colorChangedMap;
 
-            private void Process(ref ArchetypeChunk chunk) {
+            public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {
                 NativeArray<Sprite> sprites = chunk.GetNativeArray(this.spriteType);
 
                 for (int i = 0; i < chunk.Count; ++i) {
                     Sprite sprite = sprites[i];
+                    int changedIndex = this.managerToIndexMap[sprite.spriteManagerEntity];
+                    
                     if (sprite.verticesChanged.Value) {
-                        this.verticesChangedMap.TryAdd(sprite.spriteManagerEntity, 0);
+                        this.verticesChangedMap[changedIndex] = true;
                     }
     
                     if (sprite.renderOrderChanged.Value) {
-                        this.trianglesChangedMap.TryAdd(sprite.spriteManagerEntity, 0);
+                        this.trianglesChangedMap[changedIndex] = true;
                     }
     
                     if (sprite.uvChanged.Value) {
-                        this.uvChangedMap.TryAdd(sprite.spriteManagerEntity, 0);
+                        this.uvChangedMap[changedIndex] = true;
                     }
     
                     if (sprite.colorChanged.Value) {
-                        this.colorChangedMap.TryAdd(sprite.spriteManagerEntity, 0);
+                        this.colorChangedMap[changedIndex] = true;
                     }
                 }
             }

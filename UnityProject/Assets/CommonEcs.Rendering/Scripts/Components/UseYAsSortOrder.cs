@@ -1,8 +1,8 @@
-﻿namespace CommonEcs {
-    using System;
+﻿using System;
 
-    using Unity.Entities;
-    
+using Unity.Entities;
+
+namespace CommonEcs {
     /// <summary>
     /// A component that identifies whether or not to use Y as the sort order
     /// </summary>

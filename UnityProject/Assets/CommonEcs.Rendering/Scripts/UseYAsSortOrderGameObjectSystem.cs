@@ -51,7 +51,7 @@ namespace CommonEcs {
             public void Execute(Entity entity, int index, ref Sprite sprite, [ReadOnly] ref UseYAsSortOrder sortOrder) {
                 float3 position = this.stashes[index].position;
                 
-                // We use negative of z here because the higher z should be ordered first
+                // We use negative of y here because the higher y should be ordered first
                 sprite.RenderOrder = -(position.y + sortOrder.offset);
             }
         }

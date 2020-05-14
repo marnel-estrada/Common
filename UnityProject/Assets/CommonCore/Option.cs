@@ -11,7 +11,7 @@ namespace Common {
     /// Match().
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public readonly struct Option<T> : IEquatable<Option<T>> where T : class {
+    public readonly struct Option<T> : IEquatable<Option<T>> {
         public static readonly Option<T> NONE = new Option<T>();
 
         /// <summary>
@@ -28,9 +28,21 @@ namespace Common {
 
         private Option(T value) {
             this.value = value;
-            Assertion.AssertNotNull(this.value); // Can't be null
-            
+
+            // Check only for null if it's nullable or reference type
+            if (IsNullable() || IsReferenceType()) {
+                Assertion.Assert(this.value != null); // Can't be null
+            }
+
             this.hasValue = true;
+        }
+        
+        private static bool IsNullable() {
+            return Nullable.GetUnderlyingType(typeof(T)) != null;
+        }
+
+        private static bool IsReferenceType() {
+            return !typeof(T).IsValueType;
         }
 
         public bool IsSome {
@@ -96,8 +108,8 @@ namespace Common {
             return this.hasValue ? matcher.OnSome(this.value) : matcher.OnNone();
         } 
 
-        public bool ReferenceEquals(T other) {
-            return this.value == other;
+        public bool Equals(T otherValue) {
+            return EqualityComparer<T>.Default.Equals(this.value, otherValue);
         }
 
         public bool Equals(Option<T> other) {

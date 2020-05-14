@@ -1,3 +1,5 @@
+using System;
+
 using UnityEditor;
 
 using UnityEngine;
@@ -72,8 +74,8 @@ namespace Common {
             }
             
             // Check that duplicate ID should not exist yet
-            Maybe<T> existingItem = pool.Find(this.duplicateId);
-            if (existingItem.HasValue) {
+            Option<T> existingItem = pool.Find(this.duplicateId);
+            if (existingItem.IsSome) {
                 // This means that there's an existing item with the same id
                 EditorUtility.DisplayDialog("Duplicate", $"An item with ID \"{this.duplicateId}\" already exists. Choose a new ID.", "OK");
                 return;

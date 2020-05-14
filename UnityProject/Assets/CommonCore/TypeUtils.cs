@@ -126,16 +126,35 @@ namespace Common {
         /// <param name="className"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T Instantiate<T>(ClassData data, NamedValueLibrary parentVariables) {
-            Type type = TypeIdentifier.GetType(data.ClassName);
-            Assertion.AssertNotNull(type, data.ClassName);
-            ConstructorInfo constructor = ResolveEmptyConstructor(type);
-            T instance = (T) constructor.Invoke(EMPTY_PARAMETERS);
-            
-            // Inject variables
-            NamedValueUtils.InjectNamedProperties(parentVariables, data.Variables, type, instance);
+        public static Option<T> Instantiate<T>(ClassData data, NamedValueLibrary parentVariables) where T : class {
+            Option<Type> type = TypeIdentifier.GetType(data.ClassName);
+            Assertion.AssertIsSome(type, data.ClassName);
 
-            return instance;
+            return type.Match<InstantiateMatcher<T>, Option<T>>(new InstantiateMatcher<T>(data, parentVariables));
+        }
+
+        private readonly struct InstantiateMatcher<T> : IFuncOptionMatcher<Type, Option<T>> where T : class {
+            private readonly ClassData data;
+            private readonly NamedValueLibrary parentVariables;
+
+            public InstantiateMatcher(ClassData data, NamedValueLibrary parentVariables) {
+                this.data = data;
+                this.parentVariables = parentVariables;
+            }
+            
+            public Option<T> OnSome(Type type) {
+                ConstructorInfo constructor = ResolveEmptyConstructor(type);
+                T instance = (T) constructor.Invoke(EMPTY_PARAMETERS);
+            
+                // Inject variables
+                NamedValueUtils.InjectNamedProperties(this.parentVariables, this.data.Variables, type, instance);
+                
+                return Option<T>.Some(instance);
+            }
+
+            public Option<T> OnNone() {
+                return Option<T>.NONE;
+            }
         }
     }
 }

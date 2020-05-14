@@ -81,24 +81,14 @@ namespace Common {
         }
 
         /// <summary>
-        /// Retrieves a value with the specified key
-        /// Returns null if not found. Client code should check for this
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public V GetWithKey(K key) {
-            Assertion.Assert(this.dictionary.TryGetValue(key, out V value));
-            return value;
-        }
-
-        /// <summary>
         /// Looks for the value with the specified key
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public V Find(K key) {
+        public Option<V> Find(K key) {
             // This may be null so client code should check for it
             return this.dictionary.Find(key);
+            
         }
 
         /// <summary>
@@ -107,6 +97,7 @@ namespace Common {
         /// <param name="index"></param>
         /// <returns></returns>
         public V GetAt(int index) {
+            // This throws error if index is out of bounds
             return this.valueList[index];
         }
 

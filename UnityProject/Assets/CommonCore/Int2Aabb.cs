@@ -1,35 +1,33 @@
-﻿using Common.Math;
-
-using Unity.Mathematics;
+﻿using Unity.Mathematics;
 
 namespace Common {
     /// <summary>
     /// An implementation of AABB but using integer coordinates
     /// </summary>
-    public class IntAabb2 {
-        private readonly IntVector2 min = new IntVector2();
-        private readonly IntVector2 max = new IntVector2();
+    public class Int2Aabb {
+        private int2 min = new int2();
+        private int2 max = new int2();
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public IntAabb2() {
+        public Int2Aabb() {
             Empty();
         }
 
-        public IntAabb2(int2 min, int2 max) {
+        public Int2Aabb(int2 min, int2 max) {
             Empty();
             AddToContain(min.x, min.y);
             AddToContain(max.x, max.y);
         }
 
-        public IntVector2 Min {
+        public int2 Min {
             get {
                 return min;
             }
         }
 
-        public IntVector2 Max {
+        public int2 Max {
             get {
                 return max;
             }
@@ -39,8 +37,8 @@ namespace Common {
         /// Empties the bounding box
         /// </summary>
         public void Empty() {
-            this.min.Set(int.MaxValue, int.MaxValue);
-            this.max.Set(int.MinValue, int.MinValue);
+            this.min = new int2(int.MaxValue, int.MaxValue);
+            this.max = new int2(int.MinValue, int.MinValue);
         }
 
         /// <summary>
@@ -52,17 +50,16 @@ namespace Common {
                 return (this.min.x > this.max.x) && (this.min.y > this.max.y);
             }
         }
-
-        private readonly IntVector2 center = new IntVector2();
         
         /// <summary>
         /// Resolves the center of the bounds
         /// </summary>
-        public IntVector2 Center {
+        public int2 Center {
             get {
-                this.center.x = (this.min.x + this.max.x) >> 1; // Divide 2
-                this.center.y = (this.min.y + this.max.y) >> 1; // Divide 2
-                return this.center;
+                int2 center;
+                center.x = (this.min.x + this.max.x) >> 1; // Divide 2
+                center.y = (this.min.y + this.max.y) >> 1; // Divide 2
+                return center;
             }
         }
         
@@ -106,7 +103,7 @@ namespace Common {
         /// Expands the bounds to contain the specified point
         /// </summary>
         /// <param name="point"></param>
-        public void AddToContain(IntVector2 point) {
+        public void AddToContain(int2 point) {
             AddToContain(point.x, point.y);
         }
 
@@ -126,35 +123,35 @@ namespace Common {
         /// </summary>
         /// <param name="point"></param>
         /// <returns></returns>
-        public bool Contains(IntVector2 point) {
+        public bool Contains(int2 point) {
             return Contains(point.x, point.y);
         }
 
-        public IntVector2 TopLeft {
+        public int2 TopLeft {
             get {
-                return new IntVector2(this.min.x, this.max.y);
+                return new int2(this.min.x, this.max.y);
             }
         }
 
-        public IntVector2 BottomLeft {
+        public int2 BottomLeft {
             get {
                 // Return a copy because IntVector2 is a class
                 // This prevents accidental changes
-                return new IntVector2(this.min);
+                return new int2(this.min);
             }
         }
 
-        public IntVector2 TopRight {
+        public int2 TopRight {
             get {
                 // Return a copy because IntVector2 is a class
                 // This prevents accidental changes
-                return new IntVector2(this.max);
+                return new int2(this.max);
             }
         }
 
-        public IntVector2 BottomRight {
+        public int2 BottomRight {
             get {
-                return new IntVector2(this.max.x, this.min.y);
+                return new int2(this.max.x, this.min.y);
             }
         }
 
@@ -238,10 +235,10 @@ namespace Common {
         /// Copies the specified box
         /// </summary>
         /// <param name="other"></param>
-        public void Copy(IntAabb2 other) {
+        public void Copy(Int2Aabb other) {
             if (other != null) {
-                this.min.Set(other.min);
-                this.max.Set(other.max);
+                this.min = other.min;
+                this.max = other.max;
             }
         }
 

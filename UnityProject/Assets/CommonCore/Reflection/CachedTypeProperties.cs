@@ -16,12 +16,14 @@ namespace Common {
         }
         
         public PropertyInfo[] GetProperties(Type type) {
-            PropertyInfo[] properties = this.map.Find(type);
-            if (properties == null) {
-                // Not yet in the map. We cache it.
-                properties = type.GetProperties(this.flags);
-                this.map[type] = properties;
+            if (this.map.TryGetValue(type, out PropertyInfo[] properties)) {
+                // Already exists
+                return properties;
             }
+            
+            // Not yet in the map. We cache it.
+            properties = type.GetProperties(this.flags);
+            this.map[type] = properties;
 
             return properties;
         }

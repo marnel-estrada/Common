@@ -96,8 +96,8 @@ namespace Common {
             
             if (propertyRenderer == null || string.IsNullOrEmpty(propertyRenderer.RendererType)) {
                 // No custom renderer
-                PropertyRenderer renderer = RENDERER_MAP.Find(property.PropertyType);
-                return renderer != null;
+                Option<PropertyRenderer> renderer = RENDERER_MAP.Find(property.PropertyType);
+                return renderer.IsSome;
             }
             
             // Has a custom renderer
@@ -142,40 +142,68 @@ namespace Common {
                 RenderReadOnly(property, instance);
             }
         }
+
+        private Action<EditorPropertyRenderer> customRenderMatcher;
         
         private void CustomRender(PropertyInfo property, object instance, Common.PropertyRenderer propRenderer) {
-            EditorPropertyRenderer renderer = ResolveRenderer(propRenderer.RendererType);
-            Assertion.AssertNotNull(renderer);
-            renderer.Render(property, instance);
+            Option<EditorPropertyRenderer> resolvedRenderer = ResolveRenderer(propRenderer.RendererType);
+            Assertion.AssertIsSome(resolvedRenderer);
+
+            if (this.customRenderMatcher == null) {
+                this.customRenderMatcher = delegate(EditorPropertyRenderer renderer) {
+                    renderer.Render(property, instance);
+                };
+            }
+
+            resolvedRenderer.Match(this.customRenderMatcher);
         }
 
-        private EditorPropertyRenderer ResolveRenderer(string textType) {
-            EditorPropertyRenderer renderer = this.customRenderers.Find(textType);
-            if (renderer != null) {
+        private readonly struct CreateEditorPropertyRendererMatcher : IFuncOptionMatcher<Type, Option<EditorPropertyRenderer>> {
+            private readonly string rendererTypeName;
+            private readonly Dictionary<string, EditorPropertyRenderer> customRenderers;
+
+            public CreateEditorPropertyRendererMatcher(string rendererTypeName, Dictionary<string, EditorPropertyRenderer> customRenderers) {
+                this.rendererTypeName = rendererTypeName;
+                this.customRenderers = customRenderers;
+            }
+
+            public Option<EditorPropertyRenderer> OnSome(Type rendererType) {
+                ConstructorInfo constructor = TypeUtils.ResolveEmptyConstructor(rendererType);
+                EditorPropertyRenderer renderer = (EditorPropertyRenderer) constructor.Invoke(TypeUtils.EMPTY_PARAMETERS);
+            
+                // Maintain
+                this.customRenderers[this.rendererTypeName] = renderer;
+
+                return Option<EditorPropertyRenderer>.Some(renderer);
+            }
+
+            public Option<EditorPropertyRenderer> OnNone() {
+                return Option<EditorPropertyRenderer>.NONE;
+            }
+        }
+
+        private Option<EditorPropertyRenderer> ResolveRenderer(string rendererTypeName) {
+            Option<EditorPropertyRenderer> renderer = this.customRenderers.Find(rendererTypeName);
+            if (renderer.IsSome) {
                 // Already exists
                 return renderer;
             }
             
             // At this point, renderer does not exist yet
             // Let's make one
-            Type rendererType = TypeIdentifier.GetType(textType);
-            Assertion.AssertNotNull(rendererType, textType);
-            ConstructorInfo constructor = TypeUtils.ResolveEmptyConstructor(rendererType);
-            renderer = (EditorPropertyRenderer) constructor.Invoke(TypeUtils.EMPTY_PARAMETERS);
-            
-            // Maintain
-            this.customRenderers[textType] = renderer;
+            Option<Type> foundType = TypeIdentifier.GetType(rendererTypeName);
+            Assertion.AssertIsSome(foundType, rendererTypeName);
 
-            return renderer;
+            return foundType.Match<CreateEditorPropertyRendererMatcher, Option<EditorPropertyRenderer>>(
+                new CreateEditorPropertyRendererMatcher(rendererTypeName, this.customRenderers));
         }
 
         private static int AscendingNameComparison(PropertyInfo a, PropertyInfo b) {
-            return String.Compare(a.Name, b.Name, StringComparison.Ordinal);
+            return string.Compare(a.Name, b.Name, StringComparison.Ordinal);
         }
 
         private List<PropertyInfo> ResolveGroupedList(string groupName) {
-            List<PropertyInfo> list = this.groupMap.Find(groupName);
-            if(list != null) {
+            if (this.groupMap.TryGetValue(groupName, out List<PropertyInfo> list)) {
                 // Already exists
                 return list;
             }

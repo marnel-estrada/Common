@@ -1,5 +1,5 @@
 namespace Common {
-    public interface IFuncOptionMatcher<in TWrappedType, out TReturnType> where TWrappedType : class {
+    public interface IFuncOptionMatcher<in TWrappedType, out TReturnType> {
         /// <summary>
         /// Handling when there's a value
         /// </summary>

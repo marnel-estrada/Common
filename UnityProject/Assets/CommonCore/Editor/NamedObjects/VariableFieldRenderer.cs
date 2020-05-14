@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-using Common.Math;
+using Unity.Mathematics;
 
 using UnityEditor;
 
@@ -61,8 +61,8 @@ namespace Common {
                 return value;
             });
 
-            AddFieldRenderer(NamedValueType.INT_VECTOR2, delegate(ValueHolder holder) {
-                IntVector2 value = (IntVector2) holder.Get();
+            AddFieldRenderer(NamedValueType.INT2, delegate(ValueHolder holder) {
+                int2 value = (int2) holder.Get();
 
                 EditorGUILayout.BeginHorizontal(GUILayout.Width(110));
 

@@ -1,8 +1,6 @@
-﻿using Common.Math;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
+
+using Unity.Mathematics;
 
 using UnityEngine;
 
@@ -12,13 +10,12 @@ namespace Common {
     /// This is an immutable class
     /// </summary>
     public class NamedValueType {
-
         public static readonly NamedValueType STRING = new NamedValueType(typeof(NamedString), typeof(string), "NamedString", "String");
         public static readonly NamedValueType INT = new NamedValueType(typeof(NamedInt), typeof(int), "NamedInt", "int");
         public static readonly NamedValueType FLOAT = new NamedValueType(typeof(NamedFloat), typeof(float), "NamedFloat", "float");
         public static readonly NamedValueType BOOL = new NamedValueType(typeof(NamedBool), typeof(bool), "NamedBool", "bool");
         public static readonly NamedValueType VECTOR3 = new NamedValueType(typeof(NamedVector3), typeof(Vector3), "NamedVector3", "Vector3");
-        public static readonly NamedValueType INT_VECTOR2 = new NamedValueType(typeof(NamedIntVector2), typeof(IntVector2), "NamedIntVector2", "IntVector2");
+        public static readonly NamedValueType INT2 = new NamedValueType(typeof(NamedInt2), typeof(int2), "NamedInt2", "int2");
 
         public static readonly NamedValueType[] ALL_TYPES = new NamedValueType[] {
             STRING,
@@ -26,7 +23,7 @@ namespace Common {
             FLOAT,
             VECTOR3,
             BOOL,
-            INT_VECTOR2
+            INT2
         };
 
         public static readonly int SupportedTypesCount = ALL_TYPES.Length;

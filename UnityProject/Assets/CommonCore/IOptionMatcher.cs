@@ -1,5 +1,5 @@
 namespace Common {
-    public interface IOptionMatcher<in T> where T : class {
+    public interface IOptionMatcher<in T> {
         /// <summary>
         /// Handling when there's a value
         /// </summary>

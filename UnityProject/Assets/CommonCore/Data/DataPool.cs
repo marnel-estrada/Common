@@ -53,15 +53,9 @@ namespace Common {
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Maybe<T> Find(string id) {
+        public Option<T> Find(string id) {
             PopulateMap(); // We populate first because this may be invoked before Awake() (like in editor)
-            T found = this.map.Find(id);
-            return found == null ? Maybe<T>.Nothing : new Maybe<T>(found);
-        }
-
-        public Option<T> FindAsOption(string id) {
-            PopulateMap(); // We populate first because this may be invoked before Awake() (like in editor)
-            return this.map.FindAsOption(id);
+            return this.map.Find(id);
         }
 
         /// <summary>

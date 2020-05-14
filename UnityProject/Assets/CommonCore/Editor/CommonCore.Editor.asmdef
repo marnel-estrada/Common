@@ -1,7 +1,8 @@
 {
     "name": "CommonCore.Editor",
     "references": [
-        "CommonCore"
+        "CommonCore",
+        "Unity.Mathematics"
     ],
     "includePlatforms": [
         "Editor"
@@ -12,5 +13,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }

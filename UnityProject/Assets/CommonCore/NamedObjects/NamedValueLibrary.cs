@@ -9,7 +9,6 @@ namespace Common {
     /// </summary>
     [Serializable]
     public class NamedValueLibrary {
-
         [SerializeField]
         private NamedStringMap stringMap = new NamedStringMap();
 
@@ -57,7 +56,7 @@ namespace Common {
                 return this.vector3Map;
             }));
 
-            AddContainerMapping(NamedValueType.INT_VECTOR2, new NamedMapContainerWrapper<NamedIntVector2>(delegate() {
+            AddContainerMapping(NamedValueType.INT2, new NamedMapContainerWrapper<NamedInt2>(delegate() {
                 return this.intVector2Map;
             }));
         }
@@ -137,12 +136,25 @@ namespace Common {
         /// <param name="type"></param>
         /// <returns></returns>
         public bool Contains(string name, NamedValueType type) {
-            NamedValueContainer container = this.containerMap.Find(type);
-            if(container == null) {
-                return false;
+            Option<NamedValueContainer> container = this.containerMap.Find(type);
+            return container.Match<ContainsMatcher, bool>(new ContainsMatcher(name));
+        }
+        
+        private readonly struct ContainsMatcher : IFuncOptionMatcher<NamedValueContainer, bool> {
+            private readonly string name;
+
+            public ContainsMatcher(string name) {
+                this.name = name;
             }
 
-            return container.Contains(name);
+            public bool OnSome(NamedValueContainer container) {
+                return container.Contains(this.name);
+            }
+
+            public bool OnNone() {
+                // No container
+                return false;
+            }
         }
 
         /// <summary>
@@ -207,6 +219,5 @@ namespace Common {
         public NamedValueContainer GetContainer(NamedValueType type) {
             return this.containerMap[type];
         }
-
     }
 }

@@ -28,7 +28,9 @@ namespace Common {
 
         private Option(T value) {
             this.value = value;
-            Assertion.AssertNotNull(this.value); // Can't be null
+            if (this.value == null) {
+                throw new Exception("Value can't be null");
+            }
             
             this.hasValue = true;
         }

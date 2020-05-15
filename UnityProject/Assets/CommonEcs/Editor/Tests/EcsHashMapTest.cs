@@ -162,7 +162,7 @@ namespace CommonEcs {
             private ArchetypeChunkComponentType<EcsHashMap<int, int>> mapType;
             private ArchetypeChunkBufferType<EntityBufferElement> bucketsType;
 
-            protected override void OnCreateManager() {
+            protected override void OnCreate() {
                 this.query = GetEntityQuery(typeof(EcsHashMap<int, int>), typeof(EntityBufferElement));
             }
 
@@ -213,7 +213,7 @@ namespace CommonEcs {
 
             private ComponentDataFromEntity<EcsHashMap<int, int>> allHashMaps;
 
-            protected override void OnCreateManager() {
+            protected override void OnCreate() {
                 this.query = GetEntityQuery(typeof(EcsHashMap<int, int>));
             }
 

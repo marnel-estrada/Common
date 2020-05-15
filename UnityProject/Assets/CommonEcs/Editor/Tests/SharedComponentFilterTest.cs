@@ -27,7 +27,7 @@ namespace CommonEcs.Test {
             private ArchetypeChunkComponentType<TestComponent> testComponentType;
             private ArchetypeChunkSharedComponentType<TestSharedComponent> sharedComponentType;
 
-            protected override void OnCreateManager() {
+            protected override void OnCreate() {
                 this.query = GetEntityQuery(typeof(TestSharedComponent), typeof(TestComponent));
                 this.sharedComponentQuery = new SharedComponentQuery<TestSharedComponent>(this, this.EntityManager);
             }
@@ -40,7 +40,7 @@ namespace CommonEcs.Test {
 
                 IReadOnlyList<TestSharedComponent> sharedComponents = this.sharedComponentQuery.SharedComponents;
                 for (int i = 1; i < sharedComponents.Count; ++i) {
-                    this.query.SetFilter(sharedComponents[i]);
+                    this.query.SetSharedComponentFilter(sharedComponents[i]);
                     Process(this.query.CreateArchetypeChunkArray(Allocator.TempJob));
                 }
             }

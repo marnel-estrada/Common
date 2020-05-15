@@ -51,7 +51,7 @@ namespace Common {
             }
 
             // The type just couldn't be found...
-            return null;
+            throw new Exception($"Type can't be found for \"{typeName}\".");
         }
 
         /**
@@ -105,8 +105,7 @@ namespace Common {
                 }
             }
 
-            Assertion.Assert(false, "Can't resolve appropriate constructor");
-            return null;
+            throw new Exception("Can't resolve appropriate constructor");
         }
 
         /// <summary>

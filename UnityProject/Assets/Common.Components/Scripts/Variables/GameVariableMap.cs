@@ -1,12 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using UnityEngine;
-
-using Common;
 
 namespace Common {
     /// <summary>
@@ -15,7 +8,6 @@ namespace Common {
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class GameVariableMap<T> {
-
         private readonly Func<string, GameVariable<T>> instanceCreator;
 
         private readonly Dictionary<string, GameVariable<T>> map = new Dictionary<string, GameVariable<T>>();
@@ -34,8 +26,7 @@ namespace Common {
         /// <param name="key"></param>
         /// <returns></returns>
         public T GetValue(string key) {
-            GameVariable<T> variable = this.map.Find(key);
-            if(variable != null) {
+            if(this.map.TryGetValue(key, out GameVariable<T> variable)) {
                 // Already instantiated before
                 return variable.Value;
             }
@@ -47,6 +38,5 @@ namespace Common {
 
             return variable.Value;
         }
-
     }
 }

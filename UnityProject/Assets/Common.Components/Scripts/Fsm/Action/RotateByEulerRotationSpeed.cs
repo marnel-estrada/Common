@@ -9,7 +9,7 @@ namespace Common.Fsm.Action {
         private readonly TimeReference timeReference;
         
         public RotateByEulerRotationSpeed(FsmState owner, string timeReferenceName) : base(owner) {
-            this.timeReference = TimeReferencePool.GetInstance().Get(timeReferenceName).Value;
+            this.timeReference = TimeReferencePool.GetInstance().Get(timeReferenceName);
         }
 
         public void Init(Transform transform, Vector3 eulerRotationVelocity) {

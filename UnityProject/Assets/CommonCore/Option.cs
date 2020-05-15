@@ -28,15 +28,20 @@ namespace Common {
 
         private Option(T value) {
             this.value = value;
-
-            // Check only for null if it's nullable or reference type
-            if (IsNullable() || IsReferenceType()) {
-                Assertion.Assert(this.value != null); // Can't be null
-            }
+            CheckForNull(this.value);
 
             this.hasValue = true;
         }
-        
+
+        private static void CheckForNull(T value) {
+            // Check only for null if it's nullable or reference type
+            if (IsNullable() || IsReferenceType()) {
+                if (value == null) {
+                    throw new Exception("Can't use null.");
+                }
+            }
+        }
+
         private static bool IsNullable() {
             return Nullable.GetUnderlyingType(typeof(T)) != null;
         }
@@ -132,6 +137,18 @@ namespace Common {
 
         public static bool operator !=(Option<T> left, Option<T> right) {
             return !left.Equals(right);
+        }
+
+        /// <summary>
+        /// Returns the value if Option is Some
+        /// Otherwise, it returns the specified value
+        /// The specified value can't be null
+        /// </summary>
+        /// <param name="otherValue"></param>
+        /// <returns></returns>
+        public T ValueOr(T otherValue) {
+            CheckForNull(otherValue);
+            return this.hasValue ? this.value : otherValue;
         }
     }
 }

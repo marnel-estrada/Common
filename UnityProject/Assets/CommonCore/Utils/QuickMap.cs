@@ -54,7 +54,6 @@
         /// <param name="key"></param>
         /// <returns></returns>
         public T Get(int key) {
-            // Mey return null so client code should check for this
             return this.items[key];
         }
 

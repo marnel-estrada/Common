@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -7,8 +8,8 @@ namespace Common.Xml {
 
         private const string YES = "yes";
         private const string TRUE = "true";
-        public Dictionary<string, string> Attributes;
-        public List<SimpleXmlNode> Children;
+        private readonly Dictionary<string, string> attributes;
+        private readonly List<SimpleXmlNode> children;
         public SimpleXmlNode ParentNode;
 
         public string TagName;
@@ -16,8 +17,8 @@ namespace Common.Xml {
         public SimpleXmlNode() {
             this.TagName = "NONE";
             this.ParentNode = null;
-            this.Children = new List<SimpleXmlNode>();
-            this.Attributes = new Dictionary<string, string>();
+            this.children = new List<SimpleXmlNode>();
+            this.attributes = new Dictionary<string, string>();
         }
 
         public string InnerText { get; set; }
@@ -29,38 +30,38 @@ namespace Common.Xml {
             return FindFirstNodeInChildren(this, tagName);
         }
 
-        private SimpleXmlNode FindFirstNodeInChildren(SimpleXmlNode node, string tagName) {
-            for (int i = 0; i < node.Children.Count; ++i) {
-                if (node.Children[i].TagName.EqualsFast(tagName)) {
-                    return node.Children[i];
+        private static SimpleXmlNode FindFirstNodeInChildren(SimpleXmlNode node, string tagName) {
+            for (int i = 0; i < node.children.Count; ++i) {
+                if (node.children[i].TagName.EqualsFast(tagName)) {
+                    return node.children[i];
                 }
             }
 
             // not found
             // try to look for it in children
-            for (int i = 0; i < node.Children.Count; ++i) {
-                SimpleXmlNode found = FindFirstNodeInChildren(node.Children[i], tagName);
+            for (int i = 0; i < node.children.Count; ++i) {
+                SimpleXmlNode found = FindFirstNodeInChildren(node.children[i], tagName);
                 if (found != null) {
                     return found;
                 }
             }
 
             // not found
-            return null;
+            throw new Exception($"Can't find any node named \"{tagName}\".");
         }
 
         /**
          * Returns whether or not the node contains the specified attribute.
          */
         public bool HasAttribute(string attributeKey) {
-            return this.Attributes.ContainsKey(attributeKey);
+            return this.attributes.ContainsKey(attributeKey);
         }
 
         /**
          * Returns the attribute value with the specified key.
          */
         public string GetAttribute(string attributeKey) {
-            return this.Attributes[attributeKey].Trim();
+            return this.attributes[attributeKey].Trim();
         }
 
         /**
@@ -107,16 +108,26 @@ namespace Common.Xml {
          * Returns whether or not the node contains the specified attribute.
          */
         public bool ContainsAttribute(string attributeKey) {
-            return this.Attributes.ContainsKey(attributeKey);
+            return this.attributes.ContainsKey(attributeKey);
         }
 
-        /**
-         * Traverses the children nodes of this node.
-         */
-        public void TraverseChildren(NodeProcessor visitor) {
-            int count = this.Children.Count;
-            for (int i = 0; i < count; ++i) {
-                visitor(this.Children[i]);
+        public void AddChild(SimpleXmlNode child) {
+            this.children.Add(child);
+        }
+
+        public void AddAttribute(string name, string value) {
+            this.attributes[name] = value;
+        }
+        
+        public IReadOnlyList<SimpleXmlNode> Children {
+            get {
+                return this.children;
+            }
+        }
+
+        public IReadOnlyDictionary<string, string> Attributes {
+            get {
+                return this.attributes;
             }
         }
     }

@@ -28,7 +28,7 @@ namespace Common.Fsm {
 			this.transitionMap[eventId] = destinationState;
 		}
 
-		public FsmState GetTransition(string eventId) {
+		public Option<FsmState> GetTransition(string eventId) {
 			return this.transitionMap.Find(eventId);
 		}
 

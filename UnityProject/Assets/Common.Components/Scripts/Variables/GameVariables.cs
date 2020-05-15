@@ -64,14 +64,15 @@ namespace Common {
             SimpleXmlReader reader = new SimpleXmlReader();
             SimpleXmlNode root = reader.Read(xmlText).FindFirstNodeInChildren("GameVariables");
 
-            string overrideToUse = root.GetAttribute("useOverride");
+            string xmlOverride = root.GetAttribute("useOverride");
+
+            Option<string> resolvedOverride = ResolveOverride();
 
             // Resolved override has higher precedence
-            string resolvedOverride = ResolveOverride();
-            if (!string.IsNullOrEmpty(resolvedOverride)) {
-                overrideToUse = resolvedOverride;
-            }
+            ParseOverride(root, resolvedOverride.ValueOr(xmlOverride));
+        }
 
+        private void ParseOverride(SimpleXmlNode root, string overrideToUse) {
             SimpleXmlNode overrideNode = null;
 
             for (int i = 0; i < root.Children.Count; ++i) {
@@ -99,12 +100,12 @@ namespace Common {
             }
         }
 
-        private string ResolveOverride() {
+        private Option<string> ResolveOverride() {
             if(this.overrideResolver != null) {
-                return this.overrideResolver.ResolveOverride();
+                return Option<string>.Some(this.overrideResolver.ResolveOverride());
             }
 
-            return null;
+            return Option<string>.NONE;
         }
 
         private void ParseOverride(SimpleXmlNode node) {

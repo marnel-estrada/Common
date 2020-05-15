@@ -1,4 +1,5 @@
 using UnityEngine;
+
 using System.IO;
 
 namespace Common {
@@ -18,6 +19,7 @@ namespace Common {
          */
         public static bool RandomBoolean() {
             int random = UnityEngine.Random.Range(0, 2); // zero or one
+
             return random > 0; // returns true if one
         }
 
@@ -85,31 +87,30 @@ namespace Common {
             return aValue;
         }
 
-        /**
-      * Looks for a certain component in the specified object.
-      * (We use trasform for the hierarchy.)
-      */
-        public static TComponentType FindComponentThroughParent<TComponentType>(Transform transform)
-            where TComponentType : Component {
-            TComponentType component = transform.GetComponent<TComponentType>();
-            if (component == null) {
-                // component was not found, we search up through its parents
-                if (transform.parent == null) {
-                    // no more parent, so there's no more path to search with
-                    return null;
+        /// <summary>
+        /// Looks for a certain component in the specified object.
+        /// (We use transform for the hierarchy.)
+        /// </summary>
+        /// <param name="transform"></param>
+        /// <typeparam name="TComponentType"></typeparam>
+        /// <returns></returns>
+        public static Option<TComponentType> FindComponentThroughParent<TComponentType>(Transform transform) where TComponentType : Component {
+            while (true) {
+                TComponentType component = transform.GetComponent<TComponentType>();
+                if (component == null) {
+                    // component was not found, we search up through its parents
+                    if (transform.parent == null) {
+                        // no more parent, so there's no more path to search with
+                        return Option<TComponentType>.NONE;
+                    }
+
+                    transform = transform.parent;
+
+                    continue;
                 }
 
-                return FindComponentThroughParent<TComponentType>(transform.parent);
+                return Option<TComponentType>.Some(component);
             }
-
-            return component;
-        }
-
-        /**
-      * Returns whether or not the specified string is empty.
-      */
-        public static bool IsEmpty(string str) {
-            return str == null || str.Length == 0;
         }
 
         /**
@@ -133,6 +134,7 @@ namespace Common {
                     if (name.Equals(currentParent.gameObject.name)) {
                         return true;
                     }
+
                     currentParent = currentParent.parent;
                 }
             } while (currentParent != null);
@@ -145,27 +147,27 @@ namespace Common {
       * Searches for the transform with the specified name in the specified transform heirarchy.
       * This only searches down the heirarchy.
       */
-        public static Transform FindTransformByName(Transform transformRoot, string name) {
+        public static Option<Transform> FindTransformByName(Transform transformRoot, string name) {
             if (name == transformRoot.name) {
-                return transformRoot;
+                return Option<Transform>.Some(transformRoot);
             }
 
             // search in children
-            Transform searchResult = null;
             foreach (Transform childTransform in transformRoot) {
-                searchResult = FindTransformByName(childTransform, name);
-                if (searchResult != null) {
+                Option<Transform> searchResult = FindTransformByName(childTransform, name);
+                if (searchResult.IsSome) {
                     return searchResult;
                 }
             }
 
-            return null;
+            return Option<Transform>.NONE;
         }
 
         /**
          * Looks for the object with the specified name and retrieves the specified component.
          */
-        public static TComponentType GetRequiredComponent<TComponentType>(string objectName) where TComponentType : Component {
+        public static TComponentType GetRequiredComponent<TComponentType>(string objectName)
+            where TComponentType : Component {
             GameObject gameObject = GameObject.Find(objectName);
             Assertion.AssertNotNull(gameObject);
 
@@ -176,22 +178,11 @@ namespace Common {
         }
 
         /**
-         * Looks for the object with the specified name and retrieves the specified component. This may return null if the component is not found so client code must check for it.
-         */
-        public static TComponentType GetComponent<TComponentType>(string objectName) where TComponentType : Component {
-            GameObject gameObject = GameObject.Find(objectName);
-            if (gameObject == null) {
-                return null;
-            }
-
-            return gameObject.GetComponent<TComponentType>();
-        }
-
-        /**
          * Computes the travel time based on the distance of two vectors and the specified velocity.
          */
         public static float ComputeTravelTime(Vector3 start, Vector3 destination, float velocity) {
             float distance = (destination - start).magnitude;
+
             return distance / velocity;
         }
 
@@ -199,9 +190,8 @@ namespace Common {
          * Returns whether or not the two vectors are approximately equal.
          */
         public static bool TolerantEquals(Vector3 a, Vector3 b) {
-            return Comparison.TolerantEquals(a.x, b.x)
-          && Comparison.TolerantEquals(a.y, b.y)
-          && Comparison.TolerantEquals(a.z, b.z);
+            return Comparison.TolerantEquals(a.x, b.x) && Comparison.TolerantEquals(a.y, b.y) &&
+                Comparison.TolerantEquals(a.z, b.z);
         }
 
         /**
@@ -299,7 +289,7 @@ namespace Common {
             }
 
             // Recurse to children (active only)
-            foreach(Transform child in root) {
+            foreach (Transform child in root) {
                 if (child.gameObject.activeSelf) {
                     SetSortingOrderInHierarchy(child, order);
                 }

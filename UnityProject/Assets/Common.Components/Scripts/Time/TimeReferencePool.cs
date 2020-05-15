@@ -6,7 +6,6 @@ namespace Common.Time {
 	 * Class that manages multiple TimeReference instances.
 	 */
 	public class TimeReferencePool {
-		
 		private readonly Dictionary<string, TimeReference> instanceMap;
 		
 		private TimeReferencePool() {
@@ -39,18 +38,12 @@ namespace Common.Time {
 		/**
 		 * Retrieves the TimeReference instance for this specified name.
 		 */
-		public Maybe<TimeReference> Get(string name) {
-			if(string.IsNullOrEmpty(name)) {
-				return new Maybe<TimeReference>(TimeReference.GetDefaultInstance());
-			}
-
-			// May return null if the time reference was not added yet
-			TimeReference foundReference = this.instanceMap.Find(name);
-			if (foundReference == null) {
-				return Maybe<TimeReference>.Nothing;
+		public TimeReference Get(string name) {
+			if (this.instanceMap.TryGetValue(name, out TimeReference timeReference)) {
+				return timeReference;
 			}
 			
-			return new Maybe<TimeReference>(foundReference);
+			throw new Exception($"Can't find TimeReference named \"name\"");
 		}
 		
 		/**

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Common {
+﻿namespace Common {
     /// <summary>
     /// A utility class that caches a bool game variable
     /// </summary>

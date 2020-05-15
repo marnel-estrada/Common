@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 using UnityEngine;
-using UnityEngine.UI;
-
-using Common.Utils;
 
 namespace Common {
     /// <summary>
@@ -14,7 +9,6 @@ namespace Common {
     /// Also handles the expansion of the height of the rect whenever a row is added or removed
     /// </summary>
     public class GridContainer : MonoBehaviour {
-
         [SerializeField]
         private PrefabManager gridRowPool;
 
@@ -29,10 +23,10 @@ namespace Common {
 
         private RectTransform selfRect;
 
-        private List<GridRow> allRows = new List<GridRow>(); // maintenance
-        private List<GridRow> visibleList = new List<GridRow>();
+        private readonly List<GridRow> allRows = new List<GridRow>(); // maintenance
+        private readonly List<GridRow> visibleList = new List<GridRow>();
 
-        void Awake() {
+        private void Awake() {
             Assertion.AssertNotNull(this.gridRowPool);
             Assertion.AssertNotEmpty(this.gridRowPrefabName);
 
@@ -119,7 +113,24 @@ namespace Common {
         /// </summary>
         /// <param name="rowId"></param>
         public void RemoveRow(string rowId) {
-            RemoveRow(GetRow(rowId));
+            Option<GridRow> gridRow = GetRow(rowId);
+            gridRow.Match(new RemoveRowMatcher(this));
+        }
+
+        private struct RemoveRowMatcher : IOptionMatcher<GridRow> {
+            private readonly GridContainer gridContainer;
+
+            public RemoveRowMatcher(GridContainer gridContainer) {
+                this.gridContainer = gridContainer;
+            }
+            
+            public void OnSome(GridRow gridRow) {
+                this.gridContainer.RemoveRow(gridRow);
+            }
+
+            public void OnNone() {
+                // Does nothing
+            }
         }
 
         /// <summary>
@@ -147,17 +158,16 @@ namespace Common {
         /// </summary>
         /// <param name="rowId"></param>
         /// <returns></returns>
-        public GridRow GetRow(string rowId) {
+        public Option<GridRow> GetRow(string rowId) {
             for(int i = 0; i < this.allRows.Count; ++i) {
                 GridRow row = this.allRows[i];
-                if(row.RowId.Equals(rowId)) {
-                    return row;
+                if(row.RowId.EqualsFast(rowId)) {
+                    return Option<GridRow>.Some(row);
                 }
             }
 
-            // can't find a row with the specified rowId
-            // client code should check for this
-            return null;
+            // Can't find a row with the specified rowId
+            return Option<GridRow>.NONE;
         }
 
         private Comparison<GridRow> sortComparison;

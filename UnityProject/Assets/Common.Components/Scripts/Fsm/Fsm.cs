@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using Common.Utils;
 using UnityEngine;
 
 namespace Common.Fsm {
 	public class Fsm {
-		
 		private readonly string name;
 		
 		private FsmState currentState;
@@ -81,9 +79,12 @@ namespace Common.Fsm {
 		public void Start(string stateName) {
             this.delayedTransitionState = null; // Reset so there's no unexpected transitions
 
-            FsmState state = this.stateMap.Find(stateName);
-            Assertion.AssertNotNull(state);
-			ChangeToState(state);
+            if (this.stateMap.TryGetValue(stateName, out FsmState state)) {
+				ChangeToState(state);
+            } else {
+	            throw new Exception($"Can't find state named \"{stateName}\".");
+            }
+            
 		}
 
         /// <summary>
@@ -196,22 +197,35 @@ namespace Common.Fsm {
                 return;
 			}
 
-			FsmState transitionState = this.currentState.GetTransition(eventId);
-			if(transitionState == null) {
-#if UNITY_EDITOR
-                // log only in Unity Editor since it lags the game even if done in build
-				Debug.Log($"The current state {this.currentState.GetName()} has no transtion for event {eventId}.");
-#endif
-            } else {
-                if (this.delayTransitionToNextFrame) {
-                    // Do transition to next frame
-                    this.delayedTransitionState = transitionState;
-                } else {
-                    // No delay. Change transition right away.
-                    ChangeToState(transitionState);
-                }
-			}
+			Option<FsmState> transitionState = this.currentState.GetTransition(eventId);
+			transitionState.Match(new ChangeStateMatcher(this, eventId));
 		}
 
+		private struct ChangeStateMatcher : IOptionMatcher<FsmState> {
+			private readonly Fsm fsm;
+			private readonly string eventId;
+
+			public ChangeStateMatcher(Fsm fsm, string eventId) {
+				this.fsm = fsm;
+				this.eventId = eventId;
+			}
+			
+			public void OnSome(FsmState state) {
+				if (this.fsm.delayTransitionToNextFrame) {
+					// Do transition to next frame
+					this.fsm.delayedTransitionState = state;
+				} else {
+					// No delay. Change transition right away.
+					this.fsm.ChangeToState(state);
+				}
+			}
+
+			public void OnNone() {
+#if UNITY_EDITOR
+				// log only in Unity Editor since it lags the game even if done in build
+				Debug.Log($"The current state {this.fsm.currentState.GetName()} has no transition for event {this.eventId}.");
+#endif
+			}
+		}
 	}
 }

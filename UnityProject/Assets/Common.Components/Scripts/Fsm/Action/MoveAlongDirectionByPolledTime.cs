@@ -32,7 +32,7 @@ namespace Common.Fsm.Action {
 		 * Constructor
 		 */
 		public MoveAlongDirectionByPolledTime(FsmState owner, string timeReferenceName) : base(owner) {
-			this.timeReference = TimeReferencePool.GetInstance().Get(timeReferenceName).Value;
+			this.timeReference = TimeReferencePool.GetInstance().Get(timeReferenceName);
 		}
 		
 		/**

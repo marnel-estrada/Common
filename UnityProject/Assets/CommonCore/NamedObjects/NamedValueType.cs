@@ -26,8 +26,6 @@ namespace Common {
             INT2
         };
 
-        public static readonly int SupportedTypesCount = ALL_TYPES.Length;
-
         /**
 		 * Converts the specified value Type to an equivalent VariableType.
 		 */
@@ -38,8 +36,7 @@ namespace Common {
                 }
             }
 
-            Assertion.Assert(false, "Can't resolve the specified value Type: " + type.Name);
-            return null;
+            throw new Exception("Can't resolve the specified value Type: " + type.Name);
         }
 
         /**
@@ -52,8 +49,7 @@ namespace Common {
                 }
             }
 
-            Assertion.Assert(false, "Can't resolve the specified property Type: " + type.Name);
-            return null;
+            throw new Exception("Can't resolve the specified property Type: " + type.Name);
         }
 
         /**

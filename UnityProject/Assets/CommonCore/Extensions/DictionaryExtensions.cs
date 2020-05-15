@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Common {
     /// <summary>
@@ -15,6 +16,14 @@ namespace Common {
         /// <returns></returns>
         public static Option<V> Find<K, V>(this Dictionary<K, V> dictionary, K key) {
             return dictionary.TryGetValue(key, out V value) ? Option<V>.Some(value) : Option<V>.NONE;
+        }
+
+        public static V FindMustExist<K, V>(this Dictionary<K, V> dictionary, K key) {
+            if (dictionary.TryGetValue(key, out V value)) {
+                return value;
+            }
+
+            throw new Exception($"Can't find entry for key \"{key}\".");
         }
     }
 }

@@ -75,7 +75,9 @@ namespace CommonEcs {
         /// <returns></returns>
         public Sprite Pull() {
             // Can only pull if sprite was indeed created
-            Assertion.Assert(this.Exists);
+            if (!this.Exists) {
+                return default;
+            }
             return this.entityManager.GetComponentData<Sprite>(this.spriteEntity);
         }
 
@@ -85,7 +87,9 @@ namespace CommonEcs {
         /// <param name="sprite"></param>
         public void Push(ref Sprite sprite) {
             // Can only push if sprite was indeed created
-            Assertion.Assert(this.Exists);
+            if (!this.Exists) {
+                return;
+            }
             this.entityManager.SetComponentData(this.spriteEntity, sprite);
         }
 

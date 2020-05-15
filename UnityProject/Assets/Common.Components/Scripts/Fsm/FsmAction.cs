@@ -1,11 +1,8 @@
-using System;
-
 namespace Common.Fsm {
 	/**
 	 * Base class for FSM actions
 	 */
 	public abstract class FsmAction {
-		
 		private readonly FsmState owner;
 		
 		/**
@@ -16,7 +13,7 @@ namespace Common.Fsm {
 		}
         
 		public FsmState GetOwner() {
-			return owner;
+			return this.owner;
 		}
 
 		public virtual void OnEnter() {
@@ -30,6 +27,5 @@ namespace Common.Fsm {
 		public virtual void OnExit() {
 			// may or may not be implemented by deriving class
 		}
-
 	}
 }

@@ -1,9 +1,7 @@
 using System.Collections.Generic;
-using Common.Utils;
 
 namespace Common.Fsm {
 	public class FsmState {
-		
 		private readonly string name;
 		private readonly Fsm owner;
 		
@@ -47,7 +45,6 @@ namespace Common.Fsm {
         public void SendEvent(string eventId) {
 			this.owner.SendEvent(eventId);
 		}
-
 	}
 }
 

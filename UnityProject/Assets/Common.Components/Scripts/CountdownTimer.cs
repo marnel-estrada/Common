@@ -118,7 +118,7 @@ namespace Common {
             int minutes = (int) (timeRemaining / 60.0f);
             int seconds = ((int) timeRemaining) % 60;
 
-            return string.Format("{0}:{1:d2}", minutes, seconds);
+            return $"{minutes}:{seconds:d2}";
         }
 
         public TimeReference TimeReference {

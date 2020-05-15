@@ -1,10 +1,7 @@
-﻿using System;
-
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Common {
     public sealed class UrlOpener : MonoBehaviour {
-
         [SerializeField]
         private string url; // May or may not be specified
 
@@ -17,6 +14,5 @@ namespace Common {
                 Application.OpenURL(this.url);
             }
         }
-
     }
 }

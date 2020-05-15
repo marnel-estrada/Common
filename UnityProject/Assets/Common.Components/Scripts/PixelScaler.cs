@@ -7,7 +7,6 @@ using UnityEngine;
 
 namespace Common {
     public class PixelScaler : MonoBehaviour {
-
         [Tooltip("Pixel width")]
         [SerializeField]
         private int width = 100;
@@ -22,6 +21,8 @@ namespace Common {
         [SerializeField]
         private float orthographicSize = 1.0f;
 
+        private Transform selfTransform;
+
         /// <summary>
         /// Applies the pixel scale
         /// May be invoked in editor
@@ -33,12 +34,15 @@ namespace Common {
             float widthInUnits = this.width * unitsPerPixel;
             float heightInUnits = this.height * unitsPerPixel;
 
-            Vector3 newScale = this.transform.localScale;
+            if (this.selfTransform == null) {
+                this.selfTransform = this.transform;
+            }
+
+            Vector3 newScale = this.selfTransform.localScale;
             newScale.x = widthInUnits;
             newScale.y = heightInUnits;
 
-            this.transform.localScale = newScale;
+            this.selfTransform.localScale = newScale;
         }
-
     }
 }

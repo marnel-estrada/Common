@@ -1,6 +1,6 @@
-﻿namespace Common {
-    using UnityEngine;
+﻿using UnityEngine;
 
+namespace Common {
     /// <summary>
     /// A component used to lock the transform of the object when added
     /// This is usefult if we don't want designer or artist to move something

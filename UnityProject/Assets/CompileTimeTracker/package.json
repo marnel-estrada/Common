@@ -1,0 +1,13 @@
+{
+  "name": "com.compiletimetracker",
+  "displayName": "Compile Time Tracker",
+  "version": "1.0.0",
+  "unity": "2019.1",
+  "description": "Tracks compile time. Also plays sound when compilation is done.",
+  "dependencies": {
+  },
+  "keywords": [
+    "unity", "common"
+  ],
+  "category": "Unity"
+}

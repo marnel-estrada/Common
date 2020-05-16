@@ -138,17 +138,5 @@ namespace Common {
         public static bool operator !=(Option<T> left, Option<T> right) {
             return !left.Equals(right);
         }
-
-        /// <summary>
-        /// Returns the value if Option is Some
-        /// Otherwise, it returns the specified value
-        /// The specified value can't be null
-        /// </summary>
-        /// <param name="otherValue"></param>
-        /// <returns></returns>
-        public T ValueOr(T otherValue) {
-            CheckForNull(otherValue);
-            return this.hasValue ? this.value : otherValue;
-        }
     }
 }

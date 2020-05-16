@@ -51,7 +51,7 @@ namespace Common {
         private const string VALUE = "value";
 
         private void Parse() {
-            string xmlText = null;
+            string xmlText;
 
             if (this.useStreamingSource) {
                 string xmlPath = Application.streamingAssetsPath + "/" + gameVarXmlPath;
@@ -64,13 +64,30 @@ namespace Common {
             SimpleXmlReader reader = new SimpleXmlReader();
             SimpleXmlNode root = reader.Read(xmlText).FindFirstNodeInChildren("GameVariables");
 
-            string xmlOverride = root.GetAttribute("useOverride");
-
+            // Use custom override if it exists
+            // Otherwise, use the override from XML
             Option<string> resolvedOverride = ResolveOverride();
-
-            // Resolved override has higher precedence
-            ParseOverride(root, resolvedOverride.ValueOr(xmlOverride));
+            resolvedOverride.Match(new ParseOverrideMatcher(this, root));
         }
+
+        private readonly struct ParseOverrideMatcher : IOptionMatcher<string> {
+            private readonly GameVariables gameVariables;
+            private readonly SimpleXmlNode xmlRoot;
+
+            public ParseOverrideMatcher(GameVariables gameVariables, SimpleXmlNode xmlRoot) {
+                this.gameVariables = gameVariables;
+                this.xmlRoot = xmlRoot;
+            }
+
+            public void OnSome(string overrideId) {
+                this.gameVariables.ParseOverride(this.xmlRoot, overrideId);
+            }
+
+            public void OnNone() {
+                string xmlOverride = this.xmlRoot.GetAttribute("useOverride");
+                this.gameVariables.ParseOverride(this.xmlRoot, xmlOverride);
+            }
+        } 
 
         private void ParseOverride(SimpleXmlNode root, string overrideToUse) {
             SimpleXmlNode overrideNode = null;

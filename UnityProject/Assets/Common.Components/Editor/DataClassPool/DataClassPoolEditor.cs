@@ -10,7 +10,7 @@ namespace Common {
 
         void OnEnable() {
             this.dataPool = (DataClassPool<T>)this.target;
-            Assertion.AssertNotNull(this.dataPool);
+            Assertion.NotNull(this.dataPool);
         }
         
         protected DataClassPool<T> DataPool {

@@ -87,7 +87,7 @@ namespace Common {
         * Sets the texture to the world textured quad.
         */
         public virtual void SetTexture(Texture texture) {
-            Assertion.AssertNotNull(texture);
+            Assertion.NotNull(texture);
             this.texture = texture;
             this.material.mainTexture = texture;
         }

@@ -8,7 +8,7 @@ public class XmlTest : MonoBehaviour {
     private TextAsset sampleXml;
 
     private void Awake() {
-        Assertion.AssertNotNull(this.sampleXml, "sampleXml");
+        Assertion.NotNull(this.sampleXml, "sampleXml");
 
         SimpleXmlReader reader = new SimpleXmlReader();
         reader.PrintXML(reader.Read(this.sampleXml.text), 0);

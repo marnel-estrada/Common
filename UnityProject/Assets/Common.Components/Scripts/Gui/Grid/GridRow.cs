@@ -24,7 +24,7 @@ namespace Common {
 
         void Awake() {
             this.layoutElement = GetComponent<LayoutElement>();
-            Assertion.AssertNotNull(this.layoutElement);
+            Assertion.NotNull(this.layoutElement);
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Common {
             if(this.swarm == null) {
                 // we lazy initialize because Recycle() might get invoked before its Awake() is invoked
                 this.swarm = GetComponent<SwarmItem>();
-                Assertion.AssertNotNull(this.swarm);
+                Assertion.NotNull(this.swarm);
             }
 
             this.swarm.Kill();

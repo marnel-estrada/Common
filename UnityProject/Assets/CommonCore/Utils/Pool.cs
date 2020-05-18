@@ -50,7 +50,7 @@ namespace Common {
 		 */
 		public void Recycle(T instance) {
 			lock (SYNC_LOCK) {
-				Assertion.AssertNotNull(instance);
+				Assertion.NotNull(instance);
 
 				// The item to be recycled should not be present in recycled items
 				bool alreadyPooled = this.hashSet.Contains(instance);

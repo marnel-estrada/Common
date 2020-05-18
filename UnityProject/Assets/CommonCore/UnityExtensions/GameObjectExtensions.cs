@@ -22,7 +22,7 @@ namespace Common {
 		 */
 		public static T GetRequiredComponent<T>(this GameObject self) where T : Component {
 			T component = self.GetComponent<T>();
-			Assertion.AssertNotNull(component);
+			Assertion.NotNull(component);
 			return component;
 		}
 		

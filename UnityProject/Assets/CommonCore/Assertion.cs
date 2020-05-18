@@ -29,14 +29,14 @@ namespace Common {
 		/**
 		 * Asserts that the specified pointer is not null.
 		 */
-		public static void AssertNotNull(object pointer, string name, UnityEngine.Object context = null) {
+		public static void NotNull(object pointer, string name, UnityEngine.Object context = null) {
 			Assert(pointer != null, name, context);
 		}
 	
 		/**
 		 * Asserts that the specified pointer is not null.
 		 */
-		public static void AssertNotNull(object pointer, UnityEngine.Object context = null) {
+		public static void NotNull(object pointer, UnityEngine.Object context = null) {
 			Assert(pointer != null, DEFAULT_MESSAGE, context);
 		}
 		
@@ -51,7 +51,7 @@ namespace Common {
 		/**
 		 * Asserts that the specified UnityEngine object is not null.
 		 */
-		public static void AssertNotNull(UnityEngine.Object pointer, string name, UnityEngine.Object context = null) {
+		public static void NotNull(UnityEngine.Object pointer, string name, UnityEngine.Object context = null) {
 			if(!pointer) {
 				Assert(false, name, context);
 			}
@@ -60,7 +60,7 @@ namespace Common {
 		/**
 		 * Asserts that the specified UnityEngine object is not null.
 		 */
-		public static void AssertNotNull(UnityEngine.Object pointer, UnityEngine.Object context = null) {
+		public static void NotNull(UnityEngine.Object pointer, UnityEngine.Object context = null) {
 			if(!pointer) {
 				Assert(false, DEFAULT_MESSAGE, context);
 			}

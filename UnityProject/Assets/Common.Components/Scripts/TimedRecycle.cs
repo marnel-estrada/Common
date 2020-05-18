@@ -24,7 +24,7 @@ namespace Common {
         private bool ticking;
 
         void Awake() {
-            Assertion.AssertNotNull(this.swarm);
+            Assertion.NotNull(this.swarm);
             Assertion.Assert(this.timeBeforeRecycle > 0);
 
             if (string.IsNullOrEmpty(this.timeReferenceName)) {

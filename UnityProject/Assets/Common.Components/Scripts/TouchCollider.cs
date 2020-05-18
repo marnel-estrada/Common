@@ -12,7 +12,7 @@ namespace Common {
 
 		private void Start() {
 			this.boxCollider = this.GetComponent<BoxCollider>();
-			Assertion.AssertNotNull(boxCollider, "boxCollider");
+			Assertion.NotNull(boxCollider, "boxCollider");
 		}
 
 		private void Update() {

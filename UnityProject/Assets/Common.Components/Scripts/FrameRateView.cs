@@ -13,7 +13,7 @@ namespace Common {
 		private FrameRate frameRate;
 
 		private void Awake() {
-	        Assertion.AssertNotNull(this.text);
+	        Assertion.NotNull(this.text);
 			this.frameRate = new FrameRate();
 		}
 

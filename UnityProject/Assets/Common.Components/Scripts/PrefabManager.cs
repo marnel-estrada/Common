@@ -39,7 +39,7 @@ namespace Common {
         }
 
         private void Awake() {
-            Assertion.AssertNotNull(this.itemManager);
+            Assertion.NotNull(this.itemManager);
 
             // populate moduleMapping
             this.nameToIndexMapping = new Dictionary<string, int>();

@@ -20,7 +20,7 @@ namespace Common {
         /// <param name="updateAction"></param>
         protected virtual void Init(Action<T> updateAction) {
             this.updateAction = updateAction;
-            Assertion.AssertNotNull(this.updateAction);
+            Assertion.NotNull(this.updateAction);
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Common {
         /// 
         /// </summary>
         private void Update() {
-            Assertion.AssertNotNull(this.updateAction);
+            Assertion.NotNull(this.updateAction);
 
             int count = this.entries.Count;
             for (int i = 0; i < count; ++i) {

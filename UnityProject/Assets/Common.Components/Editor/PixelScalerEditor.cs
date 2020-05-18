@@ -20,7 +20,7 @@ public class PixelScalerEditor : Editor {
 
         if(this.scaler == null) {
             this.scaler = this.target as PixelScaler;
-            Assertion.AssertNotNull(this.scaler);
+            Assertion.NotNull(this.scaler);
         }
 
         if(GUILayout.Button("Apply Scale")) {

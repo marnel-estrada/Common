@@ -57,7 +57,7 @@ namespace Common {
 
                     // resolve again
                     holder = localVariables.Get(property.Name, namedType) as ValueHolder;
-                    Assertion.AssertNotNull(holder, "holder");
+                    Assertion.NotNull(holder, "holder");
                 }
 
                 RenderVariableField(parentVariables, property, holder, namedType, showHints);

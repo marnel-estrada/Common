@@ -26,7 +26,7 @@ namespace Common {
             Assertion.AssertNotEmpty(this.gameVarXmlPath);
 
             if (!this.useStreamingSource) {
-                Assertion.AssertNotNull(this.nonStreamingSource);
+                Assertion.NotNull(this.nonStreamingSource);
             }
 
             // populate varMap

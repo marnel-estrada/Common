@@ -31,7 +31,7 @@
         /// <param name="request"></param>
         /// <returns></returns>
         public TResult Execute(TRequest request) {
-            Assertion.AssertNotNull(this.provider);
+            Assertion.NotNull(this.provider);
             return this.provider(request);
         }
 
@@ -41,7 +41,7 @@
         /// </summary>
         /// <returns></returns>
         public TResult Execute() {
-            Assertion.AssertNotNull(this.provider);
+            Assertion.NotNull(this.provider);
             return this.provider(default(TRequest));
         }
     }

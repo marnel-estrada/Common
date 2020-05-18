@@ -14,7 +14,7 @@ namespace CommonEcs {
 
         public SpriteInLayerHandle(EntityManager entityManager, Entity spriteLayerEntity) {
             this.entityManager = entityManager;
-            Assertion.AssertNotNull(this.entityManager);
+            Assertion.NotNull(this.entityManager);
 
             this.spriteLayerEntity = spriteLayerEntity;
             Assertion.Assert(this.spriteLayerEntity != Entity.Null);

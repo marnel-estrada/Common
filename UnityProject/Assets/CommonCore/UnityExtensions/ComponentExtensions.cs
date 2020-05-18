@@ -13,7 +13,7 @@ namespace Common {
         /// <returns></returns>
         public static T GetRequiredComponent<T>(this Component self) where T : Component {
             T componentInstance = self.GetComponent<T>();
-            Assertion.AssertNotNull(componentInstance);
+            Assertion.NotNull(componentInstance);
             return componentInstance;
         }
 

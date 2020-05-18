@@ -30,7 +30,7 @@ namespace Common {
         }
 
         private void Awake() {
-            Assertion.AssertNotNull(configXml);
+            Assertion.NotNull(configXml);
 
             this.profileMap = new Dictionary<string, LoadProfile>();
             this.sceneSetMap = new Dictionary<string, SceneSet>();

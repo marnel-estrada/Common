@@ -36,7 +36,7 @@ namespace Common {
                     variable = localVariables.Get(property.Name, namedType) as NamedValueHolder;
                 }
 
-                Assertion.AssertNotNull(variable, property.Name);
+                Assertion.NotNull(variable, property.Name);
 
                 // resolve the NamedVariable instace to set to the property
                 object namedInstance = variable;

@@ -27,7 +27,7 @@ namespace Common {
             this.skin = skin;
             this.onAdd = onAdd;
             
-            Assertion.AssertNotNull(this.skin);
+            Assertion.NotNull(this.skin);
 
             this.typeSelection =
                 new TypeSelectionRenderer(typeof(T), this.skin.customStyles[0], OnSelectionChange);

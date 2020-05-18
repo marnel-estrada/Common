@@ -169,10 +169,10 @@ namespace Common {
         public static TComponentType GetRequiredComponent<TComponentType>(string objectName)
             where TComponentType : Component {
             GameObject gameObject = GameObject.Find(objectName);
-            Assertion.AssertNotNull(gameObject);
+            Assertion.NotNull(gameObject);
 
             TComponentType component = gameObject.GetComponent<TComponentType>();
-            Assertion.AssertNotNull(component);
+            Assertion.NotNull(component);
 
             return component;
         }
@@ -210,7 +210,7 @@ namespace Common {
          * Enables or disable all scripts in a game object.
          */
         public static void SetAllScriptsEnabled(GameObject gameObject, bool enabled, bool traverseChildren = false) {
-            Assertion.AssertNotNull(gameObject);
+            Assertion.NotNull(gameObject);
 
             MonoBehaviour[] scripts = gameObject.GetComponentsInChildren<MonoBehaviour>();
             foreach (MonoBehaviour script in scripts) {
@@ -250,7 +250,7 @@ namespace Common {
          * Sets the layer of a certain game object.
          */
         public static void SetLayer(GameObject go, int layer, bool recurseToChildren = true) {
-            Assertion.AssertNotNull(go);
+            Assertion.NotNull(go);
             go.layer = layer;
 
             if (!recurseToChildren) {

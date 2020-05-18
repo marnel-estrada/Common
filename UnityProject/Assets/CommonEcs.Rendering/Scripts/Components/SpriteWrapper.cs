@@ -27,7 +27,7 @@ namespace CommonEcs {
             this.goEntity = this.GetRequiredComponent<GameObjectEntity>();
             
             this.entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-            Assertion.AssertNotNull(this.entityManager);
+            Assertion.NotNull(this.entityManager);
         }
 
         public Sprite Sprite {

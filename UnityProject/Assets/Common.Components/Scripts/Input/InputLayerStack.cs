@@ -30,7 +30,7 @@ namespace Common {
 			Clear();
 
 			for (int i = this.initialLayers.Length - 1; i >= 0; --i) {
-				Assertion.AssertNotNull(this.initialLayers[i]);
+				Assertion.NotNull(this.initialLayers[i]);
 				Push(this.initialLayers[i]);
 			}
 		}

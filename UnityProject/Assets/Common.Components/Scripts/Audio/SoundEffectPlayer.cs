@@ -26,10 +26,10 @@ namespace Common {
 
         void Awake() {
             this.source = GetComponent<AudioSource>();
-            Assertion.AssertNotNull(this.source);
+            Assertion.NotNull(this.source);
 
             this.swarmItem = GetComponent<SwarmItem>();
-            Assertion.AssertNotNull(this.swarmItem);
+            Assertion.NotNull(this.swarmItem);
 
             this.selfTransform = this.transform;
 

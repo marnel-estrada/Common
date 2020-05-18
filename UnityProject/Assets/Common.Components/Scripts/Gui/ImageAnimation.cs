@@ -22,7 +22,7 @@ namespace Common {
         private int currentFrameIndex;
 
         private void Awake() {
-            Assertion.AssertNotNull(this.image);
+            Assertion.NotNull(this.image);
             Assertion.Assert(this.framesPerSecond > 0);
 
             this.polledTime = 0;

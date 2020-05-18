@@ -10,7 +10,7 @@ public class RotationInRadiansEditor : Editor {
 
 	void OnEnable() {
 		this.transform = ((RotationInRadians)this.target).transform;
-		Assertion.AssertNotNull(this.transform);
+		Assertion.NotNull(this.transform);
 	}
 	
 	public override void OnInspectorGUI() {

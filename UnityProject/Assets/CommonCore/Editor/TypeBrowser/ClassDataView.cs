@@ -89,7 +89,7 @@ namespace Common {
             if (data.ClassType == null) {
                 // Cache
                 data.ClassType = TypeUtils.GetType(data.ClassName);
-                Assertion.AssertNotNull(data.ClassType);
+                Assertion.NotNull(data.ClassType);
             }
 
             GUILayout.BeginHorizontal();
@@ -117,7 +117,7 @@ namespace Common {
             GUILayout.EndHorizontal();
 
             // Variables
-            Assertion.AssertNotNull(data.ClassType);
+            Assertion.NotNull(data.ClassType);
             this.propertiesRenderer.RenderVariables(data.Variables, data.Variables, data.ClassType, data.ShowHints);
         }
         

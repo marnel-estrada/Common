@@ -27,10 +27,10 @@ namespace CommonEcs {
         private EntityManager entityManager;
 
         private void Awake() {
-            Assertion.AssertNotNull(this.material);
+            Assertion.NotNull(this.material);
             
             this.entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-            Assertion.AssertNotNull(this.entityManager);
+            Assertion.NotNull(this.entityManager);
             
             this.entity = this.entityManager.CreateEntity();
 

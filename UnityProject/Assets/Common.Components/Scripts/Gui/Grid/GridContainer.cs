@@ -27,11 +27,11 @@ namespace Common {
         private readonly List<GridRow> visibleList = new List<GridRow>();
 
         private void Awake() {
-            Assertion.AssertNotNull(this.gridRowPool);
+            Assertion.NotNull(this.gridRowPool);
             Assertion.AssertNotEmpty(this.gridRowPrefabName);
 
             this.selfRect = GetComponent<RectTransform>();
-            Assertion.AssertNotNull(this.selfRect);
+            Assertion.NotNull(this.selfRect);
 
             // reset the rect height (0)
             UpdateContainerHeight();
@@ -45,7 +45,7 @@ namespace Common {
         public GridRow AddRow(string rowId) {
             GameObject go = this.gridRowPool.Request(this.gridRowPrefabName);
             GridRow gridRow = go.GetComponent<GridRow>();
-            Assertion.AssertNotNull(gridRow);
+            Assertion.NotNull(gridRow);
             gridRow.Init(rowId);
 
             AddRow(gridRow);

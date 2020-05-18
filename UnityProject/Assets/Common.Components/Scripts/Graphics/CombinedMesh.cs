@@ -91,7 +91,7 @@ namespace Common {
             this.mesh.uv2 = this.uv2Array;
 
             this.meshFilter = GetComponent<MeshFilter>();
-            Assertion.AssertNotNull(this.meshFilter);
+            Assertion.NotNull(this.meshFilter);
             this.meshFilter.mesh = this.mesh;
 
             ResolveMeshRenderer();
@@ -99,7 +99,7 @@ namespace Common {
 
         private void ResolveMeshRenderer() {
             this.meshRenderer = GetComponent<MeshRenderer>();
-            Assertion.AssertNotNull(this.meshRenderer);
+            Assertion.NotNull(this.meshRenderer);
         }
 
         private void AddToBuild(Transform owner, Mesh mesh) {

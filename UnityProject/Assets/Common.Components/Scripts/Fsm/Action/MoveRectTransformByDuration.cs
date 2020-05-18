@@ -45,7 +45,7 @@ namespace Common.Fsm.Action {
         /// <param name="finishEvent"></param>
         public void Init(RectTransform transform, Vector2 start, Vector2 destination, float duration, string finishEvent) {
             this.transform = transform;
-            Assertion.AssertNotNull(this.transform);
+            Assertion.NotNull(this.transform);
 
             this.start = start;
             this.destination = destination;

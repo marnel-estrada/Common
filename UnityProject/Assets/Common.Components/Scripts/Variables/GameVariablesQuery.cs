@@ -18,7 +18,7 @@ namespace Common {
         public const string KEY = "Key";
 
         private void Awake() {
-            Assertion.AssertNotNull(this.gameVariables);
+            Assertion.NotNull(this.gameVariables);
             
             GET_STRING_GAME_VARIABLE.RegisterProvider(delegate(string key) {
                 return this.gameVariables.Get(key);

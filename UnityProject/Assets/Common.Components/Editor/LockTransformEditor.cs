@@ -9,7 +9,7 @@
 
         private void OnEnable() {
             this.lockTransform = this.target as LockTransform;
-            Assertion.AssertNotNull(this.lockTransform);
+            Assertion.NotNull(this.lockTransform);
         }
 
         private void OnSceneGUI() {

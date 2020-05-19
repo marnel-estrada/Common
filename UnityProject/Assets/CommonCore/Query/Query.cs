@@ -14,7 +14,7 @@
         /// </summary>
         /// <param name="provider"></param>
         public void RegisterProvider(Func<TRequest, TResult> provider) {
-            Assertion.Assert(this.provider == null); // Avoid more than one provider
+            Assertion.IsTrue(this.provider == null); // Avoid more than one provider
             this.provider = provider;
         }
 

@@ -268,7 +268,7 @@ namespace Common {
          * Reads the contents of the specified text file path.
          */
         public static string ReadTextFile(string path) {
-            Assertion.Assert(File.Exists(path), "File path does not exist: " + path);
+            Assertion.IsTrue(File.Exists(path), "File path does not exist: " + path);
             StreamReader reader = new StreamReader(path);
             try {
                 return reader.ReadToEnd();

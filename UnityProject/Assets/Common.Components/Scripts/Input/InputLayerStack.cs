@@ -96,7 +96,7 @@ namespace Common {
      		 * Returns the InputLayer instance that is at the top.
      		 */
 		public InputLayer Top() {
-			Assertion.Assert(!IsEmpty(), "Can't get top if stack is empty.");
+			Assertion.IsTrue(!IsEmpty(), "Can't get top if stack is empty.");
 
 			return this.layerStack[this.layerStack.Count - 1];
 		}

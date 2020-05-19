@@ -17,13 +17,13 @@ namespace Common {
         /// <param name="key"></param>
         /// <param name="value"></param>
         public void Add(K key, V value) {
-            Assertion.Assert(!this.dictionary.ContainsKey(key)); // should not have the said item in the container
+            Assertion.IsTrue(!this.dictionary.ContainsKey(key)); // should not have the said item in the container
 
             this.keyList.Add(key);
             this.valueList.Add(value);
             this.dictionary.Add(key, value);
 
-            Assertion.Assert(this.keyList.Count == this.valueList.Count && this.valueList.Count == this.dictionary.Count);
+            Assertion.IsTrue(this.keyList.Count == this.valueList.Count && this.valueList.Count == this.dictionary.Count);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Common {
 
             this.dictionary.Remove(key);
 
-            Assertion.Assert(this.keyList.Count == this.valueList.Count && this.valueList.Count == this.dictionary.Count);
+            Assertion.IsTrue(this.keyList.Count == this.valueList.Count && this.valueList.Count == this.dictionary.Count);
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace Common {
             this.valueList.RemoveAt(index);
             this.dictionary.Remove(key);
 
-            Assertion.Assert(this.keyList.Count == this.valueList.Count && this.valueList.Count == this.dictionary.Count);
+            Assertion.IsTrue(this.keyList.Count == this.valueList.Count && this.valueList.Count == this.dictionary.Count);
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace Common {
             this.valueList.Clear();
             this.dictionary.Clear();
 
-            Assertion.Assert(this.keyList.Count == this.valueList.Count && this.valueList.Count == this.dictionary.Count);
+            Assertion.IsTrue(this.keyList.Count == this.valueList.Count && this.valueList.Count == this.dictionary.Count);
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace Common {
         /// </summary>
         public int Count {
             get {
-                Assertion.Assert(this.keyList.Count == this.valueList.Count && this.valueList.Count == this.dictionary.Count);
+                Assertion.IsTrue(this.keyList.Count == this.valueList.Count && this.valueList.Count == this.dictionary.Count);
                 return this.dictionary.Count;
             }
         }
@@ -135,7 +135,7 @@ namespace Common {
         }
 
         public int IndexOfKey(K key) {
-            Assertion.Assert(this.keyList.Count == this.valueList.Count && this.valueList.Count == this.dictionary.Count);
+            Assertion.IsTrue(this.keyList.Count == this.valueList.Count && this.valueList.Count == this.dictionary.Count);
 
             return this.keyList.IndexOf(key);
         }

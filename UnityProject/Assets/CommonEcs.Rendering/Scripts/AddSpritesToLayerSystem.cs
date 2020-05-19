@@ -66,7 +66,7 @@ namespace CommonEcs {
             for (int i = 0; i < chunk.Count; ++i) {
                 AddToSpriteLayer addToLayer = this.addToLayers[i];
                 Maybe<SpriteLayer> layer = this.layers.Get(addToLayer.layerEntity);
-                Assertion.Assert(layer.HasValue);
+                Assertion.IsTrue(layer.HasValue);
                 SpriteLayer spriteLayer = layer.Value;
 
                 // Resolve a SpriteManager with space
@@ -124,7 +124,7 @@ namespace CommonEcs {
         private void AddSpriteToManager(SpriteManager manager, int index) {
             Sprite sprite = this.sprites[index];
 
-            Assertion.Assert(manager.Owner != Entity.Null); // Should have been set already
+            Assertion.IsTrue(manager.Owner != Entity.Null); // Should have been set already
             sprite.spriteManagerEntity = manager.Owner;
 
             LocalToWorld matrix = this.matrices[index];

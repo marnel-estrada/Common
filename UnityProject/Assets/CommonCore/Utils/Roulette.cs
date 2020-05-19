@@ -40,13 +40,13 @@ namespace Common {
 		 * Adds an item to the roulette
 		 */
 		public void Add(T item, float probability) {
-            Assertion.Assert(probability > 0); // probability can't be zero or less than zero
+            Assertion.IsTrue(probability > 0); // probability can't be zero or less than zero
 
 			RouletteEntry<T> entry = new RouletteEntry<T>(item, this.currentStartingInterval, currentStartingInterval + probability);
 			this.entries.Add(entry);
 
 			currentStartingInterval += probability;
-			Assertion.Assert(Comparison.TolerantLesserThanOrEquals(currentStartingInterval, 1.0f)); // Can't exceed 1. If it does then there's something wrong with the whole population in the roulette
+			Assertion.IsTrue(Comparison.TolerantLesserThanOrEquals(currentStartingInterval, 1.0f)); // Can't exceed 1. If it does then there's something wrong with the whole population in the roulette
 		}
 
 		/**
@@ -94,7 +94,7 @@ namespace Common {
                 ++iterationCount;
             }
 
-			Assertion.Assert(false, "Unable to select an item. Something is definitely wrong: " + random);
+			Assertion.IsTrue(false, "Unable to select an item. Something is definitely wrong: " + random);
 			return default(T);
 		}
 	}

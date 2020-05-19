@@ -115,7 +115,7 @@ namespace Common {
         /// <param name="loadProfileId"></param>
         /// <param name="actionAfterLoading"></param>
         public void Load(string loadProfileId, Action actionAfterLoading = null) {
-            Assertion.Assert(this.profileMap.TryGetValue(loadProfileId, out LoadProfile loadProfile));
+            Assertion.IsTrue(this.profileMap.TryGetValue(loadProfileId, out LoadProfile loadProfile));
 
             this.startTime = DateTime.Now;
             
@@ -134,7 +134,7 @@ namespace Common {
         }
 
         private void LoadSceneSet(string sceneSetId) {
-            Assertion.Assert(this.sceneSetMap.TryGetValue(sceneSetId, out SceneSet sceneSet));
+            Assertion.IsTrue(this.sceneSetMap.TryGetValue(sceneSetId, out SceneSet sceneSet));
 
             for(int i = 0; i < sceneSet.Count; ++i) {
                 string sceneName = sceneSet.GetAt(i);

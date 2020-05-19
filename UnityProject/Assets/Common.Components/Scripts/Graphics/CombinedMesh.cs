@@ -39,7 +39,7 @@ namespace Common {
         /// <param name="owner"></param>
         /// <param name="mesh"></param>
         public MeshPartHandle Add(Transform owner, Mesh mesh) {
-            Assertion.Assert(!this.meshMap.ContainsKey(owner)); // Should not contain the specified owner yet
+            Assertion.IsTrue(!this.meshMap.ContainsKey(owner)); // Should not contain the specified owner yet
 
             this.meshMap[owner] = mesh;
 
@@ -117,7 +117,7 @@ namespace Common {
                     this.uvs2.Add(VectorUtils.ZERO_2D);
                 }
             } else {
-                Assertion.Assert(mesh.uv.Length == mesh.uv2.Length);
+                Assertion.IsTrue(mesh.uv.Length == mesh.uv2.Length);
                 this.uvs2.AddRange(mesh.uv2);
             }
 

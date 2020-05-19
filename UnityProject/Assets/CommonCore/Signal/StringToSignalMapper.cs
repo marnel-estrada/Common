@@ -30,7 +30,7 @@ namespace Common.Signal {
 		 * Adds a mapping
 		 */
 		public void Add(Signal signal) {
-			Assertion.Assert(!mapping.ContainsKey(signal.Name)); // signal should not be in the mapping yet
+			Assertion.IsTrue(!mapping.ContainsKey(signal.Name)); // signal should not be in the mapping yet
 			mapping[signal.Name] = signal;
 		}
 		
@@ -38,7 +38,7 @@ namespace Common.Signal {
 		 * Looks for the signal with the specified name and dispatches it
 		 */
 		public void Dispatch(string signalName) {
-			Assertion.Assert(mapping.ContainsKey(signalName)); // there should be signal mapping
+			Assertion.IsTrue(mapping.ContainsKey(signalName)); // there should be signal mapping
 			mapping[signalName].Dispatch();
 		}
 		
@@ -55,7 +55,7 @@ namespace Common.Signal {
 		/// <param name="signalName">Signal name.</param>
 		public Signal Get(string signalName) {
             Signal signal = null;
-            Assertion.Assert(this.mapping.TryGetValue(signalName, out signal), "Signal not found: " + signalName);
+            Assertion.IsTrue(this.mapping.TryGetValue(signalName, out signal), "Signal not found: " + signalName);
             return signal;
         }
 

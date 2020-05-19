@@ -40,7 +40,7 @@ namespace CommonEcs {
             for (int i = 0; i < sprites.Length; ++i) {
                 Sprite sprite = sprites[i];
                 Maybe<SpriteManager> maybeManager = this.spriteManagers.Get(sprite.spriteManagerEntity);
-                Assertion.Assert(maybeManager.HasValue);
+                Assertion.IsTrue(maybeManager.HasValue);
                 maybeManager.Value.Remove(sprite);
             
                 // Entities with ForRemoval means that the entity will be removed

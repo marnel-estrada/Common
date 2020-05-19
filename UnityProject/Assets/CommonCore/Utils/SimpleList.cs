@@ -106,7 +106,7 @@ namespace Common {
         /// Insert an item at the specified index, pushing the entries back.
         /// </summary>
         public void Insert(int index, T item) {
-            Assertion.Assert(0 <= index && index < this.size, "Invalid index");
+            Assertion.IsTrue(0 <= index && index < this.size, "Invalid index");
 
             if (this.buffer == null || this.size == this.buffer.Length) AllocateMore();
 
@@ -149,7 +149,7 @@ namespace Common {
         /// Remove an item at the specified index.
         /// </summary>
         public void RemoveAt(int index) {
-            Assertion.Assert(0 <= index && index < this.size, "Invalid index");
+            Assertion.IsTrue(0 <= index && index < this.size, "Invalid index");
 
             if (this.buffer != null && index < this.size) {
                 --this.size;

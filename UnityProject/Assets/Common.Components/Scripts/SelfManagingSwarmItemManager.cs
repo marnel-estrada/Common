@@ -48,7 +48,7 @@ namespace Common {
          * Prunes the inactive list to the specified max count.
          */
         public void PruneInactiveList(int itemPrefabIndex, int maxCount) {
-            Assertion.Assert(maxCount > 0, "Max count can't be zero.");
+            Assertion.IsTrue(maxCount > 0, "Max count can't be zero.");
 
             int numToPrune = this._prefabItemLists[itemPrefabIndex].inactiveItems.Count - maxCount;
             if (numToPrune <= 0) {

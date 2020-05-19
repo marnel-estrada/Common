@@ -15,7 +15,7 @@ public class MeshShaderSetterEditor : Editor {
 
         EditorGUILayout.BeginVertical();
         if (GUILayout.Button("Change Shaders")) {
-            Assertion.Assert(
+            Assertion.IsTrue(
                 this.targetComponent.GetShaderToSet() != null && this.targetComponent.GetShaderToSet().Length > 0,
                 "A shader must be specified.");
             ChangeShaders();

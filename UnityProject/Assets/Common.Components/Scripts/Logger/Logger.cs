@@ -145,7 +145,7 @@ namespace Common.Logger {
             this.currentlyWriting = true;
 
             // check if file already exists
-            Assertion.Assert(!string.IsNullOrEmpty(this.logFilePath),
+            Assertion.IsTrue(!string.IsNullOrEmpty(this.logFilePath),
                 "logFilePath should not be empty. Try setting a name for the log.");
             StreamWriter writer = null;
             try {

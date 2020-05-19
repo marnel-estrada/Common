@@ -44,7 +44,7 @@ namespace CommonEcs {
         public T GetSharedComponent(ref ArchetypeChunk chunk) {
             int sharedComponentIndex = chunk.GetSharedComponentIndex(this.sharedComponentType);
             int uniqueIndex = this.indices.IndexOf(sharedComponentIndex);
-            Assertion.Assert(uniqueIndex >= 0);
+            Assertion.IsTrue(uniqueIndex >= 0);
             return this.sharedComponents[uniqueIndex];
         }
         

@@ -163,7 +163,7 @@ namespace Common {
             this.min.x = this.min.x + units;
 
             // Client code should be careful that shrinking bounds should not lead to empty bounds
-            Assertion.Assert(!IsEmpty);
+            Assertion.IsTrue(!IsEmpty);
         }
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace Common {
             this.max.x = this.max.x - units;
 
             // Client code should be careful that shrinking bounds should not lead to empty bounds
-            Assertion.Assert(!IsEmpty);
+            Assertion.IsTrue(!IsEmpty);
         }
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace Common {
             this.min.y = this.min.y + units;
 
             // Client code should be careful that shrinking bounds should not lead to empty bounds
-            Assertion.Assert(!IsEmpty);
+            Assertion.IsTrue(!IsEmpty);
         }
 
         /// <summary>
@@ -220,7 +220,7 @@ namespace Common {
             this.max.y = this.max.y - units;
 
             // Client code should be careful that shrinking bounds should not lead to empty bounds
-            Assertion.Assert(!IsEmpty);
+            Assertion.IsTrue(!IsEmpty);
         }
 
         /// <summary>

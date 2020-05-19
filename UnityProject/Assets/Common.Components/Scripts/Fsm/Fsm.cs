@@ -47,7 +47,7 @@ namespace Common.Fsm {
 		 */
 		public FsmState AddState(string stateName) {
 			// state names should be unique
-			Assertion.Assert(!this.stateMap.ContainsKey(stateName), stateName);
+			Assertion.IsTrue(!this.stateMap.ContainsKey(stateName), stateName);
 			
 			FsmState newState = new FsmState(stateName, this);
 			this.stateMap[stateName] = newState;
@@ -188,7 +188,7 @@ namespace Common.Fsm {
 		 * Sends an event which may cause state change.
 		 */
 		public void SendEvent(string eventId) {
-			Assertion.Assert(!string.IsNullOrEmpty(eventId), "The specified eventId can't be empty.");
+			Assertion.IsTrue(!string.IsNullOrEmpty(eventId), "The specified eventId can't be empty.");
 			
 			if(this.currentState == null) {
 #if UNITY_EDITOR

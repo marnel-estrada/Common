@@ -147,7 +147,7 @@ namespace Common {
         
         private void CustomRender(PropertyInfo property, object instance, Common.PropertyRenderer propRenderer) {
             Option<EditorPropertyRenderer> resolvedRenderer = ResolveRenderer(propRenderer.RendererType);
-            Assertion.AssertIsSome(resolvedRenderer);
+            Assertion.IsSome(resolvedRenderer);
 
             if (this.customRenderMatcher == null) {
                 this.customRenderMatcher = delegate(EditorPropertyRenderer renderer) {
@@ -192,7 +192,7 @@ namespace Common {
             // At this point, renderer does not exist yet
             // Let's make one
             Option<Type> foundType = TypeIdentifier.GetType(rendererTypeName);
-            Assertion.AssertIsSome(foundType, rendererTypeName);
+            Assertion.IsSome(foundType, rendererTypeName);
 
             return foundType.Match<CreateEditorPropertyRendererMatcher, Option<EditorPropertyRenderer>>(
                 new CreateEditorPropertyRendererMatcher(rendererTypeName, this.customRenderers));

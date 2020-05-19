@@ -16,7 +16,7 @@ namespace CommonEcs {
 
         public SetSpriteLayerMaterial(Entity layerEntity, Material newMaterial) {
             this.layerEntity = layerEntity;
-            Assertion.Assert(this.layerEntity != Entity.Null);
+            Assertion.IsTrue(this.layerEntity != Entity.Null);
             
             this.newMaterial = newMaterial;
             

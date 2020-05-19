@@ -20,7 +20,7 @@ namespace Common {
 		 * This is the safe way to set the extents
 		 */
 		public static void SetValueExtents(this Slider slider, float min, float max) {
-			Assertion.Assert(Comparison.TolerantLesserThanOrEquals(min, max));
+			Assertion.IsTrue(Comparison.TolerantLesserThanOrEquals(min, max));
 
 			// ensure that maxValue is really higher than minValue first
 			// I speculate that when you set a maxValue that is lesser than the current minValue (also the other way around), Unity blows up (I don't know why)

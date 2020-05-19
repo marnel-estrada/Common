@@ -18,7 +18,7 @@ namespace Common {
 
         public Color Get(string id) {
             Populate();
-            Assertion.Assert(this.map.TryGetValue(id, out Color color), id);
+            Assertion.IsTrue(this.map.TryGetValue(id, out Color color), id);
             return color;
         }
 

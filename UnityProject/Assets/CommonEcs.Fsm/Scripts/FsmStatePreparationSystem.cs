@@ -42,7 +42,7 @@ namespace Common.Ecs.Fsm {
         /// <param name="stateId"></param>
         /// <param name="action"></param>
         protected void AddPrepareAction(byte stateId, StatePrepareAction action) {
-            Assertion.Assert(!this.statePrepareMap.ContainsKey(stateId)); // Prevent replace of prepare action
+            Assertion.IsTrue(!this.statePrepareMap.ContainsKey(stateId)); // Prevent replace of prepare action
             this.statePrepareMap[stateId] = action;
         }
         

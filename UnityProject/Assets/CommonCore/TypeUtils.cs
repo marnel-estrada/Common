@@ -127,7 +127,7 @@ namespace Common {
         /// <returns></returns>
         public static Option<T> Instantiate<T>(ClassData data, NamedValueLibrary parentVariables) where T : class {
             Option<Type> type = TypeIdentifier.GetType(data.ClassName);
-            Assertion.AssertIsSome(type, data.ClassName);
+            Assertion.IsSome(type, data.ClassName);
 
             return type.Match<InstantiateMatcher<T>, Option<T>>(new InstantiateMatcher<T>(data, parentVariables));
         }

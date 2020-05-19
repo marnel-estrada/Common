@@ -94,7 +94,7 @@ namespace Common {
          * Requests for a prefab instance.
          */
         public GameObject Request(string prefabName) {
-            Assertion.Assert(this.nameToIndexMapping.ContainsKey(prefabName),
+            Assertion.IsTrue(this.nameToIndexMapping.ContainsKey(prefabName),
                 prefabName); // "nameToIndexMapping should contain the specified prefab name: " + prefabName
             int prefabIndex = this.nameToIndexMapping[prefabName];
 
@@ -125,7 +125,7 @@ namespace Common {
          * Preloads the specified prefab for a certain amount
          */
         public void Preload(string prefabName, int count) {
-            Assertion.Assert(
+            Assertion.IsTrue(
                 this.nameToIndexMapping.
                     ContainsKey(
                         prefabName)); // "nameToIndexMapping should contain the specified prefab name: " + prefabName
@@ -139,7 +139,7 @@ namespace Common {
         /// <param name="prefabName"></param>
         /// <returns></returns>
         public int GetInactiveCount(string prefabName) {
-            Assertion.Assert(
+            Assertion.IsTrue(
                 this.nameToIndexMapping.
                     ContainsKey(
                         prefabName)); // "nameToIndexMapping should contain the specified prefab name: " + prefabName
@@ -158,7 +158,7 @@ namespace Common {
         /// <param name="prefabName"></param>
         /// <param name="count"></param>
         public void Reserve(string prefabName, int count) {
-            Assertion.Assert(
+            Assertion.IsTrue(
                 this.nameToIndexMapping.
                     ContainsKey(
                         prefabName)); // "nameToIndexMapping should contain the specified prefab name: " + prefabName

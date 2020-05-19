@@ -54,7 +54,7 @@ namespace Common {
 
 				// The item to be recycled should not be present in recycled items
 				bool alreadyPooled = this.hashSet.Contains(instance);
-				Assertion.Assert(!alreadyPooled); // Should not be in the recycled items
+				Assertion.IsTrue(!alreadyPooled); // Should not be in the recycled items
 
 				if (alreadyPooled) {
 					// Don't add if it was already recycled before

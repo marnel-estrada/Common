@@ -70,7 +70,7 @@ namespace Common {
 		/// </summary>
 		/// <param name="element"></param>
 		public void AddElement(InputLayerElement element) {
-			Assertion.Assert(!this.elements.Contains(element)); // should not contain the specified element yet
+			Assertion.IsTrue(!this.elements.Contains(element)); // should not contain the specified element yet
 			this.elements.Add(element);
 		}
 

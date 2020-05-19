@@ -12,8 +12,8 @@ namespace Common {
         private GameObject[] targets;
 
         private void Start() {
-            Assertion.AssertNotEmpty(this.gameVariableId);
-            Assertion.Assert(this.targets.Length > 0);
+            Assertion.NotEmpty(this.gameVariableId);
+            Assertion.IsTrue(this.targets.Length > 0);
 
             bool value = GameVariablesQuery.GET_BOOL_GAME_VARIABLE.Execute(this.gameVariableId);
             if (!value) {

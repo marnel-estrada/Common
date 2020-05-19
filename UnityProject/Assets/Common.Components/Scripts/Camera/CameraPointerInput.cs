@@ -16,7 +16,7 @@ namespace Common {
         private Camera referenceCamera;
 
         private void Awake() {
-            Assertion.AssertNotEmpty(this.referenceCameraName);
+            Assertion.NotEmpty(this.referenceCameraName);
             this.referenceCamera = UnityUtils.GetRequiredComponent<Camera>(this.referenceCameraName);
             this.referenceCameraName = null; // Free memory
         }

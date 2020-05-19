@@ -44,7 +44,7 @@ namespace CommonEcs {
         }
 
         private void Process(in ArchetypeChunk chunk) {
-            Assertion.Assert(chunk.Count > 0);
+            Assertion.IsTrue(chunk.Count > 0);
             NativeArray<Grid2D> grids = chunk.GetNativeArray(this.gridType);
             BufferAccessor<EntityBufferElement> buffers = chunk.GetBufferAccessor(this.bufferType);
             
@@ -71,7 +71,7 @@ namespace CommonEcs {
         /// <param name="y"></param>
         /// <returns></returns>
         public Maybe<Entity> GetCellEntity(int x, int y) {
-            Assertion.Assert(this.resolved);
+            Assertion.IsTrue(this.resolved);
             return this.gridWrapper.GetCellEntity(x, y);
         }
         

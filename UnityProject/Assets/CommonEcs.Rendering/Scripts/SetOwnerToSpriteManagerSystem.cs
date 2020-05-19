@@ -50,7 +50,7 @@ namespace CommonEcs {
 
         private void Process(ref ArchetypeChunk chunk) {
             SpriteManager spriteManager = this.spriteManagerQuery.GetSharedComponent(ref chunk);
-            Assertion.Assert(spriteManager.HasInternalInstance);
+            Assertion.IsTrue(spriteManager.HasInternalInstance);
             
             NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
 

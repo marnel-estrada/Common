@@ -249,9 +249,9 @@ namespace CommonEcs {
 
             set {
                 // Prevent overwriting of owner entity
-                Assertion.Assert(this.internalInstance.owner == Entity.Null);
+                Assertion.IsTrue(this.internalInstance.owner == Entity.Null);
                 this.internalInstance.owner = value;
-                Assertion.Assert(this.internalInstance.owner != Entity.Null);
+                Assertion.IsTrue(this.internalInstance.owner != Entity.Null);
             }
         }
 
@@ -493,7 +493,7 @@ namespace CommonEcs {
             /// <param name="sprite"></param>
             /// <param name="matrix"></param>
             public void Add(ref Sprite sprite, float4x4 matrix) {
-                Assertion.Assert(this.owner == sprite.spriteManagerEntity);
+                Assertion.IsTrue(this.owner == sprite.spriteManagerEntity);
                 
                 // Check if there are inactive Sprites and use those instances first
                 if (this.inactiveList.Count > 0) {
@@ -503,7 +503,7 @@ namespace CommonEcs {
                 }
 
                 // Should not exceed the max sprite count
-                Assertion.Assert(this.HasAvailableSpace);
+                Assertion.IsTrue(this.HasAvailableSpace);
 
                 while (this.spriteCount >= this.capacity) {
                     // We're out of space
@@ -523,7 +523,7 @@ namespace CommonEcs {
 
             // Adds a new sprite by reusing an existing sprite
             private void AddByReusingInactive(ref Sprite newSprite, float4x4 matrix) {
-                Assertion.Assert(this.inactiveList.Count > 0);
+                Assertion.IsTrue(this.inactiveList.Count > 0);
 
                 // We really only need the manager index from the removed sprites
                 int lastIndex = this.inactiveList.Count - 1;
@@ -610,7 +610,7 @@ namespace CommonEcs {
             /// </summary>
             /// <param name="sprite"></param>
             public void Remove(Sprite sprite) {
-                Assertion.Assert(this.owner == sprite.spriteManagerEntity);
+                Assertion.IsTrue(this.owner == sprite.spriteManagerEntity);
 
                 // We don't really remove. We just keep it in a temporary list of inactive sprite
                 // When a sprite is added, we check if there are sprites in inactive list and we use that instead
@@ -624,7 +624,7 @@ namespace CommonEcs {
             /// <param name="managerIndex"></param>
             public void Remove(int managerIndex) {
                 // The inactive list should not have this index yet
-                Assertion.Assert(!this.inactiveList.Contains(managerIndex), managerIndex.ToString());
+                Assertion.IsTrue(!this.inactiveList.Contains(managerIndex), managerIndex.ToString());
 
                 int index1 = managerIndex * 4;
                 int index2 = index1 + 1;
@@ -681,7 +681,7 @@ namespace CommonEcs {
             }
 
             private static NativeArray<T> CopyAndExpand<T>(NativeArray<T> original, int newLength) where T : struct {
-                Assertion.Assert(newLength > original.Length);
+                Assertion.IsTrue(newLength > original.Length);
 
                 NativeArray<T> newArray = new NativeArray<T>(newLength, Allocator.Persistent);
                 NativeSlice<T> newArraySlice = new NativeSlice<T>(newArray, 0, original.Length);

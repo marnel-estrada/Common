@@ -62,7 +62,7 @@ namespace Common {
         }
 
         private void AddContainerMapping(NamedValueType type, NamedValueContainer container) {
-            Assertion.Assert(!this.containerMap.ContainsKey(type)); // type should not have been added yet
+            Assertion.IsTrue(!this.containerMap.ContainsKey(type)); // type should not have been added yet
             this.containerMap[type] = container;
         }
 
@@ -112,7 +112,7 @@ namespace Common {
         /// <param name="name"></param>
         /// <returns></returns>
         public object Get(string name, NamedValueType type) {
-            Assertion.Assert(this.containerMap.TryGetValue(type, out NamedValueContainer container), type.Label);
+            Assertion.IsTrue(this.containerMap.TryGetValue(type, out NamedValueContainer container), type.Label);
 
             return container.Get(name);
         }
@@ -124,7 +124,7 @@ namespace Common {
         /// <param name="type"></param>
         public void Add(string name, NamedValueType type) {
             NamedValueContainer container = null;
-            Assertion.Assert(this.containerMap.TryGetValue(type, out container), type.Label);
+            Assertion.IsTrue(this.containerMap.TryGetValue(type, out container), type.Label);
 
             container.Add(name);
         }

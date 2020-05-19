@@ -122,7 +122,7 @@ namespace Common.Xml {
 
         private static bool IsEndComment(string xml, int tagEndIndex) {
             // Check for "--"
-            Assertion.Assert(tagEndIndex - 2 >= 0);
+            Assertion.IsTrue(tagEndIndex - 2 >= 0);
             return xml[tagEndIndex - 2] == DASH && xml[tagEndIndex - 1] == DASH;
         }
 	

@@ -28,7 +28,7 @@ namespace Common {
 
         private void Awake() {
             Assertion.NotNull(this.gridRowPool);
-            Assertion.AssertNotEmpty(this.gridRowPrefabName);
+            Assertion.NotEmpty(this.gridRowPrefabName);
 
             this.selfRect = GetComponent<RectTransform>();
             Assertion.NotNull(this.selfRect);
@@ -224,7 +224,7 @@ namespace Common {
                 }
             }
 
-            Assertion.Assert(false, string.Format("Can't find GridRow with ID \"{0}.\"", rowId));
+            Assertion.IsTrue(false, string.Format("Can't find GridRow with ID \"{0}.\"", rowId));
             return -1;
         }
 

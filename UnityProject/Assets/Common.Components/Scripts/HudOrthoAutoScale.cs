@@ -19,7 +19,7 @@ namespace Common {
 				this.selfCamera = Camera.main;
 			}
 			
-			Assertion.Assert(this.selfCamera.orthographic, "The assigned camera must be orthographic.");
+			Assertion.IsTrue(this.selfCamera.orthographic, "The assigned camera must be orthographic.");
 			
 			this.orthoCamera = this.selfCamera.GetComponent<OrthographicCamera>();
 			

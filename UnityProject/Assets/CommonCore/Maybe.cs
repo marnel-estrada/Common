@@ -74,7 +74,7 @@ namespace Common {
         /// The <see cref="Maybe{T}"/> to get the value of
         /// </param>
         public static explicit operator T(Maybe<T> maybe) {
-            Assertion.Assert(maybe.hasValue, "Can't convert Maybe<T> to T when not set");
+            Assertion.IsTrue(maybe.hasValue, "Can't convert Maybe<T> to T when not set");
             return maybe.Value;
         }
 
@@ -101,7 +101,7 @@ namespace Common {
         /// </value>
         public T Value {
             get {
-                Assertion.Assert(this.hasValue, "Can't get Maybe<T> value when not set");
+                Assertion.IsTrue(this.hasValue, "Can't get Maybe<T> value when not set");
                 if (!this.hasValue) {
                     // Force throw exception since Assert() does not throw exception in production
                     throw new Exception("Invalid Maybe usage. Trying to access a value that does not exits.");

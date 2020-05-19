@@ -19,7 +19,7 @@ namespace CommonEcs {
         /// <param name="durationTime"></param>
         public DurationTimer(float durationTime, float polledTime) {
             this.durationTime = durationTime;
-            Assertion.Assert(Comparison.TolerantGreaterThanOrEquals(this.durationTime, 0));
+            Assertion.IsTrue(Comparison.TolerantGreaterThanOrEquals(this.durationTime, 0));
 
             this.polledTime = polledTime;
         }

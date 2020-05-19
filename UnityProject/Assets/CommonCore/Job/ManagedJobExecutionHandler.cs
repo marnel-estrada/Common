@@ -30,7 +30,7 @@ namespace Common {
         /// This is usually invoked in LateUpdate()
         /// </summary>
         public void CompleteIfCompleted() {
-            Assertion.Assert(this.handles.Count == this.jobs.Count);
+            Assertion.IsTrue(this.handles.Count == this.jobs.Count);
             for (int i = this.handles.Count - 1; i >= 0; --i) {
                 JobHandle handle = this.handles[i];
                 if (handle.IsCompleted) {
@@ -47,7 +47,7 @@ namespace Common {
         /// Forces each job to complete
         /// </summary>
         public void ForceComplete() {
-            Assertion.Assert(this.handles.Count == this.jobs.Count);
+            Assertion.IsTrue(this.handles.Count == this.jobs.Count);
             for (int i = this.handles.Count - 1; i >= 0; --i) {
                 JobHandle handle = this.handles[i];
                 handle.Complete();

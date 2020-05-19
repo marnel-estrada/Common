@@ -48,7 +48,7 @@ namespace Common {
             }
 
             set {
-                Assertion.Assert(0 <= value && value < this.count);
+                Assertion.IsTrue(0 <= value && value < this.count);
                 this.currentIndex = value;
             }
         }

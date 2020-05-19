@@ -14,7 +14,7 @@ namespace Common {
             this.list = new List<T>(cap);
             
             this.cap = cap;
-            Assertion.Assert(this.cap > 0);
+            Assertion.IsTrue(this.cap > 0);
         }
         
         public T this[int index] {

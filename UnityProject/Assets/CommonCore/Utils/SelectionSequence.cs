@@ -87,7 +87,7 @@ namespace Common {
                 }
             }
             
-            Assertion.Assert(false, "Can't find the item to select: " + item.ToString());
+            Assertion.IsTrue(false, "Can't find the item to select: " + item.ToString());
         }
 
         public int Count {

@@ -49,7 +49,7 @@ namespace Common {
 		 * Adds an item
 		 */
 		public void Add(T item) {
-			Assertion.Assert(!Contains(item.Name)); // should maintain uniqueness of each variable
+			Assertion.IsTrue(!Contains(item.Name)); // should maintain uniqueness of each variable
 			this.ItemList.Add(item);
 		}
 		
@@ -64,7 +64,7 @@ namespace Common {
 		 * Removes an item by name.
 		 */
 		public void Remove(string name) {
-			Assertion.Assert(Contains(name)); // should contain the specified variable name
+			Assertion.IsTrue(Contains(name)); // should contain the specified variable name
 			Remove(Get(name));
 		}
 		

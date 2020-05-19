@@ -43,7 +43,7 @@ namespace Common {
 
         public T Top {
             get {
-                Assertion.Assert(this.list.Count > 0);
+                Assertion.IsTrue(this.list.Count > 0);
 
                 // Top is the last item
                 return this.list[this.list.Count - 1];

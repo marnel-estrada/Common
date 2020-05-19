@@ -49,7 +49,7 @@ namespace CommonEcs {
             for (int i = 0; i < addedList.Length; ++i) {
                 AddGameObjectSpriteToLayerSystem.Added added = addedList[i];
                 Maybe<SpriteManager> manager = this.managers.Get(added.spriteManagerEntity);
-                Assertion.Assert(manager.HasValue);
+                Assertion.IsTrue(manager.HasValue);
                 manager.Value.Remove(added.managerIndex);
                 
                 // We remove this component so it will no longer be processed by this system

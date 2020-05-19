@@ -22,7 +22,7 @@ namespace Common.Fsm {
 
 		public void AddTransition(string eventId, FsmState destinationState) {
 			// can't have two transitions for the same event
-			Assertion.Assert(!this.transitionMap.ContainsKey(eventId), string.Format("The state {0} already contains a transition for event {1}.", this.name, eventId));
+			Assertion.IsTrue(!this.transitionMap.ContainsKey(eventId), string.Format("The state {0} already contains a transition for event {1}.", this.name, eventId));
 			this.transitionMap[eventId] = destinationState;
 		}
 
@@ -31,8 +31,8 @@ namespace Common.Fsm {
 		}
 
 		public void AddAction(FsmAction action) {
-			Assertion.Assert(!this.actionList.Contains(action), "The state already contains the specified action.");
-			Assertion.Assert(action.GetOwner() == this, "The owner of the action should be this state.");
+			Assertion.IsTrue(!this.actionList.Contains(action), "The state already contains the specified action.");
+			Assertion.IsTrue(action.GetOwner() == this, "The owner of the action should be this state.");
 			this.actionList.Add(action);
 		}
         

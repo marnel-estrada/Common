@@ -17,7 +17,7 @@ namespace CommonEcs {
             Assertion.NotNull(this.entityManager);
 
             this.spriteLayerEntity = spriteLayerEntity;
-            Assertion.Assert(this.spriteLayerEntity != Entity.Null);
+            Assertion.IsTrue(this.spriteLayerEntity != Entity.Null);
         }
 
         public void Init(Entity spriteLayerEntity) {
@@ -36,8 +36,8 @@ namespace CommonEcs {
         /// <param name="sprite"></param>
         public void Create(ref Sprite sprite, float3 translation, quaternion rotation, bool isStatic, float sortOrderOffset = 0) {
             // Avoid creating a new sprite entity when another one exists
-            Assertion.Assert(!this.Exists);
-            Assertion.Assert(this.spriteLayerEntity != Entity.Null);
+            Assertion.IsTrue(!this.Exists);
+            Assertion.IsTrue(this.spriteLayerEntity != Entity.Null);
 
             this.spriteEntity = this.entityManager.CreateEntity();
             

@@ -54,7 +54,7 @@ namespace Common.Fsm.Action {
 		}
         
 		public override void OnEnter() {
-			Assertion.Assert(!Comparison.TolerantEquals(direction.sqrMagnitude, 0)); // direction should not be zero
+			Assertion.IsTrue(!Comparison.TolerantEquals(direction.sqrMagnitude, 0)); // direction should not be zero
 			
 			// normalize direction
 			if(!Comparison.TolerantEquals(this.direction.sqrMagnitude, 1)) {

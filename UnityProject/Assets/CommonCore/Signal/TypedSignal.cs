@@ -12,7 +12,7 @@
         private readonly SimpleList<SignalListener> listeners = new SimpleList<SignalListener>(1);
 
         public void AddListener(SignalListener listener) {
-            Assertion.Assert(!this.listeners.Contains(listener)); // Prevent duplicate listeners
+            Assertion.IsTrue(!this.listeners.Contains(listener)); // Prevent duplicate listeners
             this.listeners.Add(listener);
         }
 

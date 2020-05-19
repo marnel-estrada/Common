@@ -53,7 +53,7 @@ namespace CommonEcs {
 
         private bool ProcessThenReturnIfSuccess(Entity spriteEntity, Transform transform, ref Sprite sprite, ref AddToSpriteLayer addToLayer, EntityCommandBuffer commandBuffer) {
             Maybe<SpriteLayer> layer = this.layers.Get(addToLayer.layerEntity);
-            Assertion.Assert(layer.HasValue);
+            Assertion.IsTrue(layer.HasValue);
             SpriteLayer spriteLayer = layer.Value;
 
             // Resolve a SpriteManager with space
@@ -84,7 +84,7 @@ namespace CommonEcs {
         }
 
         private static void AddSpriteToManager(SpriteManager manager, Entity spriteEntity, Transform transform, ref Sprite sprite, EntityCommandBuffer commandBuffer) {
-            Assertion.Assert(manager.Owner != Entity.Null); // Should have been set already
+            Assertion.IsTrue(manager.Owner != Entity.Null); // Should have been set already
             sprite.spriteManagerEntity = manager.Owner;
 
             float4x4 matrix = new float4x4(transform.rotation, transform.position);

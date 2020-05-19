@@ -14,8 +14,8 @@ namespace Game {
         private GameObject[] targets;
 
         private void Start() {
-            Assertion.AssertNotEmpty(this.gameVariableId);
-            Assertion.Assert(this.targets.Length > 0);
+            Assertion.NotEmpty(this.gameVariableId);
+            Assertion.IsTrue(this.targets.Length > 0);
 
             BoolGameVariable variable = new BoolGameVariable(this.gameVariableId);
             if(variable.Value) {

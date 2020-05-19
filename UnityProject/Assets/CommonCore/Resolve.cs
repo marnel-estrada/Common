@@ -18,13 +18,13 @@
         public T Value {
             get {
                 // Value can only be retrieved if it was resolved
-                Assertion.Assert(this.resolved);
+                Assertion.IsTrue(this.resolved);
                 return this.value;
             }
             
             set {
                 // Can only set if it wasn't resolved yet
-                Assertion.Assert(!this.resolved);
+                Assertion.IsTrue(!this.resolved);
                 this.value = value;
             }
         }

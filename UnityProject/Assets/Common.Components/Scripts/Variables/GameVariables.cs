@@ -23,7 +23,7 @@ namespace Common {
         private GameVariableSet defaultVariables;
 
         private void Awake() {
-            Assertion.AssertNotEmpty(this.gameVarXmlPath);
+            Assertion.NotEmpty(this.gameVarXmlPath);
 
             if (!this.useStreamingSource) {
                 Assertion.NotNull(this.nonStreamingSource);
@@ -108,7 +108,7 @@ namespace Common {
 
             if (!string.IsNullOrEmpty(overrideToUse) && overrideNode == null) {
                 // This means that an override was specified but no node for it was found
-                Assertion.Assert(false, "Can't find node for override " + overrideToUse);
+                Assertion.IsTrue(false, "Can't find node for override " + overrideToUse);
             }
 
             // After parsing the default entries, we load the override if it was specified
@@ -133,7 +133,7 @@ namespace Common {
                     string key = child.GetAttribute(KEY);
                     string value = child.GetAttribute(VALUE);
 
-                    Assertion.Assert(this.defaultVariables.Contains(key), key, this.gameObject);
+                    Assertion.IsTrue(this.defaultVariables.Contains(key), key, this.gameObject);
                     this.defaultVariables.Set(key, value);
                 }
             }
@@ -151,7 +151,7 @@ namespace Common {
                 PopulateVariables();
             }
 
-            Assertion.Assert(this.defaultVariables.Contains(key), key);
+            Assertion.IsTrue(this.defaultVariables.Contains(key), key);
             return this.defaultVariables.Get(key);
         }
 
@@ -184,7 +184,7 @@ namespace Common {
                 return false;
             }
 
-            Assertion.Assert(false, "Can't resolve boolean value: " + rawBool);
+            Assertion.IsTrue(false, "Can't resolve boolean value: " + rawBool);
             return false;
         }
     }

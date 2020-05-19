@@ -42,7 +42,7 @@ namespace Common.Utils {
         public T Find(string id) {
             PopulateMap(); // We populate first because this may be invoked before Awake() (like in editor)
 
-            Assertion.Assert(this.map.TryGetValue(id, out T data), id); // data should exist
+            Assertion.IsTrue(this.map.TryGetValue(id, out T data), id); // data should exist
 
             return data;
         }

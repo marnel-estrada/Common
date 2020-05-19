@@ -14,14 +14,14 @@ namespace Common {
         private void TestEquality() {
             IntId a = new IntId(123);
             IntId b = new IntId(123);
-            Assertion.Assert(a == b);
-            Assertion.Assert(a.Equals(b));
+            Assertion.IsTrue(a == b);
+            Assertion.IsTrue(a.Equals(b));
 
             IntId c = new IntId(321);
-            Assertion.Assert(a != c);
-            Assertion.Assert(b != c);
-            Assertion.Assert(!a.Equals(c));
-            Assertion.Assert(!b.Equals(c));
+            Assertion.IsTrue(a != c);
+            Assertion.IsTrue(b != c);
+            Assertion.IsTrue(!a.Equals(c));
+            Assertion.IsTrue(!b.Equals(c));
 
             Debug.Log("TestEquality passed");
         }
@@ -29,13 +29,13 @@ namespace Common {
         private void TestAssignment() {
             IntId a = new IntId(1);
             IntId b = a;
-            Assertion.Assert(b == a);
+            Assertion.IsTrue(b == a);
 
             IntId c = new IntId(3);
-            Assertion.Assert(b != c);
+            Assertion.IsTrue(b != c);
 
             b = c;
-            Assertion.Assert(b == c);
+            Assertion.IsTrue(b == c);
 
             Debug.Log("TestAssignment passed");
         }
@@ -47,15 +47,15 @@ namespace Common {
                 { new IntId(3), "Rabbit" },
             };
 
-            Assertion.Assert(map.ContainsKey(new IntId(2)));
-            Assertion.Assert(!map.ContainsKey(new IntId(4)));
-            Assertion.Assert(map[new IntId(1)].Equals("Dog"));
+            Assertion.IsTrue(map.ContainsKey(new IntId(2)));
+            Assertion.IsTrue(!map.ContainsKey(new IntId(4)));
+            Assertion.IsTrue(map[new IntId(1)].Equals("Dog"));
 
             map[new IntId(2)] = "Human";
-            Assertion.Assert(map[new IntId(2)].Equals("Human"));
+            Assertion.IsTrue(map[new IntId(2)].Equals("Human"));
 
             map.Remove(new IntId(2));
-            Assertion.Assert(!map.ContainsKey(new IntId(2)));
+            Assertion.IsTrue(!map.ContainsKey(new IntId(2)));
 
             Debug.Log("TestAsKey passed!");
         }

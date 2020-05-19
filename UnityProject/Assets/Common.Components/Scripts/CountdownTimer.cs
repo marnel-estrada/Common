@@ -18,7 +18,7 @@ namespace Common {
         public CountdownTimer(float countdownTime, TimeReference timeReference) {
             this.timeReference = timeReference;
 
-            Assertion.Assert(countdownTime > 0, "The specified time must be greater than zero.");
+            Assertion.IsTrue(countdownTime > 0, "The specified time must be greater than zero.");
 
             Reset(countdownTime);
         }

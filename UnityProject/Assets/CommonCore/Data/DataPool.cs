@@ -138,7 +138,7 @@ namespace Common {
         /// </summary>
         /// <param name="item"></param>
         public void Add(T item) {
-            Assertion.Assert(!this.map.ContainsKey(item.Id)); // Should not contain the same ID
+            Assertion.IsTrue(!this.map.ContainsKey(item.Id)); // Should not contain the same ID
             
             item.IntId = this.idGenerator.Generate();
             this.dataList.Add(item);

@@ -129,7 +129,7 @@ namespace Common {
                 }
             }
 
-            Assertion.Assert(false, "Can't resolve type for " + this.newVariableType);
+            Assertion.IsTrue(false, "Can't resolve type for " + this.newVariableType);
 
             return default;
         }

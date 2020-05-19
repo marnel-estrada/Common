@@ -58,7 +58,7 @@ namespace Common {
 
             // Populate entries
             this.entriesMap.Clear();
-            Assertion.Assert(this.names.Count == this.textures.Count);
+            Assertion.IsTrue(this.names.Count == this.textures.Count);
             for (int i = 0; i < this.names.Count; ++i) {
                 int originalWidth = this.originalDimensions[i].x;
                 int originalHeight = this.originalDimensions[i].y;

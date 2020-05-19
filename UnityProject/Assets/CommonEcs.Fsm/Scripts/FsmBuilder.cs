@@ -88,7 +88,7 @@ namespace Common.Ecs.Fsm {
                 transitionEvent = transitionEvent
             };
 
-            Assertion.Assert(transition.transitionEvent != Fsm.NULL_EVENT);
+            Assertion.IsTrue(transition.transitionEvent != Fsm.NULL_EVENT);
             
             transitions.Add(transition);
         }

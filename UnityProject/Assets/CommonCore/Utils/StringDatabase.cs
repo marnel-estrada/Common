@@ -49,7 +49,7 @@ namespace Common {
             // Add a new entry
             int id = this.intToStringMap.Add(str);
             this.stringToIntMap[str] = id;
-            Assertion.Assert(this.intToStringMap.Get(this.stringToIntMap[str]) == str);
+            Assertion.IsTrue(this.intToStringMap.Get(this.stringToIntMap[str]) == str);
 
             return id;
         }

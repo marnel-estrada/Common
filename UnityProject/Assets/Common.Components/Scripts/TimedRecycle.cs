@@ -25,7 +25,7 @@ namespace Common {
 
         void Awake() {
             Assertion.NotNull(this.swarm);
-            Assertion.Assert(this.timeBeforeRecycle > 0);
+            Assertion.IsTrue(this.timeBeforeRecycle > 0);
 
             if (string.IsNullOrEmpty(this.timeReferenceName)) {
                 // Uses default time reference

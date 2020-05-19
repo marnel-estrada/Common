@@ -27,7 +27,7 @@ namespace Common {
 		public PopupValueSet(string[] displayList, string[] valueList) {
             this.displayList = displayList;
 			this.valueList = valueList;
-            Assertion.Assert(this.displayList.Length == this.valueList.Length); // they should have equal length
+            Assertion.IsTrue(this.displayList.Length == this.valueList.Length); // they should have equal length
 		}
 		
 		public string[] DisplayList {

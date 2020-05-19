@@ -8,14 +8,14 @@ namespace Common {
 		/**
 		 * Asserts the specified expression
 		 */
-		public static void Assert(bool expression, UnityEngine.Object context = null) {
-			Assert(expression, DEFAULT_MESSAGE, context);
+		public static void IsTrue(bool expression, UnityEngine.Object context = null) {
+			IsTrue(expression, DEFAULT_MESSAGE, context);
 		}
 	
 		/**
 		 * Asserts the specified expression.
 		 */
-		public static void Assert(bool expression, string assertErrorMessage, UnityEngine.Object context = null) {
+		public static void IsTrue(bool expression, string assertErrorMessage, UnityEngine.Object context = null) {
 			if (!expression) {
 				Debug.LogError(assertErrorMessage, context);
 				
@@ -30,22 +30,22 @@ namespace Common {
 		 * Asserts that the specified pointer is not null.
 		 */
 		public static void NotNull(object pointer, string name, UnityEngine.Object context = null) {
-			Assert(pointer != null, name, context);
+			IsTrue(pointer != null, name, context);
 		}
 	
 		/**
 		 * Asserts that the specified pointer is not null.
 		 */
 		public static void NotNull(object pointer, UnityEngine.Object context = null) {
-			Assert(pointer != null, DEFAULT_MESSAGE, context);
+			IsTrue(pointer != null, DEFAULT_MESSAGE, context);
 		}
 		
-		public static void AssertIsSome<T>(Option<T> option, UnityEngine.Object context = null) where T : class {
-			Assert(option.IsSome, "Option should be Some. Got a None instead.", context);
+		public static void IsSome<T>(Option<T> option, UnityEngine.Object context = null) where T : class {
+			IsTrue(option.IsSome, "Option should be Some. Got a None instead.", context);
 		}
 
-		public static void AssertIsSome<T>(Option<T> option, string name, UnityEngine.Object context = null) where T : class {
-			Assert(option.IsSome, name, context);
+		public static void IsSome<T>(Option<T> option, string name, UnityEngine.Object context = null) where T : class {
+			IsTrue(option.IsSome, name, context);
 		}
 		
 		/**
@@ -53,7 +53,7 @@ namespace Common {
 		 */
 		public static void NotNull(UnityEngine.Object pointer, string name, UnityEngine.Object context = null) {
 			if(!pointer) {
-				Assert(false, name, context);
+				IsTrue(false, name, context);
 			}
 		}
 	
@@ -62,23 +62,23 @@ namespace Common {
 		 */
 		public static void NotNull(UnityEngine.Object pointer, UnityEngine.Object context = null) {
 			if(!pointer) {
-				Assert(false, DEFAULT_MESSAGE, context);
+				IsTrue(false, DEFAULT_MESSAGE, context);
 			}
 		}
 		
 		/**
 		 * Asserts that the specified string is not empty.
 		 */
-		public static void AssertNotEmpty(string s, string name, UnityEngine.Object context = null) {
-			Assert(!string.IsNullOrEmpty(s), name, context);
+		public static void NotEmpty(string s, string name, UnityEngine.Object context = null) {
+			IsTrue(!string.IsNullOrEmpty(s), name, context);
 		}
 	
 		
 		/**
 		 * Asserts that the specified string is not empty.
 		 */
-		public static void AssertNotEmpty(string s, UnityEngine.Object context = null) {
-			Assert(!string.IsNullOrEmpty(s), DEFAULT_MESSAGE, context);
+		public static void NotEmpty(string s, UnityEngine.Object context = null) {
+			IsTrue(!string.IsNullOrEmpty(s), DEFAULT_MESSAGE, context);
 		}	
 	}
 }

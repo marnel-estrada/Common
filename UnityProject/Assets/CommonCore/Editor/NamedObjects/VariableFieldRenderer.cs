@@ -93,7 +93,7 @@ namespace Common {
 
             EditorGUILayout.LabelField(name + ": ", GUILayout.Width(this.fieldWidth));
 
-            Assertion.Assert(this.fieldRendererMap.TryGetValue(namedType, out FieldRenderer fieldRenderer));
+            Assertion.IsTrue(this.fieldRendererMap.TryGetValue(namedType, out FieldRenderer fieldRenderer));
             if (fieldRenderer != null) {
                 holder.Set(fieldRenderer(holder));
             }

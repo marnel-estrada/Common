@@ -59,7 +59,7 @@ namespace CommonEcs {
 
             public Internal(byte id) {
                 this.id = id;
-                Assertion.Assert(this.id > 0); // Zero is reserved to identify a non existing TimeReference
+                Assertion.IsTrue(this.id > 0); // Zero is reserved to identify a non existing TimeReference
             
                 this.timeScale = 1.0f;
             }

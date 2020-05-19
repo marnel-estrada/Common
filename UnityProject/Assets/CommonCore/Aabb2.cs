@@ -28,7 +28,7 @@ public class Aabb2 {
 
         AddToContain(v1);
         AddToContain(v2);
-        Assertion.Assert(!IsEmpty(), "AABB should not be empty when using this constructor.");
+        Assertion.IsTrue(!IsEmpty(), "AABB should not be empty when using this constructor.");
     }
 
     public Aabb2(Rect rect) {

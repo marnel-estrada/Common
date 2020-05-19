@@ -23,7 +23,7 @@ namespace Common {
 
         private void Awake() {
             Assertion.NotNull(this.image);
-            Assertion.Assert(this.framesPerSecond > 0);
+            Assertion.IsTrue(this.framesPerSecond > 0);
 
             this.polledTime = 0;
 

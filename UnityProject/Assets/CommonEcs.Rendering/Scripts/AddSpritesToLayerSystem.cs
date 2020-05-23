@@ -65,6 +65,10 @@ namespace CommonEcs {
 
             for (int i = 0; i < chunk.Count; ++i) {
                 AddToSpriteLayer addToLayer = this.addToLayers[i];
+                
+                // Must have a layer entity
+                Assertion.IsTrue(addToLayer.layerEntity != Entity.Null);
+                
                 Maybe<SpriteLayer> layer = this.layers.Get(addToLayer.layerEntity);
                 Assertion.IsTrue(layer.HasValue);
                 SpriteLayer spriteLayer = layer.Value;

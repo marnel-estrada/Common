@@ -1,14 +1,15 @@
-﻿namespace CommonEcs {
-    using System;
+﻿using System;
 
-    using Common;
+using Common;
 
-    using Unity.Entities;
-    using Unity.Mathematics;
+using Unity.Entities;
+using Unity.Mathematics;
 
-    using UnityEngine;
+using UnityEngine;
 
+namespace CommonEcs {
     [Serializable]
+    [GenerateAuthoringComponent]
     public struct Sprite : IComponentData {
         // Note here that we rearrange the variables from high number of bytes to low
         // This is so that memory is properly compacted

@@ -106,6 +106,12 @@ namespace CommonEcs {
             }
         }
 
+        public NativeList<SortedSpriteEntry> SortList {
+            get {
+                return this.internalInstance.sortList;
+            }
+        }
+
         public NativeArray<int> NativeTriangles {
             get {
                 return this.internalInstance.nativeTriangles;
@@ -306,6 +312,7 @@ namespace CommonEcs {
         /// </summary>
         public void Dispose() {
             this.internalInstance.nativeVertices.Dispose();
+            this.internalInstance.sortList.Dispose();
             this.internalInstance.nativeTriangles.Dispose();
             this.internalInstance.nativeUv.Dispose();
             this.internalInstance.nativeUv2.Dispose();
@@ -340,6 +347,8 @@ namespace CommonEcs {
 
             private int capacity;
             public int spriteCount;
+
+            public NativeList<SortedSpriteEntry> sortList;
 
             public int layer;
 
@@ -409,6 +418,8 @@ namespace CommonEcs {
                 this.nativeTriangles = new NativeArray<int>(trianglesLength, Allocator.Persistent);
 
                 this.mesh = new Mesh();
+
+                this.sortList = new NativeList<SortedSpriteEntry>(allocationCount, Allocator.Persistent);
 
                 this.spriteCount = 0;
             }

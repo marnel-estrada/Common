@@ -9,7 +9,6 @@ namespace CommonEcs {
     /// Component for duration timing
     /// </summary>
     public struct DurationTimer : IComponentData {
-
         public float durationTime;
         public float polledTime;
 
@@ -63,6 +62,5 @@ namespace CommonEcs {
         public override string ToString() {
             return "Duration: {0}; PolledTime: {1}".FormatWith(this.durationTime, this.polledTime);
         }
-
     }
 }

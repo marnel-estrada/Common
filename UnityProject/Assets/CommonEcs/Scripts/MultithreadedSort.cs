@@ -8,7 +8,7 @@ using Unity.Jobs;
 namespace CommonEcs {
     public static class MultithreadedSort {
         // Use single thread sort when array length is less than or equal than this value
-        private const int SINGLE_THREAD_THRESHOLD_LENGTH = 400;
+        public const int SINGLE_THREAD_THRESHOLD_LENGTH = 400;
 
         public static JobHandle Sort<T>(NativeArray<T> array, JobHandle parentHandle)
             where T : unmanaged, IComparable<T> {
@@ -42,7 +42,7 @@ namespace CommonEcs {
             }.Schedule(combined);
         }
 
-        private readonly struct SortRange {
+        public readonly struct SortRange {
             public readonly int left;
             public readonly int right;
 
@@ -71,7 +71,7 @@ namespace CommonEcs {
         }
 
         [BurstCompile]
-        private struct Merge<T> : IJob where T : unmanaged, IComparable<T> {
+        public struct Merge<T> : IJob where T : unmanaged, IComparable<T> {
             [NativeDisableContainerSafetyRestriction]
             public NativeArray<T> array;
             
@@ -126,7 +126,7 @@ namespace CommonEcs {
         }
 
         [BurstCompile]
-        private struct SingleThreadSortJob<T> : IJob where T : unmanaged, IComparable<T> {
+        public struct SingleThreadSortJob<T> : IJob where T : unmanaged, IComparable<T> {
             [NativeDisableContainerSafetyRestriction]
             public NativeArray<T> array;
 

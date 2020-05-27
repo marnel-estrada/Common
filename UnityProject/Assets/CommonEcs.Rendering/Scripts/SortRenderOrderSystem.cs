@@ -22,9 +22,6 @@ namespace CommonEcs {
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             this.managerQuery.Update();
             
-            // Clear first
-            ClearSortLists();
-            
             JobHandle lastHandle = inputDeps;
 
             IReadOnlyList<SpriteManager> managers = this.managerQuery.SharedComponents;
@@ -40,61 +37,42 @@ namespace CommonEcs {
                 }
                 
                 this.query.SetSharedComponentFilter(spriteManager);
+                int count = this.query.CalculateEntityCount();
+                NativeArray<SortedSpriteEntry> entries = new NativeArray<SortedSpriteEntry>(count, Allocator.TempJob);
 
                 AddJob addJob = new AddJob() {
                     chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob),
                     spriteType = spriteType,
-                    sortList = spriteManager.SortList
+                    sortList = entries
                 };
 
-                lastHandle = addJob.Schedule(lastHandle);
-            }
-
-            // Sort jobs
-            for (int i = 1; i < managers.Count; ++i) {
-                SpriteManager spriteManager = managers[i];
+                lastHandle = addJob.Schedule(this.query, lastHandle);
                 
-                if (!ShouldProcess(ref spriteManager)) {
-                    continue;
-                }
-
                 SortJob sortJob = new SortJob() {
-                    sortList = spriteManager.SortList
+                    sortList = entries
                 };
-
-                lastHandle = sortJob.Schedule(lastHandle);
-            }
-
-            // Reset jobs
-            for (int i = 1; i < managers.Count; ++i) {
-                SpriteManager spriteManager = managers[i];
                 
-                if (!ShouldProcess(ref spriteManager)) {
-                    continue;
-                }
-
+                lastHandle = sortJob.Schedule(lastHandle);
+                //lastHandle = MultiThreadSort(entries, lastHandle);
+                
                 ResetTrianglesJob resetTrianglesJob = new ResetTrianglesJob() {
                     triangles = spriteManager.NativeTriangles
                 };
 
                 lastHandle = resetTrianglesJob.Schedule(spriteManager.NativeTriangles.Length,
                     64, lastHandle);
-            }
-
-            // Set to triangles jobs
-            for (int i = 1; i < managers.Count; ++i) {
-                SpriteManager spriteManager = managers[i];
                 
-                if (!ShouldProcess(ref spriteManager)) {
-                    continue;
-                }
-
                 SetTrianglesJob setTrianglesJob = new SetTrianglesJob() {
                     triangles = spriteManager.NativeTriangles,
-                    sortList = spriteManager.SortList
+                    sortList = entries
                 };
 
                 lastHandle = setTrianglesJob.Schedule(spriteManager.Count, 64, lastHandle);
+                
+                // Don't forget to deallocate the array
+                lastHandle = new DeallocateNativeArrayJob<SortedSpriteEntry>() {
+                    array = entries
+                }.Schedule(lastHandle);
             }
 
             return lastHandle;
@@ -103,16 +81,9 @@ namespace CommonEcs {
         private static bool ShouldProcess(ref SpriteManager manager) {
             return manager.Owner != Entity.Null && (manager.RenderOrderChanged || manager.AlwaysUpdateMesh);
         }
-
-        private void ClearSortLists() {
-            // Note that we start from 1 because the first entry is the default
-            for (int i = 1; i < this.managerQuery.SharedComponents.Count; ++i) {
-                this.managerQuery.SharedComponents[i].SortList.Clear();
-            }
-        }
         
         [BurstCompile]
-        private struct AddJob : IJob {
+        private struct AddJob : IJobChunk {
             [ReadOnly]
             [DeallocateOnJobCompletion]
             public NativeArray<ArchetypeChunk> chunks;
@@ -120,27 +91,22 @@ namespace CommonEcs {
             [ReadOnly]
             public ArchetypeChunkComponentType<Sprite> spriteType;
             
-            public NativeList<SortedSpriteEntry> sortList;
+            public NativeArray<SortedSpriteEntry> sortList;
 
-            public void Execute() {
-                for (int i = 0; i < this.chunks.Length; ++i) {
-                    Process(this.chunks[i]);
-                }
-            }
-
-            private void Process(ArchetypeChunk chunk) {
+            public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {
                 NativeArray<Sprite> sprites = chunk.GetNativeArray(this.spriteType);
                 for (int i = 0; i < sprites.Length; ++i) {
                     Sprite sprite = sprites[i];
-                    this.sortList.Add(new SortedSpriteEntry(sprite.managerIndex, sprite.LayerOrder,
-                        sprite.RenderOrder));
+                    int index = firstEntityIndex + i;
+                    this.sortList[index] = new SortedSpriteEntry(sprite.managerIndex, sprite.LayerOrder,
+                        sprite.RenderOrder);
                 }
             }
         }
 
         [BurstCompile]
         private struct SortJob : IJob {
-            public NativeList<SortedSpriteEntry> sortList;
+            public NativeArray<SortedSpriteEntry> sortList;
 
             public void Execute() {
                 if (this.sortList.Length > 0) {
@@ -208,6 +174,34 @@ namespace CommonEcs {
                 return 0;
             }
         }
+        
+        private static JobHandle MultiThreadSort(NativeArray<SortedSpriteEntry> array, JobHandle parentHandle) {
+            return Sort(array, new MultithreadedSort.SortRange(0, array.Length - 1), parentHandle);
+        }
+
+        private static JobHandle Sort(NativeArray<SortedSpriteEntry> array, MultithreadedSort.SortRange range,
+            JobHandle parentHandle) {
+            if (range.Length <= MultithreadedSort.SINGLE_THREAD_THRESHOLD_LENGTH) {
+                // Use single threaded sort
+                return new MultithreadedSort.SingleThreadSortJob<SortedSpriteEntry>() {
+                    array = array, left = range.left, right = range.right
+                }.Schedule(parentHandle);
+            }
+
+            int middle = range.Middle;
+
+            MultithreadedSort.SortRange left = new MultithreadedSort.SortRange(range.left, middle);
+            JobHandle leftHandle = Sort(array, left, parentHandle);
+
+            MultithreadedSort.SortRange right = new MultithreadedSort.SortRange(middle + 1, range.right);
+            JobHandle rightHandle = Sort(array, right, parentHandle);
+
+            JobHandle combined = JobHandle.CombineDependencies(leftHandle, rightHandle);
+
+            return new MultithreadedSort.Merge<SortedSpriteEntry>() {
+                array = array, first = left, second = right
+            }.Schedule(combined);
+        }
 
         // We need this job so that triangle indeces that are past the sorted sprites are erased
         // We do this so that this remainder indeces will not render on top of the sorted ones
@@ -226,7 +220,7 @@ namespace CommonEcs {
             public NativeArray<int> triangles;
 
             [ReadOnly]
-            public NativeList<SortedSpriteEntry> sortList;
+            public NativeArray<SortedSpriteEntry> sortList;
 
             public void Execute(int index) {
                 if (index >= this.sortList.Length) {

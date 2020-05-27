@@ -42,19 +42,14 @@ namespace CommonEcs {
                 NativeArray<SortedSpriteEntry> entries = new NativeArray<SortedSpriteEntry>(count, Allocator.TempJob);
 
                 AddJob addJob = new AddJob() {
-                    chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob),
                     spriteType = spriteType,
                     sortList = entries
                 };
 
                 lastHandle = addJob.Schedule(this.query, lastHandle);
                 
-                SortJob sortJob = new SortJob() {
-                    sortList = entries
-                };
-                
-                lastHandle = sortJob.Schedule(lastHandle);
-                //lastHandle = MultiThreadSort(entries, lastHandle);
+                // Sort
+                lastHandle = MultiThreadSort(entries, lastHandle);
                 
                 ResetTrianglesJob resetTrianglesJob = new ResetTrianglesJob() {
                     triangles = spriteManager.NativeTriangles
@@ -86,10 +81,6 @@ namespace CommonEcs {
         [BurstCompile]
         private struct AddJob : IJobChunk {
             [ReadOnly]
-            [DeallocateOnJobCompletion]
-            public NativeArray<ArchetypeChunk> chunks;
-
-            [ReadOnly]
             public ArchetypeChunkComponentType<Sprite> spriteType;
             
             public NativeArray<SortedSpriteEntry> sortList;
@@ -104,78 +95,8 @@ namespace CommonEcs {
                 }
             }
         }
-
-        [BurstCompile]
-        private struct SortJob : IJob {
-            public NativeArray<SortedSpriteEntry> sortList;
-
-            public void Execute() {
-                if (this.sortList.Length > 0) {
-                    Quicksort(0, this.sortList.Length - 1);
-                }
-            }
-
-            private void Quicksort(int left, int right) {
-                int i = left;
-                int j = right;
-                SortedSpriteEntry pivot = this.sortList[(left + right) / 2];
-
-                while (i <= j) {
-                    // Lesser
-                    while (Compare(this.sortList[i], ref pivot) < 0) {
-                        ++i;
-                    }
-
-                    // Greater
-                    while (Compare(this.sortList[j], ref pivot) > 0) {
-                        --j;
-                    }
-
-                    if (i <= j) {
-                        // Swap
-                        SortedSpriteEntry temp = this.sortList[i];
-                        this.sortList[i] = this.sortList[j];
-                        this.sortList[j] = temp;
-
-                        ++i;
-                        --j;
-                    }
-                }
-
-                // Recurse
-                if (left < j) {
-                    Quicksort(left, j);
-                }
-
-                if (i < right) {
-                    Quicksort(i, right);
-                }
-            }
-
-            private int Compare(SortedSpriteEntry a, ref SortedSpriteEntry b) {
-                if (a.layerOrder < b.layerOrder) {
-                    return -1;
-                }
-
-                if (a.layerOrder > b.layerOrder) {
-                    return 1;
-                }
-
-                // At this point, they have the same layerOrder
-                // We check the renderOrder
-                if (a.renderOrder < b.renderOrder) {
-                    return -1;
-                }
-
-                if (a.renderOrder > b.renderOrder) {
-                    return 1;
-                }
-
-                // They are equal
-                return 0;
-            }
-        }
         
+        // This is copied from MultithreadedSort so that it will be Burst compiled on build
         private static JobHandle MultiThreadSort(NativeArray<SortedSpriteEntry> array, JobHandle parentHandle) {
             return Sort(array, new MultithreadedSort.SortRange(0, array.Length - 1), parentHandle);
         }

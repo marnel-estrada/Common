@@ -16,6 +16,11 @@ namespace CommonEcs {
         }
 
         private static JobHandle Sort<T>(NativeArray<T> array, SortRange range, JobHandle parentHandle) where T : unmanaged, IComparable<T> {
+            if (array.Length <= 0) {
+                // Nothing to sort
+                return parentHandle;
+            }
+            
             if (range.Length <= SINGLE_THREAD_THRESHOLD_LENGTH) {
                 // Use single threaded sort
                 return new SingleThreadSortJob<T>() {
@@ -133,8 +138,10 @@ namespace CommonEcs {
             public int left;
             public int right;
 
-            public void Execute() { 
-                Quicksort(this.left, this.right);
+            public void Execute() {
+                if (this.array.Length > 0) {
+                    Quicksort(this.left, this.right);
+                }
             }
 
             private void Quicksort(int left, int right) {

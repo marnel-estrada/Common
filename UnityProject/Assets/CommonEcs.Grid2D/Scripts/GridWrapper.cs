@@ -24,26 +24,26 @@ namespace CommonEcs {
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns></returns>
-        public Maybe<Entity> GetCellEntity(int x, int y) {
+        public Option<Entity> GetCellEntity(int x, int y) {
             int index = y * this.grid.columnCount + x;
 
             if (index < 0 || index >= this.cellEntities.Length) {
                 // Invalid index
-                return Maybe<Entity>.Nothing;
+                return Option<Entity>.NONE;
             }
 
-            return new Maybe<Entity>(this.cellEntities[index].entity);
+            return Option<Entity>.Some(this.cellEntities[index].entity);
         }
 
-        public Maybe<Entity> GetCellEntity(int2 gridCoordinates) {
+        public Option<Entity> GetCellEntity(int2 gridCoordinates) {
             return GetCellEntity(gridCoordinates.x, gridCoordinates.y);
         }
 
-        public Maybe<Entity> GetCellEntityAtWorld(int worldX, int worldY) {
+        public Option<Entity> GetCellEntityAtWorld(int worldX, int worldY) {
             return GetCellEntityAtWorld(new int2(worldX, worldY));
         }
 
-        public Maybe<Entity> GetCellEntityAtWorld(int2 worldCoordinate) {
+        public Option<Entity> GetCellEntityAtWorld(int2 worldCoordinate) {
             // Convert to grid coordinate first
             int2 gridCoordinate = worldCoordinate - this.grid.minCoordinate;
             return GetCellEntity(gridCoordinate.x, gridCoordinate.y);

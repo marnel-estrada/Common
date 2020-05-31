@@ -48,7 +48,7 @@ namespace CommonEcs {
                 lastHandle = addJob.Schedule(this.query, lastHandle);
                 
                 // Sort
-                lastHandle = MultiThreadSort(entries, lastHandle);
+                lastHandle = MultithreadedSort.Sort(entries, lastHandle);
                 
                 ResetTrianglesJob resetTrianglesJob = new ResetTrianglesJob() {
                     triangles = spriteManager.NativeTriangles
@@ -93,35 +93,6 @@ namespace CommonEcs {
                         sprite.RenderOrder);
                 }
             }
-        }
-        
-        // This is copied from MultithreadedSort so that it will be Burst compiled on build
-        private static JobHandle MultiThreadSort(NativeArray<SortedSpriteEntry> array, JobHandle parentHandle) {
-            return Sort(array, new MultithreadedSort.SortRange(0, array.Length - 1), parentHandle);
-        }
-
-        private static JobHandle Sort(NativeArray<SortedSpriteEntry> array, MultithreadedSort.SortRange range,
-            JobHandle parentHandle) {
-            if (range.Length <= MultithreadedSort.SINGLE_THREAD_THRESHOLD_LENGTH) {
-                // Use single threaded sort
-                return new MultithreadedSort.SingleThreadSortJob<SortedSpriteEntry>() {
-                    array = array, left = range.left, right = range.right
-                }.Schedule(parentHandle);
-            }
-
-            int middle = range.Middle;
-
-            MultithreadedSort.SortRange left = new MultithreadedSort.SortRange(range.left, middle);
-            JobHandle leftHandle = Sort(array, left, parentHandle);
-
-            MultithreadedSort.SortRange right = new MultithreadedSort.SortRange(middle + 1, range.right);
-            JobHandle rightHandle = Sort(array, right, parentHandle);
-
-            JobHandle combined = JobHandle.CombineDependencies(leftHandle, rightHandle);
-
-            return new MultithreadedSort.Merge<SortedSpriteEntry>() {
-                array = array, first = left, second = right
-            }.Schedule(combined);
         }
 
         // We need this job so that triangle indeces that are past the sorted sprites are erased

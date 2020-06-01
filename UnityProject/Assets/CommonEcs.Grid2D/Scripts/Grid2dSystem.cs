@@ -98,5 +98,14 @@ namespace CommonEcs {
                 return ref this.grid;
             }
         }
+
+        /// <summary>
+        /// Returns whether or not the grid is resolved
+        /// </summary>
+        public bool Resolved {
+            get {
+                return this.resolved;
+            }
+        }
     }
 }

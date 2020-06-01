@@ -14,6 +14,12 @@ namespace CommonEcs {
             this.map = new NativeHashMap<int, Entity>(10, Allocator.Persistent);
         }
 
+        protected override void OnDestroy() {
+            if (this.map.IsCreated) {
+                this.map.Dispose();
+            }
+        }
+
         /// <summary>
         /// Adds a prefab to maintain
         /// </summary>

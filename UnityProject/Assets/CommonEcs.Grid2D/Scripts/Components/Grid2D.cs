@@ -5,6 +5,16 @@ using Unity.Mathematics;
 
 namespace CommonEcs {
     public struct Grid2D : IComponentData {
+        public readonly float2 bottomLeftCellCenter; // The center of starting cell position at the bottom left
+
+        // AABB of the grid
+        public readonly float2 min;
+        public readonly float2 max;
+
+        // These are world coordinates
+        public int2 minCoordinate;
+        public int2 maxCoordinte;
+        
         // The id of the grid
         // This may be used to identify a grid if there are multiple grids
         public int id;
@@ -18,15 +28,6 @@ namespace CommonEcs {
         // We cache these values for faster calculation of grid cell position
         public readonly float gridWidth; // The whole grid width
         public readonly float gridHeight; // The whole grid height
-
-        public readonly float2 cellStart; // The center of starting cell position at the bottom left
-
-        // AABB of the grid
-        public readonly float2 min;
-        public readonly float2 max;
-
-        public int2 minCoordinate;
-        public int2 maxCoordinte;
 
         /// <summary>
         /// Constructor
@@ -46,12 +47,12 @@ namespace CommonEcs {
             this.gridWidth = cellWidth * columnCount;
             this.min.x = -this.gridWidth * 0.5f;
             this.max.x = this.gridWidth * 0.5f;
-            this.cellStart.x = this.min.x + (cellWidth * 0.5f);
+            this.bottomLeftCellCenter.x = this.min.x + (cellWidth * 0.5f);
 
             this.gridHeight = cellHeight * rowCount;
             this.min.y = -this.gridHeight * 0.5f;
             this.max.y = this.gridHeight * 0.5f;
-            this.cellStart.y = this.min.y + (cellHeight * 0.5f);
+            this.bottomLeftCellCenter.y = this.min.y + (cellHeight * 0.5f);
 
             int halfColumns = this.columnCount >> 1;
             int halfRows = this.rowCount >> 1;

@@ -41,6 +41,8 @@ namespace CommonEcs {
             }
             
             chunks.Dispose();
+
+            this.Enabled = false; // So update will not be called again
         }
 
         private void Process(in ArchetypeChunk chunk) {

@@ -22,6 +22,7 @@ namespace CommonEcs {
                     
                     this.grid = multipleGrid;
                     PopulateCellEntities(in entityBuffer);
+                    this.gridWrapper = new MultipleGrid2dWrapper(this.grid, this.cellEntities.Value);
 
                     this.resolved = true;
                     this.Enabled = false; // So update will not be called again

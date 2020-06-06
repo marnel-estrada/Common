@@ -64,7 +64,7 @@ namespace Common {
 
                 // Must have a renderer
                 if (!HasRenderer(property)) {
-                    return;
+                    continue;
                 }
 
                 // At this point the property has a renderer

@@ -48,7 +48,7 @@ namespace CommonEcs {
                 }.Schedule(masterList.Length, 64, lastHandle);
                 
                 // Sort (SortJob is fast!)
-                lastHandle = sortEntries.SortJob(lastHandle);
+                lastHandle = sortEntries.SortJobAlternate(lastHandle);
                 
                 // Update arrays
                 // sortEntries will be deallocated on this job

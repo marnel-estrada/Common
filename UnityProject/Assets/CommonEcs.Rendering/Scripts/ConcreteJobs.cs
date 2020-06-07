@@ -7,7 +7,7 @@ namespace CommonEcs.Rendering {
     static class ConcreteJobs {
         static ConcreteJobs() {
             new MultithreadedSort.Merge<SortedSpriteEntry>().Schedule();
-            new MultithreadedSort.SingleThreadSortJob<SortedSpriteEntry>().Schedule();
+            new MultithreadedSort.QuicksortJob<SortedSpriteEntry>().Schedule();
         }
     }
 }

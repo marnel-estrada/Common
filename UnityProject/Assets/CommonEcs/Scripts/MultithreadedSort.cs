@@ -7,18 +7,18 @@ using Unity.Jobs;
 
 namespace CommonEcs {
     public static class MultithreadedSort {
-        // Use single thread sort when array length is less than or equal than this value
-        public const int SINGLE_THREAD_THRESHOLD_LENGTH = 400;
+        // Use quicksort when sub-array length is less than or equal than this value
+        public const int QUICKSORT_THRESHOLD_LENGTH = 400;
 
         public static JobHandle Sort<T>(NativeArray<T> array, JobHandle parentHandle)
             where T : unmanaged, IComparable<T> {
-            return Sort(array, new SortRange(0, array.Length - 1), parentHandle);
+            return MergeSort(array, new SortRange(0, array.Length - 1), parentHandle);
         }
 
-        private static JobHandle Sort<T>(NativeArray<T> array, SortRange range, JobHandle parentHandle) where T : unmanaged, IComparable<T> {
-            if (range.Length <= SINGLE_THREAD_THRESHOLD_LENGTH) {
+        private static JobHandle MergeSort<T>(NativeArray<T> array, SortRange range, JobHandle parentHandle) where T : unmanaged, IComparable<T> {
+            if (range.Length <= QUICKSORT_THRESHOLD_LENGTH) {
                 // Use single threaded sort
-                return new SingleThreadSortJob<T>() {
+                return new QuicksortJob<T>() {
                     array = array,
                     left = range.left,
                     right = range.right
@@ -28,10 +28,10 @@ namespace CommonEcs {
             int middle = range.Middle;
 
             SortRange left = new SortRange(range.left, middle);
-            JobHandle leftHandle = Sort(array, left, parentHandle);
+            JobHandle leftHandle = MergeSort(array, left, parentHandle);
 
             SortRange right = new SortRange(middle + 1, range.right);
-            JobHandle rightHandle = Sort(array, right, parentHandle);
+            JobHandle rightHandle = MergeSort(array, right, parentHandle);
             
             JobHandle combined = JobHandle.CombineDependencies(leftHandle, rightHandle);
             
@@ -126,7 +126,7 @@ namespace CommonEcs {
         }
 
         [BurstCompile]
-        public struct SingleThreadSortJob<T> : IJob where T : unmanaged, IComparable<T> {
+        public struct QuicksortJob<T> : IJob where T : unmanaged, IComparable<T> {
             [NativeDisableContainerSafetyRestriction]
             public NativeArray<T> array;
 

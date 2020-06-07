@@ -17,7 +17,7 @@ namespace CommonEcs {
 
         private static JobHandle MergeSort<T>(NativeArray<T> array, SortRange range, JobHandle parentHandle) where T : unmanaged, IComparable<T> {
             if (range.Length <= QUICKSORT_THRESHOLD_LENGTH) {
-                // Use single threaded sort
+                // Use quicksort
                 return new QuicksortJob<T>() {
                     array = array,
                     left = range.left,
@@ -133,8 +133,10 @@ namespace CommonEcs {
             public int left;
             public int right;
 
-            public void Execute() { 
-                Quicksort(this.left, this.right);
+            public void Execute() {
+                if (this.array.Length > 0) {
+                    Quicksort(this.left, this.right);
+                }
             }
 
             private void Quicksort(int left, int right) {

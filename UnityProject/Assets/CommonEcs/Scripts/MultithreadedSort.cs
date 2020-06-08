@@ -12,8 +12,14 @@ namespace CommonEcs {
     public static class MultithreadedSort {
         public static JobHandle Sort<T>(NativeArray<T> array, JobHandle parentHandle)
             where T : unmanaged, IComparable<T> {
-            int workerCount = math.max(1, SystemInfo.processorCount);
-            return MergeSort(array, parentHandle, new SortRange(0, array.Length - 1), array.Length / workerCount);
+            if (array.Length == 0) {
+                // Nothing to sort
+                return parentHandle;
+            }
+            
+            int processorCount = math.max(1, SystemInfo.processorCount);
+            int threshold = math.max(4, array.Length / processorCount);
+            return MergeSort(array, parentHandle, new SortRange(0, array.Length - 1), threshold);
         }
 
         private static JobHandle MergeSort<T>(NativeArray<T> array, JobHandle parentHandle, SortRange range, int threshold) where T : unmanaged, IComparable<T> {

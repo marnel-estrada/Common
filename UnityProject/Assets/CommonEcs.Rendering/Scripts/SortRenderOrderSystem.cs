@@ -23,9 +23,6 @@ namespace CommonEcs {
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             this.managerQuery.Update();
             
-            // Clear first
-            ClearSortLists();
-            
             JobHandle lastHandle = inputDeps;
 
             IReadOnlyList<SpriteManager> managers = this.managerQuery.SharedComponents;
@@ -41,61 +38,37 @@ namespace CommonEcs {
                 }
                 
                 this.query.SetSharedComponentFilter(spriteManager);
+                int count = this.query.CalculateEntityCount();
+                NativeArray<SortedSpriteEntry> entries = new NativeArray<SortedSpriteEntry>(count, Allocator.TempJob);
 
                 AddJob addJob = new AddJob() {
-                    chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob),
                     spriteType = spriteType,
-                    sortList = spriteManager.SortList
+                    sortList = entries
                 };
 
-                lastHandle = addJob.Schedule(lastHandle);
-            }
-
-            // Sort jobs
-            for (int i = 1; i < managers.Count; ++i) {
-                SpriteManager spriteManager = managers[i];
+                lastHandle = addJob.Schedule(this.query, lastHandle);
                 
-                if (!ShouldProcess(ref spriteManager)) {
-                    continue;
-                }
-
-                SortJob sortJob = new SortJob() {
-                    sortList = spriteManager.SortList
-                };
-
-                lastHandle = sortJob.Schedule(lastHandle);
-            }
-
-            // Reset jobs
-            for (int i = 1; i < managers.Count; ++i) {
-                SpriteManager spriteManager = managers[i];
+                // Sort
+                lastHandle = MultithreadedSort.Sort(entries, lastHandle);
                 
-                if (!ShouldProcess(ref spriteManager)) {
-                    continue;
-                }
-
                 ResetTrianglesJob resetTrianglesJob = new ResetTrianglesJob() {
                     triangles = spriteManager.NativeTriangles
                 };
 
                 lastHandle = resetTrianglesJob.Schedule(spriteManager.NativeTriangles.Length,
                     64, lastHandle);
-            }
-
-            // Set to triangles jobs
-            for (int i = 1; i < managers.Count; ++i) {
-                SpriteManager spriteManager = managers[i];
                 
-                if (!ShouldProcess(ref spriteManager)) {
-                    continue;
-                }
-
                 SetTrianglesJob setTrianglesJob = new SetTrianglesJob() {
                     triangles = spriteManager.NativeTriangles,
-                    sortList = spriteManager.SortList
+                    sortList = entries
                 };
 
                 lastHandle = setTrianglesJob.Schedule(spriteManager.Count, 64, lastHandle);
+                
+                // Don't forget to deallocate the array
+                lastHandle = new DeallocateNativeArrayJob<SortedSpriteEntry>() {
+                    array = entries
+                }.Schedule(lastHandle);
             }
 
             return lastHandle;
@@ -104,109 +77,22 @@ namespace CommonEcs {
         private static bool ShouldProcess(ref SpriteManager manager) {
             return manager.Owner != Entity.Null && (manager.RenderOrderChanged || manager.AlwaysUpdateMesh);
         }
-
-        private void ClearSortLists() {
-            // Note that we start from 1 because the first entry is the default
-            for (int i = 1; i < this.managerQuery.SharedComponents.Count; ++i) {
-                this.managerQuery.SharedComponents[i].SortList.Clear();
-            }
-        }
         
         [BurstCompile]
-        private struct AddJob : IJob {
-            [ReadOnly]
-            [DeallocateOnJobCompletion]
-            public NativeArray<ArchetypeChunk> chunks;
-
+        private struct AddJob : IJobChunk {
             [ReadOnly]
             public ArchetypeChunkComponentType<Sprite> spriteType;
             
-            public NativeList<SortedSpriteEntry> sortList;
+            public NativeArray<SortedSpriteEntry> sortList;
 
-            public void Execute() {
-                for (int i = 0; i < this.chunks.Length; ++i) {
-                    Process(this.chunks[i]);
-                }
-            }
-
-            private void Process(ArchetypeChunk chunk) {
+            public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {
                 NativeArray<Sprite> sprites = chunk.GetNativeArray(this.spriteType);
                 for (int i = 0; i < sprites.Length; ++i) {
                     Sprite sprite = sprites[i];
-                    this.sortList.Add(new SortedSpriteEntry(sprite.managerIndex, sprite.LayerOrder,
-                        sprite.RenderOrder));
+                    int index = firstEntityIndex + i;
+                    this.sortList[index] = new SortedSpriteEntry(sprite.managerIndex, sprite.LayerOrder,
+                        sprite.RenderOrder);
                 }
-            }
-        }
-
-        [BurstCompile]
-        private struct SortJob : IJob {
-            public NativeList<SortedSpriteEntry> sortList;
-
-            public void Execute() {
-                if (this.sortList.Length > 0) {
-                    Quicksort(0, this.sortList.Length - 1);
-                }
-            }
-
-            private void Quicksort(int left, int right) {
-                int i = left;
-                int j = right;
-                SortedSpriteEntry pivot = this.sortList[(left + right) / 2];
-
-                while (i <= j) {
-                    // Lesser
-                    while (Compare(this.sortList[i], ref pivot) < 0) {
-                        ++i;
-                    }
-
-                    // Greater
-                    while (Compare(this.sortList[j], ref pivot) > 0) {
-                        --j;
-                    }
-
-                    if (i <= j) {
-                        // Swap
-                        SortedSpriteEntry temp = this.sortList[i];
-                        this.sortList[i] = this.sortList[j];
-                        this.sortList[j] = temp;
-
-                        ++i;
-                        --j;
-                    }
-                }
-
-                // Recurse
-                if (left < j) {
-                    Quicksort(left, j);
-                }
-
-                if (i < right) {
-                    Quicksort(i, right);
-                }
-            }
-
-            private int Compare(SortedSpriteEntry a, ref SortedSpriteEntry b) {
-                if (a.layerOrder < b.layerOrder) {
-                    return -1;
-                }
-
-                if (a.layerOrder > b.layerOrder) {
-                    return 1;
-                }
-
-                // At this point, they have the same layerOrder
-                // We check the renderOrder
-                if (a.renderOrder < b.renderOrder) {
-                    return -1;
-                }
-
-                if (a.renderOrder > b.renderOrder) {
-                    return 1;
-                }
-
-                // They are equal
-                return 0;
             }
         }
 
@@ -227,7 +113,7 @@ namespace CommonEcs {
             public NativeArray<int> triangles;
 
             [ReadOnly]
-            public NativeList<SortedSpriteEntry> sortList;
+            public NativeArray<SortedSpriteEntry> sortList;
 
             public void Execute(int index) {
                 if (index >= this.sortList.Length) {

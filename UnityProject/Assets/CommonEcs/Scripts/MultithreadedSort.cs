@@ -4,20 +4,21 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
+using Unity.Mathematics;
+
+using UnityEngine;
 
 namespace CommonEcs {
     public static class MultithreadedSort {
-        // Use quicksort when sub-array length is less than or equal than this value
-        public const int QUICKSORT_THRESHOLD_LENGTH = 400;
-
         public static JobHandle Sort<T>(NativeArray<T> array, JobHandle parentHandle)
             where T : unmanaged, IComparable<T> {
-            return MergeSort(array, new SortRange(0, array.Length - 1), parentHandle);
+            int workerCount = math.max(1, SystemInfo.processorCount);
+            return MergeSort(array, parentHandle, new SortRange(0, array.Length - 1), array.Length / workerCount);
         }
 
-        private static JobHandle MergeSort<T>(NativeArray<T> array, SortRange range, JobHandle parentHandle) where T : unmanaged, IComparable<T> {
-            if (range.Length <= QUICKSORT_THRESHOLD_LENGTH) {
-                // Use quicksort
+        private static JobHandle MergeSort<T>(NativeArray<T> array, JobHandle parentHandle, SortRange range, int threshold) where T : unmanaged, IComparable<T> {
+            if (range.Length <= threshold) {
+                // Use quicksort when sub-array length is less than or equal to the threshold
                 return new QuicksortJob<T>() {
                     array = array,
                     left = range.left,
@@ -28,10 +29,10 @@ namespace CommonEcs {
             int middle = range.Middle;
 
             SortRange left = new SortRange(range.left, middle);
-            JobHandle leftHandle = MergeSort(array, left, parentHandle);
+            JobHandle leftHandle = MergeSort(array, parentHandle, left, threshold);
 
             SortRange right = new SortRange(middle + 1, range.right);
-            JobHandle rightHandle = MergeSort(array, right, parentHandle);
+            JobHandle rightHandle = MergeSort(array, parentHandle, right, threshold);
             
             JobHandle combined = JobHandle.CombineDependencies(leftHandle, rightHandle);
             

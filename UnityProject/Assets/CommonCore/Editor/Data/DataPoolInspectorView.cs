@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Common {
-    public class DataPoolInspectorView<T> where T : IDataPoolItem, IDuplicable<T>, new() {
+    public class DataPoolInspectorView<T> where T : class, IDataPoolItem, IDuplicable<T>, new() {
         private readonly EditorWindow parentWindow;
         private readonly DataPoolSidebarView<T> sidebarView;
         private readonly DataPoolItemRenderer<T> itemRenderer;

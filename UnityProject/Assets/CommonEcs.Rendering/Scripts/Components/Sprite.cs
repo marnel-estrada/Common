@@ -10,8 +10,6 @@
 
     [Serializable]
     public struct Sprite : IComponentData {
-        public Entity spriteManagerEntity;
-        
         // Note here that we rearrange the variables from high number of bytes to low
         // This is so that memory is properly compacted
 
@@ -23,6 +21,8 @@
         public float3 v2;
         public float3 v3;
         public float3 v4;
+        
+        public Entity spriteManagerEntity;
 
         public Vector2 uv_1;
         public Vector2 uv_2;

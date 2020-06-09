@@ -1,7 +1,7 @@
 using UnityEditor;
 
 namespace Common {
-    public class DataPoolEditor<T> : Editor where T : IDataPoolItem, IDuplicable<T>, new() {
+    public class DataPoolEditor<T> : Editor where T : class, IDataPoolItem, IDuplicable<T>, new() {
         private DataPool<T> dataPool;
         
         void OnEnable() {

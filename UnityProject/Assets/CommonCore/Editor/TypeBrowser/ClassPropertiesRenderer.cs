@@ -10,7 +10,6 @@ namespace Common {
     ///     A class that handles rendering of named properties of a certain class
     /// </summary>
     public class ClassPropertiesRenderer {
-
         private const int LABEL_WIDTH = 150;
 
         private readonly int fieldWidth;
@@ -95,7 +94,7 @@ namespace Common {
                 // This is because we force variable selection if it has such hint
                 // Note also that we only render the var toggle if there's parent variables specified
                 holder.UseOtherHolder = GUILayout.Toggle(holder.UseOtherHolder, "var", EditorStyles.miniButton,
-                    GUILayout.Width(30));
+                    GUILayout.Width(40));
             }
 
             if (showHint) {

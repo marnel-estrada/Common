@@ -7,7 +7,7 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Common {
-    public class DataPoolEditorWindow<T> : EditorWindow where T : IDataPoolItem, IDuplicable<T>, new() {
+    public class DataPoolEditorWindow<T> : EditorWindow where T : class, IDataPoolItem, IDuplicable<T>, new() {
         private DataPool<T> target;
 
         public static readonly Signal.Signal REPAINT = new Signal.Signal("Repaint");
@@ -21,7 +21,7 @@ namespace Common {
         /// Initializer
         /// </summary>
         /// <param name="target"></param>
-        public void Init(DataPool<T> target, DataPoolItemRenderer<T> itemRenderer) {
+        public virtual void Init(DataPool<T> target, DataPoolItemRenderer<T> itemRenderer) {
             this.target = target;
             this.inspector = new DataPoolInspectorView<T>(this, this.sidebar, itemRenderer);
             REPAINT.Dispatch(); // Force a repaint

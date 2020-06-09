@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -176,6 +177,16 @@ namespace Common {
         /// <returns></returns>
         public static string AsSignedDollarText(int value) {
             return value >= 0 ? ("+" + AsDollarText(value)) : AsDollarText(value); // note that negative values already have negative sign
+        }
+        
+        // We store in a static variable because GetInvalidFileNameChars() clones an array (garbage)
+        private static readonly char[] INVALID_FILE_NAME_CHARS = Path.GetInvalidFileNameChars();
+        
+        public static string TrimInvalidFileNameCharacters(string baseName) {
+            string trimmed = string.Join("", baseName.Split(INVALID_FILE_NAME_CHARS));
+
+            // Return underscore if whole string was trimmed
+            return string.IsNullOrEmpty(trimmed) ? "_" : trimmed;
         }
     }
 }

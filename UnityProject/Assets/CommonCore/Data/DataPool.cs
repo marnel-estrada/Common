@@ -8,7 +8,7 @@ namespace Common {
     /// The same as DataClassPool but implemented as ScriptableObject
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class DataPool<T> : ScriptableObject where T : IDataPoolItem, IDuplicable<T>, new() {
+    public abstract class DataPool<T> : ScriptableObject where T : class, IDataPoolItem, IDuplicable<T>, new() {
         // This is used for the editor such that we don't need to resolve it by path
         [SerializeField]
         private GUISkin guiSkin;
@@ -57,6 +57,11 @@ namespace Common {
             PopulateMap(); // We populate first because this may be invoked before Awake() (like in editor)
             T found = this.map.Find(id);
             return found == null ? Maybe<T>.Nothing : new Maybe<T>(found);
+        }
+
+        public Option<T> FindAsOption(string id) {
+            PopulateMap(); // We populate first because this may be invoked before Awake() (like in editor)
+            return this.map.FindAsOption(id);
         }
 
         /// <summary>

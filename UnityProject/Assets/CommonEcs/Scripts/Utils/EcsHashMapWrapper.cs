@@ -41,7 +41,8 @@ namespace CommonEcs {
             this.allBuckets = new Maybe<BufferFromEntity<EntityBufferElement>>(allBuckets);
             this.allEntryLists = new Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>>(allEntryLists);
 
-            this.entityManager = ValueTypeOption<EntityManager>.NONE;
+            // Note here that this is None. We can't use static NONE as it is not allowed in Burst.
+            this.entityManager = new ValueTypeOption<EntityManager>();
         }
 
         // This is another version that uses EntityManager instead of BufferFromEntity
@@ -53,7 +54,8 @@ namespace CommonEcs {
             this.allBuckets = Maybe<BufferFromEntity<EntityBufferElement>>.Nothing;
             this.allEntryLists = Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>>.Nothing;
 
-            this.entityManager = ValueTypeOption<EntityManager>.Some(entityManager);
+            // Note here that this is Some. We can't use static NONE as it is not allowed in Burst.
+            this.entityManager = new ValueTypeOption<EntityManager>(entityManager);
         }
 
         public void AddOrSet(K key, V newValue) {

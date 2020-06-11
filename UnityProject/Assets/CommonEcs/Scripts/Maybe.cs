@@ -1,4 +1,4 @@
-using UnityEngine.Assertions;
+using System;
 
 namespace CommonEcs {
     /// <summary>
@@ -77,7 +77,10 @@ namespace CommonEcs {
         /// </param>
         public static explicit operator T(Maybe<T> maybe) {
             // Can't convert Maybe<T> to T when not set
-            Assert.IsTrue(maybe.hasValue);
+            if (!maybe.hasValue) {
+                throw new Exception("Parameter must have a value.");
+            }
+            
             return maybe.Value;
         }
 
@@ -105,7 +108,9 @@ namespace CommonEcs {
         public T Value {
             get {
                 // Can't get Maybe<T> value when not set
-                Assert.IsTrue(this.hasValue);
+                if (!this.hasValue) {
+                    throw new Exception("Trying to access value when there's no value.");
+                }
                 return this.value;
             }
         }
@@ -118,24 +123,25 @@ namespace CommonEcs {
         /// <returns>
         /// The value if set or `default(T)` if not set
         /// </returns>
-        public T GetValueOrDefault() {
-            return this.hasValue ? this.value : default(T);
+        public T ValueOrDefault {
+            get {
+                return this.hasValue ? this.value : default(T);
+            }
         }
 
         /// <summary>
-        /// Get the value passed to the construtor or the parameter if the
-        /// constructor was not called, e.g. by creating with `default(T)`.
+        /// Returns the value of Maybe if it exists. Otherwise returns the passed "other" value.
         /// </summary>
         /// 
         /// <returns>
         /// The value if set or the parameter if not set
         /// </returns>
         /// 
-        /// <param name="defaultValue">
+        /// <param name="other">
         /// Value to return if the value isn't set
         /// </param>
-        public T GetValueOrDefault(T defaultValue) {
-            return this.hasValue ? this.value : defaultValue;
+        public T ValueOr(T other) {
+            return this.hasValue ? this.value : other;
         }
     }
 }

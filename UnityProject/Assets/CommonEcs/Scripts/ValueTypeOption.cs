@@ -26,7 +26,7 @@ namespace CommonEcs {
         private readonly bool hasValue;
         private readonly T value;
 
-        private ValueTypeOption(T value) {
+        public ValueTypeOption(T value) {
             this.value = value;
             this.hasValue = true;
         }

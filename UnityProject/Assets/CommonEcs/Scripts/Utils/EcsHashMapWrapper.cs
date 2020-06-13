@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+using Common;
+
 using Unity.Entities;
 
 namespace CommonEcs {
@@ -16,8 +18,7 @@ namespace CommonEcs {
     /// </summary>
     /// <typeparam name="K"></typeparam>
     /// <typeparam name="V"></typeparam>
-    public struct EcsHashMapWrapper<K, V> : IEnumerable<EcsHashMapEntry<K, V>>
-        where K : struct, IEquatable<K> where V : struct {
+    public struct EcsHashMapWrapper<K, V> where K : struct, IEquatable<K> where V : struct {
         // The entity that points to the buckets
         private readonly Entity hashMapEntity;
 
@@ -29,7 +30,7 @@ namespace CommonEcs {
         // The entities here have DynamicBuffer that contains the HashMap values
         private readonly Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists;
 
-        private readonly EntityManager entityManager;
+        private readonly ValueTypeOption<EntityManager> entityManager;
 
         public EcsHashMapWrapper(Entity hashMapEntity, ComponentDataFromEntity<EcsHashMap<K, V>> allHashMaps,
             BufferFromEntity<EntityBufferElement> allBuckets,
@@ -40,7 +41,8 @@ namespace CommonEcs {
             this.allBuckets = new Maybe<BufferFromEntity<EntityBufferElement>>(allBuckets);
             this.allEntryLists = new Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>>(allEntryLists);
 
-            this.entityManager = null;
+            // Note here that this is None. We can't use static NONE as it is not allowed in Burst.
+            this.entityManager = new ValueTypeOption<EntityManager>();
         }
 
         // This is another version that uses EntityManager instead of BufferFromEntity
@@ -52,7 +54,8 @@ namespace CommonEcs {
             this.allBuckets = Maybe<BufferFromEntity<EntityBufferElement>>.Nothing;
             this.allEntryLists = Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>>.Nothing;
 
-            this.entityManager = entityManager;
+            // Note here that this is Some. We can't use static NONE as it is not allowed in Burst.
+            this.entityManager = new ValueTypeOption<EntityManager>(entityManager);
         }
 
         public void AddOrSet(K key, V newValue) {
@@ -116,22 +119,41 @@ namespace CommonEcs {
 
         private DynamicBuffer<EcsHashMapEntry<K, V>> ResolveEntryList(int hashCode) {
             int bucketIndex = hashCode % EcsHashMap<K, V>.BUCKET_COUNT;
+            return this.entityManager.Match<ResolveEntryListMatcher, DynamicBuffer<EcsHashMapEntry<K, V>>>(
+                new ResolveEntryListMatcher(this.hashMapEntity, bucketIndex, this.allBuckets, this.allEntryLists));
+        }
 
-            if (this.entityManager == null) {
-                // EntityManager was not specified. Use BufferFromEntity
-                DynamicBuffer<EntityBufferElement> buckets = this.allBuckets.Value[this.hashMapEntity];
-                Entity entryListEntity = buckets[bucketIndex].entity;
+        private readonly struct ResolveEntryListMatcher : 
+            IFuncOptionMatcher<EntityManager, DynamicBuffer<EcsHashMapEntry<K, V>>> {
+            private readonly Entity hashMapEntity;
+            private readonly int bucketIndex;
+            private readonly Maybe<BufferFromEntity<EntityBufferElement>> allBuckets;
+            private readonly Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists;
 
-                return this.allEntryLists.Value[entryListEntity];
+            public ResolveEntryListMatcher(Entity hashMapEntity, int bucketIndex, 
+                Maybe<BufferFromEntity<EntityBufferElement>> allBuckets, 
+                Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists) {
+                this.hashMapEntity = hashMapEntity;
+                this.bucketIndex = bucketIndex;
+                this.allBuckets = allBuckets;
+                this.allEntryLists = allEntryLists;
             }
 
-            // Use EntityManager
-            {
+            public DynamicBuffer<EcsHashMapEntry<K, V>> OnSome(EntityManager entityManager) {
+                // Use EntityManager
                 DynamicBuffer<EntityBufferElement> buckets =
-                    this.entityManager.GetBuffer<EntityBufferElement>(this.hashMapEntity);
+                    entityManager.GetBuffer<EntityBufferElement>(this.hashMapEntity);
                 Entity entryListEntity = buckets[bucketIndex].entity;
 
-                return this.entityManager.GetBuffer<EcsHashMapEntry<K, V>>(entryListEntity);
+                return entityManager.GetBuffer<EcsHashMapEntry<K, V>>(entryListEntity);
+            }
+
+            public DynamicBuffer<EcsHashMapEntry<K, V>> OnNone() {
+                // EntityManager was not specified. Use BufferFromEntity
+                DynamicBuffer<EntityBufferElement> buckets = this.allBuckets.Value[this.hashMapEntity];
+                Entity entryListEntity = buckets[this.bucketIndex].entity;
+
+                return this.allEntryLists.Value[entryListEntity];
             }
         }
 
@@ -141,34 +163,74 @@ namespace CommonEcs {
             }
         }
 
-        public IEnumerator<EcsHashMapEntry<K, V>> GetEnumerator() {
-            DynamicBuffer<EntityBufferElement> buckets =
-                this.entityManager.GetBuffer<EntityBufferElement>(this.hashMapEntity);
-
-            if (this.entityManager == null) {
-                return new EcsHashMapEnumerator<K, V>(buckets, this.allEntryLists);
-            }
-            
-            return new EcsHashMapEnumerator<K, V>(buckets, this.entityManager);
+        public EcsHashMapEnumerator<K, V> GetEnumerator() {
+            return this.entityManager.Match<GetEnumeratorMatcher, EcsHashMapEnumerator<K, V>>(
+                new GetEnumeratorMatcher(this.hashMapEntity, this.allBuckets, this.allEntryLists));
         }
 
-        IEnumerator IEnumerable.GetEnumerator() {
-            return GetEnumerator();
+        private readonly struct GetEnumeratorMatcher : IFuncOptionMatcher<EntityManager, EcsHashMapEnumerator<K, V>> {
+            private readonly Entity hashMapEntity;
+            private readonly Maybe<BufferFromEntity<EntityBufferElement>> allBuckets;
+            private readonly Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists;
+
+            public GetEnumeratorMatcher(Entity hashMapEntity, Maybe<BufferFromEntity<EntityBufferElement>> allBuckets, Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists) {
+                this.hashMapEntity = hashMapEntity;
+                this.allBuckets = allBuckets;
+                this.allEntryLists = allEntryLists;
+            }
+
+            public EcsHashMapEnumerator<K, V> OnSome(EntityManager entityManager) {
+                // Use EntityManager
+                DynamicBuffer<EntityBufferElement> buckets = entityManager.GetBuffer<EntityBufferElement>(this.hashMapEntity);
+                return new EcsHashMapEnumerator<K, V>(buckets, entityManager);
+            }
+
+            public EcsHashMapEnumerator<K, V> OnNone() {
+                DynamicBuffer<EntityBufferElement> buckets = this.allBuckets.Value[this.hashMapEntity];
+                return new EcsHashMapEnumerator<K, V>(buckets, this.allEntryLists);
+            }
         }
 
         public void Clear() {
-            DynamicBuffer<EntityBufferElement> buckets =
-                this.entityManager.GetBuffer<EntityBufferElement>(this.hashMapEntity);
-            for (int i = 0; i < buckets.Length; ++i) {
-                Entity entryListEntity = buckets[i].entity;
-                DynamicBuffer<EcsHashMapEntry<K, V>> entryList = this.entityManager?.GetBuffer<EcsHashMapEntry<K, V>>(entryListEntity) ?? this.allEntryLists.Value[entryListEntity];
-                entryList.Clear();
-            }
+            this.entityManager.Match(new ClearMatcher(this.hashMapEntity, this.allBuckets, this.allEntryLists));
             
             // Update the count
             EcsHashMap<K, V> hashMap = this.allHashMaps[this.hashMapEntity];
             hashMap.count = 0;
             this.allHashMaps[this.hashMapEntity] = hashMap; // Modify
+        }
+
+        private readonly struct ClearMatcher : IOptionMatcher<EntityManager> {
+            private readonly Entity hashMapEntity;
+            private readonly Maybe<BufferFromEntity<EntityBufferElement>> allBuckets;
+            private readonly Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists;
+
+            public ClearMatcher(Entity hashMapEntity, Maybe<BufferFromEntity<EntityBufferElement>> allBuckets, Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists) {
+                this.hashMapEntity = hashMapEntity;
+                this.allBuckets = allBuckets;
+                this.allEntryLists = allEntryLists;
+            }
+
+            public void OnSome(EntityManager entityManager) {
+                // Use EntityManager
+                DynamicBuffer<EntityBufferElement> buckets =
+                    entityManager.GetBuffer<EntityBufferElement>(this.hashMapEntity);
+                for (int i = 0; i < buckets.Length; ++i) {
+                    Entity entryListEntity = buckets[i].entity;
+                    DynamicBuffer<EcsHashMapEntry<K, V>> entryList = entityManager.GetBuffer<EcsHashMapEntry<K, V>>(entryListEntity);
+                    entryList.Clear();
+                }
+            }
+
+            public void OnNone() {
+                // No EntityManager
+                DynamicBuffer<EntityBufferElement> buckets = this.allBuckets.Value[this.hashMapEntity];
+                for (int i = 0; i < buckets.Length; ++i) {
+                    Entity entryListEntity = buckets[i].entity;
+                    DynamicBuffer<EcsHashMapEntry<K, V>> entryList = this.allEntryLists.Value[entryListEntity];
+                    entryList.Clear();
+                }
+            }
         }
     }
 }

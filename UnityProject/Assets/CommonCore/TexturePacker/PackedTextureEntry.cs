@@ -3,10 +3,12 @@ using Unity.Mathematics;
 using UnityEngine;
 
 namespace Common {
-    public class PackedTextureEntry {
-        private readonly Texture2D atlas;
+    public struct PackedTextureEntry {
         private readonly Rect uvRect;
         private readonly Rect spriteRect;
+
+        private readonly int atlasWidth;
+        private readonly int atlasHeight;
 
         // Note that the passed uvRect may already be a scaled image
         // We keep a copy of the original dimension so we can still use the sprite as though it has
@@ -19,21 +21,17 @@ namespace Common {
         /// </summary>
         /// <param name="atlas"></param>
         /// <param name="uvRect"></param>
-        public PackedTextureEntry(Texture2D atlas, Rect uvRect, int originalWidth, int originalHeight) {
-            this.atlas = atlas;
+        public PackedTextureEntry(Rect uvRect, int atlasWidth, int atlasHeight, int originalWidth, int originalHeight) {
             this.uvRect = uvRect;
 
-            this.spriteRect = new Rect(this.uvRect.x * this.atlas.width, this.uvRect.y * this.atlas.height, 
-                this.uvRect.width * this.atlas.width, this.uvRect.height * this.atlas.height);
+            this.atlasWidth = atlasWidth;
+            this.atlasHeight = atlasHeight;
+            
+            this.spriteRect = new Rect(this.uvRect.x * this.atlasWidth, this.uvRect.y * this.atlasHeight, 
+                this.uvRect.width * this.atlasWidth, this.uvRect.height * this.atlasHeight);
 
             this.originalWidth = originalWidth;
             this.originalHeight = originalHeight;
-        }
-        
-        public Texture2D Atlas {
-            get {
-                return atlas;
-            }
         }
 
         public Rect UvRect {

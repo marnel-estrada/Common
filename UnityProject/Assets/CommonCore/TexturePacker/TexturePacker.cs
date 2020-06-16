@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 
+using Unity.Collections;
+
 using UnityEngine;
 
 namespace Common {
@@ -16,8 +18,7 @@ namespace Common {
         private readonly SimpleList<Vector2Int> originalDimensions = new SimpleList<Vector2Int>(BUFFER_SIZE);
 
         // Keeps track of the packed entries
-        private readonly Dictionary<string, PackedTextureEntry> entriesMap =
-            new Dictionary<string, PackedTextureEntry>(BUFFER_SIZE);
+        private NativeHashMap<FixedString64, PackedTextureEntry> entriesMap;
 
         private Texture2D atlas;
 
@@ -25,14 +26,13 @@ namespace Common {
         /// Constructor
         /// </summary>
         public TexturePacker() {
+            this.entriesMap = new NativeHashMap<FixedString64, PackedTextureEntry>(BUFFER_SIZE, Allocator.Persistent);
         }
 
-        /// <summary>
-        /// Constructor with specified atlas
-        /// </summary>
-        /// <param name="atlas"></param>
-        public TexturePacker(Texture2D atlas) {
-            this.atlas = atlas;
+        public void Dispose() {
+            if (this.entriesMap.IsCreated) {
+                this.entriesMap.Dispose();
+            }
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Common {
                 int originalWidth = this.originalDimensions[i].x;
                 int originalHeight = this.originalDimensions[i].y;
                 this.entriesMap[this.names[i]] =
-                    new PackedTextureEntry(this.atlas, rects[i], originalWidth, originalHeight);
+                    new PackedTextureEntry(rects[i], this.atlas.width, this.atlas.height, originalWidth, originalHeight);
             }
 
             // Clear the memory held by the individual textures
@@ -92,6 +92,12 @@ namespace Common {
         public Texture2D Atlas {
             get {
                 return this.atlas;
+            }
+        }
+
+        public PackedTextureEntryResolver Resolver {
+            get {
+                return new PackedTextureEntryResolver(this.entriesMap);
             }
         }
     }

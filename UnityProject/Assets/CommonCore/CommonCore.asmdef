@@ -1,9 +1,9 @@
 {
     "name": "CommonCore",
     "references": [
-        "Unity.Mathematics"
+        "Unity.Mathematics",
+        "Unity.Collections"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": true,
@@ -11,5 +11,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }

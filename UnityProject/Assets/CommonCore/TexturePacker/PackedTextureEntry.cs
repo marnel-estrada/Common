@@ -3,18 +3,18 @@ using Unity.Mathematics;
 using UnityEngine;
 
 namespace Common {
-    public struct PackedTextureEntry {
-        private readonly Rect uvRect;
-        private readonly Rect spriteRect;
+    public readonly struct PackedTextureEntry {
+        public readonly Rect uvRect;
+        public readonly Rect spriteRect;
 
-        private readonly int atlasWidth;
-        private readonly int atlasHeight;
+        public readonly int atlasWidth;
+        public readonly int atlasHeight;
 
         // Note that the passed uvRect may already be a scaled image
         // We keep a copy of the original dimension so we can still use the sprite as though it has
         // used its original size
-        private readonly int originalWidth;
-        private readonly int originalHeight;
+        public readonly int originalWidth;
+        public readonly int originalHeight;
 
         /// <summary>
         /// Constructor
@@ -32,30 +32,6 @@ namespace Common {
 
             this.originalWidth = originalWidth;
             this.originalHeight = originalHeight;
-        }
-
-        public Rect UvRect {
-            get {
-                return uvRect;
-            }
-        }
-
-        public Rect SpriteRect {
-            get {
-                return spriteRect;
-            }
-        }
-
-        public int OriginalWidth {
-            get {
-                return this.originalWidth;
-            }
-        }
-
-        public int OriginalHeight {
-            get {
-                return this.originalHeight;
-            }
         }
 
         public float2 LowerLeftUv {

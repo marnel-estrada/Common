@@ -24,7 +24,7 @@ namespace CommonEcs {
         /// Adds a prefab to maintain
         /// </summary>
         /// <param name="item"></param>
-        public void Add(string id, Entity entityPrefab) {
+        public void Add(FixedString64 id, Entity entityPrefab) {
             int key = id.GetHashCode(); // We use hash code as the key
             if (this.map.ContainsKey(key)) {
                 throw new Exception($"The prefab pool already contains an entry for {id}");
@@ -36,13 +36,13 @@ namespace CommonEcs {
         /// <summary>
         /// This is used when the map is required inside a job
         /// </summary>
-        public NativeHashMap<int, Entity> EntityPrefabMap {
+        public EntityPrefabResolver EntityPrefabResolver {
             get {
-                return this.map;
+                return new EntityPrefabResolver(this.map);
             }
         }
 
-        public Entity GetEntityPrefab(string id) {
+        public Entity GetEntityPrefab(FixedString64 id) {
             if (this.map.TryGetValue(id.GetHashCode(), out Entity prefabEntity)) {
                 return prefabEntity;
             }

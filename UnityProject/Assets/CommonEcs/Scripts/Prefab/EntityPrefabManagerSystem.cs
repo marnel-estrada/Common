@@ -7,7 +7,7 @@ namespace CommonEcs {
     /// <summary>
     /// Holds the mapping from integer ID to the Entity prefab
     /// </summary>
-    public class EntityPrefabPoolSystem : SystemBase {
+    public class EntityPrefabManagerSystem : SystemBase {
         private NativeHashMap<int, Entity> map;
         
         protected override void OnCreate() {

@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace CommonEcs {
     [RequireComponent(typeof(ConvertToEntity))]
-    public class EntityPrefabPoolPopulator : MonoBehaviour, IDeclareReferencedPrefabs, IConvertGameObjectToEntity {
+    public class EntityPrefabManagerPopulator : MonoBehaviour, IDeclareReferencedPrefabs, IConvertGameObjectToEntity {
         [SerializeField]
         private EntityPrefabItemsHolder items;
 
@@ -24,14 +24,14 @@ namespace CommonEcs {
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem) {
             Assertion.NotNull(this.items);
 
-            EntityPrefabPoolSystem pool =
-                World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EntityPrefabPoolSystem>();
+            EntityPrefabManagerSystem manager =
+                World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EntityPrefabManagerSystem>();
             
             IReadOnlyList<EntityPrefabItem> prefabs = this.items.Prefabs;
             for (int i = 0; i < prefabs.Count; ++i) {
                 EntityPrefabItem item = prefabs[i];
                 Entity entityPrefab = conversionSystem.GetPrimaryEntity(item.prefab);
-                pool.Add(item.id, entityPrefab);
+                manager.Add(item.id, entityPrefab);
             }
         }
     }

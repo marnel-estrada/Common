@@ -19,10 +19,12 @@ namespace CommonEcs {
 
             // Check for valid index
             if (0 <= index && index < this.cellEntities.Length) {
-                return ValueTypeOption<Entity>.Some(this.cellEntities[index].entity);
+                // This is Some. We can't use the static Some() in Burst
+                return new ValueTypeOption<Entity>(this.cellEntities[index].entity);
             }
             
-            return ValueTypeOption<Entity>.NONE;
+            // This is none. We can't use the static NONE in Burst.
+            return new ValueTypeOption<Entity>();
         }
 
         public ValueTypeOption<Entity> GetCellEntity(int3 gridCoordinate) {

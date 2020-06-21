@@ -12,34 +12,28 @@ namespace CommonEcs {
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public readonly struct ValueTypeOption<T> : IEquatable<ValueTypeOption<T>> where T : struct {
-        public static readonly ValueTypeOption<T> NONE = new ValueTypeOption<T>();
-
-        /// <summary>
-        /// Returns an option with a value
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static ValueTypeOption<T> Some(T value) {
-            return new ValueTypeOption<T>(value);
-        }
+        // Note here that we don't provide static implementation for Some() and NONE.
+        // This is because they don't work within Burst. We don't provide so that we 
+        // avoid the mistake. Use default constructor for None and constructor with
+        // value for Some.
         
-        private readonly bool hasValue;
         private readonly T value;
+        private readonly byte hasValue;
 
         public ValueTypeOption(T value) {
             this.value = value;
-            this.hasValue = true;
+            this.hasValue = 1;
         }
 
         public bool IsSome {
             get {
-                return this.hasValue;
+                return this.hasValue > 0;
             }
         }
 
         public bool IsNone {
             get {
-                return !this.hasValue;
+                return this.hasValue <= 0;
             }
         }
 
@@ -49,7 +43,7 @@ namespace CommonEcs {
         /// <param name="matcher"></param>
         /// <typeparam name="TMatcher"></typeparam>
         public void Match<TMatcher>(TMatcher matcher) where TMatcher : struct, IOptionMatcher<T> {
-            if (this.hasValue) {
+            if (this.IsSome) {
                 matcher.OnSome(this.value);
             } else {
                 matcher.OnNone();
@@ -65,7 +59,7 @@ namespace CommonEcs {
         /// <returns></returns>
         public TReturnType Match<TMatcher, TReturnType>(TMatcher matcher)
             where TMatcher : struct, IFuncOptionMatcher<T, TReturnType> {
-            return this.hasValue ? matcher.OnSome(this.value) : matcher.OnNone();
+            return this.IsSome ? matcher.OnSome(this.value) : matcher.OnNone();
         }
 
         public bool Equals(ValueTypeOption<T> other) {

@@ -38,6 +38,14 @@ namespace CommonEcs {
             }
         }
 
+        public float2 TopRight {
+            get {
+                float halfWidth = this.size.x * 0.5f;
+                float halfHeight = this.size.y * 0.5f;
+                return new float2(this.center.x + halfWidth, this.center.y + halfHeight);
+            }
+        }
+
         public override string ToString() {
             return $"({this.worldCoordinate.x.ToString()}, {this.worldCoordinate.y.ToString()})";
         }

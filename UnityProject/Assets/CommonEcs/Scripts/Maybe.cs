@@ -98,6 +98,16 @@ namespace CommonEcs {
         }
 
         /// <summary>
+        /// Opposite of HasValue. We provided this as it can be easier to read than
+        /// the not operator (!).
+        /// </summary>
+        public bool IsEmpty {
+            get {
+                return !this.hasValue;
+            }
+        }
+
+        /// <summary>
         /// Get the value passed to the construtor or assert if the constructor was
         /// not called, e.g. by creating with `default(T)`.
         /// </summary>

@@ -29,5 +29,9 @@
                 this.listeners[i](parameter); // Invoke the delegate
             }
         }
+
+        public void ClearListeners() {
+            this.listeners.Clear();
+        }
     }
 }

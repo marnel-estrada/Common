@@ -19,7 +19,6 @@ namespace Common.Signal {
 	 * A simple class that can dispatch actions to listeners
 	 */
 	public class Signal {
-
 		private readonly string name;
 
 		private ConcreteSignalParameters parameters;
@@ -97,5 +96,8 @@ namespace Common.Signal {
 			}
 		}
 
+		public void ClearListeners() {
+			this.listenerList.Clear();
+		}
 	}
 }

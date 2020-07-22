@@ -13,6 +13,13 @@ namespace Common {
         public static readonly Query<string, int> GET_INT_GAME_VARIABLE = new Query<string, int>();
         public static readonly Query<string, float> GET_FLOAT_GAME_VARIABLE = new Query<string, float>();
         public static readonly Query<string, bool> GET_BOOL_GAME_VARIABLE = new Query<string, bool>();
+        
+        private static readonly PublicStaticFieldsInvoker CLEAR_PROVIDERS = new PublicStaticFieldsInvoker(typeof(GameVariablesQuery), "ClearProvider");
+        
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void OnDomainReload() {
+            CLEAR_PROVIDERS.Execute();
+        }
 
         // Parameters
         public const string KEY = "Key";

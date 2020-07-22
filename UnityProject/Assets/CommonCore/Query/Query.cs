@@ -44,5 +44,9 @@
             Assertion.NotNull(this.provider);
             return this.provider(default(TRequest));
         }
+
+        public void ClearProvider() {
+            this.provider = null;
+        }
     }
 }

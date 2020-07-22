@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace CommonEcs {
-    [CreateAssetMenu(menuName = "CommonEcs/PrefabItemsHolder")]
+    [CreateAssetMenu(menuName = "CommonEcs/EntityPrefabItemsHolder")]
     public class EntityPrefabItemsHolder : ScriptableObject {
         [SerializeField]
         private List<EntityPrefabItem> prefabs;

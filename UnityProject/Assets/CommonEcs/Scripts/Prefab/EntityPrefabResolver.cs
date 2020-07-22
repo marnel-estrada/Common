@@ -8,14 +8,14 @@ namespace CommonEcs {
     /// Used to wrap NativeHashMap so we don't pass it around when used in jobs
     /// </summary>
     public struct EntityPrefabResolver {
-        private NativeHashMap<int, Entity> map;
+        private NativeHashMap<FixedString64, Entity> map;
 
-        public EntityPrefabResolver(NativeHashMap<int, Entity> map) {
+        public EntityPrefabResolver(NativeHashMap<FixedString64, Entity> map) {
             this.map = map;
         }
 
         public Entity GetEntityPrefab(FixedString64 id) {
-            if (this.map.TryGetValue(id.GetHashCode(), out Entity prefabEntity)) {
+            if (this.map.TryGetValue(id, out Entity prefabEntity)) {
                 return prefabEntity;
             }
             

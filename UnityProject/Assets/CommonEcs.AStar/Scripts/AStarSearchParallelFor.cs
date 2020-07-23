@@ -12,16 +12,16 @@ namespace CommonEcs {
         [ReadOnly]
         public NativeArray<Entity> entities; // The request entities
 
-        [NativeDisableContainerSafetyRestriction, ReadOnly]
+        [NativeDisableParallelForRestriction, ReadOnly]
         public ComponentDataFromEntity<AStarSearchParameters> allParameters;
 
-        [NativeDisableContainerSafetyRestriction, WriteOnly]
+        [NativeDisableParallelForRestriction, WriteOnly]
         public ComponentDataFromEntity<AStarPath> allPaths;
 
-        [NativeDisableContainerSafetyRestriction, WriteOnly]
+        [NativeDisableParallelForRestriction, WriteOnly]
         public ComponentDataFromEntity<Waiting> allWaiting;
 
-        [NativeDisableContainerSafetyRestriction, WriteOnly]
+        [NativeDisableParallelForRestriction, WriteOnly]
         public BufferFromEntity<Int2BufferElement> allPathLists;
 
         [ReadOnly]

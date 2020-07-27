@@ -26,7 +26,7 @@ namespace GameEvent {
                 }
             }
 
-            Assertion.Assert(false, $"Can't convert rarity text: {name}");
+            Assertion.IsTrue(false, $"Can't convert rarity text: {name}");
             return NULL;
         }
 
@@ -42,7 +42,7 @@ namespace GameEvent {
                 }
             }
 
-            Assertion.Assert(false, $"Can't convert rarity id: {id}");
+            Assertion.IsTrue(false, $"Can't convert rarity id: {id}");
             return NULL;
         }
         

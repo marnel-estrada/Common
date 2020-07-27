@@ -15,7 +15,7 @@ namespace GameEvent {
         // This is like a pop
         public EventCard Draw() {
             // There should be cards
-            Assertion.Assert(this.cards.Count > 0);
+            Assertion.IsTrue(this.cards.Count > 0);
             
             int lastIndex = this.cards.Count - 1;
             EventCard top = this.cards[lastIndex];

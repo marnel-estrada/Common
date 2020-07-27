@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using Common;
@@ -13,8 +14,15 @@ namespace GameEvent {
         private readonly List<Requirement> requirements = new List<Requirement>(1);
         private readonly List<OptionInstance> options = new List<OptionInstance>(3);
 
+        private Action<Requirement> addRequirementMatcher;
+
         public EventInstance(EventData data) {
             this.data = data;
+            
+            this.addRequirementMatcher = delegate(Requirement requirement) {
+                this.requirements.Add(requirement);
+            };
+            
             PrepareRequirements();
             PrepareOptions();
         }
@@ -22,11 +30,11 @@ namespace GameEvent {
         private void PrepareRequirements() {
             int count = this.data.Requirements.Count;
             for (int i = 0; i < count; ++i) {
-                Requirement requirement = TypeUtils.Instantiate<Requirement>(this.data.Requirements[i], null);
-                this.requirements.Add(requirement);
+                Option<Requirement> requirement = TypeUtils.Instantiate<Requirement>(this.data.Requirements[i], null);
+                requirement.Match(this.addRequirementMatcher);
             }
         }
-
+        
         private void PrepareOptions() {
             int count = this.data.Options.Count;
             for (int i = 0; i < count; ++i) {

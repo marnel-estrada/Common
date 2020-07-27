@@ -14,7 +14,7 @@ namespace Delver {
         }
 
         public override void Forward() {
-            Assertion.Assert(this.InputCount == 2);
+            Assertion.IsTrue(this.InputCount == 2);
             this.ForwardUnit.Value = GetInputAt(0).Value + GetInputAt(1).Value;
         }
 

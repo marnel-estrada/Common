@@ -42,6 +42,16 @@ namespace Common {
             }
         }
 
+        private static bool IsNull(T value) {
+            if (IsNullable() || IsReferenceType()) {
+                return value == null;
+            }
+
+            // At this point, value may be a value type
+            // It can't be null
+            return false;
+        }
+
         private static bool IsNullable() {
             return Nullable.GetUnderlyingType(typeof(T)) != null;
         }
@@ -137,6 +147,15 @@ namespace Common {
 
         public static bool operator !=(Option<T> left, Option<T> right) {
             return !left.Equals(right);
+        }
+
+        public T ValueOr(T valueWhenNone) {
+            if (IsNull(valueWhenNone)) {
+                // Can't be null
+                throw new Exception("valueWhenNone can't be null");
+            }
+
+            return this.IsSome ? this.value : valueWhenNone;
         }
     }
 }

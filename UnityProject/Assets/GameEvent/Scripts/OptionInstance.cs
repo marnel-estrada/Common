@@ -18,12 +18,27 @@ namespace GameEvent {
             PrepareClassInstances(data.Effects, this.effects);
         }
 
-        private static void PrepareClassInstances<T>(List<ClassData> dataList, List<T> instanceList) {
+        private static void PrepareClassInstances<T>(IReadOnlyList<ClassData> dataList, ICollection<T> instanceContainer) where T : class {
             int count = dataList.Count;
             for (int i = 0; i < count; ++i) {
                 ClassData classData = dataList[i];
-                T instance = TypeUtils.Instantiate<T>(classData, null);
-                instanceList.Add(instance);
+                Option<T> instance = TypeUtils.Instantiate<T>(classData, null);
+                instance.Match(new AddInstanceMatcher<T>(instanceContainer));
+            }
+        }
+
+        private readonly struct AddInstanceMatcher<T> : IOptionMatcher<T> where T : class {
+            private readonly ICollection<T> instanceContainer;
+
+            public AddInstanceMatcher(ICollection<T> instanceContainer) {
+                this.instanceContainer = instanceContainer;
+            }
+
+            public void OnSome(T instance) {
+                this.instanceContainer.Add(instance);
+            }
+
+            public void OnNone() {
             }
         }
 

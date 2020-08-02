@@ -1,3 +1,5 @@
+using Common.Signal;
+
 using UnityEngine;
 
 namespace Common.Signal {

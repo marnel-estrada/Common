@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Common;
-
-namespace Common.Signal {
+﻿namespace Common.Signal {
     /**
 	 * This is an immutable data class
 	 */

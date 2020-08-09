@@ -11,24 +11,27 @@ using System;
 
 namespace Common.Signal {
 	public interface ISignalParameters {
-
-		/**
-		 * Adds a parameter
-		 */
+		/// <summary>
+		/// Adds a parameter
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="value"></param>
 		void AddParameter(string key, object value);
-		
-		/**
-		 * Gets a parameter value
-		 * This used to be a template method but will not work on iOS (JIT-AOT thing)
-		 */
-		object GetParameter(string key);
 
-		Option<T> GetParameterAsOption<T>(string key) where T : class;
+		/// <summary>
+		/// Returns the parameter with the specified key
+		/// Parameter may not exist. Client code should check.
+		/// </summary>
+		/// <param name="key"></param>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		Option<T> GetParameter<T>(string key) where T : class;
 
-		/**
-		 * Returns whether or not it has a parameter with the specified key
-		 */
+		/// <summary>
+		/// Returns whether or not it has a parameter with the specified key
+		/// </summary>
+		/// <param name="key"></param>
+		/// <returns></returns>
 		bool HasParameter(string key);
-
 	}
 }

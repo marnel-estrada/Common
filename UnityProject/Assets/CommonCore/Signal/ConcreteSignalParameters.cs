@@ -28,11 +28,11 @@ namespace Common.Signal {
             this.parameterStack.Peek()[key] = value;
 	    }
 		
-	    public object GetParameter(string key) {
+	    private object GetParameter(string key) {
 		    return this.parameterStack.Peek()[key];
 	    }
 
-	    public Option<T> GetParameterAsOption<T>(string key) where T : class {
+	    public Option<T> GetParameter<T>(string key) where T : class {
 		    T value = GetParameter(key) as T;
 		    return value == null ? Option<T>.NONE : Option<T>.Some(value);
 	    }

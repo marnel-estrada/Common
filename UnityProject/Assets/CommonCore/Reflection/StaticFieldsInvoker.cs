@@ -4,7 +4,7 @@ using System.Reflection;
 using UnityEngine;
 
 namespace Common {
-    public class PublicStaticFieldsInvoker {
+    public class StaticFieldsInvoker {
         private readonly Type parentType;
         private readonly FieldInfo[] fields;
         
@@ -12,7 +12,7 @@ namespace Common {
         private readonly SimpleList<string> methodNames = new SimpleList<string>(1);
 
         // This ensures that there's always at least one method name
-        public PublicStaticFieldsInvoker(Type parentType, string methodName) {
+        public StaticFieldsInvoker(Type parentType, string methodName) {
             this.parentType = parentType;
             this.fields = this.parentType.GetFields(BindingFlags.Public | BindingFlags.Static);
             

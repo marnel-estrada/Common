@@ -23,32 +23,33 @@ namespace Common {
             return new Option<T>(value);
         }
         
+        /// <summary>
+        /// We provided an explicit AsOption() so it's clear that the method accepts a null or non null
+        /// value
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static Option<T> AsOption(T value) {
+            return new Option<T>(value);
+        }
+        
         private readonly bool hasValue;
         private readonly T value;
 
         private Option(T value) {
             this.value = value;
-            CheckForNull(this.value);
-
-            this.hasValue = true;
-        }
-
-        private static void CheckForNull(T value) {
-            // Check only for null if it's nullable or reference type
-            if (IsNullable() || IsReferenceType()) {
-                if (value == null) {
-                    throw new Exception("Can't use null.");
-                }
-            }
+            
+            // This means that value is considered None if the specified value is null
+            this.hasValue = !IsNull(this.value);
         }
 
         private static bool IsNull(T value) {
+            // Check only for null if it's nullable or reference type
             if (IsNullable() || IsReferenceType()) {
                 return value == null;
             }
 
-            // At this point, value may be a value type
-            // It can't be null
+            // Value types can't be null
             return false;
         }
 

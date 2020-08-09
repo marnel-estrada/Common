@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using UnityEngine;
 using Common.Signal;
 
@@ -12,8 +13,12 @@ namespace Common {
         
         private TranslationContainer currentTranslation;
 
+        private Action<string> parseMatcher;
+
         private void Awake() {
-            Assertion.NotEmpty(this.xmlPath); 
+            Assertion.NotEmpty(this.xmlPath);
+
+            this.parseMatcher = Parse;
 
             // Parse master language on awake
             ParseDefaultLanguage();
@@ -38,8 +43,8 @@ namespace Common {
         }
 
         private void Parse(ISignalParameters parameters) {
-            string xmlPath = parameters.GetParameter(CommonLocalizationParams.XML_PATH) as string;
-            Parse(xmlPath);
+            Option<string> parameterPath = parameters.GetParameter<string>(CommonLocalizationParams.XML_PATH);
+            parameterPath.Match(this.parseMatcher);
         }
 
         /// <summary>

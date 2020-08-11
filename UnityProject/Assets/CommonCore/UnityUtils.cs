@@ -169,7 +169,7 @@ namespace Common {
         public static TComponentType GetRequiredComponent<TComponentType>(string objectName)
             where TComponentType : Component {
             GameObject gameObject = GameObject.Find(objectName);
-            Assertion.NotNull(gameObject);
+            Assertion.NotNull(gameObject, objectName);
 
             TComponentType component = gameObject.GetComponent<TComponentType>();
             Assertion.NotNull(component);

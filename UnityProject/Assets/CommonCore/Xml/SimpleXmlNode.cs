@@ -64,6 +64,11 @@ namespace Common.Xml {
             return this.attributes[attributeKey].Trim();
         }
 
+        public Option<string> GetAttributeAsOption(string attributeKey) {
+            return this.attributes.TryGetValue(attributeKey, out string value) ? Option<string>.AsOption(value.Trim()) 
+                : Option<string>.NONE;
+        }
+
         /**
          * Returns an attribute as an int.
          */

@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
+﻿using UnityEngine;
 
 namespace Common {
+    using System;
+    using System.Collections.Generic;
+    using System.Reflection;
 
     /// <summary>
     /// A utility class used for faster identification of a class from a string
@@ -25,24 +26,14 @@ namespace Common {
             AssemblyName[] referencedAssemblies = currentAssembly.GetReferencedAssemblies();
             this.loadedAssemblies = new Assembly[referencedAssemblies.Length];
             for (int i = 0; i < referencedAssemblies.Length; ++i) {
-                this.loadedAssemblies[i] = Assembly.Load(referencedAssemblies[i]);
-            }
-        }
-
-        private readonly struct StoreTypeMatcher : IOptionMatcher<Type> {
-            private readonly string typeName;
-            private readonly Dictionary<string, Type> resolvedTypes;
-
-            public StoreTypeMatcher(string typeName, Dictionary<string, Type> resolvedTypes) {
-                this.typeName = typeName;
-                this.resolvedTypes = resolvedTypes;
-            }
-            
-            public void OnSome(Type type) {
-                this.resolvedTypes[this.typeName] = type;
-            }
-
-            public void OnNone() {
+                // We try catch here so that the loading continues even if there are errors
+                // The error was reported in Crashes and Exceptions from Unity
+                try {
+                    this.loadedAssemblies[i] = Assembly.Load(referencedAssemblies[i]);
+                } catch (Exception e) {
+                    Debug.LogError(e.Message);
+                    Debug.LogError(e.StackTrace);
+                }
             }
         }
 
@@ -51,20 +42,21 @@ namespace Common {
         /// </summary>
         /// <param name="typeName"></param>
         /// <returns></returns>
-        public Option<Type> ResolveType(string typeName) {
+        public Type ResolveType(string typeName) {
             // Check if it was already resolved before
-            Option<Type> foundType = this.resolvedTypes.Find(typeName);
-            if (foundType.IsSome) {
+            Type type = this.resolvedTypes.Find(typeName);
+            if (type != null) {
                 // It was already resolved
-                return foundType;
+                return type;
             }
 
-            foundType = ResolveTypeFromAssemblies(typeName);
+            type = ResolveTypeFromAssemblies(typeName);
+            if (type != null) {
+                // It was resolved. We store it so that we only lookup the dictionary next time
+                this.resolvedTypes[typeName] = type;
+            }
             
-            // Stores the type if it was resolved
-            foundType.Match(new StoreTypeMatcher(typeName, this.resolvedTypes));
-            
-            return foundType;
+            return type;
         }
 
         /// <summary>
@@ -73,14 +65,14 @@ namespace Common {
         /// </summary>
         /// <param name="typeName"></param>
         /// <returns></returns>
-        private Option<Type> ResolveTypeFromAssemblies(string typeName) {
+        private Type ResolveTypeFromAssemblies(string typeName) {
             // Try Type.GetType() first. This will work with types defined
             // by the Mono runtime, in the same assembly as the caller, etc.
             Type type = Type.GetType(typeName);
 
             // If it worked, then we're done here
             if(type != null) {
-                return Option<Type>.Some(type);
+                return type;
             }
             
             // Attempt to search for type on the loaded assemblies
@@ -88,7 +80,7 @@ namespace Common {
             for(int i = 0; i < currentLength; ++i) {
                 type = this.currentAssemblies[i].GetType(typeName);
                 if(type != null) {
-                    return Option<Type>.Some(type);
+                    return type;
                 }
             }
             
@@ -98,12 +90,11 @@ namespace Common {
             for (int i = 0; i < loadedLength; ++i) {
                 type = this.loadedAssemblies[i].GetType(typeName);
                 if(type != null) {
-                    return Option<Type>.Some(type);
+                    return type;
                 }
             }
 
-            // Not resolved at all
-            return Option<Type>.NONE;
+            return null;
         }
 
         private static readonly TypeIdentifier INSTANCE = new TypeIdentifier();
@@ -113,9 +104,8 @@ namespace Common {
         /// </summary>
         /// <param name="typeName"></param>
         /// <returns></returns>
-        public static Option<Type> GetType(string typeName) {
+        public static Type GetType(string typeName) {
             return INSTANCE.ResolveType(typeName);
         }
-
     }
 }

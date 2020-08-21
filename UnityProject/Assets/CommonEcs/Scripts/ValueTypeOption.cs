@@ -16,6 +16,16 @@ namespace CommonEcs {
         // This is because they don't work within Burst. We don't provide so that we 
         // avoid the mistake. Use default constructor for None and constructor with
         // value for Some.
+
+        public static ValueTypeOption<T> None {
+            get {
+                return new ValueTypeOption<T>();
+            }
+        }
+        
+        public static ValueTypeOption<T> Some(T value) {
+            return new ValueTypeOption<T>(value);
+        }
         
         private readonly T value;
         private readonly byte hasValue;

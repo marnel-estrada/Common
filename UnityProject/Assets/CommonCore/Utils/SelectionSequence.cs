@@ -7,7 +7,6 @@ namespace Common {
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class SelectionSequence<T> {
-
         private readonly List<T> items = new List<T>();
 
         private int currentIndex = 0;

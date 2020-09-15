@@ -15,12 +15,10 @@ using UnityEngine;
  * Contains extension or utility methods related to Quaternions
  */
 public static class QuaternionUtils {
-
 	/**
 	 * Returns whether or not the two quaternions are equal
 	 */
 	public static bool Equals(Quaternion a, Quaternion b) {
 		return Quaternion.Equals(a, b);
 	}
-
 }

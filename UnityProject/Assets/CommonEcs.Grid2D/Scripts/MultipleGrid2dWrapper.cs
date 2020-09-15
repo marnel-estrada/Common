@@ -15,6 +15,16 @@ namespace CommonEcs {
         }
 
         public ValueTypeOption<Entity> GetCellEntity(int x, int y, int z) {
+            if (x < 0 || y < 0 || z < 0) {
+                // Outside of map
+                return ValueTypeOption<Entity>.None;
+            }
+
+            if (x >= this.grid.columns || y >= this.grid.rows) {
+                // Outside of map
+                return ValueTypeOption<Entity>.None;
+            }
+            
             int index = this.grid.ToIndex(x, y, z);
 
             // Check for valid index

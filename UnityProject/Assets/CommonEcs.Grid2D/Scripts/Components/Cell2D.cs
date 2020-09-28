@@ -2,11 +2,10 @@
 using Unity.Mathematics;
 
 namespace CommonEcs {
-
     /// <summary>
     /// A component that represents a cell in a 2D grid
     /// </summary>
-    public struct Cell2D : IComponentData {
+    public readonly struct Cell2D : IComponentData {
         public readonly float2 center;
         public readonly float2 size;
         public readonly int2 worldCoordinate; // This is the coordinate where (0, 0) is at the center

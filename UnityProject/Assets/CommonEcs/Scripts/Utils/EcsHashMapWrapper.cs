@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 
 using Common;
 
@@ -55,7 +53,7 @@ namespace CommonEcs {
             this.allEntryLists = Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>>.Nothing;
 
             // Note here that this is Some. We can't use static NONE as it is not allowed in Burst.
-            this.entityManager = new ValueTypeOption<EntityManager>(entityManager);
+            this.entityManager = ValueTypeOption<EntityManager>.Some(entityManager);
         }
 
         public void AddOrSet(K key, V newValue) {

@@ -12,11 +12,7 @@ namespace CommonEcs {
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public readonly struct ValueTypeOption<T> : IEquatable<ValueTypeOption<T>> where T : struct {
-        // Note here that we don't provide static implementation for Some() and NONE.
-        // This is because they don't work within Burst. We don't provide so that we 
-        // avoid the mistake. Use default constructor for None and constructor with
-        // value for Some.
-
+        // We use property here as static member variable doesn't work for Burst
         public static ValueTypeOption<T> None {
             get {
                 return new ValueTypeOption<T>();
@@ -30,7 +26,7 @@ namespace CommonEcs {
         private readonly T value;
         private readonly byte hasValue;
 
-        public ValueTypeOption(T value) {
+        private ValueTypeOption(T value) {
             this.value = value;
             this.hasValue = 1;
         }
@@ -70,6 +66,10 @@ namespace CommonEcs {
         public TReturnType Match<TMatcher, TReturnType>(TMatcher matcher)
             where TMatcher : struct, IFuncOptionMatcher<T, TReturnType> {
             return this.IsSome ? matcher.OnSome(this.value) : matcher.OnNone();
+        }
+
+        public T ValueOr(T other) {
+            return this.IsSome ? this.value : other;
         }
 
         public bool Equals(ValueTypeOption<T> other) {

@@ -6,8 +6,8 @@ using Common;
 namespace CommonEcs {
     public class SignalHandler<T> where T : struct, IComponentData {
         private readonly EntityQuery query;
-        private ArchetypeChunkEntityType entityType;
-        private ArchetypeChunkComponentType<T> componentType;
+        private EntityTypeHandle entityType;
+        private ComponentTypeHandle<T> componentType;
 
         private readonly ComponentSystemBase system;
 
@@ -25,8 +25,8 @@ namespace CommonEcs {
         }
 
         public void Update() {
-            this.entityType = this.system.GetArchetypeChunkEntityType();
-            this.componentType = this.system.GetArchetypeChunkComponentType<T>();
+            this.entityType = this.system.GetEntityTypeHandle();
+            this.componentType = this.system.GetComponentTypeHandle<T>();
 
             NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
             try {

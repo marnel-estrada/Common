@@ -21,7 +21,7 @@ namespace Common.Ecs.Fsm {
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             Job job = new Job() {
-                fsmType = GetArchetypeChunkComponentType<Fsm>()
+                fsmType = GetComponentTypeHandle<Fsm>()
             };
 
             return JobChunkExtensions.Schedule(job, this.query, inputDeps);
@@ -29,7 +29,7 @@ namespace Common.Ecs.Fsm {
 
         [BurstCompile]
         private struct Job : IJobChunk {
-            public ArchetypeChunkComponentType<Fsm> fsmType;
+            public ComponentTypeHandle<Fsm> fsmType;
             
             public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {
                 NativeArray<Fsm> fsms = chunk.GetNativeArray(this.fsmType);

@@ -16,7 +16,7 @@ namespace Common.Ecs.Fsm {
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             Job job = new Job() {
-                commandBuffer = this.barrier.CreateCommandBuffer().ToConcurrent()
+                commandBuffer = this.barrier.CreateCommandBuffer().AsParallelWriter()
             };
             JobHandle handle = job.Schedule(this, inputDeps);
             this.barrier.AddJobHandleForProducer(handle);
@@ -26,7 +26,7 @@ namespace Common.Ecs.Fsm {
         
         [BurstCompile]
         private struct Job : IJobForEachWithEntity<FsmAction> {
-            public EntityCommandBuffer.Concurrent commandBuffer;
+            public EntityCommandBuffer.ParallelWriter commandBuffer;
             
             public void Execute(Entity entity, int index, ref FsmAction action) {
                 if (action.finished) {

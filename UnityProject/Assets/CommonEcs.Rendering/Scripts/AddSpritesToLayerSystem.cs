@@ -16,10 +16,10 @@ namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class AddSpritesToLayerSystem : ComponentSystem {
         private EntityQuery query;
-        private ArchetypeChunkComponentType<AddToSpriteLayer> addToLayerType;
-        private ArchetypeChunkComponentType<Sprite> spriteType;
-        private ArchetypeChunkComponentType<LocalToWorld> matrixType;
-        private ArchetypeChunkEntityType entityType;
+        private ComponentTypeHandle<AddToSpriteLayer> addToLayerType;
+        private ComponentTypeHandle<Sprite> spriteType;
+        private ComponentTypeHandle<LocalToWorld> matrixType;
+        private EntityTypeHandle entityType;
 
         private SpriteLayerInstancesSystem layers;
         private SpriteManagerInstancesSystem managers;
@@ -36,10 +36,10 @@ namespace CommonEcs {
         }
 
         protected override void OnUpdate() {
-            this.addToLayerType = GetArchetypeChunkComponentType<AddToSpriteLayer>();
-            this.spriteType = GetArchetypeChunkComponentType<Sprite>();
-            this.matrixType = GetArchetypeChunkComponentType<LocalToWorld>();
-            this.entityType = GetArchetypeChunkEntityType();
+            this.addToLayerType = GetComponentTypeHandle<AddToSpriteLayer>();
+            this.spriteType = GetComponentTypeHandle<Sprite>();
+            this.matrixType = GetComponentTypeHandle<LocalToWorld>();
+            this.entityType = GetEntityTypeHandle();
 
             NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
             for (int i = 0; i < chunks.Length; ++i) {

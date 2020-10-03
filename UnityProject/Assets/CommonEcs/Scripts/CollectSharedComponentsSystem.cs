@@ -10,7 +10,7 @@ namespace CommonEcs {
         } 
 
         private EntityQuery query;
-        private ArchetypeChunkEntityType entityType;
+        private EntityTypeHandle entityType;
         private SharedComponentQuery<T> sharedQuery;
         
         private readonly Dictionary<Entity, T> map = new Dictionary<Entity, T>(1);
@@ -34,7 +34,7 @@ namespace CommonEcs {
         }
 
         protected override void OnUpdate() {
-            this.entityType = GetArchetypeChunkEntityType();
+            this.entityType = GetEntityTypeHandle();
             this.sharedQuery.Update();
             NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
             

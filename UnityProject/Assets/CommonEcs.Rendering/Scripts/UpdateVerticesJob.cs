@@ -8,7 +8,7 @@ namespace CommonEcs {
     [BurstCompile]
     public struct UpdateVerticesJob : IJobChunk {
         [ReadOnly]
-        public ArchetypeChunkComponentType<Sprite> spriteType;
+        public ComponentTypeHandle<Sprite> spriteType;
 
         [NativeDisableParallelForRestriction]
         public NativeArray<Vector3> vertices;

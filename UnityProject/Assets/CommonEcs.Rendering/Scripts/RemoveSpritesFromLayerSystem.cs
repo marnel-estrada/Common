@@ -12,8 +12,8 @@ namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class RemoveSpritesFromLayerSystem : ComponentSystem {
         private EntityQuery query;
-        private ArchetypeChunkComponentType<AddSpritesToLayerSystem.Added> addedType;
-        private ArchetypeChunkEntityType entityType;
+        private ComponentTypeHandle<AddSpritesToLayerSystem.Added> addedType;
+        private EntityTypeHandle entityType;
         
         private SpriteManagerInstancesSystem managers;
 
@@ -25,8 +25,8 @@ namespace CommonEcs {
         }
 
         protected override void OnUpdate() {
-            this.addedType = GetArchetypeChunkComponentType<AddSpritesToLayerSystem.Added>();
-            this.entityType = GetArchetypeChunkEntityType();
+            this.addedType = GetComponentTypeHandle<AddSpritesToLayerSystem.Added>();
+            this.entityType = GetEntityTypeHandle();
 
             NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
             for (int i = 0; i < chunks.Length; ++i) {

@@ -9,7 +9,7 @@ namespace Common.Ecs.Fsm {
         public ComponentDataFromEntity<Fsm> allFsms;
         public ComponentDataFromEntity<FsmState> allStates;
 
-        public EntityCommandBuffer.Concurrent commandBuffer;
+        public EntityCommandBuffer.ParallelWriter commandBuffer;
         
         /// <summary>
         /// Returns whether or not the action can execute based on the states of its owner FSM State and FSM.

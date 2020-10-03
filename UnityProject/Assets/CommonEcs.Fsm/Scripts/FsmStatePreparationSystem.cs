@@ -18,7 +18,7 @@ namespace Common.Ecs.Fsm {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public abstract class FsmStatePreparationSystem<T> : TemplateComponentSystem
         where T : struct, IComponentData {
-        private ArchetypeChunkComponentType<FsmState> stateType;
+        private ComponentTypeHandle<FsmState> stateType;
 
         protected delegate void StatePrepareAction(ref Entity stateEntity);
 
@@ -69,7 +69,7 @@ namespace Common.Ecs.Fsm {
         }
 
         protected override void BeforeChunkTraversal() {
-            this.stateType = GetArchetypeChunkComponentType<FsmState>();
+            this.stateType = GetComponentTypeHandle<FsmState>();
         }
 
         private NativeArray<FsmState> states;

@@ -26,7 +26,7 @@ namespace CommonEcs {
             JobHandle lastHandle = inputDeps;
 
             IReadOnlyList<SpriteManager> managers = this.managerQuery.SharedComponents;
-            ArchetypeChunkComponentType<Sprite> spriteType = GetArchetypeChunkComponentType<Sprite>(true);
+            ComponentTypeHandle<Sprite> spriteType = GetComponentTypeHandle<Sprite>(true);
 
             // Add jobs
             // Note here that we start iteration from 1 because the first SpriteManager is the default value
@@ -81,7 +81,7 @@ namespace CommonEcs {
         [BurstCompile]
         private struct AddJob : IJobChunk {
             [ReadOnly]
-            public ArchetypeChunkComponentType<Sprite> spriteType;
+            public ComponentTypeHandle<Sprite> spriteType;
             
             public NativeArray<SortedSpriteEntry> sortList;
 

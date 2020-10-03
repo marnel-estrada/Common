@@ -7,8 +7,8 @@ namespace Common.Ecs.Fsm {
     [UpdateAfter(typeof(MoveActionSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     class MoveActionCheckFinishedSystem : FsmActionSystem {
-        private ArchetypeChunkEntityType entityType;
-        private ArchetypeChunkComponentType<MoveAction> moveType;
+        private EntityTypeHandle entityType;
+        private ComponentTypeHandle<MoveAction> moveType;
 
         protected override EntityQuery ComposeQuery() {
             return GetEntityQuery(typeof(FsmAction), typeof(MoveAction));
@@ -17,8 +17,8 @@ namespace Common.Ecs.Fsm {
         protected override void BeforeChunkTraversal() {
             base.BeforeChunkTraversal();
             
-            this.entityType = GetArchetypeChunkEntityType();
-            this.moveType = GetArchetypeChunkComponentType<MoveAction>();
+            this.entityType = GetEntityTypeHandle();
+            this.moveType = GetComponentTypeHandle<MoveAction>();
         }
 
         private NativeArray<MoveAction> moveActions;

@@ -17,7 +17,7 @@ namespace Common.Ecs.Fsm {
         protected FsmStatePreparationJobSystemBarrier barrier;
 
         private EntityQuery query;
-        private ArchetypeChunkComponentType<FsmState> stateType;
+        private ComponentTypeHandle<FsmState> stateType;
 
         protected ComponentDataFromEntity<Fsm> allFsms;
 
@@ -33,8 +33,8 @@ namespace Common.Ecs.Fsm {
             this.allFsms = GetComponentDataFromEntity<Fsm>();
             
             Job job = new Job {
-                stateType = GetArchetypeChunkComponentType<FsmState>(), 
-                commandBuffer = this.barrier.CreateCommandBuffer().ToConcurrent(), 
+                stateType = GetComponentTypeHandle<FsmState>(), 
+                commandBuffer = this.barrier.CreateCommandBuffer().AsParallelWriter(), 
                 preparationAction = this.StatePreparationAction
             };
 
@@ -45,8 +45,8 @@ namespace Common.Ecs.Fsm {
         }
 
         private struct Job : IJobChunk {
-            public ArchetypeChunkComponentType<FsmState> stateType;
-            public EntityCommandBuffer.Concurrent commandBuffer;
+            public ComponentTypeHandle<FsmState> stateType;
+            public EntityCommandBuffer.ParallelWriter commandBuffer;
             public TPrepareActionType preparationAction;
             
             public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {

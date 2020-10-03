@@ -14,7 +14,7 @@ namespace CommonEcs {
         private readonly EntityManager entityManager;
     
         [ReadOnly]
-        private ArchetypeChunkSharedComponentType<T> sharedComponentType;
+        private SharedComponentTypeHandle<T> sharedComponentType;
     
         private readonly List<T> sharedComponents = new List<T>();
         private readonly List<int> indices = new List<int>();
@@ -28,7 +28,7 @@ namespace CommonEcs {
         /// Common update routines
         /// </summary>
         public void Update() {
-            this.sharedComponentType = this.system.GetArchetypeChunkSharedComponentType<T>();
+            this.sharedComponentType = this.system.GetSharedComponentTypeHandle<T>();
             
             this.sharedComponents.Clear();
             this.indices.Clear();

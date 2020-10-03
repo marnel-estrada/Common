@@ -7,8 +7,8 @@ namespace CommonEcs {
     public class DestroyUnownedEntityReferencesSystem : ComponentSystem {
         private EntityQuery query;
         
-        private ArchetypeChunkEntityType entityType;
-        private ArchetypeChunkComponentType<EntityReference> referenceType;
+        private EntityTypeHandle entityType;
+        private ComponentTypeHandle<EntityReference> referenceType;
     
         private EndInitializationEntityCommandBufferSystem barrier;
     
@@ -18,8 +18,8 @@ namespace CommonEcs {
         }
     
         protected override void OnUpdate() {
-            this.entityType = GetArchetypeChunkEntityType();
-            this.referenceType = GetArchetypeChunkComponentType<EntityReference>(true);
+            this.entityType = GetEntityTypeHandle();
+            this.referenceType = GetComponentTypeHandle<EntityReference>(true);
     
             NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
             

@@ -40,9 +40,9 @@ namespace Common.Ecs.Fsm {
                 allFsms = this.allFsms,
                 allStates = this.allStates,
                 chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob),
-                entityType = GetArchetypeChunkEntityType(),
-                actionType = GetArchetypeChunkComponentType<FsmAction>(),
-                commandBuffer = this.barrier.CreateCommandBuffer().ToConcurrent(),
+                entityType = GetEntityTypeHandle(),
+                actionType = GetComponentTypeHandle<FsmAction>(),
+                commandBuffer = this.barrier.CreateCommandBuffer().AsParallelWriter(),
                 actionComposer = GetJobActionComposer()
             };
 
@@ -62,11 +62,11 @@ namespace Common.Ecs.Fsm {
             public NativeArray<ArchetypeChunk> chunks;
 
             [ReadOnly]
-            public ArchetypeChunkEntityType entityType;
+            public EntityTypeHandle entityType;
             
-            public ArchetypeChunkComponentType<FsmAction> actionType;
+            public ComponentTypeHandle<FsmAction> actionType;
             
-            public EntityCommandBuffer.Concurrent commandBuffer; 
+            public EntityCommandBuffer.ParallelWriter commandBuffer; 
 
             public ComposerType actionComposer;
 
@@ -96,9 +96,9 @@ namespace Common.Ecs.Fsm {
             public FsmActionUtility utility;
             
             [ReadOnly]
-            public ArchetypeChunkEntityType entityType;
+            public EntityTypeHandle entityType;
             
-            public ArchetypeChunkComponentType<FsmAction> actionType;
+            public ComponentTypeHandle<FsmAction> actionType;
             
             public ComposerType actionComposer;
 

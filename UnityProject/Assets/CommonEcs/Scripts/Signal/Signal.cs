@@ -28,7 +28,7 @@ namespace CommonEcs {
             buffer.AddComponent(entity, signalComponent);
         }
         
-        public static void Dispatch<T>(int jobIndex, EntityCommandBuffer.Concurrent buffer, T signalComponent) where T : struct, IComponentData {
+        public static void Dispatch<T>(int jobIndex, EntityCommandBuffer.ParallelWriter buffer, T signalComponent) where T : struct, IComponentData {
             Entity entity = buffer.CreateEntity(jobIndex);
             buffer.AddComponent(jobIndex, entity, new Signal());
             buffer.AddComponent(jobIndex, entity, signalComponent);

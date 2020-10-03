@@ -37,16 +37,16 @@ namespace Common.Ecs.Fsm {
         protected override ActionComposer GetJobActionComposer() {
             return new ActionComposer() {
                 allTranslations = this.allTranslations,
-                moveActionType = GetArchetypeChunkComponentType<MoveAction>(),
-                timerType = GetArchetypeChunkComponentType<DurationTimer>()
+                moveActionType = GetComponentTypeHandle<MoveAction>(),
+                timerType = GetComponentTypeHandle<DurationTimer>()
             };
         }
 
         public struct ActionComposer : IFsmJobActionComposer<MoveJobAction> {
             public ComponentDataFromEntity<Translation> allTranslations;
             
-            public ArchetypeChunkComponentType<MoveAction> moveActionType;
-            public ArchetypeChunkComponentType<DurationTimer> timerType;
+            public ComponentTypeHandle<MoveAction> moveActionType;
+            public ComponentTypeHandle<DurationTimer> timerType;
             
             public MoveJobAction Compose(ArchetypeChunk chunk) {
                 return new MoveJobAction() {

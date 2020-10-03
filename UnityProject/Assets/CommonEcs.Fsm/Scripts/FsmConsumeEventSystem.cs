@@ -7,9 +7,9 @@ namespace Common.Ecs.Fsm {
     [UpdateBefore(typeof(FsmActionStartSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class FsmConsumeEventSystem : TemplateComponentSystem {
-        private ArchetypeChunkEntityType entityType;
-        private ArchetypeChunkComponentType<Fsm> fsmType;
-        private ArchetypeChunkBufferType<FsmTransition> transitionType;
+        private EntityTypeHandle entityType;
+        private ComponentTypeHandle<Fsm> fsmType;
+        private BufferTypeHandle<FsmTransition> transitionType;
 
         protected override EntityQuery ComposeQuery() {
             return GetEntityQuery(typeof(Fsm), ComponentType.ReadOnly<HasFsmEvent>(), 
@@ -17,9 +17,9 @@ namespace Common.Ecs.Fsm {
         }
 
         protected override void BeforeChunkTraversal() {
-            this.entityType = GetArchetypeChunkEntityType();
-            this.fsmType = GetArchetypeChunkComponentType<Fsm>();
-            this.transitionType = GetArchetypeChunkBufferType<FsmTransition>();
+            this.entityType = GetEntityTypeHandle();
+            this.fsmType = GetComponentTypeHandle<Fsm>();
+            this.transitionType = GetBufferTypeHandle<FsmTransition>();
         }
 
         private NativeArray<Entity> entities;

@@ -6,12 +6,12 @@ namespace Common.Ecs.Fsm {
     [UpdateBefore(typeof(FsmActionEndSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public abstract class FsmActionSystem : FsmSystem {
-        private ArchetypeChunkEntityType entityType;
-        private ArchetypeChunkComponentType<FsmAction> fsmActionType;
+        private EntityTypeHandle entityType;
+        private ComponentTypeHandle<FsmAction> fsmActionType;
         
         protected override void BeforeChunkTraversal() {
-            this.entityType = GetArchetypeChunkEntityType();
-            this.fsmActionType = GetArchetypeChunkComponentType<FsmAction>();
+            this.entityType = GetEntityTypeHandle();
+            this.fsmActionType = GetComponentTypeHandle<FsmAction>();
         }
 
         private NativeArray<Entity> entities;

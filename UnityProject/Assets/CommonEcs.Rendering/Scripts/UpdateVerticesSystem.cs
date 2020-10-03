@@ -17,7 +17,7 @@ namespace CommonEcs {
         private SharedComponentQuery<SpriteManager> spriteManagerQuery;
 
         private EntityQuery query;
-        private ArchetypeChunkComponentType<Sprite> spriteType;
+        private ComponentTypeHandle<Sprite> spriteType;
 
         protected override void OnCreate() {
             this.spriteManagerQuery = new SharedComponentQuery<SpriteManager>(this, this.EntityManager);
@@ -34,7 +34,7 @@ namespace CommonEcs {
             this.spriteManagerQuery.Update();
             IReadOnlyList<SpriteManager> spriteManagers = this.spriteManagerQuery.SharedComponents;
 
-            this.spriteType = GetArchetypeChunkComponentType<Sprite>(true);
+            this.spriteType = GetComponentTypeHandle<Sprite>(true);
             
             JobHandle lastHandle = inputDeps;
             

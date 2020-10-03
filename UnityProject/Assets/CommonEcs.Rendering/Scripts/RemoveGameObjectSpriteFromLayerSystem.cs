@@ -15,8 +15,8 @@ namespace CommonEcs {
     public class RemoveGameObjectSpriteFromLayerSystem : ComponentSystem {
         private EntityQuery query;
         
-        private ArchetypeChunkComponentType<AddGameObjectSpriteToLayerSystem.Added> addedType;
-        private ArchetypeChunkEntityType entityType;
+        private ComponentTypeHandle<AddGameObjectSpriteToLayerSystem.Added> addedType;
+        private EntityTypeHandle entityType;
         
         private SpriteManagerInstancesSystem managers;
 
@@ -31,8 +31,8 @@ namespace CommonEcs {
         }
 
         protected override void OnUpdate() {
-            this.addedType = GetArchetypeChunkComponentType<AddGameObjectSpriteToLayerSystem.Added>();
-            this.entityType = GetArchetypeChunkEntityType();
+            this.addedType = GetComponentTypeHandle<AddGameObjectSpriteToLayerSystem.Added>();
+            this.entityType = GetEntityTypeHandle();
             
             NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
             for (int i = 0; i < chunks.Length; ++i) {

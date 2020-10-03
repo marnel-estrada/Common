@@ -8,8 +8,8 @@ namespace Common.Ecs.Fsm {
     [UpdateBefore(typeof(FsmActionEndSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class TimedWaitActionSystem : FsmActionSystem {
-        private ArchetypeChunkComponentType<TimedWaitAction> waitType;
-        private ArchetypeChunkComponentType<DurationTimer> timerType;
+        private ComponentTypeHandle<TimedWaitAction> waitType;
+        private ComponentTypeHandle<DurationTimer> timerType;
         
         protected override EntityQuery ComposeQuery() {
             return GetEntityQuery(typeof(FsmAction), typeof(TimedWaitAction), typeof(DurationTimer));
@@ -18,8 +18,8 @@ namespace Common.Ecs.Fsm {
         protected override void BeforeChunkTraversal() {
             base.BeforeChunkTraversal();
 
-            this.waitType = GetArchetypeChunkComponentType<TimedWaitAction>();
-            this.timerType = GetArchetypeChunkComponentType<DurationTimer>();
+            this.waitType = GetComponentTypeHandle<TimedWaitAction>();
+            this.timerType = GetComponentTypeHandle<DurationTimer>();
         }
 
         private NativeArray<TimedWaitAction> waitActions;

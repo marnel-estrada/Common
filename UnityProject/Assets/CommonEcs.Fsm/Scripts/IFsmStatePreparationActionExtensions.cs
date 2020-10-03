@@ -8,7 +8,7 @@ namespace Common.Ecs.Fsm {
         /// <param name="prepareAction"></param>
         /// <param name="stateEntity"></param>
         /// <param name="commandBuffer"></param>
-        public static Entity AddAction<T>(this T prepareAction, ref Entity stateEntity, ref EntityCommandBuffer.Concurrent commandBuffer, int jobIndex)
+        public static Entity AddAction<T>(this T prepareAction, ref Entity stateEntity, ref EntityCommandBuffer.ParallelWriter commandBuffer, int jobIndex)
             where T : struct, IFsmStatePreparationAction {
             Entity entity = commandBuffer.CreateEntity(jobIndex);
 

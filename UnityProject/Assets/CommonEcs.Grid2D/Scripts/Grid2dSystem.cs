@@ -8,8 +8,8 @@ namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class Grid2dSystem : ComponentSystem {
         private EntityQuery query;
-        private ArchetypeChunkComponentType<Grid2D> gridType;
-        private ArchetypeChunkBufferType<EntityBufferElement> bufferType;
+        private ComponentTypeHandle<Grid2D> gridType;
+        private BufferTypeHandle<EntityBufferElement> bufferType;
 
         private bool resolved;
         private Grid2D grid;
@@ -33,8 +33,8 @@ namespace CommonEcs {
                 return;
             }
 
-            this.gridType = GetArchetypeChunkComponentType<Grid2D>(true);
-            this.bufferType = GetArchetypeChunkBufferType<EntityBufferElement>(true);
+            this.gridType = GetComponentTypeHandle<Grid2D>(true);
+            this.bufferType = GetBufferTypeHandle<EntityBufferElement>(true);
             NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
             for (int i = 0; i < chunks.Length; ++i) {
                 Process(chunks[i]);

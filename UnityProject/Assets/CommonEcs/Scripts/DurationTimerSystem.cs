@@ -32,7 +32,7 @@ namespace CommonEcs {
             IReadOnlyList<TimeReference> timeReferences = this.timeReferenceQuery.SharedComponents;
 
             JobHandle lastHandle = dependency;
-            ArchetypeChunkComponentType<DurationTimer> timerType = GetArchetypeChunkComponentType<DurationTimer>();
+            ComponentTypeHandle<DurationTimer> timerType = GetComponentTypeHandle<DurationTimer>();
             
             // Note here that we start counting from 1 since the first entry is always a default one
             for (int i = 1; i < timeReferences.Count; ++i) {
@@ -53,7 +53,7 @@ namespace CommonEcs {
 
         private JobHandle ScheduleNonScaled(JobHandle dependency) {
             NonScaledJob job = new NonScaledJob() {
-                timerType = GetArchetypeChunkComponentType<DurationTimer>(),
+                timerType = GetComponentTypeHandle<DurationTimer>(),
                 deltaTime = UnityEngine.Time.deltaTime
             };
 
@@ -62,7 +62,7 @@ namespace CommonEcs {
 
         [BurstCompile]
         private struct ScaledJob : IJobChunk {
-            public ArchetypeChunkComponentType<DurationTimer> timerType;
+            public ComponentTypeHandle<DurationTimer> timerType;
             public float scaledDeltaTime;
 
             public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {
@@ -79,7 +79,7 @@ namespace CommonEcs {
 
         [BurstCompile]
         private struct NonScaledJob : IJobChunk {
-            public ArchetypeChunkComponentType<DurationTimer> timerType;
+            public ComponentTypeHandle<DurationTimer> timerType;
             public float deltaTime;
 
             public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {

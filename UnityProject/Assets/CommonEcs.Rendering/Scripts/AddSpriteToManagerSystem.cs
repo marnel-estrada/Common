@@ -29,13 +29,13 @@ namespace CommonEcs {
         
         private EntityQuery query;
         
-        private ArchetypeChunkComponentType<Sprite> spriteType;
+        private ComponentTypeHandle<Sprite> spriteType;
         
         [ReadOnly]
-        private ArchetypeChunkEntityType entityType;
+        private EntityTypeHandle entityType;
         
         [ReadOnly]
-        private ArchetypeChunkComponentType<LocalToWorld> matrixType;
+        private ComponentTypeHandle<LocalToWorld> matrixType;
 
         private SpriteManagerInstancesSystem spriteManagers;
 
@@ -51,9 +51,9 @@ namespace CommonEcs {
         }
 
         protected override void OnUpdate() {
-            this.entityType = GetArchetypeChunkEntityType();
-            this.spriteType = GetArchetypeChunkComponentType<Sprite>();
-            this.matrixType = GetArchetypeChunkComponentType<LocalToWorld>(true);
+            this.entityType = GetEntityTypeHandle();
+            this.spriteType = GetComponentTypeHandle<Sprite>();
+            this.matrixType = GetComponentTypeHandle<LocalToWorld>(true);
             NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
             
             for (int i = 0; i < chunks.Length; ++i) {

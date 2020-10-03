@@ -7,7 +7,7 @@ namespace Common.Ecs.Fsm {
         /// </summary>
         /// <param name="state"></param>
         /// <param name="commandBuffer"></param>
-        void Prepare(ref FsmState state, ref EntityCommandBuffer.Concurrent commandBuffer, int jobIndex);
+        void Prepare(ref FsmState state, ref EntityCommandBuffer.ParallelWriter commandBuffer, int jobIndex);
         
     }
 }

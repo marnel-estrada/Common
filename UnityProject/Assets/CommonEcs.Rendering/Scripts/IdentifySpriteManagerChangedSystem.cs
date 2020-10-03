@@ -15,7 +15,7 @@ namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class IdentifySpriteManagerChangedSystem : JobComponentSystem {
         private EntityQuery query;
-        private ArchetypeChunkComponentType<Sprite> spriteType;
+        private ComponentTypeHandle<Sprite> spriteType;
 
         private readonly List<SpriteManager> managers = new List<SpriteManager>(1);
         private readonly List<int> managerIndices = new List<int>(1);
@@ -26,7 +26,7 @@ namespace CommonEcs {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            this.spriteType = GetArchetypeChunkComponentType<Sprite>();
+            this.spriteType = GetComponentTypeHandle<Sprite>();
             
             this.managers.Clear();
             this.managerIndices.Clear();
@@ -94,7 +94,7 @@ namespace CommonEcs {
         [BurstCompile]
         private struct Job : IJobChunk {
             [ReadOnly]
-            public ArchetypeChunkComponentType<Sprite> spriteType;
+            public ComponentTypeHandle<Sprite> spriteType;
             
             [ReadOnly]
             public NativeHashMap<Entity, int> managerToIndexMap;

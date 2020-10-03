@@ -10,8 +10,8 @@ namespace CommonEcs {
     /// </summary>
     public class JobSignalHandler<T> where T : struct, IComponentData {
         private readonly EntityQuery query;
-        private ArchetypeChunkEntityType entityType;
-        private ArchetypeChunkComponentType<T> componentType;
+        private EntityTypeHandle entityType;
+        private ComponentTypeHandle<T> componentType;
 
         private readonly ComponentSystemBase system;
         
@@ -28,8 +28,8 @@ namespace CommonEcs {
         }
 
         public JobHandle Update(JobHandle inputDeps) {
-            this.entityType = this.system.GetArchetypeChunkEntityType();
-            this.componentType = this.system.GetArchetypeChunkComponentType<T>();
+            this.entityType = this.system.GetEntityTypeHandle();
+            this.componentType = this.system.GetComponentTypeHandle<T>();
 
             JobHandle lastHandle = inputDeps;
 

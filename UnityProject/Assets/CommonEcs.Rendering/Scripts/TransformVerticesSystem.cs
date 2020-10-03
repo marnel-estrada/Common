@@ -13,10 +13,10 @@ namespace CommonEcs {
     public class TransformVerticesSystem : JobComponentSystem {
         private EntityQuery query;
 
-        private ArchetypeChunkComponentType<Sprite> spriteType;
+        private ComponentTypeHandle<Sprite> spriteType;
 
         [ReadOnly]
-        private ArchetypeChunkComponentType<LocalToWorld> matrixType;
+        private ComponentTypeHandle<LocalToWorld> matrixType;
 
         protected override void OnCreate() {
             // All entities that has Sprite and LocalToWorld, but no Static
@@ -34,8 +34,8 @@ namespace CommonEcs {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            this.spriteType = GetArchetypeChunkComponentType<Sprite>();
-            this.matrixType = GetArchetypeChunkComponentType<LocalToWorld>(true);
+            this.spriteType = GetComponentTypeHandle<Sprite>();
+            this.matrixType = GetComponentTypeHandle<LocalToWorld>(true);
 
             NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
 
@@ -48,10 +48,10 @@ namespace CommonEcs {
 
         [BurstCompile]
         private struct Job : IJobParallelFor {
-            public ArchetypeChunkComponentType<Sprite> spriteType;
+            public ComponentTypeHandle<Sprite> spriteType;
 
             [ReadOnly]
-            public ArchetypeChunkComponentType<LocalToWorld> matrixType;
+            public ComponentTypeHandle<LocalToWorld> matrixType;
 
             [ReadOnly]
             [DeallocateOnJobCompletion]

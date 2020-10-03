@@ -15,7 +15,7 @@ namespace CommonEcs {
         private EntityQuery query;
         
         [ReadOnly]
-        private ArchetypeChunkEntityType entityType;
+        private EntityTypeHandle entityType;
 
         private SharedComponentQuery<SpriteManager> spriteManagerQuery;
         
@@ -37,7 +37,7 @@ namespace CommonEcs {
 
         protected override void OnUpdate() {
             this.spriteManagerQuery.Update();
-            this.entityType = GetArchetypeChunkEntityType();
+            this.entityType = GetEntityTypeHandle();
             NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
             
             for (int i = 0; i < chunks.Length; ++i) {

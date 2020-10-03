@@ -10,8 +10,8 @@ namespace CommonEcs {
     public class RemoveSpriteFromManagerSystem : ComponentSystem {
         private EntityQuery query;
 
-        private ArchetypeChunkComponentType<Sprite> spriteType;
-        private ArchetypeChunkEntityType entityType;
+        private ComponentTypeHandle<Sprite> spriteType;
+        private EntityTypeHandle entityType;
 
         private SpriteManagerInstancesSystem spriteManagers;
 
@@ -21,8 +21,8 @@ namespace CommonEcs {
         }
 
         protected override void OnUpdate() {
-            this.spriteType = GetArchetypeChunkComponentType<Sprite>();
-            this.entityType = GetArchetypeChunkEntityType();
+            this.spriteType = GetComponentTypeHandle<Sprite>();
+            this.entityType = GetEntityTypeHandle();
             
             NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
             for (int i = 0; i < chunks.Length; ++i) {

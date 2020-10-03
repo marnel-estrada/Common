@@ -14,7 +14,7 @@ namespace Common.Ecs.Fsm {
     class FsmStartStateSystem : TemplateComponentSystem {
         private ComponentDataFromEntity<Fsm> allFsms;
 
-        private ArchetypeChunkComponentType<FsmState> stateType;
+        private ComponentTypeHandle<FsmState> stateType;
 
         protected override EntityQuery ComposeQuery() {
             return GetEntityQuery(typeof(FsmState), typeof(StartState));
@@ -22,7 +22,7 @@ namespace Common.Ecs.Fsm {
 
         protected override void BeforeChunkTraversal() {
             this.allFsms = GetComponentDataFromEntity<Fsm>();
-            this.stateType = GetArchetypeChunkComponentType<FsmState>();
+            this.stateType = GetComponentTypeHandle<FsmState>();
         }
 
         private NativeArray<FsmState> states;

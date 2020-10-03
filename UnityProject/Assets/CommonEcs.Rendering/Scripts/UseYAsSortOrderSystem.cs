@@ -10,11 +10,11 @@ namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class UseYAsSortOrderSystem : JobComponentSystem {
         private EntityQuery query;
-        private ArchetypeChunkComponentType<Sprite> spriteType;
-        private ArchetypeChunkComponentType<Translation> translationType;
+        private ComponentTypeHandle<Sprite> spriteType;
+        private ComponentTypeHandle<Translation> translationType;
 
         [ReadOnly]
-        private ArchetypeChunkComponentType<UseYAsSortOrder> useYType;
+        private ComponentTypeHandle<UseYAsSortOrder> useYType;
 
         protected override void OnCreate() {
             this.query = GetEntityQuery(this.ConstructQuery(null, new ComponentType[] {
@@ -29,13 +29,13 @@ namespace CommonEcs {
         /// </summary>
         [BurstCompile]
         private struct Job : IJobParallelFor {
-            public ArchetypeChunkComponentType<Sprite> spriteType;
+            public ComponentTypeHandle<Sprite> spriteType;
             
             [ReadOnly]
-            public ArchetypeChunkComponentType<Translation> translationType;
+            public ComponentTypeHandle<Translation> translationType;
             
             [ReadOnly]
-            public ArchetypeChunkComponentType<UseYAsSortOrder> useYType;
+            public ComponentTypeHandle<UseYAsSortOrder> useYType;
 
             [ReadOnly]
             [DeallocateOnJobCompletion]
@@ -67,9 +67,9 @@ namespace CommonEcs {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            this.spriteType = GetArchetypeChunkComponentType<Sprite>();
-            this.translationType = GetArchetypeChunkComponentType<Translation>();
-            this.useYType = GetArchetypeChunkComponentType<UseYAsSortOrder>(true);
+            this.spriteType = GetComponentTypeHandle<Sprite>();
+            this.translationType = GetComponentTypeHandle<Translation>();
+            this.useYType = GetComponentTypeHandle<UseYAsSortOrder>(true);
             NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
             
             Job job = new Job() {

@@ -30,12 +30,12 @@ namespace Common {
             Assertion.NotNull(this.skin);
 
             this.typeSelection =
-                new TypeSelectionRenderer(typeof(T), this.skin.customStyles[0], OnSelectionChange);
+                new TypeSelectionRenderer(typeof(T), this.skin.customStyles[0], OnTypeSelectionChange);
 
             this.baseTypeName = typeof(T).Name;
         }
 
-        private void OnSelectionChange(Type type) {
+        private void OnTypeSelectionChange(Type type) {
             // Set to selected type
             this.selectedType = type;
         }

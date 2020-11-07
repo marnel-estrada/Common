@@ -13,7 +13,7 @@ namespace CommonEcs {
     [UpdateBefore(typeof(SortRenderOrderSystem))]
     [UpdateBefore(typeof(UpdateChangedVerticesSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class IdentifySpriteManagerChangedSystem : JobComponentSystem {
+    public class IdentifySpriteManagerChangedSystem : SystemBase {
         private EntityQuery query;
         private ComponentTypeHandle<Sprite> spriteType;
 
@@ -24,8 +24,12 @@ namespace CommonEcs {
             this.query = GetEntityQuery(typeof(Sprite), typeof(SpriteManager), 
                 ComponentType.Exclude<AlwaysUpdateMesh>());
         }
+        
+        protected override void OnUpdate() {
+            this.Dependency = OnUpdate(this.Dependency);
+        }
 
-        protected override JobHandle OnUpdate(JobHandle inputDeps) {
+        private JobHandle OnUpdate(JobHandle inputDeps) {
             this.spriteType = GetComponentTypeHandle<Sprite>();
             
             this.managers.Clear();
@@ -99,9 +103,16 @@ namespace CommonEcs {
             [ReadOnly]
             public NativeHashMap<Entity, int> managerToIndexMap;
 
+            [NativeDisableParallelForRestriction]
             public NativeArray<bool> verticesChangedMap;
+            
+            [NativeDisableParallelForRestriction]
             public NativeArray<bool> trianglesChangedMap;
+            
+            [NativeDisableParallelForRestriction]
             public NativeArray<bool> uvChangedMap;
+            
+            [NativeDisableParallelForRestriction]
             public NativeArray<bool> colorChangedMap;
 
             public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {

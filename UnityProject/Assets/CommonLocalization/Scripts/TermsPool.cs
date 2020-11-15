@@ -81,7 +81,7 @@ namespace Common {
             }
 
             Option<Term> currentTerm = this.currentTranslation.GetTerm(termId.Trim());
-            return currentTerm.Match<GetTranslationMatcher, Option<string>>(new GetTranslationMatcher());
+            return currentTerm.MatchExplicit<GetTranslationMatcher, Option<string>>(new GetTranslationMatcher());
         }
 
         private readonly struct GetTranslationMatcher : IFuncOptionMatcher<Term, Option<string>> {

@@ -129,7 +129,7 @@ namespace Common {
             Option<Type> type = TypeIdentifier.GetType(data.ClassName);
             Assertion.IsSome(type, data.ClassName);
 
-            return type.Match<InstantiateMatcher<T>, Option<T>>(new InstantiateMatcher<T>(data, parentVariables));
+            return type.MatchExplicit<InstantiateMatcher<T>, Option<T>>(new InstantiateMatcher<T>(data, parentVariables));
         }
 
         private readonly struct InstantiateMatcher<T> : IFuncOptionMatcher<Type, Option<T>> where T : class {

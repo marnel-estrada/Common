@@ -194,7 +194,7 @@ namespace Common {
             Option<Type> foundType = TypeIdentifier.GetType(rendererTypeName);
             Assertion.IsSome(foundType, rendererTypeName);
 
-            return foundType.Match<CreateEditorPropertyRendererMatcher, Option<EditorPropertyRenderer>>(
+            return foundType.MatchExplicit<CreateEditorPropertyRendererMatcher, Option<EditorPropertyRenderer>>(
                 new CreateEditorPropertyRendererMatcher(rendererTypeName, this.customRenderers));
         }
 

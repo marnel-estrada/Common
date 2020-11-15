@@ -114,12 +114,14 @@ namespace Common {
 
         /// <summary>
         /// This is used for matching using a struct without incurring garbage
+        /// We used a different name to avoid mistake of using Match() to structs which
+        /// causes garbage by boxing.
         /// </summary>
         /// <param name="matcher"></param>
         /// <typeparam name="TMatcher"></typeparam>
         /// <typeparam name="TReturnType"></typeparam>
         /// <returns></returns>
-        public TReturnType Match<TMatcher, TReturnType>(TMatcher matcher)
+        public TReturnType MatchExplicit<TMatcher, TReturnType>(TMatcher matcher)
             where TMatcher : struct, IFuncOptionMatcher<T, TReturnType> {
             return this.hasValue ? matcher.OnSome(this.value) : matcher.OnNone();
         } 

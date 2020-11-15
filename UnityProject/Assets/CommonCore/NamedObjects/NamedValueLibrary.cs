@@ -137,7 +137,7 @@ namespace Common {
         /// <returns></returns>
         public bool Contains(string name, NamedValueType type) {
             Option<NamedValueContainer> container = this.containerMap.Find(type);
-            return container.Match<ContainsMatcher, bool>(new ContainsMatcher(name));
+            return container.MatchExplicit<ContainsMatcher, bool>(new ContainsMatcher(name));
         }
         
         private readonly struct ContainsMatcher : IFuncOptionMatcher<NamedValueContainer, bool> {

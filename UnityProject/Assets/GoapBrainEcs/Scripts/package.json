@@ -1,0 +1,16 @@
+{
+  "name": "com.squeakywheel.goapbrainecs",
+  "displayName": "Goap Brain ECS",
+  "version": "0.0.1",
+  "unity": "2020.1",
+  "description": "GOAP AI but in ECS",
+  "dependencies": {
+    "com.unity.entities": "0.16.0",
+    "com.unity.burst": "1.0.1",
+    "com.squeakywheel.common.core": "1.0.0"
+  },
+  "keywords": [
+    "unity"
+  ],
+  "category": "Unity"
+}

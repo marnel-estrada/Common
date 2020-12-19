@@ -1,0 +1,32 @@
+{
+    "name": "GoapBrainEcs.Tests",
+    "references": [
+        "GUID:5530ac271acaa3049ae143fdf74c20cb",
+        "CommonEcs",
+        "GoapBrainEcs",
+        "Unity.Entities",
+        "Unity.Entities.Hybrid",
+        "Unity.Transforms",
+        "Unity.Burst",
+        "Unity.Entities.Properties",
+        "Unity.Transforms.Hybrid",
+        "Unity.Mathematics",
+        "Unity.Collections",
+        "Unity.Entities.Tests",
+        "GUID:152e8ba67c80173489af2deb5a3e3e49",
+        "CommonCore"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}

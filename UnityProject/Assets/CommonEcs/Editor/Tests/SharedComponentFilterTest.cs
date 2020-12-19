@@ -24,8 +24,8 @@ namespace CommonEcs.Test {
             private EntityQuery query;
             private SharedComponentQuery<TestSharedComponent> sharedComponentQuery;
 
-            private ArchetypeChunkComponentType<TestComponent> testComponentType;
-            private ArchetypeChunkSharedComponentType<TestSharedComponent> sharedComponentType;
+            private ComponentTypeHandle<TestComponent> testComponentType;
+            private SharedComponentTypeHandle<TestSharedComponent> sharedComponentType;
 
             protected override void OnCreate() {
                 this.query = GetEntityQuery(typeof(TestSharedComponent), typeof(TestComponent));
@@ -35,8 +35,8 @@ namespace CommonEcs.Test {
             protected override void OnUpdate() {
                 this.sharedComponentQuery.Update();
 
-                this.testComponentType = GetArchetypeChunkComponentType<TestComponent>(true);
-                this.sharedComponentType = GetArchetypeChunkSharedComponentType<TestSharedComponent>();
+                this.testComponentType = GetComponentTypeHandle<TestComponent>(true);
+                this.sharedComponentType = GetSharedComponentTypeHandle<TestSharedComponent>();
 
                 IReadOnlyList<TestSharedComponent> sharedComponents = this.sharedComponentQuery.SharedComponents;
                 for (int i = 1; i < sharedComponents.Count; ++i) {

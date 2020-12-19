@@ -159,16 +159,16 @@ namespace CommonEcs {
         [DisableAutoCreation]
         private class TestHashMapByCommandBufferSystem : ComponentSystem {
             private EntityQuery query;
-            private ArchetypeChunkComponentType<EcsHashMap<int, int>> mapType;
-            private ArchetypeChunkBufferType<EntityBufferElement> bucketsType;
+            private ComponentTypeHandle<EcsHashMap<int, int>> mapType;
+            private BufferTypeHandle<EntityBufferElement> bucketsType;
 
             protected override void OnCreate() {
                 this.query = GetEntityQuery(typeof(EcsHashMap<int, int>), typeof(EntityBufferElement));
             }
 
             protected override void OnUpdate() {
-                this.mapType = GetArchetypeChunkComponentType<EcsHashMap<int, int>>();
-                this.bucketsType = GetArchetypeChunkBufferType<EntityBufferElement>();
+                this.mapType = GetComponentTypeHandle<EcsHashMap<int, int>>();
+                this.bucketsType = GetBufferTypeHandle<EntityBufferElement>();
                 
                 NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
                 for (int i = 0; i < chunks.Length; ++i) {

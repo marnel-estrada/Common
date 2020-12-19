@@ -5,7 +5,7 @@
   "unity": "2020.1",
   "description": "GOAP AI but in ECS",
   "dependencies": {
-    "com.unity.entities": "0.16.0",
+    "com.unity.entities": "0.16.0-preview.21",
     "com.unity.burst": "1.0.1",
     "com.squeakywheel.common.core": "1.0.0",
     "com.squeakywheel.common.ecs": "1.0.0"

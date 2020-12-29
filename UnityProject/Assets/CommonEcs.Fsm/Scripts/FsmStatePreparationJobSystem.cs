@@ -38,7 +38,7 @@ namespace Common.Ecs.Fsm {
                 preparationAction = this.StatePreparationAction
             };
 
-            JobHandle jobHandle = JobChunkExtensions.Schedule(job, this.query, inputDeps);
+            JobHandle jobHandle = job.Schedule(this.query, inputDeps);
             this.barrier.AddJobHandleForProducer(jobHandle);
 
             return jobHandle;

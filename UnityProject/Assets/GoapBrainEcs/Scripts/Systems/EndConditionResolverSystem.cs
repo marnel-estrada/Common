@@ -57,7 +57,7 @@ namespace GoapBrainEcs {
             }
             
             // At this point, the status is DONE
-            Assertion.Assert(resolver.status == ConditionResolverStatus.DONE);
+            Assertion.IsTrue(resolver.status == ConditionResolverStatus.DONE);
 
             ActionsSearch search = this.allSearches[resolver.actionSearchEntity];
             Condition currentTargetCondition = search.CurrentTargetCondition;

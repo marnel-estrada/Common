@@ -79,19 +79,40 @@ namespace GoapBrainEcs {
             Entity actionSearchEntity = this.entities[index];
             
             // Create the resolver entity if a preparation exists
-            Common.Maybe<IConditionResolverComposer> resolverPreparation = domain.GetResolver(search.CurrentTargetCondition.id);
-            if (resolverPreparation.HasValue) {
-                CreateResolverEntity(request.agentEntity, search, actionSearchEntity, resolverPreparation);
+            Option<IConditionResolverComposer> resolverPreparation = domain.GetResolver(search.CurrentTargetCondition.id);
+            resolverPreparation.Match(new CreateResolverEntityMatcher(this, index, request.agentEntity, search, actionSearchEntity));
+        }
 
+        private struct CreateResolverEntityMatcher : IOptionMatcher<IConditionResolverComposer> {
+            private readonly StartConditionResolverSystem system;
+            private readonly int index;
+            private readonly Entity agentEntity;
+            private readonly ActionsSearch search;
+            private readonly Entity actionSearchEntity;
+
+            public CreateResolverEntityMatcher(StartConditionResolverSystem system, int index, Entity agentEntity, ActionsSearch search, Entity actionSearchEntity) {
+                this.system = system;
+                this.index = index;
+                this.agentEntity = agentEntity;
+                this.search = search;
+                this.actionSearchEntity = actionSearchEntity;
+            }
+
+            public void OnSome(IConditionResolverComposer composer) {
+                this.system.CreateResolverEntity(this.agentEntity, this.search, this.actionSearchEntity, composer);
+                
                 // After the preparation adds the needed components for the resolution,
                 // we wait for the resolver system to resolve the value.
-            } else {
+            }
+
+            public void OnNone() {
                 // This means that there are no condition resolvers for the current condition
                 // We search for actions
                 // We reset the action index as it is looking for a new action
-                search.currentActionIndex = -1;
-                this.searches[index] = search; // Modify
-                this.PostUpdateCommands.AddComponent(actionSearchEntity, new CheckSearchAction());
+                ActionsSearch searchCopy = this.search;
+                searchCopy.currentActionIndex = -1;
+                this.system.searches[this.index] = searchCopy; // Modify
+                this.system.PostUpdateCommands.AddComponent(this.actionSearchEntity, new CheckSearchAction());
             }
         }
 
@@ -173,15 +194,14 @@ namespace GoapBrainEcs {
                 // The search is not root
                 // It means that it's parent is resolving an action
                 ActionsSearch parentSearch = this.allSearches[currentSearch.parentSearch];
-                Assertion.Assert(parentSearch.currentActionIndex >= 0);
+                Assertion.IsTrue(parentSearch.currentActionIndex >= 0);
                 
                 // Add the action being resolved by parent to the parent's action list
                 GoapAgent agent = this.allAgents[request.agentEntity];
                 GoapDomain domain = this.planningSystem.GetDomain(agent.domainId);
                 Condition currentTargetCondition = parentSearch.CurrentTargetCondition;
-                Common.Maybe<IReadOnlyList<GoapAction>> actions = domain.GetActions(currentTargetCondition);
-                DynamicBuffer<ActionEntry> parentSearchActionList = this.EntityManager.GetBuffer<ActionEntry>(currentSearch.parentSearch);
-                parentSearchActionList.Add(new ActionEntry(actions.Value[parentSearch.currentActionIndex].id));
+                Option<IReadOnlyList<GoapAction>> actions = domain.GetActions(currentTargetCondition);
+                actions.Match(new AddToParentSearch(this, currentSearch, parentSearch));
                 
                 // We add this component to resolve the next condition of the parent search
                 this.PostUpdateCommands.AddComponent(currentSearch.parentSearch, new ResolveNextCondition());   
@@ -189,6 +209,26 @@ namespace GoapBrainEcs {
             
             // We destroy the current search to save memory as it is already done
             this.PostUpdateCommands.DestroyEntity(this.entities[index]);
+        }
+
+        private readonly struct AddToParentSearch : IOptionMatcher<IReadOnlyList<GoapAction>> {
+            private readonly StartConditionResolverSystem system;
+            private readonly ActionsSearch currentSearch;
+            private readonly ActionsSearch parentSearch;
+
+            public AddToParentSearch(StartConditionResolverSystem system, ActionsSearch currentSearch, ActionsSearch parentSearch) {
+                this.system = system;
+                this.currentSearch = currentSearch;
+                this.parentSearch = parentSearch;
+            }
+
+            public void OnSome(IReadOnlyList<GoapAction> actions) {
+                DynamicBuffer<ActionEntry> parentSearchActionList = this.system.EntityManager.GetBuffer<ActionEntry>(this.currentSearch.parentSearch);
+                parentSearchActionList.Add(new ActionEntry(actions[this.parentSearch.currentActionIndex].id));
+            }
+
+            public void OnNone() {
+            }
         }
 
         private void AddActionEffectsToParent(int index, ref ActionsSearch currentSearch) {
@@ -225,13 +265,13 @@ namespace GoapBrainEcs {
             }
         }
 
-        private void CreateResolverEntity(Entity agentEntity, ActionsSearch search, Entity actionSearchEntity, Common.Maybe<IConditionResolverComposer> resolverPreparation) {
+        private void CreateResolverEntity(Entity agentEntity, ActionsSearch search, Entity actionSearchEntity, IConditionResolverComposer resolverPreparation) {
             Entity resolverEntity = this.PostUpdateCommands.CreateEntity();
             
             ConditionResolver resolver = new ConditionResolver(agentEntity, actionSearchEntity);
             this.PostUpdateCommands.AddComponent(resolverEntity, resolver);
 
-            resolverPreparation.Value.Prepare(resolverEntity, this.PostUpdateCommands);
+            resolverPreparation.Prepare(resolverEntity, this.PostUpdateCommands);
             
             // We add reference so that resolver entities would be removed if the action search entity is removed
             EntityReference.Create(actionSearchEntity, resolverEntity, this.PostUpdateCommands);

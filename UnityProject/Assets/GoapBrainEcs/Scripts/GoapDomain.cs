@@ -36,12 +36,12 @@ namespace GoapBrainEcs {
         /// <param name="atomActionSet"></param>
         public void AddAction(in GoapAction action, AtomActionSet atomActionSet) {
             // Should not contain the action yet
-            Assertion.Assert(!this.addedActions.Contains(action.id));
-            Assertion.Assert(atomActionSet.Count > 0); // Should have action composers
+            Assertion.IsTrue(!this.addedActions.Contains(action.id));
+            Assertion.IsTrue(atomActionSet.Count > 0); // Should have action composers
             
 #if UNITY_EDITOR
             // We only check in Unity Editor because this can be slow
-            Assertion.Assert(!HasCircularDependency(action, action.effect));
+            Assertion.IsTrue(!HasCircularDependency(action, action.effect));
 #endif
             
             ResolveActionSet(action.effect.id).Add(action);
@@ -55,18 +55,34 @@ namespace GoapBrainEcs {
             ConditionList10 preconditions = action.preconditions;
             for (int i = 0; i < preconditions.Count; ++i) {
                 Condition precondition = preconditions[i];
-                Maybe<IReadOnlyList<GoapAction>> actions = GetActions(precondition);
-                if (!actions.HasValue) {
-                    // There are no actions that satisfies the current precondition
-                    continue;
-                }
-
-                if (HasCircularDependency(actions.Value, effect)) {
+                Option<IReadOnlyList<GoapAction>> actions = GetActions(precondition);
+                bool hasCircularDependency = actions.MatchExplicit<HasCircularDependencyMatcher, bool>(
+                    new HasCircularDependencyMatcher(this, effect));
+                
+                if (hasCircularDependency) {
                     return true;
                 }
             }
 
             return false;
+        }
+
+        private readonly struct HasCircularDependencyMatcher : IFuncOptionMatcher<IReadOnlyList<GoapAction>, bool> {
+            private readonly GoapDomain domain;
+            private readonly Condition effect;
+
+            public HasCircularDependencyMatcher(GoapDomain domain, Condition effect) {
+                this.domain = domain;
+                this.effect = effect;
+            }
+
+            public bool OnSome(IReadOnlyList<GoapAction> actions) {
+                return this.domain.HasCircularDependency(actions, this.effect);
+            }
+
+            public bool OnNone() {
+                return false;
+            }
         }
 
         private bool HasCircularDependency(IReadOnlyList<GoapAction> preconditionActions, Condition effect) {
@@ -90,14 +106,15 @@ namespace GoapBrainEcs {
 #endif
 
         private ActionSet ResolveActionSet(ushort conditionId) {
-            ActionSet actionSet = this.effectToActionsMap.Find(conditionId);
-            if (actionSet == null) {
-                // Not yet created. We create one and maintain it.
-                actionSet = new ActionSet(conditionId);
-                this.effectToActionsMap[conditionId] = actionSet;
-            }
+            if (this.effectToActionsMap.TryGetValue(conditionId, out ActionSet actionSet)) {
+                return actionSet;
+            } 
+            
+            // Not yet created. We create one and maintain it.
+            ActionSet newActionSet = new ActionSet(conditionId);
+            this.effectToActionsMap[conditionId] = newActionSet;
 
-            return actionSet;
+            return newActionSet;
         }
 
         /// <summary>
@@ -105,14 +122,26 @@ namespace GoapBrainEcs {
         /// </summary>
         /// <param name="condition"></param>
         /// <returns></returns>
-        public Maybe<IReadOnlyList<GoapAction>> GetActions(Condition condition) {
-            ActionSet actionSet = this.effectToActionsMap.Find(condition.id);
-            if (actionSet == null) {
-                // There are no actions for the specified condition
-                return Maybe<IReadOnlyList<GoapAction>>.Nothing;
+        public Option<IReadOnlyList<GoapAction>> GetActions(Condition condition) {
+            Option<ActionSet> actionSet = this.effectToActionsMap.Find(condition.id);
+            return actionSet.MatchExplicit<GetActionsFromActionSet, Option<IReadOnlyList<GoapAction>>>(new GetActionsFromActionSet(condition));
+        }
+
+        private readonly struct
+            GetActionsFromActionSet : IFuncOptionMatcher<ActionSet, Option<IReadOnlyList<GoapAction>>> {
+            private readonly Condition condition;
+
+            public GetActionsFromActionSet(Condition condition) {
+                this.condition = condition;
             }
 
-            return new Maybe<IReadOnlyList<GoapAction>>(actionSet.GetActions(condition.value));
+            public Option<IReadOnlyList<GoapAction>> OnSome(ActionSet actionSet) {
+                return Option<IReadOnlyList<GoapAction>>.AsOption(actionSet.GetActions(this.condition.value));
+            }
+
+            public Option<IReadOnlyList<GoapAction>> OnNone() {
+                return Option<IReadOnlyList<GoapAction>>.NONE;
+            }
         }
 
         public GoapAction GetAction(ushort actionId) {
@@ -134,14 +163,8 @@ namespace GoapBrainEcs {
         /// </summary>
         /// <param name="conditionId"></param>
         /// <returns></returns>
-        public Maybe<IConditionResolverComposer> GetResolver(ushort conditionId) {
-            IConditionResolverComposer composer = this.conditionResolverMap.Find(conditionId);
-            if (composer == null) {
-                // No resolver for such condition
-                return Maybe<IConditionResolverComposer>.Nothing;
-            }
-            
-            return new Maybe<IConditionResolverComposer>(composer);
+        public Option<IConditionResolverComposer> GetResolver(ushort conditionId) {
+            return this.conditionResolverMap.Find(conditionId);
         }
 
         public void SortActions() {

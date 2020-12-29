@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 
+using Common;
+
 using CommonEcs;
 
 using Unity.Collections;
@@ -56,19 +58,40 @@ namespace GoapBrainEcs {
             GoapAgent agent = this.allAgents[request.agentEntity];
             GoapDomain domain = this.planningSystem.GetDomain(agent.domainId);
             
-            Common.Maybe<IReadOnlyList<GoapAction>> actions = domain.GetActions(search.CurrentTargetCondition);
-            if (actions.HasValue && actions.Value.Count > 0) {
-                // There are actions to satisfy the current condition
-                // Start search on actions
-                SearchActions(index, ref search, actions.Value);
-            } else {
-                // There are no actions to satisfy the current condition
-                // The search fails
-                DoOnFail(index, ref search);
-            }
+            Option<IReadOnlyList<GoapAction>> actions = domain.GetActions(search.CurrentTargetCondition);
+            actions.Match(new ProcessActions(this, index));
             
             // We remove this component so it won't be processed by the system again
             this.PostUpdateCommands.RemoveComponent<CheckSearchAction>(this.entities[index]);
+        }
+
+        private readonly struct ProcessActions : IOptionMatcher<IReadOnlyList<GoapAction>> {
+            private readonly CheckSearchActionSystem system;
+            private readonly int index;
+
+            public ProcessActions(CheckSearchActionSystem system, int index) {
+                this.system = system;
+                this.index = index;
+            }
+
+            public void OnSome(IReadOnlyList<GoapAction> actions) {
+                // There are actions to satisfy the current condition
+                // Start search on actions
+                if (actions.Count <= 0) {
+                    // No actions
+                    return;
+                }
+
+                ActionsSearch search = this.system.searches[this.index];
+                this.system.SearchActions(this.index, ref search, actions);
+            }
+
+            public void OnNone() {
+                // There are no actions to satisfy the current condition
+                // The search fails
+                ActionsSearch search = this.system.searches[this.index];
+                this.system.DoOnFail(this.index, ref search);
+            }
         }
         
         // Routine to do on fail

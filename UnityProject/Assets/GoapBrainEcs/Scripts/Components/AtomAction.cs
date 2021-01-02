@@ -1,5 +1,3 @@
-using CommonEcs;
-
 using Unity.Entities;
 
 namespace GoapBrainEcs {
@@ -7,7 +5,7 @@ namespace GoapBrainEcs {
         public readonly Entity agentEntity; // We added it here for convenience on writing action systems
         public readonly Entity parentAtomActionSetExecution;
 
-        public ByteBool started;
+        public bool started;
         public GoapStatus status;
 
         public AtomAction(Entity agentEntity, Entity parentAtomActionSetExecution) {

@@ -17,6 +17,7 @@ namespace GoapBrainEcs {
                 // Start
                 if (!atomAction.started) {
                     atomAction.status = Start(ref atomAction, ref actionComponent);
+                    atomAction.started = true;
                     if (atomAction.status == GoapStatus.SUCCESS || atomAction.status == GoapStatus.FAILED) {
                         // Action is already done
                         return;

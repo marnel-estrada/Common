@@ -1,20 +1,22 @@
 using System;
 using System.Collections;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Common {
     /// <summary>
     ///     Represents a probabilistic data structure that is optimal to
     ///     determine if an object isn't or may be present in a set.
     /// </summary>
-    public class BloomFilter {
-        private readonly MurMurHash3 hashFunction = new MurMurHash3();
-
+    public class BloomFilter<T> where T : IEquatable<T> {
         private readonly int k;
         private readonly int m;
 
         private BitArray filter;
+
+        private readonly int[] hashes;
+
+        // The byte array representation of the BloomFilter
+        // This is useful for serialization
+        private readonly byte[] byteArray;
 
         /// <summary>
         ///     Initialized a new instance of <see cref="BloomFilter" /> with the specified desired capacity and
@@ -36,6 +38,9 @@ namespace Common {
             this.k = EvaluateK(this.m, n);
 
             this.filter = new BitArray(this.m);
+            this.hashes = new int[this.k];
+            
+            this.byteArray = new byte[(this.filter.Length - 1) / 8 + 1];
         }
 
         /// <summary>Initialized a new instance of <see cref="BloomFilter" /> with the specified width and depth.</summary>
@@ -61,17 +66,17 @@ namespace Common {
         ///     Adds an object to the <see cref="BloomFilter" />.
         ///     <code>Complexity: O(1)</code>
         /// </summary>
-        /// <param name="obj">The object to add to the <see cref="BloomFilter" />.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="obj" /> is <c>null</c>.</exception>
-        public void Add(object obj) {
-            if (obj == null) {
-                throw new ArgumentNullException(nameof(obj));
+        /// <param name="item">The object to add to the <see cref="BloomFilter" />.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="item" /> is <c>null</c>.</exception>
+        public void Add(T item) {
+            if (item == null) {
+                throw new ArgumentNullException(nameof(item));
             }
 
-            int[] hashes = GetHashes(obj, this.m, this.k);
+            ComputeHashes(item, this.m);
 
             for (int i = 0; i < this.k; i++) {
-                this.filter[hashes[i]] = true;
+                this.filter[this.hashes[i]] = true;
             }
         }
 
@@ -79,16 +84,16 @@ namespace Common {
         ///     Determines if the specified object isn't or may be in the <see cref="BloomFilter" />.
         ///     <code>Complexity: O(1)</code>
         /// </summary>
-        /// <param name="obj">The object to locate in the <see cref="BloomFilter" />.</param>
+        /// <param name="item">The object to locate in the <see cref="BloomFilter" />.</param>
         /// <returns>
-        ///     <c>false</c> if <paramref name="obj" /> is definitely not in the <see cref="BloomFilter" />, <c>true</c> if it
+        ///     <c>false</c> if <paramref name="item" /> is definitely not in the <see cref="BloomFilter" />, <c>true</c> if it
         ///     may be.
         /// </returns>
-        public bool Contains(object obj) {
-            int[] hashes = GetHashes(obj, this.m, this.k);
+        public bool Contains(T item) {
+            ComputeHashes(item, this.m);
 
-            for (int i = 0; i < this.k; i++) {
-                if (!this.filter[hashes[i]]) {
+            for (int i = 0; i < this.hashes.Length; i++) {
+                if (!this.filter[this.hashes[i]]) {
                     return false;
                 }
             }
@@ -98,10 +103,19 @@ namespace Common {
 
         /// <summary>Removes all objects from the <see cref="BloomFilter" />.</summary>
         public void Clear() {
-            this.filter = new BitArray(this.m);
+            this.filter.SetAll(false);
+        }
+        
+        public byte[] ByteArray {
+            get {
+                this.filter.CopyTo(this.byteArray, 0);
+                return this.byteArray;
+            }
         }
 
-        #region Helpers
+        public void Set(byte[] byteArray) {
+            this.filter = new BitArray(byteArray);
+        }
 
         private static int EvaluateM(double n, double p) {
             return (int) System.Math.Ceiling(-n * System.Math.Log(p) / System.Math.Pow(System.Math.Log(2), 2));
@@ -111,44 +125,19 @@ namespace Common {
             return (int) System.Math.Round(m / n * System.Math.Log(2));
         }
 
-        // https://en.wikipedia.org/wiki/Double_hashing
-        private int[] GetHashes(object obj, int maxValue, int count) {
-            int hash1 = obj.GetHashCode();
-            int hash2 = GetHash(obj);
+        private void ComputeHashes(T item, int maxValue) {
+            // Zero out values first
+            for (int i = 0; i < this.hashes.Length; ++i) {
+                this.hashes[i] = 0;
+            }
 
-            int[] array = new int[count];
+            int doubledHash = item.GetHashCode() << 1;
 
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < this.hashes.Length; i++) {
                 unchecked {
-                    array[i] = System.Math.Abs(hash1 + hash2 * (i + 1)) % maxValue;
+                    this.hashes[i] = System.Math.Abs(doubledHash * (i + 1)) % maxValue;
                 }
             }
-
-            return array;
         }
-
-        private int GetHash(object obj) {
-            int output;
-            using (MemoryStream stream = new MemoryStream(ObjectToStream(obj))) {
-                output = this.hashFunction.Hash(stream);
-            }
-
-            return output;
-        }
-
-        private static byte[] ObjectToStream(object obj) {
-            if (obj == null) {
-                return null;
-            }
-
-            BinaryFormatter bf = new BinaryFormatter();
-            using (MemoryStream ms = new MemoryStream()) {
-                bf.Serialize(ms, obj);
-                return ms.ToArray();
-            }
-        }
-
-        #endregion
-
     }
 }

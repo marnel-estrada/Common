@@ -34,12 +34,21 @@ namespace GoapBrainEcs {
 
             JobHandle handle = job.Schedule(inputDeps);
             chunks.Dispose(handle);
+            
+            Dispose(handle);
 
             return handle;
         }
 
         protected abstract AtomActionType PrepareStructAction();
 
+        // This is used for cases when the deriving class wants to dispose something after the
+        // action job is scheduled. The action might have created arrays that need to be disposed.
+        protected virtual void Dispose(JobHandle handle) {
+            // May or may not be overridden by deriving class
+        }
+
+        // We use IJob here because we don't know if AtomActionType can run in multiple threads
         private struct Job : IJob {
             public EntityTypeHandle entityTypeHandle;
             public ComponentTypeHandle<AtomAction> atomActionType;
@@ -72,12 +81,12 @@ namespace GoapBrainEcs {
                         // Modify
                         atomActions[i] = atomAction;
                         components[i] = actionComponent;
-                        
-                        // Action is done if success or failure
-                        // Continue to update if running
-                        if (atomAction.status == GoapStatus.SUCCESS || atomAction.status == GoapStatus.FAILED) {
-                            return;
-                        }
+                    }
+                    
+                    // Action is done if success or failure
+                    // Continue to update if running
+                    if (atomAction.status == GoapStatus.SUCCESS || atomAction.status == GoapStatus.FAILED) {
+                        return;
                     }
                     
                     // Update

@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+using Common;
+
 using Unity.Entities;
 
 namespace CommonEcs {
@@ -9,7 +11,7 @@ namespace CommonEcs {
         where K : struct, IEquatable<K> where V : struct {
         private readonly DynamicBuffer<EntityBufferElement> buckets;
         private readonly Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists;
-        private readonly EntityManager entityManager;
+        private readonly ValueTypeOption<EntityManager> entityManager;
 
         private int bucketIndex;
         private int entryIndex;
@@ -25,10 +27,9 @@ namespace CommonEcs {
             Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists) {
             this.buckets = buckets;
             this.allEntryLists = allEntryLists;
-            this.entityManager = null;
-
             this.bucketIndex = 0;
             this.entryIndex = -1;
+            this.entityManager = default;
 
             // Resolve entry list
             this.currentEntryList = this.allEntryLists.Value[this.buckets[this.bucketIndex].entity];
@@ -37,14 +38,12 @@ namespace CommonEcs {
         public EcsHashMapEnumerator(DynamicBuffer<EntityBufferElement> buckets, EntityManager entityManager) {
             this.buckets = buckets;
             this.allEntryLists = Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>>.Nothing;
-            this.entityManager = entityManager;
+            this.entityManager = new ValueTypeOption<EntityManager>(entityManager);
 
             this.bucketIndex = 0;
             this.entryIndex = -1;
 
-            this.currentEntryList =
-                this.entityManager.GetBuffer<EcsHashMapEntry<K, V>>(
-                    this.buckets[this.bucketIndex].entity);
+            this.currentEntryList = entityManager.GetBuffer<EcsHashMapEntry<K, V>>(this.buckets[this.bucketIndex].entity);
         }
 
         public bool MoveNext() {
@@ -88,11 +87,26 @@ namespace CommonEcs {
         }
 
         private DynamicBuffer<EcsHashMapEntry<K, V>> ResolveEntryList(Entity entryListEntity) {
-            if (this.entityManager == null) {
-                return this.allEntryLists.Value[entryListEntity];
+            return this.entityManager.Match<ResolveEntryListMatcher, DynamicBuffer<EcsHashMapEntry<K, V>>>(
+                new ResolveEntryListMatcher(entryListEntity, this.allEntryLists));
+        }
+
+        private readonly struct ResolveEntryListMatcher : IFuncOptionMatcher<EntityManager, DynamicBuffer<EcsHashMapEntry<K, V>>> {
+            private readonly Entity entryListEntity;
+            private readonly Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists;
+
+            public ResolveEntryListMatcher(Entity entryListEntity, Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists) {
+                this.entryListEntity = entryListEntity;
+                this.allEntryLists = allEntryLists;
             }
 
-            return this.entityManager.GetBuffer<EcsHashMapEntry<K, V>>(entryListEntity);
+            public DynamicBuffer<EcsHashMapEntry<K, V>> OnSome(EntityManager entityManager) {
+                return entityManager.GetBuffer<EcsHashMapEntry<K, V>>(this.entryListEntity);
+            }
+
+            public DynamicBuffer<EcsHashMapEntry<K, V>> OnNone() {
+                return this.allEntryLists.Value[this.entryListEntity];
+            }
         }
     }
 }

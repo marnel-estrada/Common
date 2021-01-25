@@ -14,6 +14,8 @@ namespace GameEvent {
                 EventsEditorWindow window = EditorWindow.GetWindow<EventsEditorWindow>("Events Editor");
                 window.Init(this.DataPool, new EventDataRenderer(window));
                 window.AddFilterStrategy(new OptionCostFilterStrategy(90));
+                window.AddFilterStrategy(new OptionRequirementFilterStrategy(120));
+                window.AddFilterStrategy(new EventRequirementFilterStrategy(120));
                 window.Repaint();
             }
         }

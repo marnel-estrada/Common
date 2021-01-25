@@ -23,7 +23,7 @@ namespace GameEvent {
             List<ClassData> costs = option.Costs;
             for (int i = 0; i < costs.Count; ++i) {
                 ClassData classData = costs[i];
-                if (classData.ClassName.Contains(this.FilterText)) {
+                if (classData.ClassName.ToLower().Contains(this.FilterText.ToLower())) {
                     return true;
                 }
             }

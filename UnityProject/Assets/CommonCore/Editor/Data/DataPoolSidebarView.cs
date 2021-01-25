@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Common {
-    public class DataPoolSidebarView<T> where T : class, IDataPoolItem, IDuplicable<T>, new() {
+    public class DataPoolSidebarView<T> : IDataPoolSidebarView<T> where T : class, IDataPoolItem, IDuplicable<T>, new() {
         private readonly Dictionary<string, T> filteredMap = new Dictionary<string, T>();
         private readonly List<string> filteredIds = new List<string>(); // Used to render list of action buttons
 
@@ -14,6 +14,8 @@ namespace Common {
         private int selection;
         
         private readonly SimpleList<DataPoolFilterStrategy<T>> filterStrategies = new SimpleList<DataPoolFilterStrategy<T>>();
+
+        private bool shouldSortItems = true;
         
         /// <summary>
         /// Renders the UI for the specified pool
@@ -80,24 +82,30 @@ namespace Common {
         private string filterText = "";
 
         private void RenderItems(DataPool<T> pool) {
+            this.filteredIds.Clear();
+            this.filteredMap.Clear();
+            
             GUILayout.Label("Filters", GUILayout.Width(50));
             
             // The filters
             GUILayout.BeginHorizontal();
             GUILayout.Label("ID:", GUILayout.Width(40));
+            
             this.filterText = EditorGUILayout.TextField(this.filterText);
-            Filter(pool);
+            if (!string.IsNullOrEmpty(this.filterText)) {
+                Filter(pool);
+            }
+
             GUILayout.EndHorizontal();
 
             RenderFilterStrategies(pool);
-            
-            // Sort by ID
-            this.filteredIds.Sort();
 
             if (this.filteredIds.Count == 0) {
-                // Try empty filter in the hopes of finding entries
-                this.filterText = "";
-                Filter(pool);
+                // Add all
+                for (int i = 0; i < pool.Count; ++i) {
+                    T item = pool.GetAt(i);
+                    AddToFiltered(item);
+                }
 
                 if (this.filteredIds.Count == 0) {
                     // It's still empty after trying to search with empty filter
@@ -105,13 +113,18 @@ namespace Common {
                     GUILayout.Label("(empty)");
                 }
             }
+            
+            if (this.ShouldSortItems) {
+                // Sort by ID
+                this.filteredIds.Sort();
+            }
 
             this.scrollPos = GUILayout.BeginScrollView(this.scrollPos);
             ResolveSelection();
             this.selection = GUILayout.SelectionGrid(this.selection, this.filteredIds.ToArray(), 1);
             GUILayout.EndScrollView();
         }
-
+        
         private IOptionMatcher<string> resolveSelectionMatcher;
 
         private void ResolveSelection() {
@@ -138,15 +151,16 @@ namespace Common {
         private void RenderFilterStrategy(DataPool<T> pool, DataPoolFilterStrategy<T> strategy) {
             GUILayout.BeginHorizontal();
             GUILayout.Label(strategy.Label + ":", GUILayout.Width(strategy.LabelWidth));
+            
             strategy.FilterText = EditorGUILayout.TextField(strategy.FilterText);
-            Filter(pool, strategy);
+            if (!string.IsNullOrEmpty(strategy.FilterText)) {
+                Filter(pool, strategy);
+            }
+
             GUILayout.EndHorizontal();
         }
 
         private void Filter(DataPool<T> pool, DataPoolFilterStrategy<T> strategy) {
-            this.filteredMap.Clear();
-            this.filteredIds.Clear();
-            
             for (int i = 0; i < pool.Count; ++i) {
                 T item = pool.GetAt(i);
                 if (strategy.IsFilterMet(item)) {
@@ -166,31 +180,32 @@ namespace Common {
             for (int i = 0; i < pool.Count; ++i) {
                 T item = pool.GetAt(i);
 
-                if (string.IsNullOrEmpty(this.filterText)) {
-                    // Filter text is empty
-                    // Add every action data
-                    AddToFiltered(item);
-                } else if (item.Id.ToLower().Contains(this.filterText.ToLower())) {
+                if (item.Id.ToLower().Contains(this.filterText.ToLower())) {
                     AddToFiltered(item);
                 }
             }
         }
 
-        public bool IsValidSelection {
-            get {
-                return 0 <= this.selection && this.selection < this.filteredMap.Count;
-            }
+        public bool IsValidSelection(DataPool<T> pool) {
+            return 0 <= this.selection && this.selection < this.filteredMap.Count;
         }
 
-        public T SelectedItem {
-            get {
-                if (this.IsValidSelection) {
-                    // Valid index
-                    string selectedId = this.filteredIds[this.selection];
-                    return this.filteredMap[selectedId];
-                }
+        public T GetSelectedItem(DataPool<T> pool) {
+            if (IsValidSelection(pool)) {
+                // Valid index
+                string selectedId = this.filteredIds[this.selection];
+                return this.filteredMap[selectedId];
+            }
 
-                return default;
+            return default;
+        }
+
+        public bool ShouldSortItems {
+            get {
+                return this.shouldSortItems;
+            }
+            set {
+                this.shouldSortItems = value;
             }
         }
 

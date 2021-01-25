@@ -138,11 +138,8 @@ namespace Common {
         private void RenderFilterStrategy(DataPool<T> pool, DataPoolFilterStrategy<T> strategy) {
             GUILayout.BeginHorizontal();
             GUILayout.Label(strategy.Label + ":", GUILayout.Width(strategy.LabelWidth));
-            string newFilter = EditorGUILayout.TextField(strategy.FilterText);
-            if (newFilter != strategy.FilterText) {
-                strategy.FilterText = newFilter;
-                Filter(pool, strategy);
-            }
+            strategy.FilterText = EditorGUILayout.TextField(strategy.FilterText);
+            Filter(pool, strategy);
             GUILayout.EndHorizontal();
         }
 

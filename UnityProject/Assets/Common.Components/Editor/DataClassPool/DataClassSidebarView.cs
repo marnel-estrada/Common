@@ -3,8 +3,6 @@
 using UnityEngine;
 using UnityEditor;
 
-using Common.Utils;
-
 namespace Common {
     class DataClassSidebarView<T> where T : Identifiable, new() {
         private readonly Dictionary<string, T> filteredMap = new Dictionary<string, T>();

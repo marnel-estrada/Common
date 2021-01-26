@@ -2,4 +2,4 @@ using Common.Ecs.Fsm;
 
 using Unity.Entities;
 
-[assembly: RegisterGenericJobType(typeof(FsmStatePreparationJobSystem<DummyComponent, DummyPreparationAction>))]
+[assembly: RegisterGenericJobType(typeof(FsmStatePreparationJobSystem<DummyComponent, DummyPreparationAction>.Job))]

@@ -1,6 +1,4 @@
-﻿using Common.Utils;
-
-namespace Common {
+﻿namespace Common {
     /// <summary>
     /// Interface for classes that render the items
     /// </summary>

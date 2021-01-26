@@ -1,10 +1,11 @@
 {
     "name": "Common.Editor",
+    "rootNamespace": "",
     "references": [
-        "Common",
         "CommonCore",
         "Swarm",
-        "CommonCore.Editor"
+        "CommonCore.Editor",
+        "Common.Components"
     ],
     "includePlatforms": [
         "Editor"
@@ -15,5 +16,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }

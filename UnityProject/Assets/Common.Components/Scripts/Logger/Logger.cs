@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Globalization;
 
-using Common.Utils;
-
 using UnityEngine;
 
 namespace Common.Logger {

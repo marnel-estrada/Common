@@ -19,8 +19,6 @@ namespace Common.Ecs.Fsm {
         private EntityQuery query;
         private ComponentTypeHandle<FsmState> stateType;
 
-        protected ComponentDataFromEntity<Fsm> allFsms;
-
         protected override void OnCreate() {
             this.barrier = this.World.GetOrCreateSystem<FsmStatePreparationJobSystemBarrier>();
             this.query = GetEntityQuery(typeof(FsmState), typeof(StateJustTransitioned), 
@@ -30,8 +28,6 @@ namespace Common.Ecs.Fsm {
         protected abstract TPrepareActionType StatePreparationAction { get; }
         
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            this.allFsms = GetComponentDataFromEntity<Fsm>();
-            
             Job job = new Job {
                 stateType = GetComponentTypeHandle<FsmState>(), 
                 commandBuffer = this.barrier.CreateCommandBuffer().AsParallelWriter(), 
@@ -44,7 +40,7 @@ namespace Common.Ecs.Fsm {
             return jobHandle;
         }
 
-        private struct Job : IJobChunk {
+        public struct Job : IJobChunk {
             public ComponentTypeHandle<FsmState> stateType;
             public EntityCommandBuffer.ParallelWriter commandBuffer;
             public TPrepareActionType preparationAction;

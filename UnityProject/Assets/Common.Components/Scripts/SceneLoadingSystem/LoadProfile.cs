@@ -1,6 +1,4 @@
-﻿using Common.Utils;
-
-namespace Common {
+﻿namespace Common {
     internal class LoadProfile {
         private IdentifiableSet<string> set;
         

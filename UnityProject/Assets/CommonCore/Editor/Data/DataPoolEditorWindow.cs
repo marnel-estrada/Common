@@ -58,6 +58,7 @@ namespace Common {
             GUILayout.BeginHorizontal();
 
             if (GUILayout.Button("Save", GUILayout.Width(40))) {
+                DoBeforeSave(this.target);
                 EditorUtility.SetDirty(this.target);
                 AssetDatabase.SaveAssets();
                 EditorUtility.DisplayDialog("Save", "Save Successful", "OK");
@@ -82,8 +83,8 @@ namespace Common {
             GUILayout.Space(10);
 
             // Inspector
-            if (this.sidebar.IsValidSelection) {
-                this.inspector.Render(this.target, this.sidebar.SelectedItem);
+            if (this.sidebar.IsValidSelection(this.target)) {
+                this.inspector.Render(this.target, this.sidebar.GetSelectedItem(this.target));
             }
 
             GUILayout.EndHorizontal();
@@ -107,6 +108,12 @@ namespace Common {
         /// <param name="strategy"></param>
         public void AddFilterStrategy(DataPoolFilterStrategy<T> strategy) {
             this.sidebar.AddFilterStrategy(strategy);
+        }
+        
+        /// <summary>
+        /// Routines that subclass may perform like verifying data before saving
+        /// </summary>
+        protected virtual void DoBeforeSave(DataPool<T> target) {
         }
     }
 }

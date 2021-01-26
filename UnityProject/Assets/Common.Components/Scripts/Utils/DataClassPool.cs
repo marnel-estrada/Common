@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace Common.Utils {
+namespace Common {
     /// <summary>
     /// Maintains a pool of T instances
     /// </summary>

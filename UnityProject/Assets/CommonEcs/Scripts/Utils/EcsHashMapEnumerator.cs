@@ -38,7 +38,7 @@ namespace CommonEcs {
         public EcsHashMapEnumerator(DynamicBuffer<EntityBufferElement> buckets, EntityManager entityManager) {
             this.buckets = buckets;
             this.allEntryLists = Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>>.Nothing;
-            this.entityManager = new ValueTypeOption<EntityManager>(entityManager);
+            this.entityManager = ValueTypeOption<EntityManager>.Some(entityManager);
 
             this.bucketIndex = 0;
             this.entryIndex = -1;

@@ -1,6 +1,4 @@
-﻿using Common.Utils;
-
-namespace Common {
+﻿namespace Common {
     /// <summary>
     /// Editor class for DataClassPool objects. Must be derived before it can be used.
     /// </summary>

@@ -1,6 +1,4 @@
-﻿using Common.Utils;
-
-namespace Common {
+﻿namespace Common {
     /// <summary>
     /// The generic renderer for an item
     /// </summary>

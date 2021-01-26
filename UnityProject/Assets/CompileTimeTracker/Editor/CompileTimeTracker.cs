@@ -7,8 +7,6 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-using Debug = System.Diagnostics.Debug;
-
 namespace DTCompileTimeTracker {
     [InitializeOnLoad]
     public static class CompileTimeTracker {
@@ -75,15 +73,20 @@ namespace DTCompileTimeTracker {
         private static void PlayClip(AudioClip clip, int startSample = 0, bool loop = false) {
             Assembly unityEditorAssembly = typeof(AudioImporter).Assembly;
             Type audioUtilClass = unityEditorAssembly.GetType("UnityEditor.AudioUtil");
-            MethodInfo method = audioUtilClass.GetMethod("PlayClip", BindingFlags.Static | BindingFlags.Public, null,
+            const string audioPlayerPreviewName = "PlayPreviewClip";
+            MethodInfo method = audioUtilClass.GetMethod(audioPlayerPreviewName, BindingFlags.Static | BindingFlags.Public, null,
                 new[] {
                     typeof(AudioClip), typeof(int), typeof(bool)
                 }, null);
-            
-            Debug.Assert(method != null, nameof(method) + " != null");
-            method.Invoke(null, new object[] {
-                clip, startSample, loop
-            });
+
+            if (method == null) {
+                Debug.LogError($"{audioPlayerPreviewName} can't be found");
+            } else {
+                // The method exists
+                method.Invoke(null, new object[] {
+                    clip, startSample, loop
+                });
+            }
         }
     }
 }

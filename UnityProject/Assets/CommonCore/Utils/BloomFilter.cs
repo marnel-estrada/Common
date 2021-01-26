@@ -70,7 +70,8 @@ namespace Common {
         /// <exception cref="ArgumentNullException"><paramref name="item" /> is <c>null</c>.</exception>
         public void Add(T item) {
             if (item == null) {
-                throw new ArgumentNullException(nameof(item));
+                // Do not add null items
+                return;
             }
 
             ComputeHashes(item, this.m);

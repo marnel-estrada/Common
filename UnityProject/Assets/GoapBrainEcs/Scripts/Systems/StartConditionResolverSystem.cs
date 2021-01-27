@@ -143,15 +143,31 @@ namespace GoapBrainEcs {
             EcsHashMapWrapper<ushort, ByteBool> conditionsMap =
                 new EcsHashMapWrapper<ushort, ByteBool>(request.agentEntity, this.allConditionResultMaps,
                     this.EntityManager);
-            CommonEcs.Maybe<ByteBool> conditionValue = conditionsMap.Find(search.CurrentTargetCondition.id);
+            ValueTypeOption<ByteBool> conditionValue = conditionsMap.Find(search.CurrentTargetCondition.id);
             Entity actionSearchEntity = this.entities[index];
 
-            bool resolvedByCondition =
-                conditionValue.HasValue && conditionValue.Value == search.CurrentTargetCondition.value;
+            bool resolvedByCondition = conditionValue.Match<IsResolvedByCondition, bool>(
+                new IsResolvedByCondition(search.CurrentTargetCondition));
 
             // The current target condition is resolved if it is resolved by condition resolvers 
             // or through parent actions
             return resolvedByCondition || HasBeenSatisfiedInAncestry(search.CurrentTargetCondition, actionSearchEntity);
+        }
+
+        private readonly struct IsResolvedByCondition : IFuncOptionMatcher<ByteBool, bool> {
+            private readonly Condition targetCondition;
+
+            public IsResolvedByCondition(Condition targetCondition) {
+                this.targetCondition = targetCondition;
+            }
+
+            public bool OnSome(ByteBool conditionValue) {
+                return conditionValue == this.targetCondition.value;
+            }
+
+            public bool OnNone() {
+                return false;
+            }
         }
         
         private bool HasBeenSatisfiedInAncestry(Condition condition, Entity searchEntity) {

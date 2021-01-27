@@ -98,7 +98,7 @@ namespace CommonEcs {
             }
         }
 
-        public Maybe<V> Find(K key) {
+        public ValueTypeOption<V> Find(K key) {
             int hashCode = key.GetHashCode();
             DynamicBuffer<EcsHashMapEntry<K, V>> valueList = ResolveEntryList(hashCode);
 
@@ -107,18 +107,28 @@ namespace CommonEcs {
                 EcsHashMapEntry<K, V> entry = valueList[i];
                 if (entry.hashCode == hashCode) {
                     // We found it
-                    return new Maybe<V>(entry.value);
+                    return ValueTypeOption<V>.Some(entry.value);
                 }
             }
 
             // Not found
-            return Maybe<V>.Nothing;
+            return ValueTypeOption<V>.None;
         }
 
         private DynamicBuffer<EcsHashMapEntry<K, V>> ResolveEntryList(int hashCode) {
-            int bucketIndex = hashCode % EcsHashMap<K, V>.BUCKET_COUNT;
+            int bucketIndex = FibonacciHash(hashCode);
             return this.entityManager.Match<ResolveEntryListMatcher, DynamicBuffer<EcsHashMapEntry<K, V>>>(
                 new ResolveEntryListMatcher(this.hashMapEntity, bucketIndex, this.allBuckets, this.allEntryLists));
+        }
+        
+        // This is taken from https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/
+        private static int FibonacciHash(int hash) {
+            // This is 2^64 / 1.6180339 (Fibonacci constant)
+            const ulong magicNumber = 11400714819323198485;
+            
+            // We shift 60 bits here as we only need 4 bits (0-15)
+            // Note that EcsHashMap.BUCKET_COUNT is 16
+            return (int)(((ulong)hash * magicNumber) >> 60);
         }
 
         private readonly struct ResolveEntryListMatcher : 
@@ -141,7 +151,7 @@ namespace CommonEcs {
                 // Use EntityManager
                 DynamicBuffer<EntityBufferElement> buckets =
                     entityManager.GetBuffer<EntityBufferElement>(this.hashMapEntity);
-                Entity entryListEntity = buckets[bucketIndex].entity;
+                Entity entryListEntity = buckets[this.bucketIndex].entity;
 
                 return entityManager.GetBuffer<EcsHashMapEntry<K, V>>(entryListEntity);
             }

@@ -1,4 +1,6 @@
-﻿using  Unity.Entities;
+﻿using CommonEcs;
+
+using Unity.Entities;
 using Unity.Collections;
 using Unity.Jobs;
 
@@ -11,7 +13,7 @@ namespace Common.Ecs.Fsm {
     [UpdateBefore(typeof(FsmStatePreparationJobSystemBarrier))]
     [UpdateBefore(typeof(FsmResetEventSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public abstract class FsmStatePreparationJobSystem<TTagType, TPrepareActionType> : JobComponentSystem
+    public abstract class FsmStatePreparationJobSystem<TTagType, TPrepareActionType> : JobSystemBase
         where TTagType : struct, IComponentData
         where TPrepareActionType : struct, IFsmStatePreparationAction {
         protected FsmStatePreparationJobSystemBarrier barrier;
@@ -40,7 +42,7 @@ namespace Common.Ecs.Fsm {
             return jobHandle;
         }
 
-        public struct Job : IJobChunk {
+        private struct Job : IJobChunk {
             public ComponentTypeHandle<FsmState> stateType;
             public EntityCommandBuffer.ParallelWriter commandBuffer;
             public TPrepareActionType preparationAction;

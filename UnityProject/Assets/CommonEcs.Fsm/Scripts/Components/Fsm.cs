@@ -4,7 +4,6 @@ using UnityEngine.Assertions;
 
 namespace Common.Ecs.Fsm {
     public struct Fsm : IComponentData {
-
         // The value 0 is reserved as a null event
         public const uint NULL_EVENT = 0;
 
@@ -23,6 +22,5 @@ namespace Common.Ecs.Fsm {
             Assert.IsTrue(anEvent != NULL_EVENT); // Can't be a null event
             this.currentEvent = anEvent;
         }
-
     }
 }

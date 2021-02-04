@@ -1,6 +1,4 @@
-﻿using System;
-
-using Unity.Entities;
+﻿using Unity.Entities;
 
 namespace Common.Ecs.Fsm {
     /// <summary>

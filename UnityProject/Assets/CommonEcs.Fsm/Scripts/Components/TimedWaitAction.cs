@@ -23,13 +23,12 @@ namespace Common.Ecs.Fsm {
         /// <param name="actionEntity"></param>
         /// <param name="duration"></param>
         /// <param name="finishEvent"></param>
-        public static void AddAsAction(EntityCommandBuffer postCommandBuffer, Entity actionEntity, float duration, uint finishEvent) {
+        public static void AddAsAction(EntityCommandBuffer commandBuffer, Entity actionEntity, float duration, uint finishEvent) {
             DurationTimer timer = new DurationTimer();
-            postCommandBuffer.AddComponent(actionEntity, timer);
+            commandBuffer.AddComponent(actionEntity, timer);
 
             TimedWaitAction waitAction = new TimedWaitAction(duration, finishEvent);
-            postCommandBuffer.AddComponent(actionEntity, waitAction);
+            commandBuffer.AddComponent(actionEntity, waitAction);
         }
-
     }
 }

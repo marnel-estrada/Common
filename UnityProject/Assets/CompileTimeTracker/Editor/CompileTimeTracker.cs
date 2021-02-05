@@ -7,30 +7,37 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
+#nullable enable
+
 namespace DTCompileTimeTracker {
     [InitializeOnLoad]
     public static class CompileTimeTracker {
-        private const string kCompileTimeTrackerKey = "CompileTimeTracker::_data";
+        private const string K_COMPILE_TIME_TRACKER_KEY = "CompileTimeTracker::_data";
 
-        private static readonly AudioClip COMPILATION_COMPLETED_CLIP;
-        private static CompileTimeTrackerData _data;
+        private static readonly AudioClip? COMPILATION_COMPLETED_CLIP;
+        private static CompileTimeTrackerData? DATA;
 
         static CompileTimeTracker() {
             EditorApplicationCompilationUtil.StartedCompiling += HandleEditorStartedCompiling;
             EditorApplicationCompilationUtil.FinishedCompiling += HandleEditorFinishedCompiling;
 
-            string guid = AssetDatabase.FindAssets("t:AudioClip CompileFinished")[0];
-            COMPILATION_COMPLETED_CLIP = AssetDatabase.LoadAssetAtPath<AudioClip>(AssetDatabase.GUIDToAssetPath(guid));
-            Assert.IsNotNull(COMPILATION_COMPLETED_CLIP);
+            string[] foundResults = AssetDatabase.FindAssets("t:AudioClip CompileFinished");
+            if (foundResults.Length > 0) {
+                // Get only the first one
+                string guid = foundResults[0];
+                COMPILATION_COMPLETED_CLIP =
+                    AssetDatabase.LoadAssetAtPath<AudioClip>(AssetDatabase.GUIDToAssetPath(guid));
+                Assert.IsNotNull(COMPILATION_COMPLETED_CLIP);
+            }
         }
 
-        private static CompileTimeTrackerData _Data {
+        private static CompileTimeTrackerData Data {
             get {
-                if (_data == null) {
-                    _data = new CompileTimeTrackerData(kCompileTimeTrackerKey);
+                if (DATA == null) {
+                    DATA = new CompileTimeTrackerData(K_COMPILE_TIME_TRACKER_KEY);
                 }
 
-                return _data;
+                return DATA;
             }
         }
 
@@ -47,34 +54,36 @@ namespace DTCompileTimeTracker {
         };
 
         public static IList<CompileTimeKeyframe> GetCompileTimeHistory() {
-            return _Data.GetCompileTimeHistory();
+            return Data.GetCompileTimeHistory();
         }
 
         private static void HandleEditorStartedCompiling() {
-            _Data.StartTime = TrackingUtil.GetMilliseconds();
+            Data.StartTime = TrackingUtil.GetMilliseconds();
 
             UnityConsoleCountsByType countsByType = UnityEditorConsoleUtil.GetCountsByType();
             StoredErrorCount = countsByType.errorCount;
         }
 
         private static void HandleEditorFinishedCompiling() {
-            int elapsedTime = TrackingUtil.GetMilliseconds() - _Data.StartTime;
+            int elapsedTime = TrackingUtil.GetMilliseconds() - Data.StartTime;
 
             UnityConsoleCountsByType countsByType = UnityEditorConsoleUtil.GetCountsByType();
             bool hasErrors = countsByType.errorCount - StoredErrorCount > 0;
 
             CompileTimeKeyframe keyframe = new CompileTimeKeyframe(elapsedTime, hasErrors);
-            _Data.AddCompileTimeKeyframe(keyframe);
+            Data.AddCompileTimeKeyframe(keyframe);
             KeyframeAdded.Invoke(keyframe);
 
-            PlayClip(COMPILATION_COMPLETED_CLIP);
+            if (COMPILATION_COMPLETED_CLIP != null) {
+                PlayClip(COMPILATION_COMPLETED_CLIP);
+            }
         }
 
         private static void PlayClip(AudioClip clip, int startSample = 0, bool loop = false) {
             Assembly unityEditorAssembly = typeof(AudioImporter).Assembly;
             Type audioUtilClass = unityEditorAssembly.GetType("UnityEditor.AudioUtil");
             const string audioPlayerPreviewName = "PlayPreviewClip";
-            MethodInfo method = audioUtilClass.GetMethod(audioPlayerPreviewName, BindingFlags.Static | BindingFlags.Public, null,
+            MethodInfo? method = audioUtilClass.GetMethod(audioPlayerPreviewName, BindingFlags.Static | BindingFlags.Public, null,
                 new[] {
                     typeof(AudioClip), typeof(int), typeof(bool)
                 }, null);

@@ -63,20 +63,6 @@ namespace CommonEcs.DotsFsm {
             return actionEntity;
         }
 
-        /// <summary>
-        /// We use a list of transitions here so that they will be added in one go without
-        /// resetting the dynamic buffer of Transitions. Calling SetBuffer() clears all the items
-        /// in that buffer.
-        /// </summary>
-        /// <param name="fsmEntity"></param>
-        /// <param name="transitions"></param>
-        public void AddTransitions(Entity fsmEntity, NativeArray<Transition> transitions) {
-            DynamicBuffer<Transition> fsmTransitions = this.commandBuffer.SetBuffer<Transition>(fsmEntity);
-            for (int i = 0; i < transitions.Length; ++i) {
-                fsmTransitions.Add(transitions[i]);
-            }
-        }
-
         public void AddTransition(Entity fsmEntity, Entity fromState, FixedString64 eventId, Entity toState) {
             this.commandBuffer.AppendToBuffer(fsmEntity, new Transition(fromState, eventId, toState));
         }

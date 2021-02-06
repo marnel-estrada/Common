@@ -5,7 +5,7 @@ using Unity.Jobs;
 
 namespace CommonEcs.DotsFsm {
     [UpdateAfter(typeof(StartFsmSystem))]
-    [UpdateAfter(typeof(DotsFsmSendEventHandlerSystem))]
+    [UpdateAfter(typeof(ConsumePendingEventSystem))]
     public abstract class DotsFsmActionSystem<ActionType, ActionExecutionType> : JobSystemBase
         where ActionType : struct, IComponentData 
         where ActionExecutionType : struct, IFsmActionExecution<ActionType> {
@@ -68,6 +68,12 @@ namespace CommonEcs.DotsFsm {
             }
 
             private void Process(DotsFsm fsm, ref DotsFsmAction fsmAction, Entity entity, ref ActionType customAction) {
+                if (fsm.pendingEvent.IsSome) {
+                    // This means that the FSM is about to transition but hasn't yet
+                    // We don't run the actions until the transition has happened
+                    return;
+                }
+                
                 if (fsm.currentState.Match<IsEntityEqualTo, bool>(new IsEntityEqualTo(fsmAction.stateOwner))) {
                     // The state the current state of the FSM. We process.
                     if (!fsmAction.entered) {

@@ -42,7 +42,7 @@ namespace Common.Ecs.Fsm {
             return jobHandle;
         }
 
-        private struct Job : IJobChunk {
+        public struct Job : IJobChunk {
             public ComponentTypeHandle<FsmState> stateType;
             public EntityCommandBuffer.ParallelWriter commandBuffer;
             public TPrepareActionType preparationAction;

@@ -1,6 +1,4 @@
-﻿using System;
-
-using Unity.Entities;
+﻿using Unity.Entities;
 
 namespace Common.Ecs.Fsm {
     public struct FsmTransition : IBufferElementData {
@@ -9,6 +7,5 @@ namespace Common.Ecs.Fsm {
         public Entity fromState;
         public uint transitionEvent; // The event that would cause the transition
         public Entity toState;
-
     }
 }

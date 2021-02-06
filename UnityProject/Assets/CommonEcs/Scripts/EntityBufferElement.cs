@@ -6,7 +6,7 @@ namespace CommonEcs {
     /// </summary>
     [InternalBufferCapacity(10)]
     public struct EntityBufferElement : IBufferElementData {
-        public Entity entity;
+        public readonly Entity entity;
 
         public EntityBufferElement(Entity entity) {
             this.entity = entity;

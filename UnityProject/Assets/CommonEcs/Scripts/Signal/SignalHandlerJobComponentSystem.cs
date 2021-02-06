@@ -7,7 +7,7 @@ namespace CommonEcs {
     /// </summary>
     [UpdateBefore(typeof(DestroySignalsSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public abstract class SignalHandlerJobComponentSystem<T> : JobComponentSystem where T : struct, IComponentData {
+    public abstract class SignalHandlerJobComponentSystem<T> : JobSystemBase where T : struct, IComponentData {
         private EntityQuery signalQuery;
         private JobSignalHandler<T> signalHandler;
 

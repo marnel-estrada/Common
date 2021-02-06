@@ -1,6 +1,6 @@
 using Unity.Entities;
 
-namespace Common.Ecs.DotsFsm {
+namespace CommonEcs.DotsFsm {
     /// <summary>
     /// An FSM state is an entity with this component and a dynamic buffer of entities that
     /// points to its actions

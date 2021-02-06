@@ -1,6 +1,6 @@
 using Unity.Entities;
 
-namespace Common.Ecs.DotsFsm {
+namespace CommonEcs.DotsFsm {
     public struct DotsFsmAction : IComponentData {
         public readonly Entity stateOwner;
         

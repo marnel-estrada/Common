@@ -1,9 +1,7 @@
-using CommonEcs;
-
 using Unity.Collections;
 using Unity.Entities;
 
-namespace Common.Ecs.DotsFsm {
+namespace CommonEcs.DotsFsm {
     /// <summary>
     /// An FSM is an entity with this component and a dynamic buffer of DotsFsmTransition
     /// elements.

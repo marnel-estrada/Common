@@ -4,6 +4,7 @@ using Unity.Jobs;
 
 namespace CommonEcs.DotsFsm {
     [UpdateAfter(typeof(StartFsmSystem))]
+    [UpdateAfter(typeof(DotsFsmSendEventHandlerSystem))]
     public abstract class DotsFsmActionSystem<ActionType, ActionExecutionType> : JobSystemBase
         where ActionType : struct, IComponentData 
         where ActionExecutionType : struct, IFsmActionExecution<ActionType> {

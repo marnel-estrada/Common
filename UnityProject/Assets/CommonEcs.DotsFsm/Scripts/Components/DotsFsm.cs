@@ -1,4 +1,3 @@
-using Unity.Collections;
 using Unity.Entities;
 
 namespace CommonEcs.DotsFsm {
@@ -7,9 +6,6 @@ namespace CommonEcs.DotsFsm {
     /// elements.
     /// </summary>
     public struct DotsFsm : IComponentData {
-        // This will be consumed by a system that handles the transitions
-        public ValueTypeOption<FixedString64> sentEvent;
-        
         public ValueTypeOption<Entity> currentState;
     }
 }

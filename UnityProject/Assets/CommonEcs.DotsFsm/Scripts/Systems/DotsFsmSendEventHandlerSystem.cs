@@ -67,7 +67,10 @@ namespace CommonEcs.DotsFsm {
                 // We log a warning
                 Name fsmName = this.allNames[this.parameter.fsmEntity];
                 Name currentStateName = this.allNames[currentStateEntity];
-                Debug.LogWarning($"{fsmName.value.ToString()}.{currentStateName.value.ToString()} does not have transition for event {this.parameter.eventId.ToString()}");
+                
+                // Burst doesn't like any other string format methods
+                // ReSharper disable once UseStringInterpolation
+                Debug.LogWarning(string.Format("{0}.{1} does not have transition for event {2}", fsmName.value, currentStateName.value, this.parameter.eventId));
             }
 
             public void OnNone() {

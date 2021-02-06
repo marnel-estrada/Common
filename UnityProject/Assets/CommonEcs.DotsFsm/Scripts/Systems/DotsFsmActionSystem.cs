@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -15,7 +16,7 @@ namespace CommonEcs.DotsFsm {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            Job job = new Job() {
+            ExecuteActionJob job = new ExecuteActionJob() {
                 entityHandle = GetEntityTypeHandle(),
                 fsmActionHandle = GetComponentTypeHandle<DotsFsmAction>(),
                 customActionHandle = GetComponentTypeHandle<ActionType>(),
@@ -29,7 +30,8 @@ namespace CommonEcs.DotsFsm {
 
         protected abstract ActionExecutionType PrepareActionExecution(); 
 
-        public struct Job : IJobEntityBatchWithIndex {
+        [BurstCompile]
+        public struct ExecuteActionJob : IJobEntityBatchWithIndex {
             [ReadOnly]
             public EntityTypeHandle entityHandle;
             

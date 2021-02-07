@@ -6,19 +6,21 @@ using UnityEngine.SceneManagement;
 
 using Common.Xml;
 
+#nullable enable
+
 namespace Common {
     public class SceneLoadingSystem : MonoBehaviour {
         [SerializeField]
-        private TextAsset configXml;
+        private TextAsset? configXml;
 
         [SerializeField]
-        private string loadProfileToExecute;
+        private string? loadProfileToExecute;
 
         [SerializeField]
         private bool showLoadingTime;
 
-        private Dictionary<string, LoadProfile> profileMap;
-        private Dictionary<string, SceneSet> sceneSetMap;
+        private readonly Dictionary<string, LoadProfile> profileMap = new Dictionary<string, LoadProfile>();
+        private readonly Dictionary<string, SceneSet> sceneSetMap = new Dictionary<string, SceneSet>();
 
         public bool ShowLoadingTime {
             get {
@@ -30,14 +32,12 @@ namespace Common {
         }
 
         private void Awake() {
-            Assertion.NotNull(configXml);
-
-            this.profileMap = new Dictionary<string, LoadProfile>();
-            this.sceneSetMap = new Dictionary<string, SceneSet>();
+            Assertion.NotNull(this.configXml);
+            
             Parse();
 
             if(!string.IsNullOrEmpty(this.loadProfileToExecute)) {
-                Load(this.loadProfileToExecute);
+                Load(this.loadProfileToExecute ?? throw new InvalidOperationException());
             }
         }
 
@@ -46,6 +46,11 @@ namespace Common {
         private const string SCENE_SET = "SceneSet";
 
         private void Parse() {
+            if (this.configXml == null) {
+                Debug.LogError("configXml can't be null");
+                return;
+            }
+            
             SimpleXmlReader reader = new SimpleXmlReader();
             SimpleXmlNode root = reader.Read(this.configXml.text).FindFirstNodeInChildren("SceneLoadingSystem");
 
@@ -114,7 +119,7 @@ namespace Common {
         /// </summary>
         /// <param name="loadProfileId"></param>
         /// <param name="actionAfterLoading"></param>
-        public void Load(string loadProfileId, Action actionAfterLoading = null) {
+        public void Load(string loadProfileId, Action? actionAfterLoading = null) {
             Assertion.IsTrue(this.profileMap.TryGetValue(loadProfileId, out LoadProfile loadProfile));
 
             this.startTime = DateTime.Now;
@@ -154,7 +159,7 @@ namespace Common {
         /// Common algorithm for loading a scene additively
         /// </summary>
         /// <param name="sceneName"></param>
-        public static void LoadSceneAdditively(string sceneName) {
+        private static void LoadSceneAdditively(string sceneName) {
             SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
         }
     }

@@ -1,14 +1,16 @@
 using Unity.Collections;
 using Unity.Entities;
 
+#nullable enable
+
 namespace CommonEcs.DotsFsm {
     /// <summary>
     /// A utility struct that creates an FSM entity
     /// </summary>
-    public struct DotsFsmBuilder {
+    public struct DotsFsmBuilderByCommandBuffer {
         private EntityCommandBuffer commandBuffer;
 
-        public DotsFsmBuilder(EntityCommandBuffer commandBuffer) {
+        public DotsFsmBuilderByCommandBuffer(EntityCommandBuffer commandBuffer) {
             this.commandBuffer = commandBuffer;
         }
 

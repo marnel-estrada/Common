@@ -53,7 +53,7 @@ namespace Common {
 		/**
 		 * Asserts that the specified UnityEngine object is not null.
 		 */
-		public static void NotNull(UnityEngine.Object pointer, string name, UnityEngine.Object? context = null) {
+		public static void NotNull(UnityEngine.Object? pointer, string name, UnityEngine.Object? context = null) {
 			if(!pointer) {
 				IsTrue(false, name, context);
 			}
@@ -62,7 +62,7 @@ namespace Common {
 		/**
 		 * Asserts that the specified UnityEngine object is not null.
 		 */
-		public static void NotNull(UnityEngine.Object pointer, UnityEngine.Object? context = null) {
+		public static void NotNull(UnityEngine.Object? pointer, UnityEngine.Object? context = null) {
 			if(!pointer) {
 				IsTrue(false, DEFAULT_MESSAGE, context);
 			}
@@ -71,7 +71,7 @@ namespace Common {
 		/**
 		 * Asserts that the specified string is not empty.
 		 */
-		public static void NotEmpty(string s, string name, UnityEngine.Object? context = null) {
+		public static void NotEmpty(string? s, string name, UnityEngine.Object? context = null) {
 			IsTrue(!string.IsNullOrEmpty(s), name, context);
 		}
 	
@@ -79,7 +79,7 @@ namespace Common {
 		/**
 		 * Asserts that the specified string is not empty.
 		 */
-		public static void NotEmpty(string s, UnityEngine.Object? context = null) {
+		public static void NotEmpty(string? s, UnityEngine.Object? context = null) {
 			IsTrue(!string.IsNullOrEmpty(s), DEFAULT_MESSAGE, context);
 		}	
 	}

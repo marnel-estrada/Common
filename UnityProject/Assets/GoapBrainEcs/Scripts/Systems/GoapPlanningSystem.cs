@@ -78,7 +78,7 @@ namespace GoapBrainEcs {
             EntityReference.Create(planEntity, rootSearchEntity, this.PostUpdateCommands);
         }
 
-        private void AddAgentGoals(ref ConditionList10 searchConditions, ref ConditionList5 agentGoals) {
+        private static void AddAgentGoals(ref ConditionList10 searchConditions, ref ConditionList5 agentGoals) {
             for (int i = 0; i < agentGoals.Count; ++i) {
                 searchConditions.Add(agentGoals[i]);
             }

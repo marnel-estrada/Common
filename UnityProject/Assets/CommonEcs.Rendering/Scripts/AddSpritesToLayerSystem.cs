@@ -16,6 +16,7 @@ namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class AddSpritesToLayerSystem : ComponentSystem {
         private EntityQuery query;
+
         private ComponentTypeHandle<AddToSpriteLayer> addToLayerType;
         private ComponentTypeHandle<Sprite> spriteType;
         private ComponentTypeHandle<LocalToWorld> matrixType;
@@ -67,7 +68,15 @@ namespace CommonEcs {
                 AddToSpriteLayer addToLayer = this.addToLayers[i];
                 
                 // Must have a layer entity
+#if UNITY_EDITOR
+                Assertion.IsTrue(addToLayer.layerEntity != Entity.Null, this.entities[i].ToString());
+#else
                 Assertion.IsTrue(addToLayer.layerEntity != Entity.Null);
+#endif
+                if (addToLayer.layerEntity == Entity.Null) {
+                    // Might not be prepared yet
+                    continue;
+                }
                 
                 Maybe<SpriteLayer> layer = this.layers.Get(addToLayer.layerEntity);
                 Assertion.IsTrue(layer.HasValue);

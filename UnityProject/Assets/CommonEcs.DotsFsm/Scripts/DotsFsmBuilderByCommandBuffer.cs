@@ -52,9 +52,19 @@ namespace CommonEcs.DotsFsm {
             return stateEntity;
         }
 
-        public Entity AddAction<T>(Entity stateEntity, T actionComponent) where T : struct, IComponentData {
+        /// <summary>
+        /// We need the FSM entity to denormalize the data into DotsFsmAction
+        /// This is so that we don't need to look it up from the stateOwner if we want
+        /// to know the owner fsm directly
+        /// </summary>
+        /// <param name="fsmEntity"></param>
+        /// <param name="stateEntity"></param>
+        /// <param name="actionComponent"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public Entity AddAction<T>(Entity fsmEntity, Entity stateEntity, T actionComponent) where T : struct, IComponentData {
             Entity actionEntity = this.commandBuffer.CreateEntity();
-            this.commandBuffer.AddComponent(actionEntity, new DotsFsmAction(stateEntity));
+            this.commandBuffer.AddComponent(actionEntity, new DotsFsmAction(fsmEntity, stateEntity));
             this.commandBuffer.AddComponent(actionEntity, actionComponent);
             
             // Link state owner to this action

@@ -8,8 +8,7 @@ namespace CommonEcs.DotsFsm {
         /// <param name="actionEntity"></param>
         /// <param name="action"></param>
         /// <param name="actionComponent"></param>
-        /// <param name="fsm"></param>
-        void OnEnter(Entity actionEntity, DotsFsmAction action, ref T actionComponent, ref DotsFsm fsm);
+        void OnEnter(Entity actionEntity, ref DotsFsmAction action, ref T actionComponent);
         
         /// <summary>
         /// DotsFsm is passed here so that the action can send events
@@ -17,8 +16,7 @@ namespace CommonEcs.DotsFsm {
         /// <param name="actionEntity"></param>
         /// <param name="action"></param>
         /// <param name="actionComponent"></param>
-        /// <param name="fsm"></param>
-        void OnUpdate(Entity actionEntity, DotsFsmAction action, ref T actionComponent, ref DotsFsm fsm);
+        void OnUpdate(Entity actionEntity, ref DotsFsmAction action, ref T actionComponent);
         
         void OnExit(Entity actionEntity, DotsFsmAction action, ref T actionComponent);
     }

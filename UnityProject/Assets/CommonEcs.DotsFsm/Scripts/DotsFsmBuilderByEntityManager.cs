@@ -51,10 +51,10 @@ namespace CommonEcs.DotsFsm {
             return stateEntity;
         }
         
-        public Entity AddAction<T>(Entity stateEntity, T actionComponent) where T : struct, IComponentData {
+        public Entity AddAction<T>(Entity fsmEntity, Entity stateEntity, T actionComponent) where T : struct, IComponentData {
             Entity actionEntity = this.entityManager.CreateEntity(typeof(DotsFsmAction), 
                 typeof(T), typeof(LinkedEntityGroup));
-            this.entityManager.SetComponentData(actionEntity, new DotsFsmAction(stateEntity));
+            this.entityManager.SetComponentData(actionEntity, new DotsFsmAction(fsmEntity, stateEntity));
             this.entityManager.SetComponentData(actionEntity, actionComponent);
             
             // Link state owner to this action

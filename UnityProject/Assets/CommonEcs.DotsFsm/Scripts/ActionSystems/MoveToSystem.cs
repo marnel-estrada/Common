@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -11,11 +12,12 @@ namespace CommonEcs.DotsFsm {
             };
         }
         
+        [BurstCompile]
         public struct Execution : IFsmActionExecution<MoveTo> {
             public ComponentDataFromEntity<Translation> allTranslations;
             public ComponentDataFromEntity<DurationTimer> allTimers;
             
-            public void OnEnter(Entity actionEntity, DotsFsmAction action, ref MoveTo moveTo, ref DotsFsm fsm) {
+            public void OnEnter(Entity actionEntity, ref DotsFsmAction action, ref MoveTo moveTo) {
                 // Set to start position
                 this.allTranslations[moveTo.targetEntity] = new Translation() {
                     Value = moveTo.start
@@ -24,7 +26,7 @@ namespace CommonEcs.DotsFsm {
                 if (Comparison.IsZero(moveTo.duration)) {
                     // Duration is zero
                     // Let's finish right away
-                    Finish(ref action, ref moveTo, ref fsm);
+                    Finish(ref action, ref moveTo);
                     return;
                 }
                 
@@ -34,11 +36,11 @@ namespace CommonEcs.DotsFsm {
                 this.allTimers[actionEntity] = timer; // Modify
             }
 
-            public void OnUpdate(Entity actionEntity, DotsFsmAction action, ref MoveTo moveTo, ref DotsFsm fsm) {
+            public void OnUpdate(Entity actionEntity, ref DotsFsmAction action, ref MoveTo moveTo) {
                 DurationTimer timer = this.allTimers[actionEntity];
                 if (timer.HasElapsed) {
                     // Duration is done. Snap to destination.
-                    Finish(ref action, ref moveTo, ref fsm);
+                    Finish(ref action, ref moveTo);
                     return;
                 }
                 
@@ -50,7 +52,7 @@ namespace CommonEcs.DotsFsm {
                 };
             }
 
-            private void Finish(ref DotsFsmAction action, ref MoveTo moveTo, ref DotsFsm dotsFsm) {
+            private void Finish(ref DotsFsmAction action, ref MoveTo moveTo) {
                 // Snap to destination
                 this.allTranslations[moveTo.targetEntity] = new Translation() {
                     Value = moveTo.destination
@@ -58,7 +60,7 @@ namespace CommonEcs.DotsFsm {
                 
                 // Send event if it exists
                 if (moveTo.finishEvent.Length > 0) {
-                    dotsFsm.SendEvent(moveTo.finishEvent);
+                    action.SendEvent(moveTo.finishEvent);
                 }
             }
 

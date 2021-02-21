@@ -6,6 +6,7 @@ using Unity.Entities;
 using UnityEngine;
 
 namespace CommonEcs.DotsFsm {
+    [UpdateAfter(typeof(SendEventFromActionsToFsmSystem))]
     public class ConsumePendingEventSystem : SystemBase {
         protected override void OnUpdate() {
             this.Entities.ForEach(delegate(ref DotsFsm fsm, in Name name, in DynamicBuffer<Transition> transitions) {

@@ -1,7 +1,6 @@
 using System;
 
-using Common;
-
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 
@@ -37,6 +36,7 @@ namespace CommonEcs.DotsFsm {
             this.Dependency = job.ScheduleParallel(this.actionsQuery, 1, this.Dependency);
         } 
 
+        [BurstCompile]
         private struct Job : IJobEntityBatch {
             public ComponentTypeHandle<DotsFsmAction> actionType;
 

@@ -1,4 +1,3 @@
-using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -12,7 +11,6 @@ namespace CommonEcs.DotsFsm {
             };
         }
         
-        [BurstCompile]
         public struct Execution : IFsmActionExecution<MoveTo> {
             public ComponentDataFromEntity<Translation> allTranslations;
             public ComponentDataFromEntity<DurationTimer> allTimers;

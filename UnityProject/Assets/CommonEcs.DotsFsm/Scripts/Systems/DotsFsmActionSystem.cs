@@ -24,7 +24,14 @@ namespace CommonEcs.DotsFsm {
                 execution = PrepareActionExecution()
             };
             
-            return job.Schedule(this.query, inputDeps);
+            return this.ShouldScheduleParallel ? job.ScheduleParallel(this.query, 1, inputDeps) 
+                : job.Schedule(this.query, inputDeps);
+        }
+
+        protected virtual bool ShouldScheduleParallel {
+            get {
+                return false;
+            }
         }
 
         protected abstract ActionExecutionType PrepareActionExecution(); 
@@ -45,11 +52,11 @@ namespace CommonEcs.DotsFsm {
                 NativeArray<ActionType> customActions = batchInChunk.GetNativeArray(this.customActionHandle);
 
                 for (int i = 0; i < batchInChunk.Count; ++i) {
-                    Entity entity = entities[i];
+                    Entity actionEntity = entities[i];
                     DotsFsmAction fsmAction = fsmActions[i];
                     ActionType customAction = customActions[i];
 
-                    Process(ref fsmAction, entity, ref customAction);
+                    Process(actionEntity, ref fsmAction, ref customAction);
                     
                     // Modify
                     fsmActions[i] = fsmAction;
@@ -57,22 +64,22 @@ namespace CommonEcs.DotsFsm {
                 }
             }
 
-            private void Process(ref DotsFsmAction fsmAction, Entity entity, ref ActionType customAction) {
+            private void Process(Entity actionEntity, ref DotsFsmAction fsmAction, ref ActionType customAction) {
                 if (fsmAction.running) {
                     if (!fsmAction.entered) {
-                        this.execution.OnEnter(entity, ref fsmAction, ref customAction);
+                        this.execution.OnEnter(actionEntity, ref fsmAction, ref customAction);
                         fsmAction.entered = true;
                         fsmAction.exited = false;
                     }
 
                     // Run OnUpdate()
-                    this.execution.OnUpdate(entity, ref fsmAction, ref customAction);
+                    this.execution.OnUpdate(actionEntity, ref fsmAction, ref customAction);
                 } else {
                     if (fsmAction.entered && !fsmAction.exited) {
                         // This means the action's state is no longer the FSM's current state
                         // However, the state entered and hasn't exited yet
                         // We do OnExit()
-                        this.execution.OnExit(entity, fsmAction, ref customAction);
+                        this.execution.OnExit(actionEntity, fsmAction, ref customAction);
                         fsmAction.exited = true;
                     }
                     

@@ -9,6 +9,10 @@ namespace CommonEcs.DotsFsm {
         public float3 start;
         public float3 destination;
         
+        // We denormalized here instead of updating the targetEntity's translation 
+        // component right away. This is so that we can run the action in parallel.
+        public float3 currentPosition;
+        
         public readonly Entity targetEntity; // The entity to move
 
         public float duration;

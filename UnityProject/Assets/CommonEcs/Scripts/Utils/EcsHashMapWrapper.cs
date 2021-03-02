@@ -58,7 +58,7 @@ namespace CommonEcs {
 
         public void AddOrSet(K key, V newValue) {
             int hashCode = key.GetHashCode();
-            DynamicBuffer<EcsHashMapEntry<K, V>> valueList = ResolveEntryList(hashCode);
+            DynamicBuffer<EcsHashMapEntry<K, V>> valueList = ResolveBucket(hashCode);
 
             // Search for similar key. Throw exception if we find an entry with similar key.
             for (int i = 0; i < valueList.Length; ++i) {
@@ -80,7 +80,7 @@ namespace CommonEcs {
 
         public void Remove(K key) {
             int hashCode = key.GetHashCode();
-            DynamicBuffer<EcsHashMapEntry<K, V>> valueList = ResolveEntryList(hashCode);
+            DynamicBuffer<EcsHashMapEntry<K, V>> valueList = ResolveBucket(hashCode);
 
             // Search for the key in the value list and remove that
             for (int i = 0; i < valueList.Length; ++i) {
@@ -100,7 +100,7 @@ namespace CommonEcs {
 
         public ValueTypeOption<V> Find(K key) {
             int hashCode = key.GetHashCode();
-            DynamicBuffer<EcsHashMapEntry<K, V>> valueList = ResolveEntryList(hashCode);
+            DynamicBuffer<EcsHashMapEntry<K, V>> valueList = ResolveBucket(hashCode);
 
             // Search for the value with the same key
             for (int i = 0; i < valueList.Length; ++i) {
@@ -115,7 +115,7 @@ namespace CommonEcs {
             return ValueTypeOption<V>.None;
         }
 
-        private DynamicBuffer<EcsHashMapEntry<K, V>> ResolveEntryList(int hashCode) {
+        private DynamicBuffer<EcsHashMapEntry<K, V>> ResolveBucket(int hashCode) {
             int bucketIndex = FibonacciHash(hashCode);
             return this.entityManager.Match<ResolveEntryListMatcher, DynamicBuffer<EcsHashMapEntry<K, V>>>(
                 new ResolveEntryListMatcher(this.hashMapEntity, bucketIndex, this.allBuckets, this.allEntryLists));

@@ -60,7 +60,7 @@ namespace CommonEcs {
             int hashCode = key.GetHashCode();
             DynamicBuffer<EcsHashMapEntry<K, V>> valueList = ResolveBucket(hashCode);
 
-            // Search for similar key. Throw exception if we find an entry with similar key.
+            // Search for similar key. Replace the value if we find an entry with similar key.
             for (int i = 0; i < valueList.Length; ++i) {
                 EcsHashMapEntry<K, V> entry = valueList[i];
                 if (entry.hashCode == hashCode) {

@@ -26,7 +26,7 @@ namespace CommonEcs.Goap {
             ++this.count;
         }
 
-        public ValueTypeOption<bool> Get(int hashcode) {
+        public ValueTypeOption<bool> GetValue(int hashcode) {
             for (int i = 0; i < this.count; ++i) {
                 if (this.hashes[i] == hashcode) {
                     // Hashcode found
@@ -38,7 +38,27 @@ namespace CommonEcs.Goap {
             return ValueTypeOption<bool>.None;
         }
 
-        public void Remove(int hashcode) {
+        public bool Contains(int hashcode) {
+            for (int i = 0; i < this.count; ++i) {
+                if (this.hashes[i] == hashcode) {
+                    // Hashcode found
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void SetValueAtIndex(int index, bool value) {
+            this.values[index] = value;
+        }
+
+        /// <summary>
+        /// Returns whether or not an item was removed or not
+        /// </summary>
+        /// <param name="hashcode"></param>
+        /// <returns></returns>
+        public bool Remove(int hashcode) {
             for (int i = 0; i < this.count; ++i) {
                 if (this.hashes[i] == hashcode) {
                     // Item found
@@ -46,9 +66,11 @@ namespace CommonEcs.Goap {
                     ShiftItemsFrom(i);
                     --this.count;
 
-                    break;
+                    return true;
                 }
             }
+
+            return false;
         }
 
         private void ShiftItemsFrom(int index) {
@@ -62,6 +84,21 @@ namespace CommonEcs.Goap {
             get {
                 return this.count;
             }
+        }
+
+        public int GetHashCodeAtIndex(int index) {
+            if (index < 0 || index >= MAX) {
+                // We can't use string interpolation here as this will be invoked in Burst
+                throw new Exception(string.Format("Invalid index: {0}", index));
+            }
+            
+            return this.hashes[index];
+        }
+
+        public void Clear() {
+            // We no longer need to clear the values here since the slot will be replaced
+            // upon adding a new entry
+            this.count = 0;
         }
     }
 }

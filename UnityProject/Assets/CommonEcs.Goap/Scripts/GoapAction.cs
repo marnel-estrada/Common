@@ -24,11 +24,11 @@ namespace CommonEcs.Goap {
             this.preconditions.Add(condition);
         }
 
-        public void AddPrecondition(FixedString64 conditionId, bool value) {
+        public void AddPrecondition(ConditionId conditionId, bool value) {
             AddPrecondition(new Condition(conditionId, value));
         }
 
-        public bool ContainsPrecondition(FixedString64 conditionId) {
+        public bool ContainsPrecondition(ConditionId conditionId) {
             for (int i = 0; i < this.preconditions.Count; ++i) {
                 if (this.preconditions[i].id == conditionId) {
                     return true;

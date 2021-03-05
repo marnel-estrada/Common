@@ -7,8 +7,20 @@ namespace CommonEcs.Goap {
     /// A custom component may be added to such entity so that the system that will resolve
     /// the condition can filter which entities.
     /// </summary>
-    public readonly struct ConditionResolver : IComponentData {
+    public struct ConditionResolver : IComponentData {
         public readonly FixedString64 conditionId;
         public readonly Entity agentEntity;
+        
+        // We denormalize here for faster access
+        public readonly Entity plannerEntity;
+
+        public bool resolved;
+        public bool result;
+
+        public ConditionResolver(FixedString64 conditionId, Entity agentEntity, Entity plannerEntity) : this() {
+            this.conditionId = conditionId;
+            this.agentEntity = agentEntity;
+            this.plannerEntity = plannerEntity;
+        }
     }
 }

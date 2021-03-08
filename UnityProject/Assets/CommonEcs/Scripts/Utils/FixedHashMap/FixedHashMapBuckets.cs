@@ -14,13 +14,13 @@ using Unity.Collections;
 
 namespace CommonEcs {
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct FixedHashMapBuckets<K, V> where K : unmanaged, IEquatable<K> where V : unmanaged {
+    public unsafe struct FixedHashMapBuckets<V> where V : unmanaged {
         public ref struct Enumerator {
-            private readonly FixedList512<FixedHashMapEntry<K, V>>* m_Elements;
+            private readonly FixedList512<FixedHashMapEntry<V>>* m_Elements;
 
             private int m_Index;
 
-            public Enumerator(FixedList512<FixedHashMapEntry<K, V>>* elements) {
+            public Enumerator(FixedList512<FixedHashMapEntry<V>>* elements) {
                 this.m_Elements = elements;
                 this.m_Index = -1;
             }
@@ -31,7 +31,7 @@ namespace CommonEcs {
                 return this.m_Index < 16;
             }
 
-            public ref FixedList512<FixedHashMapEntry<K, V>> Current {
+            public ref FixedList512<FixedHashMapEntry<V>> Current {
                 get {
                     RequireIndexInBounds();
 
@@ -47,39 +47,39 @@ namespace CommonEcs {
             }
         }
 
-        private readonly FixedList512<FixedHashMapEntry<K, V>> m_Element0;
+        private readonly FixedList512<FixedHashMapEntry<V>> m_Element0;
 
-        private readonly FixedList512<FixedHashMapEntry<K, V>> m_Element1;
+        private readonly FixedList512<FixedHashMapEntry<V>> m_Element1;
 
-        private readonly FixedList512<FixedHashMapEntry<K, V>> m_Element2;
+        private readonly FixedList512<FixedHashMapEntry<V>> m_Element2;
 
-        private readonly FixedList512<FixedHashMapEntry<K, V>> m_Element3;
+        private readonly FixedList512<FixedHashMapEntry<V>> m_Element3;
 
-        private readonly FixedList512<FixedHashMapEntry<K, V>> m_Element4;
+        private readonly FixedList512<FixedHashMapEntry<V>> m_Element4;
 
-        private readonly FixedList512<FixedHashMapEntry<K, V>> m_Element5;
+        private readonly FixedList512<FixedHashMapEntry<V>> m_Element5;
 
-        private readonly FixedList512<FixedHashMapEntry<K, V>> m_Element6;
+        private readonly FixedList512<FixedHashMapEntry<V>> m_Element6;
 
-        private readonly FixedList512<FixedHashMapEntry<K, V>> m_Element7;
+        private readonly FixedList512<FixedHashMapEntry<V>> m_Element7;
 
-        private readonly FixedList512<FixedHashMapEntry<K, V>> m_Element8;
+        private readonly FixedList512<FixedHashMapEntry<V>> m_Element8;
 
-        private readonly FixedList512<FixedHashMapEntry<K, V>> m_Element9;
+        private readonly FixedList512<FixedHashMapEntry<V>> m_Element9;
 
-        private readonly FixedList512<FixedHashMapEntry<K, V>> m_Element10;
+        private readonly FixedList512<FixedHashMapEntry<V>> m_Element10;
 
-        private readonly FixedList512<FixedHashMapEntry<K, V>> m_Element11;
+        private readonly FixedList512<FixedHashMapEntry<V>> m_Element11;
 
-        private readonly FixedList512<FixedHashMapEntry<K, V>> m_Element12;
+        private readonly FixedList512<FixedHashMapEntry<V>> m_Element12;
 
-        private readonly FixedList512<FixedHashMapEntry<K, V>> m_Element13;
+        private readonly FixedList512<FixedHashMapEntry<V>> m_Element13;
 
-        private readonly FixedList512<FixedHashMapEntry<K, V>> m_Element14;
+        private readonly FixedList512<FixedHashMapEntry<V>> m_Element14;
 
-        private readonly FixedList512<FixedHashMapEntry<K, V>> m_Element15;
+        private readonly FixedList512<FixedHashMapEntry<V>> m_Element15;
 
-        public ref FixedList512<FixedHashMapEntry<K, V>> this[int index] {
+        public ref FixedList512<FixedHashMapEntry<V>> this[int index] {
             get {
                 RequireIndexInBounds(index);
 
@@ -87,14 +87,14 @@ namespace CommonEcs {
             }
         }
 
-        private ref FixedList512<FixedHashMapEntry<K, V>> GetElement(int index) {
-            fixed (FixedList512<FixedHashMapEntry<K, V>>* elements = &this.m_Element0) {
+        private ref FixedList512<FixedHashMapEntry<V>> GetElement(int index) {
+            fixed (FixedList512<FixedHashMapEntry<V>>* elements = &this.m_Element0) {
                 return ref elements[index];
             }
         }
 
-        private void SetElement(int index, FixedList512<FixedHashMapEntry<K, V>> value) {
-            fixed (FixedList512<FixedHashMapEntry<K, V>>* elements = &this.m_Element0) {
+        private void SetElement(int index, FixedList512<FixedHashMapEntry<V>> value) {
+            fixed (FixedList512<FixedHashMapEntry<V>>* elements = &this.m_Element0) {
                 elements[index] = value;
             }
         }
@@ -103,7 +103,7 @@ namespace CommonEcs {
 
         public Enumerator GetEnumerator() {
             // Safe because Enumerator is a 'ref struct'
-            fixed (FixedList512<FixedHashMapEntry<K, V>>* elements = &this.m_Element0) {
+            fixed (FixedList512<FixedHashMapEntry<V>>* elements = &this.m_Element0) {
                 return new Enumerator(elements);
             }
         }

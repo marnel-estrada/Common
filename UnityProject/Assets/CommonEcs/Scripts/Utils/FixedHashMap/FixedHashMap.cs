@@ -50,7 +50,7 @@ namespace CommonEcs {
             }
         }
         
-        public ValueTypeOption<V> Find(in K key) {
+        public readonly ValueTypeOption<V> Find(in K key) {
             int hashCode = key.GetHashCode();
             int bucketIndex = FibonacciHash(hashCode);
             ref FixedList512<FixedHashMapEntry<K, V>> bucket = ref this.buckets[bucketIndex];

@@ -1,5 +1,7 @@
 using System;
 
+using Unity.Collections;
+
 namespace CommonEcs.Goap {
     /// <summary>
     /// This is a wrapper to a ConditionId such that we don't have to use FixedString64 in
@@ -7,6 +9,12 @@ namespace CommonEcs.Goap {
     /// </summary>
     public readonly struct ConditionId : IEquatable<ConditionId> {
         public readonly int hashCode;
+
+        public ConditionId(FixedString32 stringId) : this(stringId.GetHashCode()) {
+        }
+        
+        public ConditionId(FixedString64 stringId) : this(stringId.GetHashCode()) {
+        }
 
         public ConditionId(int hashCode) {
             this.hashCode = hashCode;

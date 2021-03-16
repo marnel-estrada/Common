@@ -1,4 +1,3 @@
-using Unity.Collections;
 using Unity.Entities;
 
 namespace CommonEcs.Goap {
@@ -8,7 +7,7 @@ namespace CommonEcs.Goap {
     /// the condition can filter which entities.
     /// </summary>
     public struct ConditionResolver : IComponentData {
-        public readonly FixedString64 conditionId;
+        public readonly ConditionId conditionId;
         public readonly Entity agentEntity;
         
         // We denormalize here for faster access
@@ -17,7 +16,7 @@ namespace CommonEcs.Goap {
         public bool resolved;
         public bool result;
 
-        public ConditionResolver(FixedString64 conditionId, Entity agentEntity, Entity plannerEntity) : this() {
+        public ConditionResolver(ConditionId conditionId, Entity agentEntity, Entity plannerEntity) : this() {
             this.conditionId = conditionId;
             this.agentEntity = agentEntity;
             this.plannerEntity = plannerEntity;

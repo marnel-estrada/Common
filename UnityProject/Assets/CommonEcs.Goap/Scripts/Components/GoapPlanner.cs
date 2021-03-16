@@ -24,5 +24,13 @@ namespace CommonEcs.Goap {
             this.conditionsMap.Clear();
             this.state = PlannerState.RESOLVING_CONDITIONS;
         }
+
+        public bool IsPlanning {
+            get {
+                // Planner is planning if the state is RESOLVING_CONDITIONS
+                // or RESOLVING_ACTIONS
+                return this.state != PlannerState.DONE;
+            }
+        }
     }
 }

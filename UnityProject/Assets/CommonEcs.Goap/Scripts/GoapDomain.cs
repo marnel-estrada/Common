@@ -32,12 +32,17 @@ namespace CommonEcs.Goap {
             return newList;
         }
 
-        public GoapPlanningAction GetAction(int index) {
+        public readonly GoapPlanningAction GetAction(int index) {
             return this.actions[index];
         }
 
-        public ValueTypeOption<FixedList32<int>> GetActionIndices(Condition condition) {
-            return this.actionMap.Find(condition);
+        /// <summary>
+        /// Returns all actions whose effect is the specified effect
+        /// </summary>
+        /// <param name="effect"></param>
+        /// <returns></returns>
+        public readonly ValueTypeOption<FixedList32<int>> GetActionIndices(in Condition effect) {
+            return this.actionMap.Find(effect);
         }
     }
 }

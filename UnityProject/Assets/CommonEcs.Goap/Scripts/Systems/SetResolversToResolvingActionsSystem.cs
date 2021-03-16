@@ -9,7 +9,7 @@ namespace CommonEcs.Goap {
     public class SetResolversToResolvingActionsSystem : SystemBase {
         protected override void OnUpdate() {
             this.Entities.ForEach(delegate(ref GoapPlanner planner) {
-                if (planner.state != PlannerState.RESOLVING_CONDITIONS) {
+                if (planner.state == PlannerState.RESOLVING_CONDITIONS) {
                     planner.state = PlannerState.RESOLVING_ACTIONS;
                 }
             }).ScheduleParallel();

@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -14,12 +15,14 @@ namespace CommonEcs.Goap {
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             IdentifyJob job = new IdentifyJob() {
                 resolverHandle = GetComponentTypeHandle<ConditionResolver>(),
-                allPlanners = GetComponentDataFromEntity<GoapPlanner>()
+                allPlanners = GetComponentDataFromEntity<GoapPlanner>(),
+                allRequiredConditions = GetBufferFromEntity<RequiredCondition>()
             };
             
             return job.ScheduleParallel(this.query, 1, inputDeps);
         }
         
+        [BurstCompile]
         private struct IdentifyJob : IJobEntityBatch {
             public ComponentTypeHandle<ConditionResolver> resolverHandle;
 
@@ -36,10 +39,10 @@ namespace CommonEcs.Goap {
                     GoapPlanner planner = this.allPlanners[resolver.plannerEntity];
                     DynamicBuffer<RequiredCondition> requiredConditions = this.allRequiredConditions[resolver.plannerEntity];
                     
-                    // When the planner state is RESOLVING_ACTIONS, 'resolved' will be set to false
-                    // thereby causing the condition resolver systems to resolve the value
-                    resolver.resolved = planner.state != PlannerState.RESOLVING_ACTIONS 
-                        && ContainsConditionId(requiredConditions, resolver.conditionId);
+                    // We set resolved to false so that the resolver systems
+                    // will try to resolve the values
+                    resolver.resolved = !(planner.state == PlannerState.RESOLVING_CONDITIONS 
+                        && ContainsConditionId(requiredConditions, resolver.conditionId));
                     
                     // Modify
                     resolvers[i] = resolver;

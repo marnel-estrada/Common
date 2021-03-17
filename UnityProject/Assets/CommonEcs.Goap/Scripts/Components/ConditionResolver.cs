@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Entities;
 
 namespace CommonEcs.Goap {
@@ -20,6 +21,14 @@ namespace CommonEcs.Goap {
             this.conditionId = conditionId;
             this.agentEntity = agentEntity;
             this.plannerEntity = plannerEntity;
+        }
+        
+        public ConditionResolver(FixedString32 stringId, Entity agentEntity, Entity plannerEntity) 
+            : this(new ConditionId(stringId), agentEntity, plannerEntity) {
+        }
+        
+        public ConditionResolver(FixedString64 stringId, Entity agentEntity, Entity plannerEntity) 
+            : this(new ConditionId(stringId), agentEntity, plannerEntity) {
         }
     }
 }

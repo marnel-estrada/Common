@@ -5,21 +5,28 @@ namespace CommonEcs.Goap {
         // Note here that the first goal is the main goal. Then if it can't resolve
         // actions, it will try to resolve the next goals.
         public ConditionList5 goals;
-        
+
+        public readonly BlobAssetReference<GoapDomainDatabase> domainDbReference;
+
         // We use a separate entity here because we don't want the agent entity to get
         // bigger and thus will have less entities per archetype.
         // Note that the planner entity contains a BoolHashMap which is a big object.
         public readonly Entity plannerEntity;
-        
+
         public readonly int domainId; // Maps to a GoapDomain
 
-        public readonly BlobAssetReference<GoapDomainDatabase> domainDbReference;
+        public AgentState state;
+        
+        public int goalIndex;
 
         public GoapAgent(in BlobAssetReference<GoapDomainDatabase> domainDbReference, in int domainId, in Entity plannerEntity) {
             this.domainDbReference = domainDbReference;
             this.domainId = domainId;
             this.plannerEntity = plannerEntity;
             this.goals = new ConditionList5();
+            
+            this.state = AgentState.IDLE;
+            this.goalIndex = 0;
         }
 
         public void ClearGoals() {
@@ -41,9 +48,15 @@ namespace CommonEcs.Goap {
             this.goals.Add(goalCondition);
         }
 
-        public GoapDomain Domain {
+        public readonly GoapDomain Domain {
             get {
                 return this.domainDbReference.Value.domains[this.domainId];
+            }
+        }
+
+        public readonly Condition CurrentGoal {
+            get {
+                return this.goals[this.goalIndex];
             }
         }
     }

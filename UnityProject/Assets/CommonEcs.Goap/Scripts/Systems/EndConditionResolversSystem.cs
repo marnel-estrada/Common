@@ -7,7 +7,7 @@ namespace CommonEcs.Goap {
     /// This runs in a single thread. There's no way around it.
     /// </summary>
     [UpdateAfter(typeof(IdentifyConditionsToResolveSystem))]
-    public class EndResolversSystem : SystemBase {
+    public class EndConditionResolversSystem : SystemBase {
         protected override void OnUpdate() {
             ComponentDataFromEntity<GoapPlanner> allPlanners = GetComponentDataFromEntity<GoapPlanner>();
             this.Entities.ForEach(delegate(in ConditionResolver resolver) {
@@ -21,6 +21,13 @@ namespace CommonEcs.Goap {
                 // Modify
                 allPlanners[resolver.plannerEntity] = planner;
             }).Schedule();
+            
+            // Set planner state to RESOLVING_ACTIONS
+            this.Entities.ForEach(delegate(ref GoapPlanner planner) {
+                if (planner.state == PlanningState.RESOLVING_CONDITIONS) {
+                    planner.state = PlanningState.RESOLVING_ACTIONS;
+                }
+            }).ScheduleParallel();
         }
     }
 }

@@ -8,6 +8,7 @@ namespace CommonEcs.Goap {
     /// Populates the dynamic buffer of RequiredCondition elements based on the current goal
     /// of the planner
     /// </summary>
+    [UpdateAfter(typeof(StartPlanningSystem))]
     public class PopulateRequiredConditionsSystem : JobSystemBase {
         private EntityQuery query;
 
@@ -44,7 +45,7 @@ namespace CommonEcs.Goap {
 
                 for (int i = 0; i < batchInChunk.Count; ++i) {
                     GoapPlanner planner = planners[i];
-                    if (planner.state != PlannerState.RESOLVING_CONDITIONS) {
+                    if (planner.state != PlanningState.RESOLVING_CONDITIONS) {
                         // No need to continue if planner is no longer resolving conditions
                         continue;
                     }
@@ -64,10 +65,10 @@ namespace CommonEcs.Goap {
                 GoapDomain domain = agent.Domain;
                 
                 // Add the goal first since it may have a resolver
-                requiredConditions.Add(new RequiredCondition(planner.goal.id));
+                requiredConditions.Add(new RequiredCondition(planner.currentGoal.id));
                 
                 // Recurse to all preconditions of the goal until there are no actions left
-                AddPreconditions(ref requiredConditions, ref addedActions, domain, planner.goal);
+                AddPreconditions(ref requiredConditions, ref addedActions, domain, planner.currentGoal);
             }
 
             private void AddPreconditions(ref DynamicBuffer<RequiredCondition> requiredConditions, ref NativeHashSet<int> addedActions, 

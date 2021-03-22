@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace CommonEcs {
     public static class MultithreadedSort {
-        public static JobHandle Sort<T>(NativeArray<T> array, JobHandle parentHandle)
+        public static JobHandle Sort<T>(NativeArray<T> array, JobHandle parentHandle = new JobHandle())
             where T : unmanaged, IComparable<T> {
             if (array.Length == 0) {
                 // Nothing to sort
@@ -27,17 +27,17 @@ namespace CommonEcs {
                 // Use quicksort when sub-array length is less than or equal to the threshold
                 return new QuicksortJob<T>() {
                     array = array,
-                    left = range.left,
-                    right = range.right
+                    left = range.min,
+                    right = range.max
                 }.Schedule(parentHandle);
             }
 
             int middle = range.Middle;
 
-            SortRange left = new SortRange(range.left, middle);
+            SortRange left = new SortRange(range.min, middle);
             JobHandle leftHandle = MergeSort(array, parentHandle, left, threshold);
 
-            SortRange right = new SortRange(middle + 1, range.right);
+            SortRange right = new SortRange(middle + 1, range.max);
             JobHandle rightHandle = MergeSort(array, parentHandle, right, threshold);
             
             JobHandle combined = JobHandle.CombineDependencies(leftHandle, rightHandle);
@@ -50,29 +50,23 @@ namespace CommonEcs {
         }
 
         public readonly struct SortRange {
-            public readonly int left;
-            public readonly int right;
+            public readonly int min;
+            public readonly int max;
 
-            public SortRange(int left, int right) {
-                this.left = left;
-                this.right = right;
+            public SortRange(int min, int max) {
+                this.min = min;
+                this.max = max;
             }
 
             public int Length {
                 get {
-                    return this.right - this.left + 1;
+                    return this.max - this.min + 1;
                 }
             }
 
             public int Middle {
                 get {
-                    return (this.left + this.right) >> 1; // divide 2
-                }
-            }
-
-            public int Max {
-                get {
-                    return this.right;
+                    return (this.min + this.max) >> 1; // divide 2
                 }
             }
         }
@@ -86,22 +80,22 @@ namespace CommonEcs {
             public SortRange second;
             
             public void Execute() {
-                int firstIndex = this.first.left;
-                int secondIndex = this.second.left;
-                int resultIndex = this.first.left;
+                int firstIndex = this.first.min;
+                int secondIndex = this.second.min;
+                int resultIndex = this.first.min;
 
                 // Copy first
-                NativeArray<T> copy = new NativeArray<T>(this.second.right - this.first.left + 1, Allocator.Temp);
-                for (int i = this.first.left; i <= this.second.right; ++i) {
-                    int copyIndex = i - this.first.left; 
+                NativeArray<T> copy = new NativeArray<T>(this.second.max - this.first.min + 1, Allocator.Temp);
+                for (int i = this.first.min; i <= this.second.max; ++i) {
+                    int copyIndex = i - this.first.min; 
                     copy[copyIndex] = this.array[i];
                 }
 
-                while (firstIndex <= this.first.Max || secondIndex <= this.second.Max) {
-                    if (firstIndex <= this.first.Max && secondIndex <= this.second.Max) {
+                while (firstIndex <= this.first.max || secondIndex <= this.second.max) {
+                    if (firstIndex <= this.first.max && secondIndex <= this.second.max) {
                         // both subranges still have elements
-                        T firstValue = copy[firstIndex - this.first.left];
-                        T secondValue = copy[secondIndex - this.first.left];
+                        T firstValue = copy[firstIndex - this.first.min];
+                        T secondValue = copy[secondIndex - this.first.min];
 
                         if (firstValue.CompareTo(secondValue) < 0) {
                             // first value is lesser
@@ -113,15 +107,15 @@ namespace CommonEcs {
                             ++secondIndex;
                             ++resultIndex;
                         }
-                    } else if (firstIndex <= this.first.Max) {
+                    } else if (firstIndex <= this.first.max) {
                         // Only the first range has remaining elements
-                        T firstValue = copy[firstIndex - this.first.left];
+                        T firstValue = copy[firstIndex - this.first.min];
                         this.array[resultIndex] = firstValue;
                         ++firstIndex;
                         ++resultIndex;
-                    } else if (secondIndex <= this.second.Max) {
+                    } else if (secondIndex <= this.second.max) {
                         // Only the second range has remaining elements
-                        T secondValue = copy[secondIndex - this.first.left];
+                        T secondValue = copy[secondIndex - this.first.min];
                         this.array[resultIndex] = secondValue;
                         ++secondIndex;
                         ++resultIndex;

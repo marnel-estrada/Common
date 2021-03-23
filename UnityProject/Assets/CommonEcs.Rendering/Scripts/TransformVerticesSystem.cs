@@ -37,32 +37,22 @@ namespace CommonEcs {
             this.spriteType = GetComponentTypeHandle<Sprite>();
             this.matrixType = GetComponentTypeHandle<LocalToWorld>(true);
 
-            NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
-
             Job job = new Job() {
-                spriteType = this.spriteType, matrixType = this.matrixType, chunks = chunks
+                spriteType = this.spriteType, 
+                matrixType = this.matrixType
             };
 
-            return job.Schedule(chunks.Length, 64, inputDeps);
+            return job.Schedule(this.query, inputDeps);
         }
 
         [BurstCompile]
-        private struct Job : IJobParallelFor {
+        private struct Job : IJobChunk {
             public ComponentTypeHandle<Sprite> spriteType;
 
             [ReadOnly]
             public ComponentTypeHandle<LocalToWorld> matrixType;
 
-            [ReadOnly]
-            [DeallocateOnJobCompletion]
-            public NativeArray<ArchetypeChunk> chunks;
-
-            public void Execute(int index) {
-                ArchetypeChunk chunk = this.chunks[index];
-                Process(ref chunk);
-            }
-
-            private void Process(ref ArchetypeChunk chunk) {
+            public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {
                 NativeArray<Sprite> sprites = chunk.GetNativeArray(this.spriteType);
                 NativeArray<LocalToWorld> matrices = chunk.GetNativeArray(this.matrixType);
 

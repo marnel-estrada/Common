@@ -130,22 +130,15 @@ namespace CommonEcs {
                 for (int i = 0; i < chunk.Count; ++i) {
                     Sprite sprite = sprites[i];
                     int changedIndex = this.managerToIndexMap[sprite.spriteManagerEntity];
-                    
-                    if (sprite.verticesChanged.Value) {
-                        this.verticesChangedMap[changedIndex] = true;
-                    }
+
+                    this.verticesChangedMap[changedIndex] =
+                        this.verticesChangedMap[changedIndex] || sprite.verticesChanged.Value; 
     
-                    if (sprite.renderOrderChanged.Value) {
-                        this.trianglesChangedMap[changedIndex] = true;
-                    }
+                    this.trianglesChangedMap[changedIndex] = this.trianglesChangedMap[changedIndex] || sprite.renderOrderChanged.Value;
     
-                    if (sprite.uvChanged.Value) {
-                        this.uvChangedMap[changedIndex] = true;
-                    }
+                    this.uvChangedMap[changedIndex] = this.uvChangedMap[changedIndex] || sprite.uvChanged.Value;
     
-                    if (sprite.colorChanged.Value) {
-                        this.colorChangedMap[changedIndex] = true;
-                    }
+                    this.colorChangedMap[changedIndex] = this.colorChangedMap[changedIndex] || sprite.colorChanged.Value;
                 }
             }
         }

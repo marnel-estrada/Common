@@ -59,7 +59,8 @@ namespace CommonEcs {
                 verticesChangedMap = verticesChangedMap,
                 trianglesChangedMap = trianglesChangedMap,
                 uvChangedMap = uvChangedMap,
-                colorChangedMap = colorChangedMap
+                colorChangedMap = colorChangedMap,
+                lastSystemVersion = this.LastSystemVersion
             };
 
             job.Schedule(this.query, inputDeps).Complete();
@@ -115,7 +116,15 @@ namespace CommonEcs {
             [NativeDisableParallelForRestriction]
             public NativeArray<bool> colorChangedMap;
 
+            public uint lastSystemVersion;
+
             public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {
+                if (!chunk.DidChange(this.spriteType, this.lastSystemVersion)) {
+                    // This means that the sprites in the chunk have not been queried with write access
+                    // There must be no changes at the least
+                    return;
+                }
+                
                 NativeArray<Sprite> sprites = chunk.GetNativeArray(this.spriteType);
 
                 for (int i = 0; i < chunk.Count; ++i) {

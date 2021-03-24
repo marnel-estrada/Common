@@ -108,7 +108,10 @@ namespace CommonEcs.Goap {
                 // At this point, it means that there are actions to satisfy all preconditions
                 // We propagate to callee
                 conditionsMap = conditionsMapCopy;
+                
+                // Add actions to satisfy the preconditions
                 actionList.AddRange(tempActionList);
+                actionList.Add(action.id); // Add the action being search itself
                 
                 return true;
             }

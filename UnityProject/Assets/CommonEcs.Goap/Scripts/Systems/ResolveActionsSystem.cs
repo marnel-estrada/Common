@@ -46,7 +46,8 @@ namespace CommonEcs.Goap {
                     GoapDomain domain = agent.Domain;
                     BoolHashMap conditionsMap = planner.conditionsMap;
                     NativeList<int> actionList = new NativeList<int>(Allocator.Temp);
-                    bool result = SearchActions(planner.currentGoal, domain, ref conditionsMap, ref actionList);
+                    NativeHashSet<int> actionsBeingEvaluated = new NativeHashSet<int>(4, Allocator.Temp);
+                    bool result = SearchActions(planner.currentGoal, domain, ref conditionsMap, ref actionList, ref actionsBeingEvaluated);
                     planner.state = result ? PlanningState.SUCCESS : PlanningState.FAILED;
 
                     // Add the actions to action buffer if search was a success
@@ -60,7 +61,7 @@ namespace CommonEcs.Goap {
             }
 
             private bool SearchActions(in Condition goal, in GoapDomain domain, ref BoolHashMap conditionsMap, 
-                ref NativeList<int> actionList) {
+                ref NativeList<int> actionList, ref NativeHashSet<int> actionsBeingEvaluated) {
                 // Check if goal was already specified in the current conditionsMap
                 ValueTypeOption<bool> foundGoalValue = conditionsMap.Find(goal.id.hashCode);
                 if (foundGoalValue.IsSome && foundGoalValue.ValueOr(default) == goal.value) {
@@ -77,29 +78,44 @@ namespace CommonEcs.Goap {
                 FixedList32<int> actionIndices = foundActionIndices.ValueOr(default);
                 for (int i = 0; i < actionIndices.Length; ++i) {
                     GoapPlanningAction action = domain.GetAction(actionIndices[i]);
+                    if (actionsBeingEvaluated.Contains(action.id)) {
+                        // This means that the same action is being evaluated while the previous was not yet 
+                        // resolved. We skip it as this will cause infinite loop.
+                        continue;
+                    }
+
+                    actionsBeingEvaluated.TryAdd(action.id);
+                    
                     BoolHashMap conditionsMapCopy = conditionsMap;
                     NativeList<int> tempActionList = new NativeList<int>(Allocator.Temp);
-                    if (SearchActionsToSatisfyPreconditions(action, domain, ref conditionsMapCopy, ref tempActionList)) {
-                        // This means that we found actions to satisfy the goal
-                        // We apply the newly found goals to the original so they will be considered in future
-                        // searches
-                        conditionsMap = conditionsMapCopy;
-                        actionList.AddRange(tempActionList);
-                        return true;
+                    bool searchSuccess = SearchActionsToSatisfyPreconditions(action, domain, ref conditionsMapCopy, ref tempActionList, ref actionsBeingEvaluated);
+                    
+                    // We remove here because the action was already searched
+                    actionsBeingEvaluated.Remove(action.id);
+                    
+                    if (!searchSuccess) {
+                        continue;
                     }
+
+                    // This means that we found actions to satisfy the goal
+                    // We apply the newly found goals to the original so they will be considered in future
+                    // searches
+                    conditionsMap = conditionsMapCopy;
+                    actionList.AddRange(tempActionList);
+                    return true;
                 }
 
                 return false;
             }
 
             private bool SearchActionsToSatisfyPreconditions(in GoapPlanningAction action, in GoapDomain domain,
-                ref BoolHashMap conditionsMap, ref NativeList<int> actionList) {
+                ref BoolHashMap conditionsMap, ref NativeList<int> actionList, ref NativeHashSet<int> actionsBeingEvaluated) {
                 BoolHashMap conditionsMapCopy = conditionsMap;
                 NativeList<int> tempActionList = new NativeList<int>(Allocator.Temp);
                 
                 for (int i = 0; i < action.preconditions.Count; ++i) {
                     Condition precondition = action.preconditions[i];
-                    if (!SearchActions(precondition, domain, ref conditionsMapCopy, ref tempActionList)) {
+                    if (!SearchActions(precondition, domain, ref conditionsMapCopy, ref tempActionList, ref actionsBeingEvaluated)) {
                         // This means that one of the preconditions can't be met by actions
                         return false;
                     }
@@ -111,7 +127,7 @@ namespace CommonEcs.Goap {
                 
                 // Add actions to satisfy the preconditions
                 actionList.AddRange(tempActionList);
-                actionList.Add(action.id); // Add the action being search itself
+                actionList.Add(action.id); // Add the action being searched itself
                 
                 return true;
             }

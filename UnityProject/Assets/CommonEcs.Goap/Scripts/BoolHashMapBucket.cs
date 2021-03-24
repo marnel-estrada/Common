@@ -12,10 +12,6 @@ namespace CommonEcs.Goap {
         public const int MAX = 16;
 
         public void Add(int hashcode, bool value) {
-            if (hashcode < 0) {
-                throw new Exception("Hashcode can't be negative");
-            }
-
             if (this.count >= MAX) {
                 throw new Exception("Exceeded max items");
             }

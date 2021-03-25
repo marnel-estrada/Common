@@ -98,10 +98,17 @@ namespace CommonEcs.Goap {
                     }
 
                     // This means that we found actions to satisfy the goal
-                    // We apply the newly found goals to the original so they will be considered in future
-                    // searches
+                    // We add the effect
+                    Condition effect = action.effect;
+                    conditionsMapCopy.AddOrSet(effect.id.hashCode, effect.value);
+                    
+                    // We also copy the effects that the actions needed by the action to satisfy its 
+                    // preconditions
                     conditionsMap = conditionsMapCopy;
+                    
+                    // Add all the actions that were resolved so far
                     actionList.AddRange(tempActionList);
+                    
                     return true;
                 }
 
@@ -110,23 +117,15 @@ namespace CommonEcs.Goap {
 
             private bool SearchActionsToSatisfyPreconditions(in GoapPlanningAction action, in GoapDomain domain,
                 ref BoolHashMap conditionsMap, ref NativeList<int> actionList, ref NativeHashSet<int> actionsBeingEvaluated) {
-                BoolHashMap conditionsMapCopy = conditionsMap;
-                NativeList<int> tempActionList = new NativeList<int>(Allocator.Temp);
-                
                 for (int i = 0; i < action.preconditions.Count; ++i) {
                     Condition precondition = action.preconditions[i];
-                    if (!SearchActions(precondition, domain, ref conditionsMapCopy, ref tempActionList, ref actionsBeingEvaluated)) {
+                    if (!SearchActions(precondition, domain, ref conditionsMap, ref actionList, ref actionsBeingEvaluated)) {
                         // This means that one of the preconditions can't be met by actions
                         return false;
                     }
                 }
                 
                 // At this point, it means that there are actions to satisfy all preconditions
-                // We propagate to callee
-                conditionsMap = conditionsMapCopy;
-                
-                // Add actions to satisfy the preconditions
-                actionList.AddRange(tempActionList);
                 actionList.Add(action.id); // Add the action being searched itself
                 
                 return true;

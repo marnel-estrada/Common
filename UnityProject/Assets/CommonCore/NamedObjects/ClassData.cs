@@ -48,7 +48,7 @@ namespace Common {
 
         public Type ClassType {
             get {
-                return classType;
+                return this.classType;
             }
 
             set {
@@ -58,7 +58,7 @@ namespace Common {
 
         public bool ShowHints {
             get {
-                return showHints;
+                return this.showHints;
             }
 
             set {

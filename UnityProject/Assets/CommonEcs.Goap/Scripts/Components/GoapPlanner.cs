@@ -10,6 +10,9 @@ namespace CommonEcs.Goap {
         public readonly Entity agentEntity;
 
         public PlanningState state;
+        
+        // Index of the current goal being planned
+        public int goalIndex;
 
         public GoapPlanner(Entity agentEntity) : this() {
             this.agentEntity = agentEntity;

@@ -51,8 +51,8 @@ namespace CommonEcs.Goap {
                         return;
                     }
                 
-                    DotsAssert.IsTrue(agent.goalIndex >= 0 && agent.goalIndex < agent.goals.Count);
-                    planner.StartPlanning(agent.CurrentGoal);
+                    DotsAssert.IsTrue(planner.goalIndex >= 0 && planner.goalIndex < agent.goals.Count);
+                    planner.StartPlanning(agent.GetGoal(planner.goalIndex));
                     
                     // Modify
                     planners[i] = planner;

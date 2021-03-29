@@ -16,8 +16,6 @@ namespace CommonEcs.Goap {
         public readonly int domainId; // Maps to a GoapDomain
 
         public AgentState state;
-        
-        public int goalIndex;
 
         public GoapAgent(in BlobAssetReference<GoapDomainDatabase> domainDbReference, in int domainId, in Entity plannerEntity) {
             this.domainDbReference = domainDbReference;
@@ -26,7 +24,6 @@ namespace CommonEcs.Goap {
             this.goals = new ConditionList5();
             
             this.state = AgentState.IDLE;
-            this.goalIndex = 0;
         }
 
         public void ClearGoals() {
@@ -54,10 +51,8 @@ namespace CommonEcs.Goap {
             }
         }
 
-        public readonly Condition CurrentGoal {
-            get {
-                return this.goals[this.goalIndex];
-            }
+        public readonly Condition GetGoal(int index) {
+            return this.goals[index];
         }
     }
 }

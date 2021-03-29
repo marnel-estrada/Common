@@ -16,7 +16,26 @@ namespace CommonEcs.Goap {
             FixedList32<int> indexList = ResolveFixedList(action.effect);
             indexList.Add(actionIndex);
             
-            // Update map
+            // We need to do insertion sort here because we need to sort the actions by cost
+            // Bubble down the added action until its cost is in the right place
+            for (int i = indexList.Length - 1; i > 0; --i) {
+                float currentCost = this.actions[indexList[i]].cost;
+                float previousCost = this.actions[indexList[i - 1]].cost;
+
+                if (Comparison.TolerantGreaterThanOrEquals(currentCost, previousCost)) {
+                    // This means that the action at i is already in its correct place
+                    break;
+                }
+                
+                // At this point, this means that the action at i has lesser cost than the action
+                // at i - 1
+                // We swap action indices
+                int temp = indexList[i];
+                indexList[i] = indexList[i - 1];
+                indexList[i - 1] = temp;
+            }
+            
+            // Update map (because we are using structs)
             this.actionMap.AddOrSet(action.effect, indexList);
         }
 

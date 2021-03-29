@@ -108,5 +108,11 @@ namespace CommonEcs {
             
             this.count = 0;
         }
+
+        public FixedHashMapBuckets<K, V>.Enumerator BucketsEnumerator {
+            get {
+                return this.buckets.GetEnumerator();
+            }
+        }
     }
 }

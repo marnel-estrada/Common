@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Text;
 
+using UnityEngine;
+
 namespace Common {
     /// <summary>
     /// Contains string extension methods
@@ -35,7 +37,16 @@ namespace Common {
         /// <param name="parameters"></param>
         /// <returns></returns>
         public static string FormatWith(this string source, params object[] parameters) {
-            return string.Format(source, parameters);
+            try {
+                return string.Format(source, parameters);
+            } catch(Exception e) {
+                Debug.LogError(source);
+                Debug.LogError(e.Message);
+
+                // We return source here even if it's wrong to prevent the error from propagating
+                // to callers
+                return source;
+            }
         }
 
         /// <summary>

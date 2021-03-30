@@ -11,7 +11,7 @@ namespace CommonEcs {
                 ComponentType.ReadOnly<SpriteManager>());
         }
 
-        protected override bool ShouldProcess(ref SpriteManager spriteManager) {
+        protected override bool ShouldProcess(in SpriteManager spriteManager) {
             // Process only managers where AlwaysUpdateMesh = true 
             return spriteManager.AlwaysUpdateMesh;
         }

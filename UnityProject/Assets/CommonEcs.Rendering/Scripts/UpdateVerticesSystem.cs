@@ -50,7 +50,7 @@ namespace CommonEcs {
                     continue;
                 }
 
-                if (!ShouldProcess(ref manager)) {
+                if (!ShouldProcess(manager)) {
                     continue;
                 }
 
@@ -75,6 +75,6 @@ namespace CommonEcs {
         /// </summary>
         /// <param name="spriteManager"></param>
         /// <returns></returns>
-        protected abstract bool ShouldProcess(ref SpriteManager spriteManager);
+        protected abstract bool ShouldProcess(in SpriteManager spriteManager);
     }
 }

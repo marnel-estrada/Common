@@ -15,7 +15,7 @@ namespace CommonEcs {
                 ComponentType.ReadOnly<SpriteManager>());
         }
 
-        protected override bool ShouldProcess(ref SpriteManager manager) {
+        protected override bool ShouldProcess(in SpriteManager manager) {
             // We skip SpriteManagers which are AlwaysUpdateMesh
             // Their vertices will be updated by another system
             return !manager.AlwaysUpdateMesh && (manager.VerticesChanged || manager.UvChanged || manager.ColorsChanged);

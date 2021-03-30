@@ -61,7 +61,8 @@ namespace CommonEcs {
                     vertices = manager.NativeVertices,
                     uv = manager.NativeUv,
                     uv2 = manager.NativeUv2,
-                    colors = manager.NativeColors
+                    colors = manager.NativeColors,
+                    lastSystemVersion = this.LastSystemVersion
                 };
 
                 lastHandle = job.Schedule(this.query, lastHandle);

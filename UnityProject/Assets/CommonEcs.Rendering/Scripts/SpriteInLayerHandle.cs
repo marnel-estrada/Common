@@ -7,17 +7,13 @@ using Unity.Transforms;
 
 namespace CommonEcs {
     public class SpriteInLayerHandle {
-        private readonly EntityManager entityManager;
         private Entity spriteLayerEntity; // The entity of the layer where the sprite would be added
 
         private Entity spriteEntity;
 
-        public SpriteInLayerHandle(EntityManager entityManager, Entity spriteLayerEntity) {
-            this.entityManager = entityManager;
-            Assertion.NotNull(this.entityManager);
-
+        public SpriteInLayerHandle(Entity spriteLayerEntity) {
             this.spriteLayerEntity = spriteLayerEntity;
-            Assertion.IsTrue(this.spriteLayerEntity != Entity.Null);
+            Assertion.Assert(this.spriteLayerEntity != Entity.Null);
         }
 
         public void Init(Entity spriteLayerEntity) {
@@ -36,10 +32,11 @@ namespace CommonEcs {
         /// <param name="sprite"></param>
         public void Create(ref Sprite sprite, in float3 translation, in quaternion rotation, bool isStatic, float sortOrderOffset = 0) {
             // Avoid creating a new sprite entity when another one exists
-            Assertion.IsTrue(!this.Exists);
-            Assertion.IsTrue(this.spriteLayerEntity != Entity.Null);
+            Assertion.Assert(!this.Exists);
+            Assertion.Assert(this.spriteLayerEntity != Entity.Null);
 
-            this.spriteEntity = this.entityManager.CreateEntity();
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            this.spriteEntity = entityManager.CreateEntity();
             
             EntityCommandBuffer buffer = new EntityCommandBuffer(Allocator.TempJob);
             
@@ -65,7 +62,7 @@ namespace CommonEcs {
                 buffer.AddComponent(this.spriteEntity, new Static());
             }
             
-            buffer.Playback(this.entityManager);
+            buffer.Playback(entityManager);
             buffer.Dispose();
         }
 
@@ -78,7 +75,8 @@ namespace CommonEcs {
             if (!this.Exists) {
                 return default;
             }
-            return this.entityManager.GetComponentData<Sprite>(this.spriteEntity);
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            return entityManager.GetComponentData<Sprite>(this.spriteEntity);
         }
 
         /// <summary>
@@ -90,7 +88,8 @@ namespace CommonEcs {
             if (!this.Exists) {
                 return;
             }
-            this.entityManager.SetComponentData(this.spriteEntity, sprite);
+            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            entityManager.SetComponentData(this.spriteEntity, sprite);
         }
 
         /// <summary>
@@ -99,7 +98,8 @@ namespace CommonEcs {
         public void Destroy() {
             // Destroy only if it was created
             if (this.Exists) {
-                this.entityManager.DestroyEntity(this.spriteEntity);
+                EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+                entityManager.DestroyEntity(this.spriteEntity);
                 this.spriteEntity = Entity.Null;
             }
         }

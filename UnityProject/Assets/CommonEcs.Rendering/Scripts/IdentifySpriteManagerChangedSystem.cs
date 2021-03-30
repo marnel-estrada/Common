@@ -21,7 +21,7 @@ namespace CommonEcs {
         private readonly List<int> managerIndices = new List<int>(1);
 
         protected override void OnCreate() {
-            this.query = GetEntityQuery(typeof(Sprite), typeof(SpriteManager), 
+            this.query = GetEntityQuery(ComponentType.ReadOnly<Sprite>(), typeof(SpriteManager), 
                 ComponentType.Exclude<AlwaysUpdateMesh>());
         }
         

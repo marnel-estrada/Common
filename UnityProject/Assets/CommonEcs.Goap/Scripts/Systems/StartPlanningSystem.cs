@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -29,6 +30,7 @@ namespace CommonEcs.Goap {
             return handle;
         }
 
+        [BurstCompile]
         private struct StartPlanningJob : IJobEntityBatch {
             public ComponentTypeHandle<GoapPlanner> plannerType;
             

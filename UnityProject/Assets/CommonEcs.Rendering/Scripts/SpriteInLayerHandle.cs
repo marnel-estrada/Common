@@ -13,7 +13,7 @@ namespace CommonEcs {
 
         public SpriteInLayerHandle(Entity spriteLayerEntity) {
             this.spriteLayerEntity = spriteLayerEntity;
-            Assertion.Assert(this.spriteLayerEntity != Entity.Null);
+            Assertion.IsTrue(this.spriteLayerEntity != Entity.Null);
         }
 
         public void Init(Entity spriteLayerEntity) {
@@ -32,8 +32,8 @@ namespace CommonEcs {
         /// <param name="sprite"></param>
         public void Create(ref Sprite sprite, in float3 translation, in quaternion rotation, bool isStatic, float sortOrderOffset = 0) {
             // Avoid creating a new sprite entity when another one exists
-            Assertion.Assert(!this.Exists);
-            Assertion.Assert(this.spriteLayerEntity != Entity.Null);
+            Assertion.IsTrue(!this.Exists);
+            Assertion.IsTrue(this.spriteLayerEntity != Entity.Null);
 
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             this.spriteEntity = entityManager.CreateEntity();

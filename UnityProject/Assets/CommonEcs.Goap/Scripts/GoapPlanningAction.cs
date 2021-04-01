@@ -13,7 +13,7 @@ namespace CommonEcs.Goap {
         public readonly int id;
         public readonly float cost;
 
-        public GoapPlanningAction(int id, float cost, Condition effect) {
+        public GoapPlanningAction(int id, float cost, in Condition effect) {
             this.id = id;
             this.cost = cost;
             this.preconditions = new ConditionList10();

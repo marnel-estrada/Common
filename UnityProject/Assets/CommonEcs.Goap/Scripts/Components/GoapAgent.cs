@@ -13,11 +13,17 @@ namespace CommonEcs.Goap {
         // Note that the planner entity contains a BoolHashMap which is a big object.
         public readonly Entity plannerEntity;
 
-        public readonly int domainId; // Maps to a GoapDomain
+        // Maps to a GoapDomain
+        public readonly int domainId; 
 
         public AgentState state;
+        
+        // Needed for action execution
+        public int currentActionIndex;
+        public int currentAtomActionIndex;
+        public GoapResult lastResult;
 
-        public GoapAgent(in BlobAssetReference<GoapDomainDatabase> domainDbReference, in int domainId, in Entity plannerEntity) {
+        public GoapAgent(in BlobAssetReference<GoapDomainDatabase> domainDbReference, int domainId, in Entity plannerEntity) : this() {
             this.domainDbReference = domainDbReference;
             this.domainId = domainId;
             this.plannerEntity = plannerEntity;

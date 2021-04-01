@@ -47,7 +47,7 @@ namespace CommonEcs.Goap {
                     GoapAgent agent = this.allAgents[planner.agentEntity];
                     GoapDomain domain = agent.Domain;
                     BoolHashMap conditionsMap = planner.conditionsMap;
-                    NativeList<int> actionList = new NativeList<int>(Allocator.Temp);
+                    NativeList<ResolvedAction> actionList = new NativeList<ResolvedAction>(Allocator.Temp);
                     NativeHashSet<int> actionsBeingEvaluated = new NativeHashSet<int>(4, Allocator.Temp);
                     bool result = SearchActions(planner.currentGoal, domain, ref conditionsMap, ref actionList, ref actionsBeingEvaluated);
                     planner.state = result ? PlanningState.SUCCESS : PlanningState.FAILED;
@@ -63,7 +63,7 @@ namespace CommonEcs.Goap {
             }
 
             private bool SearchActions(in Condition goal, in GoapDomain domain, ref BoolHashMap conditionsMap, 
-                ref NativeList<int> actionList, ref NativeHashSet<int> actionsBeingEvaluated) {
+                ref NativeList<ResolvedAction> actionList, ref NativeHashSet<int> actionsBeingEvaluated) {
                 // Check if goal was already specified in the current conditionsMap
                 ValueTypeOption<bool> foundGoalValue = conditionsMap.Find(goal.id.hashCode);
                 if (foundGoalValue.IsSome && foundGoalValue.ValueOr(default) == goal.value) {
@@ -79,7 +79,7 @@ namespace CommonEcs.Goap {
 
                 FixedList32<int> actionIndices = foundActionIndices.ValueOr(default);
                 for (int i = 0; i < actionIndices.Length; ++i) {
-                    GoapPlanningAction action = domain.GetAction(actionIndices[i]);
+                    GoapAction action = domain.GetAction(actionIndices[i]);
                     if (actionsBeingEvaluated.Contains(action.id)) {
                         // This means that the same action is being evaluated while the previous was not yet 
                         // resolved. We skip it as this will cause infinite loop.
@@ -89,7 +89,7 @@ namespace CommonEcs.Goap {
                     actionsBeingEvaluated.TryAdd(action.id);
                     
                     BoolHashMap conditionsMapCopy = conditionsMap;
-                    NativeList<int> tempActionList = new NativeList<int>(Allocator.Temp);
+                    NativeList<ResolvedAction> tempActionList = new NativeList<ResolvedAction>(Allocator.Temp);
                     bool searchSuccess = SearchActionsToSatisfyPreconditions(action, domain, ref conditionsMapCopy, ref tempActionList, ref actionsBeingEvaluated);
                     
                     // We remove here because the action was already searched
@@ -117,8 +117,8 @@ namespace CommonEcs.Goap {
                 return false;
             }
 
-            private bool SearchActionsToSatisfyPreconditions(in GoapPlanningAction action, in GoapDomain domain,
-                ref BoolHashMap conditionsMap, ref NativeList<int> actionList, ref NativeHashSet<int> actionsBeingEvaluated) {
+            private bool SearchActionsToSatisfyPreconditions(in GoapAction action, in GoapDomain domain,
+                ref BoolHashMap conditionsMap, ref NativeList<ResolvedAction> actionList, ref NativeHashSet<int> actionsBeingEvaluated) {
                 for (int i = 0; i < action.preconditions.Count; ++i) {
                     Condition precondition = action.preconditions[i];
                     if (!SearchActions(precondition, domain, ref conditionsMap, ref actionList, ref actionsBeingEvaluated)) {
@@ -128,14 +128,14 @@ namespace CommonEcs.Goap {
                 }
                 
                 // At this point, it means that there are actions to satisfy all preconditions
-                actionList.Add(action.id); // Add the action being searched itself
+                actionList.Add(new ResolvedAction(action.id, action.atomActionsCount)); // Add the action being searched itself
                 
                 return true;
             }
 
-            private static void AddActions(ref DynamicBuffer<ResolvedAction> resolvedActions, ref NativeList<int> computedActions) {
+            private static void AddActions(ref DynamicBuffer<ResolvedAction> resolvedActions, ref NativeList<ResolvedAction> computedActions) {
                 for (int i = 0; i < computedActions.Length; ++i) {
-                    resolvedActions.Add(new ResolvedAction(computedActions[i]));
+                    resolvedActions.Add(computedActions[i]);
                 }
             }
         }

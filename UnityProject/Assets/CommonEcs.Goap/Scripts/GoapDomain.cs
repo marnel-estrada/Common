@@ -3,12 +3,12 @@ using Unity.Collections;
 namespace CommonEcs.Goap {
     public struct GoapDomain {
         // This is the list of actions
-        public FixedList4096<GoapPlanningAction> actions;
+        public FixedList4096<GoapAction> actions;
         
         // The list of integers mapped to the condition are indices to actions
         public FixedHashMap<Condition, FixedList32<int>> actionMap;
 
-        public void AddAction(in GoapPlanningAction action) {
+        public void AddAction(in GoapAction action) {
             int actionIndex = this.actions.Length;
             this.actions.Add(action);
             
@@ -51,7 +51,7 @@ namespace CommonEcs.Goap {
             return newList;
         }
 
-        public readonly GoapPlanningAction GetAction(int index) {
+        public readonly GoapAction GetAction(int index) {
             return this.actions[index];
         }
 

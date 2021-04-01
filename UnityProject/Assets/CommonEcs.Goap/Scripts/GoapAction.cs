@@ -1,51 +1,61 @@
-using Unity.Assertions;
-using Unity.Collections;
+using System;
 
 namespace CommonEcs.Goap {
     /// <summary>
-    /// Used for planning. Does not contain atom actions
+    /// This is an action that is used in planning. This is not the actual action that
+    /// will be executed.
     /// </summary>
-    public struct GoapPlanAction {
-        public readonly FixedString64 id;
-        public readonly float cost;
+    public struct GoapAction : IEquatable<GoapAction> {
         public ConditionList10 preconditions;
         public readonly Condition effect;
         
-        public GoapPlanAction(FixedString64 id, float cost, Condition effect) {
+        // We can't use FixedString here to save space when being used in FixedHashMap
+        public readonly int id;
+        
+        public readonly float cost;
+
+        // This is used to identify if execution of atom actions is already done
+        public readonly int atomActionsCount;
+
+        public GoapAction(int id, float cost, int atomActionsCount, in Condition effect) {
             this.id = id;
             this.cost = cost;
+            this.atomActionsCount = atomActionsCount;
             this.preconditions = new ConditionList10();
             this.effect = effect;
         }
+        
+        /// <summary>
+        /// Constructor with default atomActionsCount
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cost"></param>
+        /// <param name="effect"></param>
+        public GoapAction(int id, float cost, in Condition effect) : this(id, cost, 1, effect) {
+        }
 
         public void AddPrecondition(Condition condition) {
-            // Should not contain the specified condition yet
-            Assert.IsFalse(ContainsPrecondition(condition.id));
             this.preconditions.Add(condition);
         }
 
-        public void AddPrecondition(ConditionId conditionId, bool value) {
-            AddPrecondition(new Condition(conditionId, value));
+        public bool Equals(GoapAction other) {
+            return this.id == other.id;
         }
 
-        public bool ContainsPrecondition(ConditionId conditionId) {
-            for (int i = 0; i < this.preconditions.Count; ++i) {
-                if (this.preconditions[i].id == conditionId) {
-                    return true;
-                }
-            }
-
-            return false;
+        public override bool Equals(object obj) {
+            return obj is GoapAction other && Equals(other);
         }
 
-        public bool HasPrecondition(Condition condition) {
-            for (int i = 0; i < this.preconditions.Count; ++i) {
-                if (this.preconditions[i] == condition) {
-                    return true;
-                }
-            }
+        public override int GetHashCode() {
+            return this.id;
+        }
 
-            return false;
+        public static bool operator ==(GoapAction left, GoapAction right) {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(GoapAction left, GoapAction right) {
+            return !left.Equals(right);
         }
     }
 }

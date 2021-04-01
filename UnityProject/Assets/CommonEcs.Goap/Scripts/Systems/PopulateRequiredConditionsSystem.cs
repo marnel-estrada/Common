@@ -82,7 +82,7 @@ namespace CommonEcs.Goap {
 
                 FixedList32<int> actionIndices = foundActionIndices.ValueOr(default);
                 for (int i = 0; i < actionIndices.Length; ++i) {
-                    GoapPlanningAction action = domain.GetAction(actionIndices[i]);
+                    GoapAction action = domain.GetAction(actionIndices[i]);
 
                     if (addedActions.Contains(action.id)) {
                         // The action was already added. We skip.
@@ -96,7 +96,7 @@ namespace CommonEcs.Goap {
 
             // Adds the preconditions of the specified action
             private void AddPreconditions(ref DynamicBuffer<RequiredCondition> requiredConditions, ref NativeHashSet<int> addedActions,
-                in GoapPlanningAction action) {
+                in GoapAction action) {
                 ConditionList10 preconditions = action.preconditions;
                 for (int i = 0; i < preconditions.Count; ++i) {
                     requiredConditions.Add(new RequiredCondition(preconditions[i].id));
@@ -106,7 +106,7 @@ namespace CommonEcs.Goap {
             }
 
             private void RecurseThroughPreconditions(ref DynamicBuffer<RequiredCondition> requiredConditions, ref NativeHashSet<int> addedActions,
-                in GoapDomain domain, in GoapPlanningAction action) {
+                in GoapDomain domain, in GoapAction action) {
                 ConditionList10 preconditions = action.preconditions;
                 for (int i = 0; i < preconditions.Count; ++i) {
                     AddPreconditions(ref requiredConditions, ref addedActions, domain, preconditions[i]);

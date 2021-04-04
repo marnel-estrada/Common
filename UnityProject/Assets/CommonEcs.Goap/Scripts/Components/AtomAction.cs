@@ -16,6 +16,12 @@ namespace CommonEcs.Goap {
         public bool canExecute;
         public bool started;
 
+        public AtomAction(int actionId, Entity agentEntity, int order) : this() {
+            this.agentEntity = agentEntity;
+            this.actionId = actionId;
+            this.order = order;
+        }
+
         public void MarkCanExecute() {
             this.canExecute = true;
             this.result = GoapResult.RUNNING;

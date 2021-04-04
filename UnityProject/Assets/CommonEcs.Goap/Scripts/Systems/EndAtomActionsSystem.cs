@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -35,6 +36,7 @@ namespace CommonEcs.Goap {
             return handle;
         }
         
+        [BurstCompile]
         private struct SetLastResultJob : IJobEntityBatch {
             [ReadOnly]
             public ComponentTypeHandle<AtomAction> atomActionType;
@@ -59,6 +61,7 @@ namespace CommonEcs.Goap {
             }
         }
         
+        [BurstCompile]
         private struct MoveToNextActionJob : IJobEntityBatch {
             public ComponentTypeHandle<GoapAgent> agentType;
 

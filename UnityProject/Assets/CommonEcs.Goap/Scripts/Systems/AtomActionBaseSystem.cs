@@ -15,15 +15,18 @@ namespace CommonEcs.Goap {
         where TActionFilter : unmanaged, IComponentData
         where TProcessor : unmanaged, IAtomActionProcess<TActionFilter> {
         private EntityQuery query;
+        private bool isActionFilterZeroSized;
 
         protected override void OnCreate() {
             this.query = GetEntityQuery(typeof(AtomAction), typeof(TActionFilter));
+            this.isActionFilterZeroSized = TypeManager.GetTypeInfo(TypeManager.GetTypeIndex<TActionFilter>()).IsZeroSized;
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             Job job = new Job() {
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
                 actionFilterType = GetComponentTypeHandle<TActionFilter>(),
+                actionFilterHasArray = !this.isActionFilterZeroSized, // Action filter has array if it's not zero sized
                 processor = PrepareProcessor()
             };
             
@@ -37,13 +40,13 @@ namespace CommonEcs.Goap {
         public struct Job : IJobEntityBatch {
             public ComponentTypeHandle<AtomAction> atomActionType;
             public ComponentTypeHandle<TActionFilter> actionFilterType;
+            public bool actionFilterHasArray;
             public TProcessor processor;
             
             public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
                 NativeArray<AtomAction> atomActions = batchInChunk.GetNativeArray(this.atomActionType);
 
-                bool hasChunk = batchInChunk.HasChunkComponent(this.actionFilterType);
-                NativeArray<TActionFilter> filterActions = hasChunk ? batchInChunk.GetNativeArray(this.actionFilterType) : default;
+                NativeArray<TActionFilter> filterActions = this.actionFilterHasArray ? batchInChunk.GetNativeArray(this.actionFilterType) : default;
                 TActionFilter defaultActionFilter = default; // This will be used if TActionFilter has no chunk (it's a tag component)
                 
                 int count = batchInChunk.Count;
@@ -55,33 +58,37 @@ namespace CommonEcs.Goap {
                         continue;
                     }
 
-                    if (hasChunk) {
+                    if (this.actionFilterHasArray) {
                         TActionFilter filterAction = filterActions[i];
-                        if (!atomAction.started) {
-                            // We call Start() if not yet started
-                            atomAction.result = this.processor.Start(ref atomAction, ref filterAction);
-                            atomAction.started = true;
-                        }
-
-                        atomAction.result = this.processor.Update(ref atomAction, ref filterAction);
+                        ExecuteAction(ref atomAction, ref filterAction);
 
                         // Modify
                         atomActions[i] = atomAction;
                         filterActions[i] = filterAction;
                     } else {
-                        // There's no chunk for the TActionFilter. It must be a tag component
-                        if (!atomAction.started) {
-                            // We call Start() if not yet started
-                            atomAction.result = this.processor.Start(ref atomAction, ref defaultActionFilter);
-                            atomAction.started = true;
-                        }
-
-                        atomAction.result = this.processor.Update(ref atomAction, ref defaultActionFilter);
+                        // There's no array for the TActionFilter. It must be a tag component.
+                        // Use a default filter component
+                        ExecuteAction(ref atomAction, ref defaultActionFilter);
 
                         // Modify
                         atomActions[i] = atomAction;
                     }
                 }
+            }
+
+            private void ExecuteAction(ref AtomAction atomAction, ref TActionFilter filterAction) {
+                if (!atomAction.started) {
+                    // We call Start() if not yet started
+                    atomAction.result = this.processor.Start(ref atomAction, ref filterAction);
+                    atomAction.started = true;
+
+                    if (atomAction.result == GoapResult.FAILED || atomAction.result == GoapResult.SUCCESS) {
+                        // No need to proceed to update if the Start already failed or succeeded
+                        return;
+                    }
+                }
+
+                atomAction.result = this.processor.Update(ref atomAction, ref filterAction);
             }
         }
     }

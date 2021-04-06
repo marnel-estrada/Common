@@ -3,6 +3,8 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 
+using UnityEngine;
+
 namespace CommonEcs.Goap {
     /// <summary>
     /// Atom action systems should execute between IdentifyAtomActionsThatCanExecuteSystem and
@@ -46,26 +48,36 @@ namespace CommonEcs.Goap {
                         // We skip
                         continue;
                     }
-                    
-                    // Note that the resolved actions are tied up to the planner entity
-                    DynamicBuffer<ResolvedAction> actionSet = this.allActionSets[agent.plannerEntity];
-                    int currentActionId = actionSet[agent.currentActionIndex].actionId;
-                    if (atomAction.actionId != currentActionId) {
-                        // Not the action to carry out yet
-                        continue;
-                    }
 
-                    if (agent.currentAtomActionIndex != atomAction.order) {
-                        // Not yet the correct order to execute
-                        continue;
+                    if (CanExecute(atomAction, agent)) {
+                        atomAction.MarkCanExecute();    
+                    } else {
+                        // Reset this to false so that other systems that are using this will not
+                        // mistake that the atom action is still running.
+                        // Only one atom action should run per frame per agent.
+                        atomAction.canExecute = false;
                     }
-                    
-                    // At this point, the atom action can execute
-                    atomAction.MarkCanExecute();
                     
                     // Modify
                     atomActions[i] = atomAction;
                 }
+            }
+
+            private bool CanExecute(in AtomAction atomAction, in GoapAgent agent) {
+                // Note that the resolved actions are tied up to the planner entity
+                DynamicBuffer<ResolvedAction> actionSet = this.allActionSets[agent.plannerEntity];
+                int currentActionId = actionSet[agent.currentActionIndex].actionId;
+                if (atomAction.actionId != currentActionId) {
+                    // Not the action to carry out yet
+                    return false;
+                }
+
+                if (agent.currentAtomActionIndex != atomAction.order) {
+                    // Not yet the correct order to execute
+                    return false;
+                }
+
+                return true;
             }
         }
     }

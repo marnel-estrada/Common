@@ -38,6 +38,10 @@ namespace CommonEcs.Goap {
                         // actions
                         agent.state = AgentState.EXECUTING;
                         
+                        // Don't forget to reset this. It may retain the previous result of 
+                        // success or fail.
+                        agent.lastResult = GoapResult.RUNNING;
+                        
                         // Also reset the variables needed for action execution
                         agent.currentActionIndex = 0;
                         agent.currentAtomActionIndex = 0;

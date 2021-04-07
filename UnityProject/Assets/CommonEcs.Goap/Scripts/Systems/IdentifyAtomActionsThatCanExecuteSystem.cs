@@ -3,8 +3,6 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 
-using UnityEngine;
-
 namespace CommonEcs.Goap {
     /// <summary>
     /// Atom action systems should execute between IdentifyAtomActionsThatCanExecuteSystem and
@@ -49,6 +47,14 @@ namespace CommonEcs.Goap {
                         continue;
                     }
 
+                    if (atomAction.executing) {
+                        // The atom action is already currently executing. We should not continue
+                        // because if we do, we will call AtomAction.MarkCanExecute() which will reset
+                        // the started flag. If we do this, Start() routines will be invoked again
+                        // and this is a bug because the action could be stuck.
+                        continue;
+                    }
+
                     if (CanExecute(atomAction, agent)) {
                         atomAction.MarkCanExecute();    
                     } else {
@@ -56,6 +62,7 @@ namespace CommonEcs.Goap {
                         // mistake that the atom action is still running.
                         // Only one atom action should run per frame per agent.
                         atomAction.canExecute = false;
+                        atomAction.executing = false;
                     }
                     
                     // Modify

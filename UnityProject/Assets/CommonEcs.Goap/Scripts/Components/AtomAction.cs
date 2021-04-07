@@ -18,6 +18,11 @@ namespace CommonEcs.Goap {
 
         public bool canExecute;
         public bool started;
+        
+        // We need this such that we don't have to call MarkCanExecute() if its currently 
+        // executing. We should not call MarkCanExecute() to an executing action because it will
+        // reset the started flag which will run the Start() routine again.
+        public bool executing;
 
         public AtomAction(int actionId, Entity agentEntity, int order, int debugId = 0) : this() {
             this.agentEntity = agentEntity;

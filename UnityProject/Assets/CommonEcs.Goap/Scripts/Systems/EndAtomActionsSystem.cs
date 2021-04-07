@@ -14,18 +14,28 @@ namespace CommonEcs.Goap {
     public class EndAtomActionsSystem : JobSystemBase {
         private EntityQuery atomActionsQuery;
         private EntityQuery agentsQuery;
+        private EntityQuery plannersQuery;
 
         protected override void OnCreate() {
-            this.atomActionsQuery = GetEntityQuery(ComponentType.ReadOnly<AtomAction>());
+            this.atomActionsQuery = GetEntityQuery(typeof(AtomAction));
             this.agentsQuery = GetEntityQuery(typeof(GoapAgent));
+            this.plannersQuery = GetEntityQuery(typeof(GoapPlanner));
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            SetLastResultJob setLastResultJob = new SetLastResultJob() {
-                atomActionType = GetComponentTypeHandle<AtomAction>(true),
+            ProcessAtomActionsJob processAtomActionsJob = new ProcessAtomActionsJob() {
+                atomActionType = GetComponentTypeHandle<AtomAction>(),
                 allAgents = GetComponentDataFromEntity<GoapAgent>()
             };
-            JobHandle handle = setLastResultJob.ScheduleParallel(this.atomActionsQuery, 1, inputDeps);
+            JobHandle handle = processAtomActionsJob.ScheduleParallel(this.atomActionsQuery, 1, inputDeps);
+            
+            // We try to reset the goal index first so that GoapAgent.state remains Executing.
+            // Note that it is set to Idle in MoveToNextActionJob when last action failed or ended
+            ResetPlannerGoalIndexJob resetGoalIndexJob = new ResetPlannerGoalIndexJob() {
+                plannerType = GetComponentTypeHandle<GoapPlanner>(), 
+                allAgents = GetComponentDataFromEntity<GoapAgent>()
+            };
+            handle = resetGoalIndexJob.ScheduleParallel(this.plannersQuery, 1, handle);
 
             MoveToNextActionJob moveToNextActionJob = new MoveToNextActionJob() {
                 agentType = GetComponentTypeHandle<GoapAgent>(), 
@@ -36,9 +46,11 @@ namespace CommonEcs.Goap {
             return handle;
         }
         
+        /// <summary>
+        /// Routines like setting AtomAction.executing and setting GoapAgent.lastResult is done here
+        /// </summary>
         [BurstCompile]
-        private struct SetLastResultJob : IJobEntityBatch {
-            [ReadOnly]
+        private struct ProcessAtomActionsJob : IJobEntityBatch {
             public ComponentTypeHandle<AtomAction> atomActionType;
 
             [NativeDisableParallelForRestriction]
@@ -50,13 +62,23 @@ namespace CommonEcs.Goap {
                     AtomAction atomAction = atomActions[i];
 
                     // Apply only to atom actions that were executing
-                    if (atomAction.canExecute) {
-                        GoapAgent agent = this.allAgents[atomAction.agentEntity];
-                        agent.lastResult = atomAction.result;
-
-                        // Modify
-                        this.allAgents[atomAction.agentEntity] = agent;
+                    if (!atomAction.canExecute) {
+                        continue;
                     }
+
+                    GoapAgent agent = this.allAgents[atomAction.agentEntity];
+                    agent.lastResult = atomAction.result;
+                    
+                    // We also set the executing flag so that AtomAction.MarkCanExecute() will not 
+                    // be called again in IdentifyAtomActionsThatCanExecuteSystem.
+                    // Note here that it is only executing if the last result was Running.
+                    // If it was Success or Failed, then the atomAction is already done and
+                    // no longer executing.
+                    atomAction.executing = atomAction.result == GoapResult.RUNNING;
+
+                    // Modify
+                    atomActions[i] = atomAction;
+                    this.allAgents[atomAction.agentEntity] = agent;
                 }
             }
         }
@@ -119,6 +141,38 @@ namespace CommonEcs.Goap {
 
                 // We set to zero here as it is a new action to execute
                 agent.currentAtomActionIndex = 0;
+            }
+        }
+
+        [BurstCompile]
+        private struct ResetPlannerGoalIndexJob : IJobEntityBatch {
+            public ComponentTypeHandle<GoapPlanner> plannerType;
+
+            [ReadOnly]
+            public ComponentDataFromEntity<GoapAgent> allAgents;
+
+            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
+                NativeArray<GoapPlanner> planners = batchInChunk.GetNativeArray(this.plannerType);
+                for (int i = 0; i < batchInChunk.Count; ++i) {
+                    GoapPlanner planner = planners[i];
+                    GoapAgent agent = this.allAgents[planner.agentEntity];
+                    
+                    if (agent.state != AgentState.EXECUTING) {
+                        // Agent is not executing. We don't need to do anything.
+                        continue;
+                    }
+
+                    if (agent.lastResult == GoapResult.FAILED || agent.lastResult == GoapResult.SUCCESS) {
+                        // This means that the agent was executing and its last result was failed
+                        // or success. In other words, the agent has done executing its current
+                        // plan. So we reset the planner's goal index so it will plan for the
+                        // main goal again.
+                        planner.goalIndex = 0;
+                        
+                        // Modify
+                        planners[i] = planner;
+                    }
+                }
             }
         }
     }

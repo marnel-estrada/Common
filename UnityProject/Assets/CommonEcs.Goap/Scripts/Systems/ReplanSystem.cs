@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -44,6 +45,7 @@ namespace CommonEcs.Goap {
             return handle;
         }
         
+        [BurstCompile]
         private struct ResetAtomActionsJob : IJobEntityBatch {
             public ComponentTypeHandle<AtomAction> atomActionType;
 
@@ -72,6 +74,7 @@ namespace CommonEcs.Goap {
             }
         }
         
+        [BurstCompile]
         private struct ResetGoalIndexJob : IJobEntityBatch {
             public ComponentTypeHandle<GoapPlanner> plannerType;
 

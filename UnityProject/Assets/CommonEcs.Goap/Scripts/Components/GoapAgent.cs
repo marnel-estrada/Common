@@ -23,6 +23,9 @@ namespace CommonEcs.Goap {
         public int currentAtomActionIndex;
         public GoapResult lastResult;
 
+        // This will be consumed by a system
+        public bool replanRequested;
+
         public GoapAgent(in BlobAssetReference<GoapDomainDatabase> domainDbReference, int domainId, in Entity plannerEntity) : this() {
             this.domainDbReference = domainDbReference;
             this.domainId = domainId;
@@ -59,6 +62,14 @@ namespace CommonEcs.Goap {
 
         public readonly Condition GetGoal(int index) {
             return this.goals[index];
+        }
+
+        public void Replan() {
+            this.replanRequested = true;
+            this.lastResult = GoapResult.FAILED;
+            
+            // We set to Idle so agent will plan on the next frame
+            this.state = AgentState.IDLE;
         }
     }
 }

@@ -4,6 +4,7 @@ using Unity.Entities;
 using Unity.Jobs;
 
 namespace CommonEcs.Goap {
+    [UpdateAfter(typeof(ReplanSystem))]
     public class StartPlanningSystem : JobSystemBase {
         private EntityQuery query;
 

@@ -33,8 +33,8 @@ namespace CommonEcs.Goap {
 
         public void MarkCanExecute() {
             this.canExecute = true;
-            this.result = GoapResult.RUNNING;
             this.started = false;
+            this.result = GoapResult.RUNNING;
         }
     }
 }

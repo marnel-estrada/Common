@@ -29,11 +29,16 @@ namespace CommonEcs.Goap {
             
             // Reset the replanRequested flag
             handle = this.Entities.ForEach(delegate(ref GoapAgent agent) {
-                agent.replanRequested = false;
-                
+                if (!agent.replanRequested) {
+                    return;
+                }
+
                 // We also reset other values here to ensure that they are in correct values
+                // such they would replan again
                 agent.lastResult = GoapResult.FAILED;
                 agent.state = AgentState.IDLE;
+                
+                agent.replanRequested = false;
             }).ScheduleParallel(handle);
             
             return handle;

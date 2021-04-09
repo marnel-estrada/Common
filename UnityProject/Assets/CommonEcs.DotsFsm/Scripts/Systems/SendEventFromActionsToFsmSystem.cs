@@ -22,7 +22,7 @@ namespace CommonEcs.DotsFsm {
         }
 
         protected override void OnUpdate() {
-            ValueTypeOption<FixedString64> nonePendingEvent = ValueTypeOption<FixedString64>.None;
+            ValueTypeOption<FsmEvent> nonePendingEvent = ValueTypeOption<FsmEvent>.None;
             
             // Clear pending events from FSMs first
             // We do this because pending events should only be set once
@@ -62,7 +62,7 @@ namespace CommonEcs.DotsFsm {
                     }
                     
                     // Clear the pending event
-                    action.pendingEvent = ValueTypeOption<FixedString64>.None;
+                    action.pendingEvent = ValueTypeOption<FsmEvent>.None;
                     actions[i] = action; // Modify
                 }
             }

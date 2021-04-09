@@ -75,11 +75,15 @@ namespace CommonEcs.DotsFsm {
             return actionEntity;
         }
 
-        public void AddTransition(Entity fsmEntity, Entity fromState, FixedString64 eventId, Entity toState) {
-            this.commandBuffer.AppendToBuffer(fsmEntity, new Transition(fromState, eventId, toState));
+        public void AddTransition(in Entity fsmEntity, in Entity fromState, in FsmEvent fsmEvent, in Entity toState) {
+            this.commandBuffer.AppendToBuffer(fsmEntity, new Transition(fromState, fsmEvent, toState));
+        }
+        
+        public void AddTransition(in Entity fsmEntity, in Entity fromState, in FixedString64 eventAsString, in Entity toState) {
+            AddTransition(fsmEntity, fromState, new FsmEvent(eventAsString), toState);
         }
 
-        public void StartState(Entity stateEntity) {
+        public void StartState(in Entity stateEntity) {
             // Start the state by adding the StartState component to the state
             this.commandBuffer.AddComponent<StartState>(stateEntity);
         }

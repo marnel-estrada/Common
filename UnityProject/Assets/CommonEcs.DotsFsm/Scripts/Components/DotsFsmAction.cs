@@ -8,7 +8,7 @@ namespace CommonEcs.DotsFsm {
         // Denormalized from DotsFsm so we don't need the DotsFsm instance
         // if we want to send an event.
         // There will be a system that will consume this value.
-        public ValueTypeOption<FixedString64> pendingEvent;
+        public ValueTypeOption<FsmEvent> pendingEvent;
 
         public readonly Entity fsmOwner;
         public readonly Entity stateOwner;
@@ -21,13 +21,17 @@ namespace CommonEcs.DotsFsm {
             this.fsmOwner = fsmOwner;
             this.stateOwner = stateOwner;
         }
+
+        public void SendEvent(in FsmEvent fsmEvent) {
+            this.pendingEvent = ValueTypeOption<FsmEvent>.Some(fsmEvent);
+        }
         
-        public void SendEvent(FixedString64 eventId) {
-            if (eventId.Length == 0) {
+        public void SendEvent(in FixedString64 eventAsString) {
+            if (eventAsString.Length == 0) {
                 throw new Exception("Can't send an empty event.");
             }
             
-            this.pendingEvent = ValueTypeOption<FixedString64>.Some(eventId);
+            SendEvent(new FsmEvent(eventAsString));
         }
     }
 }

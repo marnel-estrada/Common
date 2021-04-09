@@ -51,7 +51,7 @@ namespace CommonEcs.DotsFsm {
             return stateEntity;
         }
         
-        public Entity AddAction<T>(Entity fsmEntity, Entity stateEntity, T actionComponent) where T : struct, IComponentData {
+        public Entity AddAction<T>(in Entity fsmEntity, in Entity stateEntity, in T actionComponent) where T : struct, IComponentData {
             Entity actionEntity = this.entityManager.CreateEntity(typeof(DotsFsmAction), 
                 typeof(T), typeof(LinkedEntityGroup));
             this.entityManager.SetComponentData(actionEntity, new DotsFsmAction(fsmEntity, stateEntity));
@@ -66,12 +66,16 @@ namespace CommonEcs.DotsFsm {
             return actionEntity;
         }
         
-        public void AddTransition(Entity fsmEntity, Entity fromState, FixedString64 eventId, Entity toState) {
+        public void AddTransition(in Entity fsmEntity, in Entity fromState, in FsmEvent fsmEvent, in Entity toState) {
             DynamicBuffer<Transition> transitions = this.entityManager.GetBuffer<Transition>(fsmEntity);
-            transitions.Add(new Transition(fromState, eventId, toState));
+            transitions.Add(new Transition(fromState, fsmEvent, toState));
+        }
+        
+        public void AddTransition(in Entity fsmEntity, in Entity fromState, in FixedString64 eventAsString, in Entity toState) {
+            AddTransition(fsmEntity, fromState, new FsmEvent(eventAsString), toState);
         }
 
-        public void StartState(Entity stateEntity) {
+        public void StartState(in Entity stateEntity) {
             // Start the state by adding the StartState component to the state
             this.entityManager.AddComponentData(stateEntity, new StartState());
         }

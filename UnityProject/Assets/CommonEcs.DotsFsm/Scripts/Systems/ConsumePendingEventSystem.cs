@@ -20,7 +20,7 @@ namespace CommonEcs.DotsFsm {
                 fsm = fsm.currentState.Match<TryChangeState, DotsFsm>(new TryChangeState() {
                     fsm = fsm,
                     fsmName = name,
-                    eventId = fsm.pendingEvent.ValueOr(default),
+                    fsmEvent = fsm.pendingEvent.ValueOr(default),
                     transitions = transitions,
                     allNames = GetComponentDataFromEntity<Name>(true)
                 });
@@ -30,7 +30,7 @@ namespace CommonEcs.DotsFsm {
         private struct TryChangeState : IFuncOptionMatcher<Entity, DotsFsm> {
             public DotsFsm fsm;
             public Name fsmName;
-            public FixedString64 eventId;
+            public FsmEvent fsmEvent;
             
             [ReadOnly]
             public DynamicBuffer<Transition> transitions;
@@ -39,15 +39,15 @@ namespace CommonEcs.DotsFsm {
             public ComponentDataFromEntity<Name> allNames;
 
             public DotsFsm OnSome(Entity currentStateEntity) {
-                if (this.eventId.Length == 0) {
-                    Debug.LogError("Can't have empty eventId");
+                if (this.fsmEvent.id == 0) {
+                    Debug.LogError("Can't use 0 FSM event");
                     return this.fsm;
                 }
                 
                 // Look for the entity with the same from state and eventId
                 for (int i = 0; i < this.transitions.Length; ++i) {
                     Transition transition = this.transitions[i];
-                    if (!(transition.fromState == currentStateEntity && transition.eventId.Equals(this.eventId))) {
+                    if (!(transition.fromState == currentStateEntity && transition.fsmEvent.Equals(this.fsmEvent))) {
                         continue;
                     }
 
@@ -55,7 +55,7 @@ namespace CommonEcs.DotsFsm {
                     this.fsm.currentState = ValueTypeOption<Entity>.Some(transition.toState);
                         
                     // Don't forget to clear the pending event so that actions will run
-                    this.fsm.pendingEvent = ValueTypeOption<FixedString64>.None;
+                    this.fsm.pendingEvent = ValueTypeOption<FsmEvent>.None;
                         
                     return this.fsm;
                 }
@@ -66,7 +66,7 @@ namespace CommonEcs.DotsFsm {
                 
                 // Burst doesn't like any other string format methods
                 // ReSharper disable once UseStringInterpolation
-                Debug.LogWarning(string.Format("{0}.{1} does not have transition for event {2}", this.fsmName.value, currentStateName.value, this.eventId));
+                Debug.LogWarning(string.Format("{0}.{1} does not have transition for event {2}", this.fsmName.value, currentStateName.value, this.fsmEvent));
                 
                 return this.fsm;
             }

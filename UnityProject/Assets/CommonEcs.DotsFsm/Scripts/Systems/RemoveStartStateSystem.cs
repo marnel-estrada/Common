@@ -1,6 +1,7 @@
 using Unity.Entities;
 
 namespace CommonEcs.DotsFsm {
+    [UpdateInGroup(typeof(DotsFsmSystemGroup))]
     public class RemoveStartStateSystem : SystemBase {
         private EntityQuery query;
 

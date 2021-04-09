@@ -3,6 +3,7 @@ using Unity.Collections;
 using Unity.Entities;
 
 namespace CommonEcs.DotsFsm {
+    [UpdateInGroup(typeof(DotsFsmSystemGroup))]
     [UpdateAfter(typeof(ConsumePendingEventSystem))]
     public class IdentifyRunningActionsSystem : SystemBase {
         private EntityQuery query;

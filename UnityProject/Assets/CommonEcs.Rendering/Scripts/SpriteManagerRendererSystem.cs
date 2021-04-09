@@ -38,7 +38,7 @@ namespace CommonEcs {
             this.sortedList.Clear();
         }
 
-        private static Comparison<SpriteManager> SORT_COMPARISON;
+        private static Comparison<SpriteManager>? SORT_COMPARISON;
 
         private void AddAndSort(NativeArray<ArchetypeChunk> chunks) {
             for (int i = 0; i < chunks.Length; ++i) {
@@ -53,10 +53,7 @@ namespace CommonEcs {
                 this.sortedList.Add(spriteManager);
             }
 
-            if (SORT_COMPARISON == null) {
-                SORT_COMPARISON = Compare;
-            }
-            
+            SORT_COMPARISON ??= Compare;
             this.sortedList.Sort(SORT_COMPARISON);
         }
 

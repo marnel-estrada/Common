@@ -10,6 +10,7 @@ namespace CommonEcs.DotsFsm {
     /// The event is stored there instead and will be consumed here so that we don't need a
     /// reference to DotsFsm whenever we execute actions.
     /// </summary>
+    [UpdateInGroup(typeof(DotsFsmSystemGroup))]
     [UpdateAfter(typeof(StartFsmSystem))]
     public class SendEventFromActionsToFsmSystem : SystemBase {
         private EntityQuery actionsQuery;

@@ -6,11 +6,17 @@ using Unity.Mathematics;
 using Unity.Transforms;
 
 namespace CommonEcs.DotsFsm {
+    [UpdateInGroup(typeof(DotsFsmSystemGroup))]
+    [UpdateAfter(typeof(StartFsmSystem))]
+    [UpdateAfter(typeof(ConsumePendingEventSystem))]
+    [UpdateAfter(typeof(IdentifyRunningActionsSystem))]
     public class MoveToSystem : JobSystemBase {
         private EntityQuery query;
+        private DotsFsmSystemGroup dotsFsmSystemGroup;
 
         protected override void OnCreate() {
             this.query = GetEntityQuery(typeof(DotsFsmAction), typeof(MoveTo), typeof(DurationTimer));
+            this.dotsFsmSystemGroup = this.World.GetOrCreateSystem<DotsFsmSystemGroup>();
         }
         
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
@@ -21,7 +27,8 @@ namespace CommonEcs.DotsFsm {
             ActionJob actionJob = new ActionJob {
                 fsmActionHandle = actionHandle,
                 moveToHandle = moveToHandle,
-                timerHandle = GetComponentTypeHandle<DurationTimer>()
+                timerHandle = GetComponentTypeHandle<DurationTimer>(),
+                rerunGroup = this.dotsFsmSystemGroup.RerunGroup
             };
 
             JobHandle handle = actionJob.ScheduleParallel(this.query, 1, inputDeps);
@@ -41,6 +48,9 @@ namespace CommonEcs.DotsFsm {
             public ComponentTypeHandle<DotsFsmAction> fsmActionHandle;
             public ComponentTypeHandle<MoveTo> moveToHandle;
             public ComponentTypeHandle<DurationTimer> timerHandle;
+
+            [NativeDisableParallelForRestriction]
+            public NativeReference<bool> rerunGroup;
             
             public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
                 NativeArray<DotsFsmAction> fsmActions = batchInChunk.GetNativeArray(this.fsmActionHandle);
@@ -61,7 +71,7 @@ namespace CommonEcs.DotsFsm {
                 }
             }
             
-            private static void Process(ref DotsFsmAction fsmAction, ref MoveTo moveTo, ref DurationTimer timer) {
+            private void Process(ref DotsFsmAction fsmAction, ref MoveTo moveTo, ref DurationTimer timer) {
                 if (fsmAction.running) {
                     if (!fsmAction.entered) {
                         OnEnter(ref fsmAction, ref moveTo, ref timer);
@@ -83,7 +93,7 @@ namespace CommonEcs.DotsFsm {
                 }
             }
 
-            private static void OnEnter(ref DotsFsmAction action, ref MoveTo moveTo,
+            private void OnEnter(ref DotsFsmAction action, ref MoveTo moveTo,
                 ref DurationTimer timer) {
                 // Set to start position
                 moveTo.currentPosition = moveTo.start;
@@ -99,7 +109,7 @@ namespace CommonEcs.DotsFsm {
                 timer.Reset(moveTo.duration);
             }
             
-            private static void OnUpdate(ref DotsFsmAction action, ref MoveTo moveTo,
+            private void OnUpdate(ref DotsFsmAction action, ref MoveTo moveTo,
                 ref DurationTimer timer) {
                 if (timer.HasElapsed) {
                     // Duration is done. Snap to destination.
@@ -113,13 +123,16 @@ namespace CommonEcs.DotsFsm {
                 moveTo.currentPosition = newPosition;
             }
             
-            private static void Finish(ref DotsFsmAction action, ref MoveTo moveTo) {
+            private void Finish(ref DotsFsmAction action, ref MoveTo moveTo) {
                 // Snap to destination
                 moveTo.currentPosition = moveTo.destination;
                 
                 // Send event if it exists
                 if (moveTo.finishEvent.Length > 0) {
                     action.SendEvent(moveTo.finishEvent);
+                    
+                    
+                    this.rerunGroup.Value = true;
                 }
             }
         }

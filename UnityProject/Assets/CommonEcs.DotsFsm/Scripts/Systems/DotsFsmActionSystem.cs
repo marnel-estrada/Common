@@ -4,6 +4,7 @@ using Unity.Entities;
 using Unity.Jobs;
 
 namespace CommonEcs.DotsFsm {
+    [UpdateInGroup(typeof(DotsFsmSystemGroup))]
     [UpdateAfter(typeof(StartFsmSystem))]
     [UpdateAfter(typeof(ConsumePendingEventSystem))]
     [UpdateAfter(typeof(IdentifyRunningActionsSystem))]
@@ -11,9 +12,11 @@ namespace CommonEcs.DotsFsm {
         where ActionType : struct, IComponentData 
         where ActionExecutionType : struct, IFsmActionExecution<ActionType> {
         private EntityQuery query;
+        private DotsFsmSystemGroup systemGroup;
 
         protected override void OnCreate() {
             this.query = GetEntityQuery(typeof(DotsFsmAction), typeof(ActionType));
+            this.systemGroup = this.World.GetOrCreateSystem<DotsFsmSystemGroup>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
@@ -26,6 +29,12 @@ namespace CommonEcs.DotsFsm {
             
             return this.ShouldScheduleParallel ? job.ScheduleParallel(this.query, 1, inputDeps) 
                 : job.Schedule(this.query, inputDeps);
+        }
+
+        protected ref NativeReference<bool> RerunGroup {
+            get {
+                return ref this.systemGroup.RerunGroup;
+            }
         }
 
         protected virtual bool ShouldScheduleParallel {
@@ -64,7 +73,7 @@ namespace CommonEcs.DotsFsm {
                 }
             }
 
-            private void Process(Entity actionEntity, ref DotsFsmAction fsmAction, ref ActionType customAction) {
+            private void Process(in Entity actionEntity, ref DotsFsmAction fsmAction, ref ActionType customAction) {
                 if (fsmAction.running) {
                     if (!fsmAction.entered) {
                         this.execution.OnEnter(actionEntity, ref fsmAction, ref customAction);

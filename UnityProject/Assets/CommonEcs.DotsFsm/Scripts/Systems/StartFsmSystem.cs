@@ -2,6 +2,7 @@ using Unity.Entities;
 using Unity.Jobs;
 
 namespace CommonEcs.DotsFsm {
+    [UpdateInGroup(typeof(DotsFsmSystemGroup))]
     [UpdateBefore(typeof(RemoveStartStateSystem))]
     public class StartFsmSystem : JobSystemBase {
         protected override JobHandle OnUpdate(JobHandle inputDeps) {

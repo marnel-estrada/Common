@@ -6,6 +6,7 @@ using Unity.Entities;
 using UnityEngine;
 
 namespace CommonEcs.DotsFsm {
+    [UpdateInGroup(typeof(DotsFsmSystemGroup))]
     [UpdateAfter(typeof(SendEventFromActionsToFsmSystem))]
     public class ConsumePendingEventSystem : SystemBase {
         protected override void OnUpdate() {

@@ -1,18 +1,46 @@
+using Common;
+
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 
 namespace CommonEcs.DotsFsm {
     [UpdateInGroup(typeof(DotsFsmSystemGroup))]
-    [UpdateBefore(typeof(RemoveStartStateSystem))]
     public class StartFsmSystem : JobSystemBase {
+        private EntityQuery query;
+
+        protected override void OnCreate() {
+            this.query = GetEntityQuery(typeof(DotsFsm));
+        }
+
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            return this.Entities.WithAll<StartState>().ForEach(delegate(Entity entity, in DotsFsmState state) {
-                DotsFsm fsm = GetComponent<DotsFsm>(state.fsmOwner);
-                fsm.currentState = ValueTypeOption<Entity>.Some(entity);
-                SetComponent(state.fsmOwner, fsm); // Modify
-            }).Schedule(inputDeps);
+            Job job = new Job() {
+                fsmType = GetComponentTypeHandle<DotsFsm>()
+            };
+
+            return job.ScheduleParallel(this.query, 1, inputDeps);
+        }
+        
+        private struct Job : IJobEntityBatch {
+            public ComponentTypeHandle<DotsFsm> fsmType;
             
-            // Removal of StartState component is done in RemoveStartStateSystem
+            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
+                NativeArray<DotsFsm> fsms = batchInChunk.GetNativeArray(this.fsmType);
+                for (int i = 0; i < fsms.Length; ++i) {
+                    DotsFsm fsm = fsms[i];
+                    if (fsm.startState.IsNone) {
+                        // No start state
+                        continue;
+                    }
+                    
+                    // At this point, there's a start state
+                    fsm.currentState = fsm.startState;
+                    fsm.startState = ValueTypeOption<Entity>.None; // Clear so it won't be set again
+                    
+                    // Modify
+                    fsms[i] = fsm;
+                }
+            }
         }
     }
 }

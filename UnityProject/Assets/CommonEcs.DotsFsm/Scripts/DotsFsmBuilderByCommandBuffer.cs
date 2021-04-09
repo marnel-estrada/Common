@@ -83,17 +83,22 @@ namespace CommonEcs.DotsFsm {
             AddTransition(fsmEntity, fromState, new FsmEvent(eventAsString), toState);
         }
 
-        public void StartState(in Entity stateEntity) {
-            // Start the state by adding the StartState component to the state
-            this.commandBuffer.AddComponent<StartState>(stateEntity);
-        }
-
         /// <summary>
         /// Used when the underlying commandBuffer is from an EntityManager
         /// </summary>
         /// <param name="entityManager"></param>
         public void Build(ref EntityManager entityManager) {
             this.commandBuffer.Playback(entityManager);
+        }
+
+        /// <summary>
+        /// Starts the specified FSM with the specified state
+        /// </summary>
+        /// <param name="fsmEntity"></param>
+        /// <param name="stateEntity"></param>
+        public void Start(Entity fsmEntity, Entity stateEntity) {
+            DotsFsm dotsFsm = new DotsFsm(stateEntity);
+            this.commandBuffer.SetComponent(fsmEntity, dotsFsm);
         }
     }
 }

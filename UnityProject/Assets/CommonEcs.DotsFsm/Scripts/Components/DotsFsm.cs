@@ -13,6 +13,22 @@ namespace CommonEcs.DotsFsm {
         public ValueTypeOption<FsmEvent> pendingEvent;
         public ValueTypeOption<Entity> currentState;
 
+        // To start a state, we set the entity of the state that we want to start
+        // This will be consumed by StartFsmSystem
+        public ValueTypeOption<Entity> startState;
+
+        /// <summary>
+        /// Constructor with specified starting state
+        /// </summary>
+        /// <param name="stateEntity"></param>
+        public DotsFsm(Entity stateEntity) : this() {
+            Start(stateEntity);
+        }
+
+        public void Start(Entity stateEntity) {
+            this.startState = ValueTypeOption<Entity>.Some(stateEntity);
+        }
+
         public void SendEvent(in FsmEvent fsmEvent) {
             if (this.pendingEvent.IsSome) {
                 // This means that there could be two actions that sent events

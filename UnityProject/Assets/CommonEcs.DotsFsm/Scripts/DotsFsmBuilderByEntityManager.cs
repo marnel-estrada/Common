@@ -10,7 +10,7 @@ namespace CommonEcs.DotsFsm {
         private readonly EntityArchetype fsmArchetype;
         private readonly EntityArchetype stateArchetype;
 
-        public DotsFsmBuilderByEntityManager(EntityManager entityManager) {
+        public DotsFsmBuilderByEntityManager(ref EntityManager entityManager) {
             this.entityManager = entityManager;
             
             this.fsmArchetype = this.entityManager.CreateArchetype(typeof(DotsFsm), 
@@ -74,10 +74,10 @@ namespace CommonEcs.DotsFsm {
         public void AddTransition(in Entity fsmEntity, in Entity fromState, in FixedString64 eventAsString, in Entity toState) {
             AddTransition(fsmEntity, fromState, new FsmEvent(eventAsString), toState);
         }
-
-        public void StartState(in Entity stateEntity) {
-            // Start the state by adding the StartState component to the state
-            this.entityManager.AddComponentData(stateEntity, new StartState());
+        
+        public void Start(Entity fsmEntity, Entity stateEntity) {
+            DotsFsm dotsFsm = new DotsFsm(stateEntity);
+            this.entityManager.SetComponentData(fsmEntity, dotsFsm);
         }
     }
 }

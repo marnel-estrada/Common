@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Common.Utils;
-
-namespace Delver {
+﻿namespace Delver {
     public class GenericNeuronLayer : NeuronLayerAdapter {
 
         private int inputCount;

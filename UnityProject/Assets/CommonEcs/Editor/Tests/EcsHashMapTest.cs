@@ -21,17 +21,17 @@ namespace CommonEcs {
                 mapWrapper.AddOrSet(1, 2);
                 Assert.True(mapWrapper.Count == 1);
 
-                Debug.Log(mapWrapper.Find(1).Value);
-                Assert.True(mapWrapper.Find(1).Value == 2);
+                Debug.Log(mapWrapper.Find(1).ValueOr(default));
+                Assert.True(mapWrapper.Find(1).ValueOr(default) == 2);
 
                 mapWrapper.AddOrSet(2, 4);
-                Debug.Log(mapWrapper.Find(2).Value);
-                Assert.True(mapWrapper.Find(2).Value == 4);
+                Debug.Log(mapWrapper.Find(2).ValueOr(default));
+                Assert.True(mapWrapper.Find(2).ValueOr(default) == 4);
                 
                 // Test replace
                 mapWrapper.AddOrSet(2, 8);
-                Debug.Log(mapWrapper.Find(2).Value);
-                Assert.True(mapWrapper.Find(2).Value == 8);
+                Debug.Log(mapWrapper.Find(2).ValueOr(default));
+                Assert.True(mapWrapper.Find(2).ValueOr(default) == 8);
             }
         }
 
@@ -52,12 +52,12 @@ namespace CommonEcs {
                 Assert.True(mapWrapper.Count == 2);
 
                 // Should have no value
-                Maybe<int> result = mapWrapper.Find(3);
-                Assert.False(result.HasValue);
+                ValueTypeOption<int> result = mapWrapper.Find(3);
+                Assert.True(result.IsNone);
                 ;
 
-                Assert.True(mapWrapper.Find(5).Value == 10);
-                Assert.True(mapWrapper.Find(1).Value == 2);
+                Assert.True(mapWrapper.Find(5).ValueOr(default) == 10);
+                Assert.True(mapWrapper.Find(1).ValueOr(default) == 2);
 
                 mapWrapper.Remove(1);
                 mapWrapper.Remove(5);

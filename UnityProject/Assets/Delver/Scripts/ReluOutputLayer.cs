@@ -14,7 +14,7 @@ namespace Delver {
         }
 
         protected override void PrepareNeurons(int outputNeuronCount, float stepSize) {
-            Assertion.Assert(outputNeuronCount > 0);
+            Assertion.IsTrue(outputNeuronCount > 0);
             for (int i = 0; i < outputNeuronCount; ++i) {
                 Gate neuron = new ReluNeuron(this.PreviousLayer.NeuronCount, stepSize);
                 neuron.Prepare();

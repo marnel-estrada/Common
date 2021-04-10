@@ -23,10 +23,10 @@ namespace Delver {
         /// <param name="inputCount"></param>
         public LinearNeuron(int inputCount, float stepSize, float standardDeviationScale = 1) : base(inputCount) {
             this.inputCount = inputCount;
-            Assertion.Assert(this.inputCount > 0);
+            Assertion.IsTrue(this.inputCount > 0);
 
             this.StepSize = stepSize;
-            Assertion.Assert(this.StepSize > 0);
+            Assertion.IsTrue(this.StepSize > 0);
 
             // Used for initial parameters
             float standardDeviation = standardDeviationScale / Mathf.Sqrt(this.inputCount);
@@ -51,7 +51,7 @@ namespace Delver {
         private const int WEIGHT_INDEX = 0;
 
         public override void Prepare() {
-            Assertion.Assert(this.InputCount == this.inputCount);
+            Assertion.IsTrue(this.InputCount == this.inputCount);
 
             // prepare multiply gates
             for(int i = 0; i < this.inputCount; ++i) {
@@ -83,7 +83,7 @@ namespace Delver {
                 PrepareAdditionGate(lastAddGate.ForwardUnit, this.weights[this.weights.Count - 1]);
             }
 
-            Assertion.Assert(this.addGates.Count == this.inputCount);
+            Assertion.IsTrue(this.addGates.Count == this.inputCount);
         }
 
         private Gate PrepareAdditionGate(Unit a, Unit b) {
@@ -96,7 +96,7 @@ namespace Delver {
         }
 
         public override void Backward() {
-            Assertion.Assert(this.weights[0].Gradient < 10000, "Gradient is too large. You might have forgotten to reset them.");
+            Assertion.IsTrue(this.weights[0].Gradient < 10000, "Gradient is too large. You might have forgotten to reset them.");
 
             // Addition first
             Backward(this.addGates);
@@ -225,9 +225,7 @@ namespace Delver {
             StringBuilder builder = new StringBuilder();
 
             for (int i = 0; i < this.multiplyGates.Count; ++i) {
-                Unit parameter = this.multiplyGates[i].GetInput(WEIGHT_INDEX);
-                Unit input = this.multiplyGates[i].GetInput(INPUT_INDEX);
-                builder.Append(this.multiplyGates[i].ToString()).Append(" + ");
+                builder.Append(this.multiplyGates[i]).Append(" + ");
             }
 
             // Add the last factor
@@ -264,7 +262,7 @@ namespace Delver {
 
             set {
                 // Set the weights
-                Assertion.Assert(value.Length == this.weights.Count);
+                Assertion.IsTrue(value.Length == this.weights.Count);
                 for(int i = 0; i < value.Length; ++i) {
                     this.weights[i].Value = value[i];
                 }

@@ -97,7 +97,7 @@ namespace Delver {
 
         // Note here that the action is also the next state
         private void AddStateAction(int state, int action) {
-            Assertion.Assert(!this.actionMap[state].Contains(action));
+            Assertion.IsTrue(!this.actionMap[state].Contains(action));
             this.actionMap[state].Add(action);
         }
 

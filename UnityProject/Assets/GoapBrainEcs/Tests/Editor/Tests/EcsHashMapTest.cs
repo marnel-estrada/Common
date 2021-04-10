@@ -123,9 +123,9 @@ namespace GoapBrainEcs {
                 
                 // Query and assert
                 for (byte i = 1; i <= 10; ++i) {
-                    Maybe<byte> found = hashMap.Find(i);
-                    Assert.IsTrue(found.Value == i * 2);
-                    Debug.Log($"{i}: {found.Value}");
+                    ValueTypeOption<byte> found = hashMap.Find(i);
+                    Assert.IsTrue(found.ValueOr(default) == i * 2);
+                    Debug.Log($"{i}: {found.ValueOr(default)}");
                 }
             }
         }
@@ -255,9 +255,9 @@ namespace GoapBrainEcs {
                     EcsHashMapWrapper<int, int> hashMap = new EcsHashMapWrapper<int, int>(hashMapEntity, 
                         this.allHashMaps, this.allBuckets, this.allEntryLists);
                     for (int i = 1; i <= TEST_COUNT; ++i) {
-                        Maybe<int> result = hashMap.Find(i);
-                        Assert.IsTrue(result.HasValue);
-                        Assert.IsTrue(result.Value == i * 2);
+                        var result = hashMap.Find(i);
+                        Assert.IsTrue(result.IsSome);
+                        Assert.IsTrue(result.ValueOr(default) == i * 2);
                     }
                 }
             }

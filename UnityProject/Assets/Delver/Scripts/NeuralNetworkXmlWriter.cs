@@ -87,7 +87,7 @@ namespace Delver {
             writer.WriteStartElement("Neuron");
 
             float[] weights = neuron.Weights;
-            Assertion.AssertNotNull(weights); // Neuron should have weights
+            Assertion.NotNull(weights); // Neuron should have weights
 
             // Write weights
             for(int i = 0; i < weights.Length; ++i) {

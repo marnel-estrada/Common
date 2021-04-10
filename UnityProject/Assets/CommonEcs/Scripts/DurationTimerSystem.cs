@@ -9,6 +9,7 @@ namespace CommonEcs {
     /// <summary>
     /// Updates duration timers with time scaling
     /// </summary>
+    [UpdateInGroup(typeof(ScalableTimeSystemGroup))]
     public class DurationTimerSystem : JobComponentSystem {
         private EntityQuery scaledQuery;
         private EntityQuery nonScaledQuery;

@@ -2,6 +2,7 @@ using Unity.Collections;
 using Unity.Entities;
 
 namespace CommonEcs.DotsFsm {
+    [UpdateInGroup(typeof(ScalableTimeSystemGroup))]
     public class DotsFsmSystemGroup : ComponentSystemGroup {
         private NativeReference<bool> rerunGroup;
 

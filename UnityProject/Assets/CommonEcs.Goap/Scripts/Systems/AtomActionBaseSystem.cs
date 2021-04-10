@@ -30,7 +30,18 @@ namespace CommonEcs.Goap {
                 processor = PrepareProcessor()
             };
             
-            return job.ScheduleParallel(this.query, 1, inputDeps);
+            return this.ShouldScheduleParallel ? 
+                job.ScheduleParallel(this.query, 1, inputDeps) : job.Schedule(this.query, inputDeps);
+        }
+
+        /// <summary>
+        /// There may be times that the action system might not want to schedule in parallel
+        /// Like for cases when they write using ComponentDataFromEntity
+        /// </summary>
+        protected virtual bool ShouldScheduleParallel {
+            get {
+                return true;
+            }
         }
 
         protected abstract TProcessor PrepareProcessor();

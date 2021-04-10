@@ -1,0 +1,15 @@
+{
+    "name": "GoapBrain",
+    "references": [
+        "CommonCode",
+        "CommonCore",
+        "CommonEcs",
+        "Common.Components",
+        "UnityThreading",
+        "Unity.Entities",
+        "Unity.Entities.Hybrid",
+        "Unity.Transforms"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}

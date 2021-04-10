@@ -1,0 +1,323 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c8b28d0e952e9f478f114c462cab3bb, type: 3}
+  m_Name: TestDomainData
+  m_EditorClassIdentifier: 
+  conditionNames:
+  - name: AxeInHand
+    renameMode: 0
+    newName: 
+  - name: AxeIsAvailable
+    renameMode: 0
+    newName: 
+  - name: NearLog
+    renameMode: 0
+    newName: 
+  - name: LogIsAvailable
+    renameMode: 0
+    newName: 
+  - name: HasFirewood
+    renameMode: 0
+    newName: 
+  - name: NewRenamedName
+    renameMode: 0
+    newName: NewRenamedName
+  - name: MoreConditionsPlease
+    renameMode: 0
+    newName: 
+  - name: MoreConditionsPlease1
+    renameMode: 0
+    newName: 
+  - name: MoreConditionsPlease2
+    renameMode: 0
+    newName: 
+  variables:
+    stringMap:
+      itemList:
+      - name: MoveDestination
+        varValue: 
+        useOtherHolder: 0
+        otherHolderName: 
+    intMap:
+      itemList: []
+    floatMap:
+      itemList: []
+    boolMap:
+      itemList: []
+    vector3Map:
+      itemList: []
+    intVector2Map:
+      itemList: []
+  actions:
+  - name: ChopLog
+    cost: 0
+    comment: "Sample comment hehehe Sample comment hehehe Sample comment hehehe Sample
+      comment hehehe Sample comment hehehe Sample comment hehehe Sample comment hehehe
+      Sample comment hehehe Sample comment hehehe Sample comment hehehe Sample comment
+      hehehe Sample comment hehehe Sample comment hehehe Sample comment hehehe Sample
+      comment hehehe Sample comment hehehe Sample comment hehehe Sample comment hehehe
+      \n\nSample comment hehehe Sample comment hehehe Sample comment hehehe Sample
+      comment hehehe Sample comment hehehe Sample comment hehehe Sample comment hehehe
+      Sample comment hehehe Sample comment hehehe Sample comment hehehe Sample comment
+      hehehe Sample comment hehehe Sample comment hehehe Sample comment hehehe Sample
+      comment hehehe Sample comment hehehe Sample comment hehehe Sample comment hehehe
+      \n\nSample comment hehehe Sample comment hehehe Sample comment hehehe Sample
+      comment hehehe Sample comment hehehe Sample comment hehehe Sample comment hehehe
+      Sample comment hehehe Sample comment hehehe Sample comment hehehe Sample comment
+      hehehe Sample comment hehehe Sample comment hehehe Sample comment hehehe Sample
+      comment hehehe Sample comment hehehe Sample comment hehehe Sample comment hehehe
+      \n\nSample comment hehehe Sample comment hehehe Sample comment hehehe Sample
+      comment hehehe Sample comment hehehe Sample comment hehehe Sample comment hehehe
+      Sample comment hehehe Sample comment hehehe Sample comment hehehe Sample comment
+      hehehe Sample comment hehehe Sample comment hehehe Sample comment hehehe Sample
+      comment hehehe Sample comment hehehe Sample comment hehehe Sample comment hehehe "
+    editComment: 0
+    showComment: 0
+    enabled: 1
+    preconditions:
+    - name: AxeInHand
+      value: 1
+    - name: NearLog
+      value: 1
+    effects:
+    - name: HasFirewood
+      value: 1
+    atomActions:
+    - className: GoapBrain.GoapTimedWait
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList:
+          - name: duration
+            varValue: 1
+            useOtherHolder: 0
+            otherHolderName: 
+        boolMap:
+          itemList: []
+        vector3Map:
+          itemList: []
+        intVector2Map:
+          itemList: []
+      showHints: 0
+    - className: GoapBrain.DebugLogAction
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList: []
+        boolMap:
+          itemList: []
+        vector3Map:
+          itemList: []
+        intVector2Map:
+          itemList: []
+      showHints: 0
+    - className: GoapBrain.MoveBySpeed
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList:
+          - name: speed
+            varValue: 1
+            useOtherHolder: 0
+            otherHolderName: 
+        boolMap:
+          itemList:
+          - name: ignoreZ
+            varValue: 0
+            useOtherHolder: 0
+            otherHolderName: 
+        vector3Map:
+          itemList:
+          - name: destination
+            varValue: {x: 0, y: 0, z: 0}
+            useOtherHolder: 0
+            otherHolderName: 
+        intVector2Map:
+          itemList: []
+      showHints: 0
+    - className: GoapBrain.MoveBySpeed
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList:
+          - name: speed
+            varValue: 0
+            useOtherHolder: 0
+            otherHolderName: 
+        boolMap:
+          itemList:
+          - name: ignoreZ
+            varValue: 0
+            useOtherHolder: 0
+            otherHolderName: 
+        vector3Map:
+          itemList:
+          - name: destination
+            varValue: {x: 0, y: 0, z: 0}
+            useOtherHolder: 0
+            otherHolderName: 
+        intVector2Map:
+          itemList: []
+      showHints: 0
+  - name: GetAxe
+    cost: 0
+    comment: 
+    editComment: 0
+    showComment: 0
+    enabled: 1
+    preconditions:
+    - name: AxeIsAvailable
+      value: 1
+    effects:
+    - name: AxeInHand
+      value: 1
+    atomActions: []
+  - name: CollectBranches
+    cost: 0
+    comment: 
+    editComment: 0
+    showComment: 0
+    enabled: 1
+    preconditions: []
+    effects:
+    - name: HasFirewood
+      value: 1
+    atomActions: []
+  - name: GoToLog
+    cost: 0
+    comment: 
+    editComment: 0
+    showComment: 0
+    enabled: 1
+    preconditions:
+    - name: LogIsAvailable
+      value: 1
+    effects:
+    - name: NearLog
+      value: 1
+    atomActions:
+    - className: GoapBrain.MoveBySpeed
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList:
+          - name: speed
+            varValue: 0
+            useOtherHolder: 0
+            otherHolderName: 
+        boolMap:
+          itemList:
+          - name: ignoreZ
+            varValue: 0
+            useOtherHolder: 0
+            otherHolderName: 
+        vector3Map:
+          itemList:
+          - name: destination
+            varValue: {x: 0, y: 0, z: 0}
+            useOtherHolder: 0
+            otherHolderName: 
+        intVector2Map:
+          itemList: []
+      showHints: 0
+  - name: TestRenameCondition
+    cost: 0
+    comment: 
+    editComment: 0
+    showComment: 0
+    enabled: 1
+    preconditions:
+    - name: NewRenamedName
+      value: 0
+    effects:
+    - name: NewRenamedName
+      value: 1
+    atomActions: []
+  conditionResolvers:
+  - conditionName: LogIsAvailable
+    resolver:
+      className: GoapBrain.ConstantResolver
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList: []
+        boolMap:
+          itemList:
+          - name: boolValue
+            varValue: 1
+            useOtherHolder: 0
+            otherHolderName: 
+        vector3Map:
+          itemList: []
+        intVector2Map:
+          itemList: []
+      showHints: 0
+  - conditionName: AxeIsAvailable
+    resolver:
+      className: GoapBrain.ConstantResolver
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList: []
+        boolMap:
+          itemList:
+          - name: boolValue
+            varValue: 0
+            useOtherHolder: 0
+            otherHolderName: 
+        vector3Map:
+          itemList: []
+        intVector2Map:
+          itemList: []
+      showHints: 0
+  - conditionName: NewRenamedName
+    resolver:
+      className: GoapBrain.ConstantResolver
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList: []
+        boolMap:
+          itemList:
+          - name: boolValue
+            varValue: 0
+            useOtherHolder: 0
+            otherHolderName: 
+        vector3Map:
+          itemList: []
+        intVector2Map:
+          itemList: []
+      showHints: 0
+  extensions: []

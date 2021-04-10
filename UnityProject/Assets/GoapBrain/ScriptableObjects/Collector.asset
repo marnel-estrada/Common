@@ -1,0 +1,303 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c8b28d0e952e9f478f114c462cab3bb, type: 3}
+  m_Name: Collector
+  m_EditorClassIdentifier: 
+  conditionNames:
+  - name: HasUnclaimedShinyObject
+    renameMode: 0
+    newName: 
+  - name: HasShinyObject
+    renameMode: 0
+    newName: 
+  - name: ShinyObjectIncreased
+    renameMode: 0
+    newName: 
+  variables:
+    stringMap:
+      itemList: []
+    intMap:
+      itemList: []
+    floatMap:
+      itemList:
+      - name: Speed
+        varValue: 0.5
+        useOtherHolder: 0
+        otherHolderName: 
+    boolMap:
+      itemList: []
+    vector3Map:
+      itemList:
+      - name: Destination
+        varValue: {x: 0, y: 0, z: 0}
+        useOtherHolder: 0
+        otherHolderName: 
+    intVector2Map:
+      itemList: []
+  actions:
+  - name: GetShinyObject
+    cost: 0
+    comment: 
+    editComment: 0
+    showComment: 0
+    enabled: 1
+    preconditions:
+    - name: HasUnclaimedShinyObject
+      value: 1
+    effects:
+    - name: HasShinyObject
+      value: 1
+    atomActions:
+    - className: GoapBrain.ReserveUnclaimed
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList: []
+        boolMap:
+          itemList: []
+        vector3Map:
+          itemList: []
+        intVector2Map:
+          itemList: []
+      showHints: 0
+    - className: GoapBrain.GetClaimedObjectPosition
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList: []
+        boolMap:
+          itemList: []
+        vector3Map:
+          itemList:
+          - name: result
+            varValue: {x: 0, y: 0, z: 0}
+            useOtherHolder: 1
+            otherHolderName: Destination
+        intVector2Map:
+          itemList: []
+      showHints: 0
+    - className: GoapBrain.MoveBySpeed
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList:
+          - name: speed
+            varValue: 0
+            useOtherHolder: 1
+            otherHolderName: Speed
+        boolMap:
+          itemList:
+          - name: ignoreZ
+            varValue: 1
+            useOtherHolder: 0
+            otherHolderName: 
+        vector3Map:
+          itemList:
+          - name: destination
+            varValue: {x: 0, y: 0, z: 0}
+            useOtherHolder: 1
+            otherHolderName: Destination
+        intVector2Map:
+          itemList: []
+      showHints: 0
+    - className: GoapBrain.CarryUnclaimedObject
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList: []
+        boolMap:
+          itemList: []
+        vector3Map:
+          itemList: []
+        intVector2Map:
+          itemList: []
+      showHints: 0
+  - name: ProcessShinyObject
+    cost: 0
+    comment: 
+    editComment: 0
+    showComment: 0
+    enabled: 1
+    preconditions:
+    - name: HasShinyObject
+      value: 1
+    effects:
+    - name: ShinyObjectIncreased
+      value: 1
+    atomActions:
+    - className: GoapBrain.GetProcessorPosition
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList: []
+        boolMap:
+          itemList: []
+        vector3Map:
+          itemList:
+          - name: result
+            varValue: {x: 0, y: 0, z: 0}
+            useOtherHolder: 1
+            otherHolderName: Destination
+        intVector2Map:
+          itemList: []
+      showHints: 0
+    - className: GoapBrain.MoveBySpeed
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList:
+          - name: speed
+            varValue: 0
+            useOtherHolder: 1
+            otherHolderName: Speed
+        boolMap:
+          itemList:
+          - name: ignoreZ
+            varValue: 1
+            useOtherHolder: 0
+            otherHolderName: 
+        vector3Map:
+          itemList:
+          - name: destination
+            varValue: {x: 0, y: 0, z: 0}
+            useOtherHolder: 1
+            otherHolderName: Destination
+        intVector2Map:
+          itemList: []
+      showHints: 0
+    - className: GoapBrain.ProcessShinyObject
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList: []
+        boolMap:
+          itemList: []
+        vector3Map:
+          itemList: []
+        intVector2Map:
+          itemList: []
+      showHints: 0
+  - name: Roam
+    cost: 5
+    comment: 
+    editComment: 0
+    showComment: 0
+    enabled: 1
+    preconditions: []
+    effects:
+    - name: ShinyObjectIncreased
+      value: 1
+    atomActions:
+    - className: GoapBrain.GetNewRoamPosition
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList: []
+        boolMap:
+          itemList: []
+        vector3Map:
+          itemList:
+          - name: result
+            varValue: {x: 0, y: 0, z: 0}
+            useOtherHolder: 1
+            otherHolderName: Destination
+        intVector2Map:
+          itemList: []
+      showHints: 0
+    - className: GoapBrain.MoveBySpeed
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList:
+          - name: speed
+            varValue: 0
+            useOtherHolder: 1
+            otherHolderName: Speed
+        boolMap:
+          itemList:
+          - name: ignoreZ
+            varValue: 1
+            useOtherHolder: 0
+            otherHolderName: 
+        vector3Map:
+          itemList:
+          - name: destination
+            varValue: {x: 0, y: 0, z: 0}
+            useOtherHolder: 1
+            otherHolderName: Destination
+        intVector2Map:
+          itemList: []
+      showHints: 0
+    - className: GoapBrain.GoapTimedWait
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList:
+          - name: duration
+            varValue: 0.5
+            useOtherHolder: 0
+            otherHolderName: 
+        boolMap:
+          itemList: []
+        vector3Map:
+          itemList: []
+        intVector2Map:
+          itemList: []
+      showHints: 0
+  conditionResolvers:
+  - conditionName: HasUnclaimedShinyObject
+    resolver:
+      className: GoapBrain.HasUnclaimedShinyObjectResolver
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList: []
+        boolMap:
+          itemList: []
+        vector3Map:
+          itemList: []
+        intVector2Map:
+          itemList: []
+      showHints: 0
+  extensions: []

@@ -1,0 +1,220 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c8b28d0e952e9f478f114c462cab3bb, type: 3}
+  m_Name: TestAgent
+  m_EditorClassIdentifier: 
+  conditionNames:
+  - name: HasFuel
+    renameMode: 0
+    newName: 
+  - name: Warm
+    renameMode: 0
+    newName: 
+  - name: HasFire
+    renameMode: 0
+    newName: 
+  - name: SatisfyFood
+    renameMode: 0
+    newName: 
+  - name: HasFood
+    renameMode: 0
+    newName: 
+  - name: HasIngredients
+    renameMode: 0
+    newName: 
+  variables:
+    stringMap:
+      itemList: []
+    intMap:
+      itemList: []
+    floatMap:
+      itemList: []
+    boolMap:
+      itemList: []
+    vector3Map:
+      itemList: []
+    intVector2Map:
+      itemList: []
+  actions:
+  - name: CollectTwigs
+    cost: 0
+    cancellable: 1
+    comment: 
+    editComment: 0
+    showComment: 0
+    enabled: 1
+    preconditions: []
+    effects:
+    - name: HasFuel
+      value: 1
+    atomActions:
+    - className: GoapBrain.IndefiniteWait
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList: []
+        boolMap:
+          itemList: []
+        vector3Map:
+          itemList: []
+        intVector2Map:
+          itemList: []
+      showHints: 0
+  - name: MakeFire
+    cost: 0
+    cancellable: 1
+    comment: 
+    editComment: 0
+    showComment: 0
+    enabled: 1
+    preconditions:
+    - name: HasFuel
+      value: 1
+    effects:
+    - name: HasFire
+      value: 1
+    atomActions:
+    - className: GoapBrain.IndefiniteWait
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList: []
+        boolMap:
+          itemList: []
+        vector3Map:
+          itemList: []
+        intVector2Map:
+          itemList: []
+      showHints: 0
+  - name: GoToNearFire
+    cost: 0
+    cancellable: 1
+    comment: 
+    editComment: 0
+    showComment: 0
+    enabled: 1
+    preconditions:
+    - name: HasFire
+      value: 1
+    effects:
+    - name: Warm
+      value: 1
+    atomActions:
+    - className: GoapBrain.IndefiniteWait
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList: []
+        boolMap:
+          itemList: []
+        vector3Map:
+          itemList: []
+        intVector2Map:
+          itemList: []
+      showHints: 0
+  - name: Fish
+    cost: 0
+    cancellable: 1
+    comment: 
+    editComment: 0
+    showComment: 0
+    enabled: 1
+    preconditions: []
+    effects:
+    - name: HasIngredients
+      value: 1
+    atomActions:
+    - className: GoapBrain.IndefiniteWait
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList: []
+        boolMap:
+          itemList: []
+        vector3Map:
+          itemList: []
+        intVector2Map:
+          itemList: []
+      showHints: 0
+  - name: Cook
+    cost: 0
+    cancellable: 1
+    comment: 
+    editComment: 0
+    showComment: 0
+    enabled: 1
+    preconditions:
+    - name: HasFire
+      value: 1
+    - name: HasIngredients
+      value: 1
+    effects:
+    - name: HasFood
+      value: 1
+    atomActions:
+    - className: GoapBrain.IndefiniteWait
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList: []
+        boolMap:
+          itemList: []
+        vector3Map:
+          itemList: []
+        intVector2Map:
+          itemList: []
+      showHints: 0
+  - name: Eat
+    cost: 0
+    cancellable: 1
+    comment: 
+    editComment: 0
+    showComment: 0
+    enabled: 1
+    preconditions:
+    - name: HasFood
+      value: 1
+    effects:
+    - name: SatisfyFood
+      value: 1
+    atomActions:
+    - className: GoapBrain.IndefiniteWait
+      variables:
+        stringMap:
+          itemList: []
+        intMap:
+          itemList: []
+        floatMap:
+          itemList: []
+        boolMap:
+          itemList: []
+        vector3Map:
+          itemList: []
+        intVector2Map:
+          itemList: []
+      showHints: 0
+  conditionResolvers: []
+  extensions: []

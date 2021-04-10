@@ -8,6 +8,7 @@ namespace CommonEcs.Goap {
     /// Populates the dynamic buffer of RequiredCondition elements based on the current goal
     /// of the planner
     /// </summary>
+    [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(StartPlanningSystem))]
     public class PopulateRequiredConditionsSystem : JobSystemBase {
         private EntityQuery query;

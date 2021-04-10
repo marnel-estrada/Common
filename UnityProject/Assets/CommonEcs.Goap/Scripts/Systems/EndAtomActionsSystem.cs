@@ -10,6 +10,7 @@ namespace CommonEcs.Goap {
     /// Aside from a marker that ends atom actions, it's also the system that copies the atom action result
     /// into the agent result.
     /// </summary>
+    [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(IdentifyAtomActionsThatCanExecuteSystem))]
     public class EndAtomActionsSystem : JobSystemBase {
         private EntityQuery atomActionsQuery;

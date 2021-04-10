@@ -8,6 +8,7 @@ namespace CommonEcs.Goap {
     /// Atom action systems should execute between IdentifyAtomActionsThatCanExecuteSystem and
     /// EndAtomActionsSystem.
     /// </summary>
+    [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(ChangeAgentStateToExecutingSystem))]
     public class IdentifyAtomActionsThatCanExecuteSystem : JobSystemBase {
         private EntityQuery query;

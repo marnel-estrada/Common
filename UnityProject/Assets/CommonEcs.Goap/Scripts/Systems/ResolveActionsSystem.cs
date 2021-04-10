@@ -4,6 +4,7 @@ using Unity.Entities;
 using Unity.Jobs;
 
 namespace CommonEcs.Goap {
+    [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(EndConditionResolversSystem))]
     public class ResolveActionsSystem : JobSystemBase {
         private EntityQuery query;

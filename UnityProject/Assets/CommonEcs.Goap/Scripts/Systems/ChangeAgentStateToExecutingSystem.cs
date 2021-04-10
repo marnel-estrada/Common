@@ -4,6 +4,7 @@ using Unity.Entities;
 using Unity.Jobs;
 
 namespace CommonEcs.Goap {
+    [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(MoveToNextGoalIfPlanningFailedSystem))]
     public class ChangeAgentStateToExecutingSystem : JobSystemBase {
         private EntityQuery query;

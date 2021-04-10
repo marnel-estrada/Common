@@ -6,6 +6,7 @@ namespace CommonEcs.Goap {
     /// This will set to results to the conditionsMap of the planner.
     /// This runs in a single thread. There's no way around it.
     /// </summary>
+    [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(IdentifyConditionsToResolveSystem))]
     public class EndConditionResolversSystem : SystemBase {
         protected override void OnUpdate() {

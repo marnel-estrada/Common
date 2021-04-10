@@ -9,6 +9,7 @@ namespace CommonEcs.Goap {
     /// </summary>
     /// <typeparam name="TActionFilter"></typeparam>
     /// <typeparam name="TProcessor"></typeparam>
+    [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(IdentifyAtomActionsThatCanExecuteSystem))]
     [UpdateBefore(typeof(EndAtomActionsSystem))]
     public abstract class AtomActionBaseSystem<TActionFilter, TProcessor> : JobSystemBase 

@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace GoapBrain {
     class ConditionResolverBrowserWindow : EditorWindow {
-        private GUISkin skin;
+        private GUISkin? skin;
 
         private TypeSelectionRenderer typeSelection;
 
@@ -21,8 +21,16 @@ namespace GoapBrain {
         /// <param name="onAdd"></param>
         public void Init(Action<Type> onSelect) {
             this.onSelect = onSelect;
-
-            this.skin = AssetDatabase.LoadAssetAtPath("Assets/GoapBrain/Editor/GoapEditorSkin.guiskin", typeof(GUISkin)) as GUISkin;
+            
+            // We did it this way so we can search for the skin even when the asset is in the package
+            string[] foundResults = AssetDatabase.FindAssets("GoapEditorSkin");
+            foreach (string guid in foundResults) {
+                this.skin = AssetDatabase.LoadAssetAtPath<GUISkin>(AssetDatabase.GUIDToAssetPath(guid));
+                if (this.skin != null) {
+                    // Found the skin
+                    break;
+                }
+            }
             Assertion.NotNull(this.skin);
 
             this.typeSelection = new TypeSelectionRenderer(typeof(ConditionResolver), this.skin.customStyles[0], OnTypeSelectionChange);

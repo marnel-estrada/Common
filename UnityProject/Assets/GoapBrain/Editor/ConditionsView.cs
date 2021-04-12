@@ -96,7 +96,7 @@ namespace GoapBrain {
             }
 
             // Check if it already exists
-            ConditionName name = data.GetConditionName(conditionName);
+            ConditionName? name = data.GetConditionName(conditionName);
             if (name != null) {
                 // An action with the same name already exists
                 EditorUtility.DisplayDialog("Can't add", "A condition with the same name already exists.", "OK");
@@ -175,18 +175,19 @@ namespace GoapBrain {
                 }
             }
 
-            // Rename effects
-            for (int i = 0; i < action.Effects.Count; ++i) {
-                Condition condition = action.Effects[i];
-                if (condition.Name.EqualsFast(oldName)) {
-                    condition.Name = newName;
-                }
+            // Rename effect
+            if (action.Effect == null) {
+                return;
+            }
+
+            if (action.Effect.Name.EqualsFast(oldName)) {
+                action.Effect.Name = newName;
             }
         }
 
         private void TryRemoveConditionName(GoapDomainData domain, ConditionName conditionName) {
             if (EditorUtility.DisplayDialogComplex("Remove Condition",
-                string.Format("Are you sure you want to remove condition \"{0}\"?", conditionName.Name), "Yes", "No",
+                $"Are you sure you want to remove condition \"{conditionName.Name}\"?", "Yes", "No",
                 "Cancel") != 0) {
                 // Deletion cancelled or selected No
                 return;
@@ -198,7 +199,7 @@ namespace GoapBrain {
             }
 
             // Remove resolver
-            ConditionResolverData resolver = domain.GetConditionResolver(conditionName.Name);
+            ConditionResolverData? resolver = domain.GetConditionResolver(conditionName.Name);
             if (resolver != null) {
                 domain.RemoveConditionResolver(resolver);
             }
@@ -208,23 +209,22 @@ namespace GoapBrain {
             GoapEditorSignals.REPAINT.Dispatch();
         }
 
-        private void RemoveAssociatedConditions(GoapActionData action, ConditionName conditionName) {
+        private static void RemoveAssociatedConditions(GoapActionData action, ConditionName conditionName) {
             // Remove from preconditions, there can only be one
-            Condition found = FindCondition(action.Preconditions, conditionName);
+            Condition? found = FindCondition(action.Preconditions, conditionName);
             if (found != null) {
                 action.Preconditions.Remove(found);
             }
 
-            // Remove from effects, there can only be one
-            found = FindCondition(action.Effects, conditionName);
-            if (found != null) {
-                action.Effects.Remove(found);
+            // Remove effect if the name is the same
+            if (action.Effect != null && action.Effect.Name.EqualsFast(conditionName.Name)) {
+                action.Effect = null;
             }
         }
 
-        private static Condition FindCondition(List<Condition> conditionList, ConditionName conditionName) {
+        private static Condition? FindCondition(IReadOnlyList<Condition> conditionList, ConditionName conditionName) {
             for (int i = 0; i < conditionList.Count; ++i) {
-                if (conditionList[i].Name.Equals(conditionName.Name)) {
+                if (conditionList[i].Name.EqualsFast(conditionName.Name)) {
                     return conditionList[i];
                 }
             }

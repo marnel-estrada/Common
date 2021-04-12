@@ -1,5 +1,7 @@
 using System;
 
+using Unity.Collections;
+
 namespace CommonEcs.Goap {
     /// <summary>
     /// This is an action that is used in planning. This is not the actual action that
@@ -32,6 +34,11 @@ namespace CommonEcs.Goap {
         /// <param name="cost"></param>
         /// <param name="effect"></param>
         public GoapAction(int id, float cost, in Condition effect) : this(id, cost, 1, effect) {
+        }
+
+        public GoapAction(FixedString64 name, float cost, in Condition effect) :
+            this(name.GetHashCode(), cost, effect) {
+            
         }
 
         public void AddPrecondition(Condition condition) {

@@ -45,7 +45,7 @@ namespace GoapBrain {
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public ConditionName GetConditionName(string name) {
+        public ConditionName? GetConditionName(string name) {
             for(int i = 0; i < this.conditionNames.Count; ++i) {
                 if(this.conditionNames[i].Name.Equals(name)) {
                     return this.conditionNames[i];
@@ -154,7 +154,7 @@ namespace GoapBrain {
         /// </summary>
         /// <param name="conditionName"></param>
         /// <returns></returns>
-        public ConditionResolverData GetConditionResolver(string conditionName) {
+        public ConditionResolverData? GetConditionResolver(string conditionName) {
             for(int i = 0; i < this.conditionResolvers.Count; ++i) {
                 ConditionResolverData data = this.conditionResolvers[i];
                 if(data.ConditionName.Equals(conditionName)) {

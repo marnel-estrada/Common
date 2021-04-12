@@ -145,16 +145,13 @@ namespace GoapBrain {
         }
 
         private static bool ContainsEffect(GoapActionData action, string filter) {
-            string loweredFilter = filter.ToLower();
-
-            for (int i = 0; i < action.Effects.Count; ++i) {
-                Condition precondition = action.Effects[i];
-                if (precondition.Name.ToLower().Contains(loweredFilter)) {
-                    return true;
-                }
+            if (action.Effect == null) {
+                return false;
             }
-
-            return false;
+            
+            // We use upper here because it is faster
+            string upperFilter = filter.ToUpperInvariant();
+            return action.Effect.Name.ToUpperInvariant().Contains(upperFilter);
         }
 
         private void Filter(GoapDomainData domainData, string filter, Func<GoapActionData, string, bool> predicate) {

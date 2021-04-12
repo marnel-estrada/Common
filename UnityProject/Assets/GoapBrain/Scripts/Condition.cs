@@ -44,8 +44,6 @@ namespace GoapBrain {
 
         public string Name {
             get {
-                Assertion.NotEmpty(this.name, "Trying to use condition name when it's empty. Maybe use ID instead.");
-
                 return this.name;
             }
 

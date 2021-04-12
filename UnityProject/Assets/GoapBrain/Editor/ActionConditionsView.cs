@@ -30,7 +30,7 @@ namespace GoapBrain {
         /// Renders a list of conditions
         /// </summary>
         /// <param name="conditionList"></param>
-        public void Render(GoapDomainData domain, List<Condition> conditionList) {
+        public void RenderConditions(GoapDomainData domain, List<Condition> conditionList) {
             // New condition
             RenderAddNewCondition(domain, conditionList);
 
@@ -140,7 +140,7 @@ namespace GoapBrain {
             GoapEditorSignals.REPAINT.Dispatch();
         }
 
-        private void MoveUp(GoapDomainData domain, List<Condition> conditionList, int index) {
+        private static void MoveUp(GoapDomainData domain, List<Condition> conditionList, int index) {
             if(index <= 0) {
                 // Can no longer move up
                 return;
@@ -152,7 +152,7 @@ namespace GoapBrain {
             GoapEditorSignals.REPAINT.Dispatch();
         }
 
-        private void MoveDown(GoapDomainData domain, List<Condition> conditionList, int index) {
+        private static void MoveDown(GoapDomainData domain, List<Condition> conditionList, int index) {
             if (index + 1 >= conditionList.Count) {
                 // Can no longer move down
                 return;
@@ -164,11 +164,83 @@ namespace GoapBrain {
             GoapEditorSignals.REPAINT.Dispatch();
         }
 
-        private static void Swap(List<Condition> conditionList, int a, int b) {
+        private static void Swap(IList<Condition> conditionList, int a, int b) {
             Condition temp = conditionList[a];
             conditionList[a] = conditionList[b];
             conditionList[b] = temp;
         }
 
+        /// <summary>
+        /// Renders a single condition
+        /// </summary>
+        /// <param name="conditionList"></param>
+        public void RenderEffect(GoapDomainData domain, GoapActionData action) {
+            // New condition
+            RenderSelectCondition(domain, action);
+
+            GUILayout.Space(5);
+            
+            // Render the effect
+            if (action.Effect == null || string.IsNullOrEmpty(action.Effect.Name)) {
+                // Empty
+                GUILayout.Label("(Empty)");
+            } else {
+                // Render the single effect
+                GUILayout.BeginHorizontal();
+
+                // Name
+                GUI.backgroundColor = this.backgroundColor;
+                GUILayout.Box(action.Effect.Name, GUILayout.Width(400), GUILayout.Height(20));
+                GUI.backgroundColor = ColorUtils.WHITE;
+
+                // Value
+                action.Effect.Value = GUILayout.Toggle(action.Effect.Value, action.Effect.Value ? "true" : "false", EditorStyles.miniButton, GUILayout.Width(50), GUILayout.Height(20));
+
+                GUILayout.EndHorizontal();
+            }
+        }
+        
+        private void RenderSelectCondition(GoapDomainData domain, GoapActionData action) {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Effect Name:", GUILayout.Width(80), GUILayout.Height(20));
+
+            GUI.backgroundColor = this.backgroundColor;
+            GUILayout.Box(string.IsNullOrEmpty(this.newConditionName) ? "(none selected)" : this.newConditionName,
+                GUILayout.Width(200));
+            GUI.backgroundColor = Color.white;
+
+            Rect buttonRect = GUILayoutUtility.GetRect(this.chooseGuiContent, GUI.skin.button, GUILayout.Width(70), GUILayout.Height(20));
+            if (GUI.Button(buttonRect, "Choose...")) {
+                GoapEditorUtils.OpenConditionSelector(domain, this.parent, OnConditionSelected, this.includeExtensions);
+            }
+
+            GUILayout.Space(5);
+            
+            this.newConditionValue = GUILayout.Toggle(this.newConditionValue, this.newConditionValue ? "true" : "false", EditorStyles.miniButton, GUILayout.Width(50), GUILayout.Height(20));
+
+            GUILayout.Space(5);
+
+            GUI.backgroundColor = ColorUtils.GREEN;
+            if (GUILayout.Button("Set", GUILayout.Width(40), GUILayout.Height(20))) {
+                SetNewEffect(domain, action);
+            }
+            GUI.backgroundColor = ColorUtils.WHITE;
+            GUILayout.EndHorizontal();
+        }
+        
+        private void SetNewEffect(GoapDomainData domain, GoapActionData action) {
+            if(string.IsNullOrEmpty(this.newConditionName)) {
+                // No condition currently chosen
+                return;
+            }
+
+            Condition newEffect = new Condition(this.newConditionName, this.newConditionValue);
+            action.Effect = newEffect;
+
+            this.newConditionName = "";
+
+            EditorUtility.SetDirty(domain);
+            GoapEditorSignals.REPAINT.Dispatch();
+        }
     }
 }

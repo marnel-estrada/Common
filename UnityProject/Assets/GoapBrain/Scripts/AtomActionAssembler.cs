@@ -5,7 +5,7 @@ namespace GoapBrain {
     /// <summary>
     /// A class that represents an atomized action
     /// </summary>
-    public abstract class GoapAtomAction {
+    public abstract class AtomActionAssembler {
         /// <summary>
         /// Entity archetype of the atom action can be made here to save garbage when using
         /// EntityManager.CreateEntity(params Type[])

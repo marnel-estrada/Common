@@ -35,6 +35,10 @@ namespace GoapBrain {
         [SerializeField]
         private List<Condition> effects = new List<Condition>();
 
+        // Note here that we changed the convention for each action to only have one effect
+        [SerializeField]
+        private Condition? effect;
+
         [SerializeField]
         private List<ClassData> atomActions = new List<ClassData>();
 
@@ -123,6 +127,15 @@ namespace GoapBrain {
 
             set {
                 cancellable = value;
+            }
+        }
+
+        public Condition? Effect {
+            get {
+                return this.effect;
+            }
+            set {
+                this.effect = value;
             }
         }
 

@@ -127,7 +127,7 @@ namespace GoapBrain {
             GUILayout.Label("Preconditions:");
             ActionConditionsView preconditionsView = ResolvePreconditionsView(extension);
             Assertion.NotNull(preconditionsView);
-            preconditionsView.Render(domainData, extension.Preconditions);
+            preconditionsView.RenderConditions(domainData, extension.Preconditions);
         }
     }
 }

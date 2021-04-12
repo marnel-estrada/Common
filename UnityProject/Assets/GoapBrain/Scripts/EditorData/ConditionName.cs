@@ -4,7 +4,6 @@ using UnityEngine;
 namespace GoapBrain {
     [Serializable]
     public class ConditionName {
-
         // Name of the condition
         [SerializeField]
         private string name;
@@ -45,6 +44,5 @@ namespace GoapBrain {
                 this.newName = value;
             }
         }
-
     }
 }

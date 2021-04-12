@@ -4,7 +4,7 @@ using Unity.Collections;
 using Unity.Entities;
 
 namespace GoapBrain {
-    public abstract class SingleComponentAssembler<T> : GoapAtomAction where T : unmanaged, IComponentData {
+    public abstract class SingleComponentAssembler<T> : AtomActionAssembler where T : unmanaged, IComponentData {
         private EntityArchetype archetype;
 
         public override void Init(ref EntityManager entityManager) {

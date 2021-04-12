@@ -79,16 +79,16 @@ namespace GoapBrain {
             GUILayout.Box("Preconditions", GUILayout.Width(100));
             GUI.backgroundColor = ColorUtils.WHITE;
 
-            this.preconditionsView.Render(domain, action.Preconditions);
+            this.preconditionsView.RenderConditions(domain, action.Preconditions);
 
             GUILayout.Space(10);
 
             // Effects
             GUI.backgroundColor = ColorUtils.GREEN;
-            GUILayout.Box("Effects", GUILayout.Width(70));
+            GUILayout.Box("Effect", GUILayout.Width(70));
             GUI.backgroundColor = ColorUtils.WHITE;
 
-            this.effectsView.Render(domain, action.Effects);
+            this.effectsView.RenderEffect(domain, action);
 
             GUILayout.Space(10);
 

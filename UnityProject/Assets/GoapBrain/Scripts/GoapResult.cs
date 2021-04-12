@@ -3,10 +3,8 @@
     /// Enum of goap results
     /// </summary>
     public enum GoapResult {
-
         SUCCESS,
         FAILED,
         RUNNING
-
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEditor;
 
 namespace GoapBrain {
-    class AtomActionBrowserWindow : EditorWindow {
+    internal class AtomActionBrowserWindow : EditorWindow {
         private GUISkin skin;
 
         private TypeSelectionRenderer typeSelection;
@@ -41,9 +41,7 @@ namespace GoapBrain {
             this.selectedType = type;
         }
 
-        private Vector2 scrollPos = new Vector2();
-
-        void OnGUI() {
+        private void OnGUI() {
             EditorGUILayout.BeginVertical();
 
             GUILayout.Label("Atom Actions Browser", EditorStyles.boldLabel);

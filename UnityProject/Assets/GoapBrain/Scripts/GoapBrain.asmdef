@@ -4,11 +4,13 @@
         "CommonCode",
         "CommonCore",
         "CommonEcs",
+        "CommonEcs.Goap",
         "Common.Components",
         "UnityThreading",
         "Unity.Entities",
         "Unity.Entities.Hybrid",
-        "Unity.Transforms"
+        "Unity.Transforms",
+        "Unity.Collections"
     ],
     "includePlatforms": [],
     "excludePlatforms": []

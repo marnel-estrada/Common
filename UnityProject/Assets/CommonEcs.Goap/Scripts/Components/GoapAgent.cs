@@ -1,6 +1,7 @@
 using Unity.Entities;
 
 namespace CommonEcs.Goap {
+    [GenerateAuthoringComponent]
     public struct GoapAgent : IComponentData {
         // Note here that the first goal is the main goal. Then if it can't resolve
         // actions, it will try to resolve the next goals.

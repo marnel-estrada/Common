@@ -35,10 +35,9 @@ namespace CommonEcs.Goap {
         /// <param name="effect"></param>
         public GoapAction(int id, float cost, in Condition effect) : this(id, cost, 1, effect) {
         }
-
-        public GoapAction(FixedString64 name, float cost, in Condition effect) :
-            this(name.GetHashCode(), cost, effect) {
-            
+        
+        public GoapAction(FixedString64 name, float cost, int atomActionsCount, in Condition effect) :
+            this(name.GetHashCode(), cost, atomActionsCount, effect) {
         }
 
         public void AddPrecondition(Condition condition) {

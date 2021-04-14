@@ -50,5 +50,10 @@
             
             return this.provider(default!);
         }
+
+        // Do not remove this even if not called. This is invoked by reflection such as StaticFieldsInvoker.
+        public void ClearProvider() {
+            this.provider = null;
+        }
     }
 }

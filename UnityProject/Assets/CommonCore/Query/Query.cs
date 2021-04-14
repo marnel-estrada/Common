@@ -7,7 +7,7 @@
     /// <typeparam name="TRequest"></typeparam>
     /// <typeparam name="TResult"></typeparam>
     public class Query<TRequest, TResult> {
-        private Func<TRequest, TResult> provider;
+        private Func<TRequest, TResult>? provider;
 
         /// <summary>
         /// Registers a provider
@@ -31,7 +31,10 @@
         /// <param name="request"></param>
         /// <returns></returns>
         public TResult Execute(TRequest request) {
-            Assertion.NotNull(this.provider);
+            if (this.provider == null) {
+                throw new Exception("Provider was not specified yet");
+            }
+            
             return this.provider(request);
         }
 
@@ -41,12 +44,11 @@
         /// </summary>
         /// <returns></returns>
         public TResult Execute() {
-            Assertion.NotNull(this.provider);
-            return this.provider(default(TRequest));
-        }
-
-        public void ClearProvider() {
-            this.provider = null;
+            if (this.provider == null) {
+                throw new Exception("Provider was not specified yet");
+            }
+            
+            return this.provider(default!);
         }
     }
 }

@@ -5,7 +5,7 @@ namespace GoapBrain {
     /// <summary>
     /// An abstract base class for classes that resolves a condition value
     /// </summary>
-    public abstract class ConditionResolver {
+    public abstract class ConditionResolverAssembler {
         /// <summary>
         /// Entity archetype of the atom action can be made here to save garbage when using
         /// EntityManager.CreateEntity(params Type[])
@@ -20,6 +20,6 @@ namespace GoapBrain {
         /// <param name="agentEntity"></param>
         /// <param name="linkedEntities"></param>
         public abstract void Prepare(ref EntityManager entityManager, in Entity agentEntity,
-            ref NativeList<Entity> linkedEntities);
+            in FixedString64 conditionName, ref NativeList<Entity> linkedEntities);
     }
 }

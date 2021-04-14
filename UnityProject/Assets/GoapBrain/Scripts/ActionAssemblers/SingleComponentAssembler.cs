@@ -7,12 +7,14 @@ namespace GoapBrain {
     public abstract class SingleComponentAssembler<T> : AtomActionAssembler where T : unmanaged, IComponentData {
         private EntityArchetype archetype;
 
-        public override void Init(ref EntityManager entityManager) {
+        public override void Init(ref EntityManager entityManager, int actionId, int order) {
+            base.Init(ref entityManager, actionId, order);
             this.archetype = entityManager.CreateArchetype(typeof(AtomAction), typeof(T));
         }
 
-        public override void Prepare(ref EntityManager entityManager, in Entity agentEntity, ref NativeList<Entity> linkedEntities) {
+        public override void Prepare(ref EntityManager entityManager, in Entity agentEntity,ref NativeList<Entity> linkedEntities) {
             Entity actionEntity = entityManager.CreateEntity(this.archetype);
+            entityManager.SetComponentData(actionEntity, new AtomAction(this.ActionId, agentEntity, this.Order));
             PrepareAction(ref entityManager, agentEntity, actionEntity);
             linkedEntities.Add(actionEntity);
         }

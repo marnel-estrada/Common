@@ -80,12 +80,9 @@ namespace CommonEcs.Goap {
                     return false;
                 }
 
-                if (agent.currentAtomActionIndex != atomAction.order) {
-                    // Not yet the correct order to execute
-                    return false;
-                }
-
-                return true;
+                // Returns true if the atom action's order is also the same as the agent's
+                // currentAtomActionIndex
+                return agent.currentAtomActionIndex == atomAction.order;
             }
         }
     }

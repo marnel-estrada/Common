@@ -33,7 +33,7 @@ namespace GoapBrain {
             }
             Assertion.NotNull(this.skin);
 
-            this.typeSelection = new TypeSelectionRenderer(typeof(ConditionResolver), this.skin.customStyles[0], OnTypeSelectionChange);
+            this.typeSelection = new TypeSelectionRenderer(typeof(ConditionResolverAssembler), this.skin.customStyles[0], OnTypeSelectionChange);
         }
 
         private void OnTypeSelectionChange(Type type) {

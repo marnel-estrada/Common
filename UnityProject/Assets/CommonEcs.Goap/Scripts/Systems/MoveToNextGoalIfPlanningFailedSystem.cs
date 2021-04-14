@@ -37,9 +37,16 @@ namespace CommonEcs.Goap {
                         // Not failed
                         continue;
                     }
+
+                    GoapAgent agent = this.allAgents[planner.agentEntity];
+
+                    // Agent does not have a goal yet
+                    // This also prevents divide by zero
+                    if (agent.goals.Count == 0) {
+                        continue;
+                    }
                     
                     // Move goalIndex to the next
-                    GoapAgent agent = this.allAgents[planner.agentEntity];
                     planner.goalIndex = (planner.goalIndex + 1) % agent.goals.Count;
                     planner.StartPlanning(agent.goals[planner.goalIndex]);
                     

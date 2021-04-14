@@ -30,6 +30,7 @@
             }
         }
 
+        // Do not remove this even if not called. This is invoked by reflection such as StaticFieldsInvoker.
         public void ClearListeners() {
             this.listeners.Clear();
         }

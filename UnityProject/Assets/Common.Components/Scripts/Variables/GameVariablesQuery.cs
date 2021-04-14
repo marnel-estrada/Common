@@ -21,9 +21,6 @@ namespace Common {
             CLEAR_PROVIDERS.Execute();
         }
 
-        // Parameters
-        public const string KEY = "Key";
-
         private void Awake() {
             Assertion.NotNull(this.gameVariables);
             

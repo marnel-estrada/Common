@@ -30,11 +30,11 @@ namespace GoapBrain {
         private bool enabled = true;
 
         [SerializeField]
-        private List<Condition> preconditions = new List<Condition>();
+        private List<ConditionData> preconditions = new List<ConditionData>();
 
         // Note here that we changed the convention for each action to only have one effect
         [SerializeField]
-        private Condition? effect;
+        private ConditionData? effect;
 
         [SerializeField]
         private List<ClassData> atomActions = new List<ClassData>();
@@ -49,7 +49,7 @@ namespace GoapBrain {
             }
         }
 
-        public List<Condition> Preconditions {
+        public List<ConditionData> Preconditions {
             get {
                 return preconditions;
             }
@@ -121,7 +121,7 @@ namespace GoapBrain {
             }
         }
 
-        public Condition? Effect {
+        public ConditionData? Effect {
             get {
                 return this.effect;
             }

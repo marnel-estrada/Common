@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace GoapBrain {
     [Serializable]
-    public class Condition {
+    public class ConditionData {
         [SerializeField]
         private string name;
 
@@ -19,14 +19,14 @@ namespace GoapBrain {
         /// <summary>
         ///     Empty constructor
         /// </summary>
-        public Condition() {
+        public ConditionData() {
         }
 
         /// <summary>
         ///     Constructor with specified values
         /// </summary>
         /// <param name="name"></param>
-        public Condition(string name, bool value) {
+        public ConditionData(string name, bool value) {
             this.name = name;
             this.value = value;
         }
@@ -37,7 +37,7 @@ namespace GoapBrain {
         /// </summary>
         /// <param name="id"></param>
         /// <param name="value"></param>
-        public Condition(ConditionId id, bool value) {
+        public ConditionData(ConditionId id, bool value) {
             this.id = id;
             this.value = value;
         }

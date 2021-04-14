@@ -7,7 +7,7 @@ namespace GoapBrain {
     public class GoapExtensionData {
 
         [SerializeField]
-        private List<Condition> preconditions = new List<Condition>();
+        private List<ConditionData> preconditions = new List<ConditionData>();
 
         [SerializeField]
         private GoapDomainData domainData;
@@ -22,7 +22,7 @@ namespace GoapBrain {
             }
         }
 
-        public List<Condition> Preconditions {
+        public List<ConditionData> Preconditions {
             get {
                 return preconditions;
             }

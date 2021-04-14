@@ -159,7 +159,7 @@ namespace GoapBrain {
 
         private void RenameConditions(GoapExtensionData extension, string oldName, string newName) {
             for (int i = 0; i < extension.Preconditions.Count; ++i) {
-                Condition condition = extension.Preconditions[i];
+                ConditionData condition = extension.Preconditions[i];
                 if (condition.Name.EqualsFast(oldName)) {
                     condition.Name = newName;
                 }
@@ -169,7 +169,7 @@ namespace GoapBrain {
         private void RenameConditions(GoapActionData action, string oldName, string newName) {
             // Rename preconditions
             for (int i = 0; i < action.Preconditions.Count; ++i) {
-                Condition condition = action.Preconditions[i];
+                ConditionData condition = action.Preconditions[i];
                 if (condition.Name.EqualsFast(oldName)) {
                     condition.Name = newName;
                 }
@@ -211,7 +211,7 @@ namespace GoapBrain {
 
         private static void RemoveAssociatedConditions(GoapActionData action, ConditionName conditionName) {
             // Remove from preconditions, there can only be one
-            Condition? found = FindCondition(action.Preconditions, conditionName);
+            ConditionData? found = FindCondition(action.Preconditions, conditionName);
             if (found != null) {
                 action.Preconditions.Remove(found);
             }
@@ -222,7 +222,7 @@ namespace GoapBrain {
             }
         }
 
-        private static Condition? FindCondition(IReadOnlyList<Condition> conditionList, ConditionName conditionName) {
+        private static ConditionData? FindCondition(IReadOnlyList<ConditionData> conditionList, ConditionName conditionName) {
             for (int i = 0; i < conditionList.Count; ++i) {
                 if (conditionList[i].Name.EqualsFast(conditionName.Name)) {
                     return conditionList[i];

@@ -48,17 +48,16 @@ namespace GoapBrain {
 
             for (int i = 0; i < data.ActionCount; ++i) {
                 GoapActionData actionData = data.GetActionAt(i);
-                Condition? effectData = actionData.Effect;
+                ConditionData? effectData = actionData.Effect;
                 Assertion.NotNull(effectData);
 
                 if (effectData == null) {
                     throw new Exception($"Action {actionData.Name} does not have an effect.");
                 }
 
-                CommonEcs.Goap.Condition unmanagedEffect =
-                    new CommonEcs.Goap.Condition(effectData.Name, effectData.Value);
+                Condition effect = new Condition(effectData.Name, effectData.Value);
                 GoapAction action = new GoapAction(actionData.Name, actionData.Cost, actionData.AtomActions.Count, 
-                    unmanagedEffect);
+                    effect);
                     
                 AddPreconditions(ref action, actionData);
                 Assertion.IsTrue(action.preconditions.Count == actionData.Preconditions.Count);
@@ -77,7 +76,7 @@ namespace GoapBrain {
 
         private static void AddPreconditions(ref GoapAction action, GoapActionData data) {
             for (int i = 0; i < data.Preconditions.Count; ++i) {
-                Condition preconditionData = data.Preconditions[i];
+                ConditionData preconditionData = data.Preconditions[i];
                 CommonEcs.Goap.Condition unmanagedPrecondition =
                     new CommonEcs.Goap.Condition(preconditionData.Name, preconditionData.Value);
                 action.AddPrecondition(unmanagedPrecondition);

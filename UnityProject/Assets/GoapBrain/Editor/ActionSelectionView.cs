@@ -125,7 +125,7 @@ namespace GoapBrain {
             string loweredFilter = filter.ToLower();
 
             for (int i = 0; i < action.Preconditions.Count; ++i) {
-                Condition precondition = action.Preconditions[i];
+                ConditionData precondition = action.Preconditions[i];
                 if (precondition.Name.ToLower().Contains(loweredFilter)) {
                     return true;
                 }

@@ -30,7 +30,7 @@ namespace GoapBrain {
         /// Renders a list of conditions
         /// </summary>
         /// <param name="conditionList"></param>
-        public void RenderConditions(GoapDomainData domain, List<Condition> conditionList) {
+        public void RenderConditions(GoapDomainData domain, List<ConditionData> conditionList) {
             // New condition
             RenderAddNewCondition(domain, conditionList);
 
@@ -49,7 +49,7 @@ namespace GoapBrain {
         
         private readonly GUIContent chooseGuiContent = new GUIContent("Choose...");
 
-        private void RenderAddNewCondition(GoapDomainData domain, List<Condition> conditionList) {
+        private void RenderAddNewCondition(GoapDomainData domain, List<ConditionData> conditionList) {
             GUILayout.BeginHorizontal();
             GUILayout.Label("New:", GUILayout.Width(40), GUILayout.Height(20));
 
@@ -77,7 +77,7 @@ namespace GoapBrain {
             GUILayout.EndHorizontal();
         }
 
-        private void RenderCondition(GoapDomainData domain, List<Condition> conditionList, Condition condition, int index) {
+        private void RenderCondition(GoapDomainData domain, List<ConditionData> conditionList, ConditionData condition, int index) {
             GUILayout.BeginHorizontal();
 
             // Remove button
@@ -110,7 +110,7 @@ namespace GoapBrain {
             this.newConditionName = conditionName;
         }
 
-        private void AddNewCondition(GoapDomainData domain, List<Condition> conditionList) {
+        private void AddNewCondition(GoapDomainData domain, List<ConditionData> conditionList) {
             if(string.IsNullOrEmpty(this.newConditionName)) {
                 // No condition currently chosen
                 return;
@@ -118,7 +118,7 @@ namespace GoapBrain {
 
             // Check if the same condition already exists
 
-            Condition condition = new Condition(this.newConditionName, this.newConditionValue);
+            ConditionData condition = new ConditionData(this.newConditionName, this.newConditionValue);
             conditionList.Add(condition);
 
             this.newConditionName = "";
@@ -127,7 +127,7 @@ namespace GoapBrain {
             GoapEditorSignals.REPAINT.Dispatch();
         }
 
-        private void RemoveCondition(GoapDomainData domain, List<Condition> conditionList, Condition condition) {
+        private void RemoveCondition(GoapDomainData domain, List<ConditionData> conditionList, ConditionData condition) {
             if(EditorUtility.DisplayDialogComplex(string.Format("Remove {0}", this.itemName), string.Format("Are you sure you want to remove {0} \"{1}\"", this.itemName, condition.Name), 
                 "Yes", "No", "Cancel") != 0) {
                 // Cancelled or selected No
@@ -140,7 +140,7 @@ namespace GoapBrain {
             GoapEditorSignals.REPAINT.Dispatch();
         }
 
-        private static void MoveUp(GoapDomainData domain, List<Condition> conditionList, int index) {
+        private static void MoveUp(GoapDomainData domain, List<ConditionData> conditionList, int index) {
             if(index <= 0) {
                 // Can no longer move up
                 return;
@@ -152,7 +152,7 @@ namespace GoapBrain {
             GoapEditorSignals.REPAINT.Dispatch();
         }
 
-        private static void MoveDown(GoapDomainData domain, List<Condition> conditionList, int index) {
+        private static void MoveDown(GoapDomainData domain, List<ConditionData> conditionList, int index) {
             if (index + 1 >= conditionList.Count) {
                 // Can no longer move down
                 return;
@@ -164,8 +164,8 @@ namespace GoapBrain {
             GoapEditorSignals.REPAINT.Dispatch();
         }
 
-        private static void Swap(IList<Condition> conditionList, int a, int b) {
-            Condition temp = conditionList[a];
+        private static void Swap(IList<ConditionData> conditionList, int a, int b) {
+            ConditionData temp = conditionList[a];
             conditionList[a] = conditionList[b];
             conditionList[b] = temp;
         }
@@ -234,7 +234,7 @@ namespace GoapBrain {
                 return;
             }
 
-            Condition newEffect = new Condition(this.newConditionName, this.newConditionValue);
+            ConditionData newEffect = new ConditionData(this.newConditionName, this.newConditionValue);
             action.Effect = newEffect;
 
             this.newConditionName = "";

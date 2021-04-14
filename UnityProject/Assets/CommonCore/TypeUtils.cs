@@ -18,7 +18,7 @@ namespace Common {
         public static Type GetType(string typeName) {
             // Try Type.GetType() first. This will work with types defined
             // by the Mono runtime, in the same assembly as the caller, etc.
-            Type type = Type.GetType(typeName);
+            Type? type = Type.GetType(typeName);
 
             // If it worked, then we're done here
             if(type != null) {
@@ -41,12 +41,14 @@ namespace Common {
             foreach(AssemblyName assemblyName in referencedAssemblies) {
                 // Load the referenced assembly
                 Assembly assembly = Assembly.Load(assemblyName);
-                if(assembly != null) {
-                    // See if that assembly defines the named type
-                    type = assembly.GetType(typeName);
-                    if(type != null) {
-                        return type;
-                    }
+                if (assembly == null) {
+                    continue;
+                }
+
+                // See if that assembly defines the named type
+                type = assembly.GetType(typeName);
+                if(type != null) {
+                    return type;
                 }
             }
 
@@ -114,7 +116,7 @@ namespace Common {
         /// <typeparam name="T"></typeparam>
         /// <param name="property"></param>
         /// <returns></returns>
-        public static T GetCustomAttribute<T>(PropertyInfo property) where T : Attribute {
+        public static T? GetCustomAttribute<T>(PropertyInfo property) where T : Attribute {
             Attribute attribute = Attribute.GetCustomAttribute(property, typeof(T));
             return attribute as T;
         }
@@ -123,6 +125,8 @@ namespace Common {
         /// Instantiates an instance from a class name
         /// </summary>
         /// <param name="className"></param>
+        /// <param name="data"></param>
+        /// <param name="parentVariables"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public static Option<T> Instantiate<T>(ClassData data, NamedValueLibrary parentVariables) where T : class {

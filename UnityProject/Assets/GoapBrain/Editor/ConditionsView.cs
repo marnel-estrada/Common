@@ -146,24 +146,9 @@ namespace GoapBrain {
                 }
             }
 
-            // Renamed preconditions in extensions
-            for (int i = 0; i < domain.Extensions.Count; ++i) {
-                GoapExtensionData extension = domain.Extensions[i];
-                RenameConditions(extension, conditionName.Name, conditionName.NewName);
-            }
-
             // Finally, rename the condition name itself
             conditionName.Name = conditionName.NewName;
             conditionName.RenameMode = false;
-        }
-
-        private void RenameConditions(GoapExtensionData extension, string oldName, string newName) {
-            for (int i = 0; i < extension.Preconditions.Count; ++i) {
-                ConditionData condition = extension.Preconditions[i];
-                if (condition.Name.EqualsFast(oldName)) {
-                    condition.Name = newName;
-                }
-            }
         }
 
         private void RenameConditions(GoapActionData action, string oldName, string newName) {

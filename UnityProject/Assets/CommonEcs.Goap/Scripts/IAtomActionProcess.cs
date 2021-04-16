@@ -5,7 +5,7 @@ namespace CommonEcs.Goap {
     /// An interface used to qualify structs as an atom action
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IAtomActionProcess<T> where T : struct, IComponentData {
+    public interface IAtomActionProcess<T> where T : unmanaged, IComponentData {
         /// <summary>
         /// Start routines
         /// </summary>

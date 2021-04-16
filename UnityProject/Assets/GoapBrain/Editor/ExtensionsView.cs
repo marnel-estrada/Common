@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace GoapBrain {
     internal class ExtensionsView {
-        private GoapDomainData newExtensionDomainData;
+        private GoapDomainData? newExtensionDomainData;
 
         private readonly EditorWindow parent;
 
@@ -22,7 +22,6 @@ namespace GoapBrain {
         /// </summary>
         public ExtensionsView(EditorWindow parent) {
             this.parent = parent;
-            //this.preconditionsView = new ActionConditionsView(parent, "Precondition", ColorUtils.RED, false);
         }
 
         /// <summary>
@@ -106,7 +105,7 @@ namespace GoapBrain {
                 if (EditorUtility.DisplayDialogComplex("Delete Extension",
                     "Are you sure you want to delete \"{0}\"?".FormatWith(extension.DomainData.name), "Yes", "No",
                     "Cancel") == 0) {
-                    // Chosed Yes
+                    // Chosen Yes
                     domainData.Extensions.Remove(extension);
                     EditorUtility.SetDirty(domainData);
                     this.parent.Repaint();
@@ -123,11 +122,6 @@ namespace GoapBrain {
                 EditorGUILayout.ObjectField(extension.DomainData, typeof(GoapDomainData), false, GUILayout.Width(200))
                     as GoapDomainData;
             GUILayout.EndHorizontal();
-
-            GUILayout.Label("Preconditions:");
-            ActionConditionsView preconditionsView = ResolvePreconditionsView(extension);
-            Assertion.NotNull(preconditionsView);
-            preconditionsView.RenderConditions(domainData, extension.Preconditions);
         }
     }
 }

@@ -71,12 +71,12 @@ namespace CommonEcs.Goap {
                     }
 
                     if (this.actionFilterHasArray) {
-                        TActionFilter filterAction = filterActions[i];
-                        ExecuteAction(ref atomAction, ref filterAction);
+                        TActionFilter actionFilter = filterActions[i];
+                        ExecuteAction(ref atomAction, ref actionFilter);
 
                         // Modify
                         atomActions[i] = atomAction;
-                        filterActions[i] = filterAction;
+                        filterActions[i] = actionFilter;
                     } else {
                         // There's no array for the TActionFilter. It must be a tag component.
                         // Use a default filter component
@@ -88,10 +88,10 @@ namespace CommonEcs.Goap {
                 }
             }
 
-            private void ExecuteAction(ref AtomAction atomAction, ref TActionFilter filterAction) {
+            private void ExecuteAction(ref AtomAction atomAction, ref TActionFilter actionFilter) {
                 if (!atomAction.started) {
                     // We call Start() if not yet started
-                    atomAction.result = this.processor.Start(ref atomAction, ref filterAction);
+                    atomAction.result = this.processor.Start(ref atomAction, ref actionFilter);
                     atomAction.started = true;
 
                     if (atomAction.result == GoapResult.FAILED || atomAction.result == GoapResult.SUCCESS) {
@@ -100,7 +100,7 @@ namespace CommonEcs.Goap {
                     }
                 }
 
-                atomAction.result = this.processor.Update(ref atomAction, ref filterAction);
+                atomAction.result = this.processor.Update(ref atomAction, ref actionFilter);
             }
         }
     }

@@ -6,10 +6,15 @@ namespace CommonEcs {
     /// </summary>
     public struct Timer {
         public float polledTime;
-        private float countdownTime;
+        private float duration;
 
-        public void Update(float timeDelta) {
-            this.polledTime += timeDelta;
+        public Timer(float duration) {
+            this.polledTime = 0;
+            this.duration = duration;
+        }
+
+        public void Update(float deltaTime) {
+            this.polledTime += deltaTime;
         }
 
         public void Reset() {
@@ -18,25 +23,25 @@ namespace CommonEcs {
         
         public void Reset(float countdownTime) {
             Reset();
-            this.countdownTime = countdownTime;
+            this.duration = countdownTime;
         }
 
         public bool HasElapsed {
             get {
-                return Comparison.TolerantGreaterThanOrEquals(this.polledTime, this.countdownTime);
+                return Comparison.TolerantGreaterThanOrEquals(this.polledTime, this.duration);
             }
         }
 
         public float Ratio {
             get {
-                float ratio = this.polledTime / this.countdownTime;
+                float ratio = this.polledTime / this.duration;
                 return math.clamp(ratio, 0f, 1f);
             }
         }
 
-        public float CountdownTime {
+        public float Duration {
             get {
-                return this.countdownTime;
+                return this.duration;
             }
         }
 
@@ -44,7 +49,7 @@ namespace CommonEcs {
         /// Forces the timer to end
         /// </summary>
         public void End() {
-            this.polledTime = this.countdownTime;
+            this.polledTime = this.duration;
         }
     }
 }

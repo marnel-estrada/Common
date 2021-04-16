@@ -39,18 +39,19 @@ namespace GoapBrain {
         /// <param name="entityManager"></param>
         /// <param name="agentEntity"></param>
         /// <param name="linkedEntities"></param>
-        public void Prepare(ref EntityManager entityManager, in Entity agentEntity,
+        public void Prepare(ref EntityManager entityManager, in Entity agentEntity, in Entity plannerEntity,
             ref NativeList<Entity> linkedEntities) {
             // Run for condition resolvers
             for (int i = 0; i < this.conditionResolverPairs.Count; ++i) {
                 ConditionResolverPair resolverPair = this.conditionResolverPairs[i];
-                resolverPair.assembler.Prepare(ref entityManager, agentEntity, resolverPair.conditionName, 
-                    ref linkedEntities);
+                Entity resolverEntity = resolverPair.assembler.Prepare(ref entityManager, resolverPair.conditionName, agentEntity, plannerEntity);
+                linkedEntities.Add(resolverEntity);
             }
             
             // Run for atom actions
             for (int i = 0; i < this.actionAssemblers.Count; ++i) {
-                this.actionAssemblers[i].Prepare(ref entityManager, agentEntity, ref linkedEntities);
+                Entity actionEntity = this.actionAssemblers[i].Prepare(ref entityManager, agentEntity);
+                linkedEntities.Add(actionEntity);
             }
         }
     }

@@ -16,14 +16,17 @@ namespace GoapBrain {
     /// </summary>
     public class GoapDomainDatabaseHandler : MonoBehaviour {
         [SerializeField]
-        private GoapDomainData[] domains;
+        private GoapDomainData[]? domains;
 
-        private AssemblerSet[] assemblerSets;
+        private AssemblerSet[]? assemblerSets;
         
         private BlobAssetReference<GoapDomainDatabase> domainDbReference;
 
         private void Awake() {
             Assertion.NotNull(this.domains);
+            if (this.domains == null) {
+                throw new Exception($"{nameof(this.domains)} can't be null");
+            }
             Assertion.IsTrue(this.domains.Length > 0);
             
             BlobBuilder builder = new BlobBuilder(Allocator.Temp);
@@ -40,12 +43,28 @@ namespace GoapBrain {
                 this.assemblerSets[i] = ParseAssemblerSet(domainData, i);
             }
 
-            this.domainDbReference = builder.CreateBlobAssetReference<GoapDomainDatabase>(Allocator.Temp);
+            this.domainDbReference = builder.CreateBlobAssetReference<GoapDomainDatabase>(Allocator.Persistent);
         }
 
         private static GoapDomain ParseDomain(GoapDomainData data) {
             GoapDomain domain = new GoapDomain();
+            AddActions(ref domain, data);
+            
+            // Parse each extension domain
+            // Note here that we're just adding the actions in the extensions to the main GoapDomain
+            List<GoapExtensionData> extensions = data.Extensions;
+            for (int i = 0; i < extensions.Count; ++i) {
+                GoapDomainData? extensionDomain = extensions[i].DomainData;
+                Assertion.NotNull(extensionDomain);
+                if (extensionDomain != null) {
+                    AddActions(ref domain, extensionDomain);
+                }
+            }
 
+            return domain;
+        }
+
+        private static void AddActions(ref GoapDomain domain, GoapDomainData data) {
             for (int i = 0; i < data.ActionCount; ++i) {
                 GoapActionData actionData = data.GetActionAt(i);
                 ConditionData? effectData = actionData.Effect;
@@ -64,8 +83,6 @@ namespace GoapBrain {
                     
                 domain.AddAction(action);
             }
-
-            return domain;
         }
         
         public ref BlobAssetReference<GoapDomainDatabase> DbReference {
@@ -77,9 +94,8 @@ namespace GoapBrain {
         private static void AddPreconditions(ref GoapAction action, GoapActionData data) {
             for (int i = 0; i < data.Preconditions.Count; ++i) {
                 ConditionData preconditionData = data.Preconditions[i];
-                CommonEcs.Goap.Condition unmanagedPrecondition =
-                    new CommonEcs.Goap.Condition(preconditionData.Name, preconditionData.Value);
-                action.AddPrecondition(unmanagedPrecondition);
+                Condition condition = new Condition(preconditionData.Name, preconditionData.Value);
+                action.AddPrecondition(condition);
             }
         }
 
@@ -166,6 +182,9 @@ namespace GoapBrain {
         }
 
         public AssemblerSet GetAssemblerSet(int id) {
+            if (this.assemblerSets == null) {
+                throw new Exception($"{nameof(this.assemblerSets)} can't be null");
+            }
             return this.assemblerSets[id];
         }
     }

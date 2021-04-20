@@ -43,7 +43,7 @@ namespace CommonEcs.Goap {
         protected abstract TResolverProcessor PrepareProcessor();
         
         [BurstCompile]
-        private struct Job : IJobEntityBatch {
+        public struct Job : IJobEntityBatch {
             public ComponentTypeHandle<ConditionResolver> resolverType;
             public ComponentTypeHandle<TResolverFilter> filterType;
             public bool filterHasArray;

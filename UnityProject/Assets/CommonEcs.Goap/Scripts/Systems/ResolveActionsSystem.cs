@@ -3,6 +3,8 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 
+using UnityEngine;
+
 namespace CommonEcs.Goap {
     [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(EndConditionResolversSystem))]
@@ -60,6 +62,14 @@ namespace CommonEcs.Goap {
                     
                     // Modify
                     planners[i] = planner;
+                }
+            }
+
+            // Utility method. Do not remove.
+            private static void PrintActions(in GoapPlanner planner, in DynamicBuffer<ResolvedAction> resolvedActions) {
+                Debug.Log($"Resolved actions for agent {planner.agentEntity}");
+                for (int a = 0; a < resolvedActions.Length; ++a) {
+                    Debug.Log(resolvedActions[a].actionId);
                 }
             }
 

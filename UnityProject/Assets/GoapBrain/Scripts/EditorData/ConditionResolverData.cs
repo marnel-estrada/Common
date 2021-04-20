@@ -6,7 +6,6 @@ using UnityEngine;
 namespace GoapBrain {
     [Serializable]
     public class ConditionResolverData {
-
         [SerializeField]
         private string conditionName;
 
@@ -32,6 +31,5 @@ namespace GoapBrain {
                 this.resolver = value;
             }
         }
-
     }
 }

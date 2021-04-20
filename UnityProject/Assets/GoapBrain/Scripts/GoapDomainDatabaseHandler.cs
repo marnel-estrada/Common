@@ -46,9 +46,14 @@ namespace GoapBrain {
             this.domainDbReference = builder.CreateBlobAssetReference<GoapDomainDatabase>(Allocator.Persistent);
         }
 
-        private static GoapDomain ParseDomain(GoapDomainData data) {
+        // We need this to have unique action names
+        private readonly HashSet<string> addedActions = new HashSet<string>();
+
+        private GoapDomain ParseDomain(GoapDomainData data) {
+            this.addedActions.Clear();
+            
             GoapDomain domain = new GoapDomain();
-            AddActions(ref domain, data);
+            AddActions(ref domain, data, this.addedActions);
             
             // Parse each extension domain
             // Note here that we're just adding the actions in the extensions to the main GoapDomain
@@ -57,16 +62,20 @@ namespace GoapBrain {
                 GoapDomainData? extensionDomain = extensions[i].DomainData;
                 Assertion.NotNull(extensionDomain);
                 if (extensionDomain != null) {
-                    AddActions(ref domain, extensionDomain);
+                    AddActions(ref domain, extensionDomain, this.addedActions);
                 }
             }
 
             return domain;
         }
 
-        private static void AddActions(ref GoapDomain domain, GoapDomainData data) {
+        private static void AddActions(ref GoapDomain domain, GoapDomainData data, HashSet<string> addedActions) {
             for (int i = 0; i < data.ActionCount; ++i) {
                 GoapActionData actionData = data.GetActionAt(i);
+                
+                // Check that the action is unique (not been added before)
+                Assertion.IsTrue(!addedActions.Contains(actionData.Name), actionData.Name);
+                
                 ConditionData? effectData = actionData.Effect;
                 Assertion.NotNull(effectData);
 
@@ -82,6 +91,9 @@ namespace GoapBrain {
                 Assertion.IsTrue(action.preconditions.Count == actionData.Preconditions.Count);
                     
                 domain.AddAction(action);
+                
+                // Add to unique set
+                addedActions.Add(actionData.Name);
             }
         }
         
@@ -99,11 +111,26 @@ namespace GoapBrain {
             }
         }
 
-        private static AssemblerSet ParseAssemblerSet(GoapDomainData data, int index) {
+        // We need this so that we can check that each condition only has one resolver
+        private readonly HashSet<string> conditionsWithResolvers = new HashSet<string>(); 
+
+        private AssemblerSet ParseAssemblerSet(GoapDomainData data, int index) {
             AssemblerSet set = new AssemblerSet(index);
             
+            this.conditionsWithResolvers.Clear();
+            
             PrepareActions(data, set);
-            PrepareConditionResolvers(data, set);
+            PrepareConditionResolvers(data, set, this.conditionsWithResolvers);
+            
+            // Add atom actions and condition resolvers from extensions as well
+            IReadOnlyList<GoapExtensionData> extensions = data.Extensions;
+            for (int i = 0; i < extensions.Count; ++i) {
+                GoapDomainData? extension = extensions[i].DomainData;
+                if (extension != null) {
+                    PrepareActions(extension, set);
+                    PrepareConditionResolvers(extension, set, this.conditionsWithResolvers);
+                }
+            }
 
             return set;
         }
@@ -150,13 +177,20 @@ namespace GoapBrain {
             }
         }
 
-        private static void PrepareConditionResolvers(GoapDomainData domainData, AssemblerSet set) {
+        private static void PrepareConditionResolvers(GoapDomainData domainData, AssemblerSet set, HashSet<string> conditionsWithResolvers) {
             IReadOnlyList<ConditionResolverData> conditionResolvers = domainData.ConditionResolvers;
             for (int i = 0; i < conditionResolvers.Count; ++i) {
                 ConditionResolverData data = conditionResolvers[i];
+                
+                // A condition can only have one resolver
+                Assertion.IsTrue(!conditionsWithResolvers.Contains(data.ConditionName), data.ConditionName);
+                
                 Option<ConditionResolverAssembler> assemblerInstance =
                     TypeUtils.Instantiate<ConditionResolverAssembler>(data.ResolverClass, domainData.Variables);
                 assemblerInstance.Match(new AddConditionResolverPairToSet(set, data.ConditionName));
+
+                // Add to unique set
+                conditionsWithResolvers.Add(data.ConditionName);
             }
         }
 

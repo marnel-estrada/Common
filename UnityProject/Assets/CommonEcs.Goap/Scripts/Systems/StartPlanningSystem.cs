@@ -47,12 +47,12 @@ namespace CommonEcs.Goap {
                     GoapAgent agent = this.allAgents[planner.agentEntity];
                     if (agent.state != AgentState.IDLE) {
                         // Maybe the state is currently planning of executing
-                        return;
+                        continue;
                     }
                 
                     if (agent.goals.Count == 0) {
                         // No goals specified yet
-                        return;
+                        continue;
                     }
                 
                     DotsAssert.IsTrue(planner.goalIndex >= 0 && planner.goalIndex < agent.goals.Count);

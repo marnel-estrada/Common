@@ -6,7 +6,7 @@ namespace CommonEcs {
     /// </summary>
     public struct Timer {
         public float polledTime;
-        private float duration;
+        public float duration;
 
         public Timer(float duration) {
             this.polledTime = 0;

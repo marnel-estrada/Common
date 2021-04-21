@@ -13,6 +13,8 @@ namespace CommonEcs {
         private MultipleGrid2dWrapper gridWrapper;
         
         protected override void OnUpdate() {
+            ComponentDataFromEntity<Cell2D> allCells = GetComponentDataFromEntity<Cell2D>();
+            
             this.Entities.ForEach(
                 delegate(in MultipleGrid2D multipleGrid, in DynamicBuffer<EntityBufferElement> entityBuffer) {
                     if (this.resolved) {
@@ -22,7 +24,15 @@ namespace CommonEcs {
                     
                     this.grid = multipleGrid;
                     PopulateCellEntities(in entityBuffer);
-                    this.gridWrapper = new MultipleGrid2dWrapper(this.grid, this.cellEntities.Value);
+                    
+                    // Prepare the bounding box
+                    float2 min = allCells[this.cellEntities.Value[0].entity].BottomLeft; // first cell
+
+                    int cellCount = this.cellEntities.Value.Length;
+                    float2 max = allCells[this.cellEntities.Value[cellCount - 1].entity].TopRight;
+                    Aabb2 worldBoundingBox = new Aabb2(min, max);
+                    
+                    this.gridWrapper = new MultipleGrid2dWrapper(this.grid, this.cellEntities.Value, worldBoundingBox);
 
                     this.resolved = true;
                     this.Enabled = false; // So update will not be called again

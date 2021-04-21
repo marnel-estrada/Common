@@ -51,5 +51,5 @@ namespace CommonEcs {
         public void End() {
             this.polledTime = this.duration;
         }
-    }
+    } // Just dummy change
 }

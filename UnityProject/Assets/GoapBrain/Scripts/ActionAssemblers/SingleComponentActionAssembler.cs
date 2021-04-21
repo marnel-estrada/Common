@@ -1,5 +1,6 @@
 using CommonEcs.Goap;
 
+using Unity.Collections;
 using Unity.Entities;
 
 namespace GoapBrain {
@@ -11,12 +12,13 @@ namespace GoapBrain {
             this.archetype = entityManager.CreateArchetype(typeof(AtomAction), typeof(T));
         }
 
-        public override Entity Prepare(ref EntityManager entityManager, in Entity agentEntity) {
+        public override void Prepare(ref EntityManager entityManager, in Entity agentEntity, ref NativeList<Entity> linkedEntities) {
             Entity actionEntity = entityManager.CreateEntity(this.archetype);
             entityManager.SetComponentData(actionEntity, new AtomAction(this.ActionId, agentEntity, this.Order));
+            
             PrepareAction(ref entityManager, agentEntity, actionEntity);
-
-            return actionEntity;
+            
+            linkedEntities.Add(actionEntity);
         }
 
         protected virtual void PrepareAction(ref EntityManager entityManager, in Entity agentEntity,

@@ -1,4 +1,7 @@
-﻿using Unity.Entities;
+﻿using CommonEcs;
+
+using Unity.Collections;
+using Unity.Entities;
 
 namespace GoapBrain {
     /// <summary>
@@ -19,13 +22,15 @@ namespace GoapBrain {
         }
         
         /// <summary>
-        /// Prepares the ECS atom action
-        /// The entity returned here is the action entity
+        /// Prepares an atom action.
+        ///
+        /// We need to pass the list of linkedEntities here for cases where a GOAP action might prepare
+        /// an FSM in its execution.
         /// </summary>
         /// <param name="entityManager"></param>
         /// <param name="agentEntity"></param>
         /// <param name="linkedEntities"></param>
-        public abstract Entity Prepare(ref EntityManager entityManager, in Entity agentEntity);
+        public abstract void Prepare(ref EntityManager entityManager, in Entity agentEntity, ref NativeList<Entity> linkedEntities);
         
         protected int ActionId {
             get {

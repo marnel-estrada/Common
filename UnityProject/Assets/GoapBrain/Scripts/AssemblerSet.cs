@@ -1,5 +1,7 @@
 using Common;
 
+using CommonEcs;
+
 using Unity.Collections;
 using Unity.Entities;
 
@@ -50,8 +52,7 @@ namespace GoapBrain {
             
             // Run for atom actions
             for (int i = 0; i < this.actionAssemblers.Count; ++i) {
-                Entity actionEntity = this.actionAssemblers[i].Prepare(ref entityManager, agentEntity);
-                linkedEntities.Add(actionEntity);
+                this.actionAssemblers[i].Prepare(ref entityManager, agentEntity, ref linkedEntities);
             }
         }
     }

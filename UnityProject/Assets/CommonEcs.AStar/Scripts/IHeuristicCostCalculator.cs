@@ -1,7 +1,5 @@
-using Unity.Mathematics;
-
 namespace CommonEcs {
-    public interface HeuristicCostCalculator {
+    public interface IHeuristicCostCalculator<in T> where T : unmanaged {
         /// <summary>
         /// Computes the heuristic cost from the specified starting position and the goal.
         /// </summary>
@@ -14,6 +12,6 @@ namespace CommonEcs {
         /// <param name='goal'>
         /// Goal.
         /// </param>
-        float ComputeCost(int2 start, int2 goal);
+        float ComputeCost(T start, T goal);
     }
 }

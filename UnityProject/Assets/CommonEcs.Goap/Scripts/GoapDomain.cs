@@ -2,11 +2,17 @@ using Unity.Collections;
 
 namespace CommonEcs.Goap {
     public struct GoapDomain {
+        public readonly FixedString64 name;
+        
         // This is the list of actions
         public FixedList4096<GoapAction> actions;
         
         // The list of integers mapped to the condition are indices to actions
         public FixedHashMap<Condition, FixedList32<int>> actionMap;
+
+        public GoapDomain(FixedString64 name) : this() {
+            this.name = name;
+        }
 
         public void AddAction(in GoapAction action) {
             int actionIndex = this.actions.Length;

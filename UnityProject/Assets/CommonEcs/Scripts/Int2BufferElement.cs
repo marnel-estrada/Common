@@ -5,7 +5,7 @@ namespace CommonEcs {
     /// <summary>
     /// A struct that wraps an int2 for use in DynamicBuffer
     /// </summary>
-    [InternalBufferCapacity(16)]
+    [InternalBufferCapacity(32)]
     public struct Int2BufferElement : IBufferElementData {
         public int2 value;
 

@@ -49,6 +49,10 @@ namespace CommonEcs {
         public int ToIndex(int3 gridCoordinate) {
             return this.grid.ToIndex(gridCoordinate);
         }
+        
+        public bool IsInside(int3 worldCoordinate) {
+            return this.grid.IsInsideGrid(worldCoordinate.x, worldCoordinate.y, worldCoordinate.z);
+        }
 
         /// <summary>
         /// Transform from world position to grid coordinate

@@ -1,16 +1,16 @@
 using Unity.Mathematics;
 
 namespace CommonEcs {
-    public readonly struct AStarNode {
+    public readonly struct AStarNode<T> where T : unmanaged {
         public readonly int index;
-        public readonly int2 position;
+        public readonly T position;
         public readonly int parent;
         
         public readonly float G;
         public readonly float H;
         public readonly float F;
 
-        public AStarNode(int index, int2 position, int parent, float g, float h) {
+        public AStarNode(int index, T position, int parent, float g, float h) {
             this.index = index;
             this.position = position;
             this.parent = parent;

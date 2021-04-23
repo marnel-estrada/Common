@@ -52,7 +52,7 @@ namespace GoapBrain {
         private GoapDomain ParseDomain(GoapDomainData data) {
             this.addedActions.Clear();
             
-            GoapDomain domain = new GoapDomain();
+            GoapDomain domain = new GoapDomain(data.name);
             AddActions(ref domain, data, this.addedActions);
             
             // Parse each extension domain

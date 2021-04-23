@@ -39,7 +39,7 @@ namespace CommonEcs.DotsFsm {
 
         protected virtual bool ShouldScheduleParallel {
             get {
-                return false;
+                return true;
             }
         }
 

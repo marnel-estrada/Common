@@ -1,17 +1,19 @@
+using System;
+
 using Unity.Collections;
 
 namespace CommonEcs {
     /// <summary>
     /// It's a heap that wraps a NativeArray.
     /// </summary>
-    public struct NativeArrayHeap {
+    public struct NativeArrayHeap<T> where T : unmanaged, IEquatable<T> {
         private int head;
         private int length;
         private int count;
 
-        private NativeArray<HeapNode> nodes;
+        private NativeArray<HeapNode<T>> nodes;
 
-        public NativeArrayHeap(NativeArray<HeapNode> nodes) {
+        public NativeArrayHeap(NativeArray<HeapNode<T>> nodes) {
             this.nodes = nodes;
             this.head = -1;
             this.length = 0;
@@ -24,8 +26,8 @@ namespace CommonEcs {
             }
         }
 
-        public void Push(AStarNode value) {
-            HeapNode node = new HeapNode(value, value.F);
+        public void Push(AStarNode<T> value) {
+            HeapNode<T> node = new HeapNode<T>(value, value.F);
             
             if (this.head < 0) {
                 // No entries yet
@@ -37,7 +39,7 @@ namespace CommonEcs {
             } else {
                 // Look for the correct position of the new node
                 int currentIndex = this.head;
-                HeapNode current = this.nodes[currentIndex];
+                HeapNode<T> current = this.nodes[currentIndex];
 
                 // Keep going until we find a position such that node.cost < current
                 while (current.next >= 0 && this.nodes[current.next].cost <= node.cost) {
@@ -56,8 +58,8 @@ namespace CommonEcs {
             ++this.count;
         }
 
-        public AStarNode Pop() {
-            AStarNode result = this.Top;
+        public AStarNode<T> Pop() {
+            AStarNode<T> result = this.Top;
             this.head = this.nodes[this.head].next;
             
             // Note here that we don't decrement length
@@ -69,7 +71,7 @@ namespace CommonEcs {
             return result;
         }
 
-        public AStarNode Top {
+        public AStarNode<T> Top {
             get {
                 return this.nodes[this.head].value;
             }
@@ -91,7 +93,7 @@ namespace CommonEcs {
             }
         }
 
-        public HeapNode this[int index] {
+        public HeapNode<T> this[int index] {
             get {
                 return this.nodes[index];
             }

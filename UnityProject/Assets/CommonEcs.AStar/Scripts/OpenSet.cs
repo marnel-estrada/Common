@@ -1,15 +1,16 @@
+using System;
+
 using Unity.Collections;
-using Unity.Mathematics;
 
 namespace CommonEcs {
     /// <summary>
     /// A wrapper for the open set
     /// </summary>
-    public struct OpenSet {
-        private GrowingHeap heap;
-        private NativeHashMap<int2, AStarNode> map;
+    public struct OpenSet<T> where T : unmanaged, IEquatable<T> {
+        private GrowingHeap<T> heap;
+        private NativeHashMap<T, AStarNode<T>> map;
 
-        public OpenSet(GrowingHeap heap, NativeHashMap<int2, AStarNode> map) {
+        public OpenSet(GrowingHeap<T> heap, NativeHashMap<T, AStarNode<T>> map) {
             this.heap = heap;
             this.map = map;
         }
@@ -19,19 +20,19 @@ namespace CommonEcs {
             this.map.Clear();
         }
 
-        public void Push(AStarNode node) {
+        public void Push(AStarNode<T> node) {
             this.heap.Push(node);
-            this.map.AddOrReplace<int2, AStarNode>(node.position, node);
+            this.map.AddOrReplace<T, AStarNode<T>>(node.position, node);
         }
 
-        public AStarNode Pop() {
-            AStarNode result = this.heap.Pop();
+        public AStarNode<T> Pop() {
+            AStarNode<T> result = this.heap.Pop();
             this.map.Remove(result.position);
 
             return result;
         }
 
-        public bool TryGet(int2 position, out AStarNode node) {
+        public bool TryGet(T position, out AStarNode<T> node) {
             return this.map.TryGetValue(position, out node);
         }
 

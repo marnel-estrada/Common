@@ -1,14 +1,14 @@
 using Unity.Burst;
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 
 namespace CommonEcs {
     [BurstCompile]
-    public struct AStarSearchParallelFor<HeuristicCalculator, ReachabilityType> : IJobParallelFor
-        where HeuristicCalculator : struct, HeuristicCostCalculator where ReachabilityType : struct, Reachability {
+    public struct AStarSearchParallelFor<THeuristicCalculator, TReachability> : IJobParallelFor
+        where THeuristicCalculator : struct, IHeuristicCostCalculator<int3> 
+        where TReachability : struct, IReachability<int3> {
         [ReadOnly]
         public NativeArray<Entity> entities; // The request entities
 
@@ -22,19 +22,19 @@ namespace CommonEcs {
         public ComponentDataFromEntity<Waiting> allWaiting;
 
         [NativeDisableParallelForRestriction, WriteOnly]
-        public BufferFromEntity<Int2BufferElement> allPathLists;
+        public BufferFromEntity<Int3BufferElement> allPathLists;
 
         [ReadOnly]
-        public ReachabilityType reachability;
+        public TReachability reachability;
 
-        private HeuristicCalculator heuristicCalculator;
+        private THeuristicCalculator heuristicCalculator;
 
         // This will be specified by client on whether it wants to include diagonal neighbors
         [ReadOnly]
-        public NativeArray<int2> neighborOffsets;
+        public NativeArray<int3> neighborOffsets;
 
         [ReadOnly]
-        public GridWrapper gridWrapper;
+        public MultipleGrid2dWrapper gridWrapper;
 
         // Execute search per entity in entities
         public void Execute(int index) {
@@ -62,55 +62,54 @@ namespace CommonEcs {
 
             public ComponentDataFromEntity<AStarSearchParameters> allParameters;
             public ComponentDataFromEntity<AStarPath> allPaths;
-            public BufferFromEntity<Int2BufferElement> allPathLists;
+            public BufferFromEntity<Int3BufferElement> allPathLists;
 
-            public ReachabilityType reachability;
-            public HeuristicCalculator heuristicCalculator;
-            public NativeArray<int2> neighborOffsets;
+            public TReachability reachability;
+            public THeuristicCalculator heuristicCalculator;
+            public NativeArray<int3> neighborOffsets;
 
-            public GridWrapper gridWrapper;
+            public MultipleGrid2dWrapper gridWrapper;
 
             // This is the master container for all AStarNodes. The key is the hash code of the position.
             // This will be specified by client code
-            private NativeList<AStarNode> allNodes;
+            private NativeList<AStarNode<int3>> allNodes;
 
-            private OpenSet openSet;
+            private OpenSet<int3> openSet;
 
             // Only used for existence of position in closed set
             // This will be specified by client code
-            private NativeHashMap<int2, byte> closeSet;
+            private NativeHashMap<int3, byte> closeSet;
 
-            private int2 goalPosition;
+            private int3 goalPosition;
 
             public void Execute() {
                 // Instantiate containers
-                this.allNodes = new NativeList<AStarNode>(10, Allocator.Temp);
+                this.allNodes = new NativeList<AStarNode<int3>>(10, Allocator.Temp);
                 
-                NativeList<HeapNode> heapList = new NativeList<HeapNode>(10, Allocator.Temp);
-                GrowingHeap heap = new GrowingHeap(heapList);
+                NativeList<HeapNode<int3>> heapList = new NativeList<HeapNode<int3>>(10, Allocator.Temp);
+                GrowingHeap<int3> heap = new GrowingHeap<int3>(heapList);
 
-                NativeHashMap<int2,AStarNode> openSetMap = new NativeHashMap<int2, AStarNode>(10, Allocator.Temp);
-                this.openSet = new OpenSet(heap, openSetMap);
+                NativeHashMap<int3, AStarNode<int3>> openSetMap = new NativeHashMap<int3, AStarNode<int3>>(10, Allocator.Temp);
+                this.openSet = new OpenSet<int3>(heap, openSetMap);
                 
-                this.closeSet = new NativeHashMap<int2, byte>(10, Allocator.Temp);
+                this.closeSet = new NativeHashMap<int3, byte>(10, Allocator.Temp);
 
                 AStarSearchParameters parameters = this.allParameters[this.entity];
                 this.goalPosition = parameters.goal;
 
                 float startNodeH = this.heuristicCalculator.ComputeCost(parameters.start, this.goalPosition);
-                AStarNode startNode = CreateNode(parameters.start, -1, 0, startNodeH);
+                AStarNode<int3> startNode = CreateNode(parameters.start, -1, 0, startNodeH);
                 this.openSet.Push(startNode);
 
                 float minH = float.MaxValue;
-                Maybe<AStarNode> minHPosition = Maybe<AStarNode>.Nothing;
+                Maybe<AStarNode<int3>> minHPosition = Maybe<AStarNode<int3>>.Nothing;
 
                 // Process while there are nodes in the open set
                 while (this.openSet.HasItems) {
-                    AStarNode current = this.openSet.Pop();
+                    AStarNode<int3> current = this.openSet.Pop();
                     if (current.position.Equals(this.goalPosition)) {
                         // Goal has been found
-                        int pathCount = ConstructPath(current);
-                        this.allPaths[this.entity] = new AStarPath(pathCount, true);
+                        this.allPaths[this.entity] = new AStarPath(true);
 
                         return;
                     }
@@ -122,17 +121,17 @@ namespace CommonEcs {
                     // We save the node with the least H so we could still try to locate
                     // the nearest position to the destination 
                     if (current.H < minH) {
-                        minHPosition = new Maybe<AStarNode>(current);
+                        minHPosition = new Maybe<AStarNode<int3>>(current);
                         minH = current.H;
                     }
                 }
 
                 // Open set has been exhausted. Path is unreachable.
                 if (minHPosition.HasValue) {
-                    int pathCount = ConstructPath(minHPosition.Value);
-                    this.allPaths[this.entity] = new AStarPath(pathCount, false); // false for unreachable
+                    ConstructPath(minHPosition.Value);
+                    this.allPaths[this.entity] = new AStarPath(false); // false for unreachable
                 } else {
-                    this.allPaths[this.entity] = new AStarPath(0, false);
+                    this.allPaths[this.entity] = new AStarPath(false);
                 }
 
                 // Unity says to Dispose() Temp collections:
@@ -143,15 +142,15 @@ namespace CommonEcs {
                 this.closeSet.Dispose();
             }
 
-            private AStarNode CreateNode(int2 position, int parent, float g, float h) {
+            private AStarNode<int3> CreateNode(int3 position, int parent, float g, float h) {
                 int nodeIndex = this.allNodes.Length;
-                AStarNode node = new AStarNode(nodeIndex, position, parent, g, h);
+                AStarNode<int3> node = new AStarNode<int3>(nodeIndex, position, parent, g, h);
                 this.allNodes.Add(node);
 
                 return node;
             }
 
-            private void ProcessNode(in AStarNode current) {
+            private void ProcessNode(in AStarNode<int3> current) {
                 if (IsInCloseSet(current.position)) {
                     // Already in closed set. We no longer process because the same node with lower F
                     // might have already been processed before. Note that we don't fix the heap. We just
@@ -161,7 +160,7 @@ namespace CommonEcs {
 
                 // Process neighbors
                 for (int i = 0; i < this.neighborOffsets.Length; ++i) {
-                    int2 neighborPosition = current.position + this.neighborOffsets[i];
+                    int3 neighborPosition = current.position + this.neighborOffsets[i];
 
                     if (current.position.Equals(neighborPosition)) {
                         // No need to process if they are equal
@@ -178,22 +177,22 @@ namespace CommonEcs {
                         continue;
                     }
 
-                    if (!this.reachability.IsReachable(this.index, current.position, neighborPosition)) {
+                    if (!this.reachability.IsReachable(current.position, neighborPosition)) {
                         // Not reachable based from specified reachability
                         continue;
                     }
 
-                    float tentativeG = current.G + this.reachability.GetWeight(this.index, current.position, neighborPosition);
+                    float tentativeG = current.G + this.reachability.GetWeight(current.position, neighborPosition);
 
                     float h = this.heuristicCalculator.ComputeCost(neighborPosition, this.goalPosition);
 
-                    if (this.openSet.TryGet(neighborPosition, out AStarNode existingNode)) {
+                    if (this.openSet.TryGet(neighborPosition, out AStarNode<int3> existingNode)) {
                         // This means that the node is already in the open set
                         // We update the node if the current movement is better than the one in the open set
                         if (tentativeG < existingNode.G) {
                             // Found a better path. Replace the values.
                             // Note that creation automatically replaces the node at that position
-                            AStarNode betterNode = CreateNode(neighborPosition, current.index, tentativeG, h);
+                            AStarNode<int3> betterNode = CreateNode(neighborPosition, current.index, tentativeG, h);
 
                             // Only add to open set if it's a better movement
                             // If we just push without checking, a node with the same g score will be pushed
@@ -201,29 +200,29 @@ namespace CommonEcs {
                             this.openSet.Push(betterNode);
                         }
                     } else {
-                        AStarNode neighborNode = CreateNode(neighborPosition, current.index, tentativeG, h);
+                        AStarNode<int3> neighborNode = CreateNode(neighborPosition, current.index, tentativeG, h);
                         this.openSet.Push(neighborNode);
                     }
                 }
             }
 
             // Returns the position count in the path
-            private int ConstructPath(AStarNode destination) {
+            private int ConstructPath(AStarNode<int3> destination) {
                 // Note here that we no longer need to reverse the ordering of the path
                 // We just add them as reversed in AStarPath
                 // AStarPath then knows how to handle this
-                DynamicBuffer<Int2BufferElement> pathList = this.allPathLists[this.entity];
+                DynamicBuffer<Int3BufferElement> pathList = this.allPathLists[this.entity];
                 pathList.Clear();
-                AStarNode current = this.allNodes[destination.index];
+                AStarNode<int3> current = this.allNodes[destination.index];
                 while (current.parent >= 0) {
-                    pathList.Add(new Int2BufferElement(current.position));
+                    pathList.Add(new Int3BufferElement(current.position));
                     current = this.allNodes[current.parent];
                 }
 
                 return pathList.Length;
             }
 
-            public bool IsInCloseSet(int2 position) {
+            public bool IsInCloseSet(int3 position) {
                 return this.closeSet.TryGetValue(position, out _);
             }
         }

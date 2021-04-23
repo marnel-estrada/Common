@@ -58,6 +58,22 @@ namespace CommonEcs {
             return index / (this.columns * this.rows);
         }
 
+        public readonly bool IsInsideGrid(int x, int y, int z) {
+            if (x < this.minCoordinate.x || x > this.maxCoordinte.x) {
+                return false;
+            }
+            
+            if (y < this.minCoordinate.y || y > this.maxCoordinte.y) {
+                return false;
+            }
+            
+            if (z < this.minCoordinate.z || z > this.maxCoordinte.z) {
+                return false;
+            }
+
+            return true;
+        }
+
         public int TotalCellCount {
             get {
                 return this.rows * this.columns * this.levels;

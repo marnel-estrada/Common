@@ -9,25 +9,32 @@ namespace CommonEcs.DotsFsm {
 
         private readonly EntityArchetype fsmArchetype;
         private readonly EntityArchetype stateArchetype;
+        
+        // Instead of adding the name together with the entity of FSM or state, we use a different entity
+        // instead so it wouldn't fill up a chunk
+        private readonly EntityArchetype nameArchetype;
 
         public DotsFsmBuilderByEntityManager(ref EntityManager entityManager) {
             this.entityManager = entityManager;
             
             this.fsmArchetype = this.entityManager.CreateArchetype(typeof(DotsFsm), 
-                typeof(Name), typeof(Transition), typeof(LinkedEntityGroup));
+                typeof(NameReference),typeof(Transition), typeof(LinkedEntityGroup));
             
             this.stateArchetype = this.entityManager.CreateArchetype(typeof(DotsFsmState), 
-                typeof(Name), typeof(LinkedEntityGroup), typeof(EntityBufferElement));
+                typeof(NameReference), typeof(LinkedEntityGroup), typeof(EntityBufferElement));
+
+            this.nameArchetype = this.entityManager.CreateArchetype(typeof(Name));
         }
         
         public Entity CreateFsm(FixedString64 name) {
             Entity fsmEntity = this.entityManager.CreateEntity(this.fsmArchetype);
-            this.entityManager.SetComponentData(fsmEntity, new Name(name));
-
+            
             DynamicBuffer<LinkedEntityGroup> linkedEntities = this.entityManager.GetBuffer<LinkedEntityGroup>(fsmEntity);
             linkedEntities.Add(new LinkedEntityGroup() {
                 Value = fsmEntity
             });
+            
+            Name.SetName(ref this.entityManager, fsmEntity, name);
 
             return fsmEntity;
         }
@@ -35,13 +42,14 @@ namespace CommonEcs.DotsFsm {
         public Entity AddState(Entity fsmOwnerEntity, FixedString64 name) {
             Entity stateEntity = this.entityManager.CreateEntity(this.stateArchetype);
             this.entityManager.SetComponentData(stateEntity, new DotsFsmState(fsmOwnerEntity));
-            this.entityManager.SetComponentData(stateEntity, new Name(name));
             
             // We added this so that we don't need to add the stateEntity when adding action entities
             DynamicBuffer<LinkedEntityGroup> stateLinkedEntities = this.entityManager.GetBuffer<LinkedEntityGroup>(stateEntity);
             stateLinkedEntities.Add(new LinkedEntityGroup() {
                 Value = stateEntity
             });
+            
+            Name.SetName(ref this.entityManager, stateEntity, name);
             
             DynamicBuffer<LinkedEntityGroup> fsmLinkedEntities = this.entityManager.GetBuffer<LinkedEntityGroup>(fsmOwnerEntity);
             fsmLinkedEntities.Add(new LinkedEntityGroup() {

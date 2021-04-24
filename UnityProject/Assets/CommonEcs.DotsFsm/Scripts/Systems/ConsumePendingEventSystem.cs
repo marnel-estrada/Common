@@ -15,7 +15,7 @@ namespace CommonEcs.DotsFsm {
 
         protected override void OnCreate() {
             this.query = GetEntityQuery(typeof(DotsFsm), ComponentType.ReadOnly<NameReference>(), 
-                ComponentType.ReadOnly<Transition>());
+                ComponentType.ReadOnly<Transition>(), ComponentType.ReadOnly<DebugFsm>());
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
@@ -23,6 +23,7 @@ namespace CommonEcs.DotsFsm {
                 fsmType = GetComponentTypeHandle<DotsFsm>(),
                 nameReferenceType = GetComponentTypeHandle<NameReference>(),
                 transitionType = GetBufferTypeHandle<Transition>(),
+                debugType = GetComponentTypeHandle<DebugFsm>(true),
                 allNameReferences = GetComponentDataFromEntity<NameReference>(true),
                 allNames = GetComponentDataFromEntity<Name>(true)
             };
@@ -39,6 +40,9 @@ namespace CommonEcs.DotsFsm {
 
             [ReadOnly]
             public BufferTypeHandle<Transition> transitionType;
+
+            [ReadOnly]
+            public ComponentTypeHandle<DebugFsm> debugType;
             
             [ReadOnly]
             public ComponentDataFromEntity<NameReference> allNameReferences;
@@ -50,6 +54,7 @@ namespace CommonEcs.DotsFsm {
                 NativeArray<DotsFsm> fsms = batchInChunk.GetNativeArray(this.fsmType);
                 NativeArray<NameReference> nameReferences = batchInChunk.GetNativeArray(this.nameReferenceType);
                 BufferAccessor<Transition> transitionLists = batchInChunk.GetBufferAccessor(this.transitionType);
+                NativeArray<DebugFsm> debugList = batchInChunk.GetNativeArray(this.debugType);
 
                 for (int i = 0; i < batchInChunk.Count; ++i) {
                     DotsFsm fsm = fsms[i];
@@ -68,7 +73,8 @@ namespace CommonEcs.DotsFsm {
                         fsmEvent = fsm.pendingEvent.ValueOr(default),
                         transitions = transitions,
                         allNameReferences = this.allNameReferences,
-                        allNames = this.allNames
+                        allNames = this.allNames,
+                        isDebug = debugList[i].isDebug
                     });
                     
                     // Modify
@@ -91,6 +97,8 @@ namespace CommonEcs.DotsFsm {
             [ReadOnly]
             public ComponentDataFromEntity<Name> allNames;
 
+            public bool isDebug;
+
             public DotsFsm OnSome(Entity currentStateEntity) {
                 if (this.fsmEvent.id == 0) {
                     Debug.LogError("Can't use 0 FSM event");
@@ -106,6 +114,13 @@ namespace CommonEcs.DotsFsm {
 
                     // We found a transition
                     this.fsm.currentState = ValueTypeOption<Entity>.Some(transition.toState);
+
+                    if (this.isDebug) {
+                        // Log transition state if it's for debugging
+                        FixedString64 stateName = this.allNames[this.allNameReferences[transition.toState].nameEntity].value;
+                        // ReSharper disable once UseStringInterpolation (due to Burst)
+                        Debug.Log(string.Format("Current state is now {0}", stateName));
+                    }
                         
                     // Don't forget to clear the pending event so that actions will run
                     this.fsm.pendingEvent = ValueTypeOption<FsmEvent>.None;

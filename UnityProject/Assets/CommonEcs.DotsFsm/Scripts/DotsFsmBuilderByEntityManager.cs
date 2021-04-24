@@ -18,7 +18,8 @@ namespace CommonEcs.DotsFsm {
             this.entityManager = entityManager;
             
             this.fsmArchetype = this.entityManager.CreateArchetype(typeof(DotsFsm), 
-                typeof(NameReference),typeof(Transition), typeof(LinkedEntityGroup));
+                typeof(NameReference),typeof(Transition), typeof(LinkedEntityGroup),
+                typeof(DebugFsm));
             
             this.stateArchetype = this.entityManager.CreateArchetype(typeof(DotsFsmState), 
                 typeof(NameReference), typeof(LinkedEntityGroup), typeof(EntityBufferElement));
@@ -26,8 +27,9 @@ namespace CommonEcs.DotsFsm {
             this.nameArchetype = this.entityManager.CreateArchetype(typeof(Name));
         }
         
-        public Entity CreateFsm(FixedString64 name) {
+        public Entity CreateFsm(in FixedString64 name, bool isDebug = false) {
             Entity fsmEntity = this.entityManager.CreateEntity(this.fsmArchetype);
+            this.entityManager.SetComponentData(fsmEntity, new DebugFsm(isDebug));
             
             DynamicBuffer<LinkedEntityGroup> linkedEntities = this.entityManager.GetBuffer<LinkedEntityGroup>(fsmEntity);
             linkedEntities.Add(new LinkedEntityGroup() {
@@ -39,7 +41,7 @@ namespace CommonEcs.DotsFsm {
             return fsmEntity;
         }
         
-        public Entity AddState(Entity fsmOwnerEntity, FixedString64 name) {
+        public Entity AddState(Entity fsmOwnerEntity, in FixedString64 name) {
             Entity stateEntity = this.entityManager.CreateEntity(this.stateArchetype);
             this.entityManager.SetComponentData(stateEntity, new DotsFsmState(fsmOwnerEntity));
             

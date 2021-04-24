@@ -46,5 +46,20 @@ namespace CommonEcs {
                 Value = nameEntity
             });
         }
+
+        public static void SetName(ref EntityCommandBuffer commandBuffer, Entity owner, FixedString64 name) {
+            Entity nameEntity = commandBuffer.CreateEntity();
+            commandBuffer.AddComponent(nameEntity, new Name(name));
+            
+            // Set the reference to owner
+            // This assumes that the owner has NameReference in its archetype
+            commandBuffer.SetComponent(owner, new NameReference(nameEntity));
+            
+            // It also assumes that the owner entity has LinkedEntityGroup in its archetype
+            // and that the owner itself is already added to the list
+            commandBuffer.AppendToBuffer(owner, new LinkedEntityGroup() {
+                Value = nameEntity
+            });
+        }
     }
 }

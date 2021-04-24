@@ -14,24 +14,27 @@ namespace CommonEcs.DotsFsm {
             this.commandBuffer = commandBuffer;
         }
 
-        public Entity CreateFsm(FixedString64 name) {
+        public Entity CreateFsm(in FixedString64 name, bool isDebug = false) {
             Entity fsmEntity = this.commandBuffer.CreateEntity();
             this.commandBuffer.AddComponent(fsmEntity, new DotsFsm());
-            this.commandBuffer.AddComponent(fsmEntity, new Name(name));
+            this.commandBuffer.AddComponent(fsmEntity, new DebugFsm(isDebug));
+            this.commandBuffer.AddComponent<NameReference>(fsmEntity);
             this.commandBuffer.AddBuffer<Transition>(fsmEntity);
             this.commandBuffer.AddBuffer<LinkedEntityGroup>(fsmEntity);
             
             this.commandBuffer.AppendToBuffer(fsmEntity, new LinkedEntityGroup() {
                 Value = fsmEntity
             });
+            
+            Name.SetName(ref this.commandBuffer, fsmEntity, name);
 
             return fsmEntity;
         }
 
-        public Entity AddState(Entity fsmEntityOwner, FixedString64 name) {
+        public Entity AddState(Entity fsmEntityOwner, in FixedString64 name) {
             Entity stateEntity = this.commandBuffer.CreateEntity();
             this.commandBuffer.AddComponent(stateEntity, new DotsFsmState(fsmEntityOwner));
-            this.commandBuffer.AddComponent(stateEntity, new Name(name));
+            this.commandBuffer.AddComponent<NameReference>(stateEntity);
             
             // Link to actions
             this.commandBuffer.AddBuffer<LinkedEntityGroup>(stateEntity);
@@ -43,6 +46,8 @@ namespace CommonEcs.DotsFsm {
             this.commandBuffer.AppendToBuffer(stateEntity, new LinkedEntityGroup() {
                 Value = stateEntity
             });
+            
+            Name.SetName(ref this.commandBuffer, stateEntity, name);
             
             // Link fsm owner to this state
             this.commandBuffer.AppendToBuffer(fsmEntityOwner, new LinkedEntityGroup() {

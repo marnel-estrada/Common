@@ -39,7 +39,6 @@ namespace CommonEcs {
         // Execute search per entity in entities
         public void Execute(int index) {
             Search search = new Search() {
-                index = index,
                 entity = this.entities[index],
                 allParameters = this.allParameters,
                 allPaths = this.allPaths,
@@ -57,7 +56,6 @@ namespace CommonEcs {
         }
 
         private struct Search {
-            public int index;
             public Entity entity;
 
             public ComponentDataFromEntity<AStarSearchParameters> allParameters;
@@ -77,7 +75,6 @@ namespace CommonEcs {
             private OpenSet<int3> openSet;
 
             // Only used for existence of position in closed set
-            // This will be specified by client code
             private NativeHashMap<int3, byte> closeSet;
 
             private int3 goalPosition;

@@ -4,7 +4,7 @@ using Unity.Mathematics;
 
 namespace CommonEcs.DotsFsm {
     public struct MoveTo : IComponentData {
-        public readonly FixedString64 finishEvent;
+        public readonly ValueTypeOption<FsmEvent> finishEvent;
         
         public float3 start;
         public float3 destination;
@@ -15,7 +15,7 @@ namespace CommonEcs.DotsFsm {
         
         public readonly Entity targetEntity; // The entity to move
 
-        public float duration;
+        public Timer timer;
 
         public MoveTo(Entity targetEntity) : this() {
             this.targetEntity = targetEntity;
@@ -23,13 +23,14 @@ namespace CommonEcs.DotsFsm {
         
         public MoveTo(Entity targetEntity, FixedString64 finishEvent) : this() {
             this.targetEntity = targetEntity;
-            this.finishEvent = finishEvent;
+            this.finishEvent = finishEvent.Length > 0 ? ValueTypeOption<FsmEvent>.Some(new FsmEvent(finishEvent)) : 
+                ValueTypeOption<FsmEvent>.None;
         }
 
         public void Init(float3 start, float3 destination, float duration) {
             this.start = start;
             this.destination = destination;
-            this.duration = duration;
+            this.timer.Reset(duration);
         }
     }
 }

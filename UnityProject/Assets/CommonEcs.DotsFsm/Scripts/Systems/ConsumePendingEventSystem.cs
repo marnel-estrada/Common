@@ -118,8 +118,11 @@ namespace CommonEcs.DotsFsm {
                     if (this.isDebug) {
                         // Log transition state if it's for debugging
                         FixedString64 stateName = this.allNames[this.allNameReferences[transition.toState].nameEntity].value;
-                        // ReSharper disable once UseStringInterpolation (due to Burst)
-                        Debug.Log(string.Format("Current state is now {0}", stateName));
+
+                        if (this.isDebug) {
+                            // ReSharper disable once UseStringInterpolation (due to Burst)
+                            Debug.Log(string.Format("Current state is now {0}", stateName));
+                        }
                     }
                         
                     // Don't forget to clear the pending event so that actions will run

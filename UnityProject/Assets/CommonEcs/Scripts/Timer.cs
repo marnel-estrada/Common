@@ -21,9 +21,9 @@ namespace CommonEcs {
             this.polledTime = 0;
         }
         
-        public void Reset(float countdownTime) {
+        public void Reset(float duration) {
             Reset();
-            this.duration = countdownTime;
+            this.duration = duration;
         }
 
         public bool HasElapsed {

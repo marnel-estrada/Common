@@ -5,6 +5,7 @@ namespace CommonEcs.DotsFsm {
     [UpdateInGroup(typeof(ScalableTimeSystemGroup))]
     public class DotsFsmSystemGroup : ComponentSystemGroup {
         private NativeReference<bool> rerunGroup;
+        private int rerunCounter;
 
         protected override void OnCreate() {
             base.OnCreate();
@@ -19,18 +20,24 @@ namespace CommonEcs.DotsFsm {
 
         protected override void OnUpdate() {
             // Allow rerun only twice
-            int updateCounter = 0;
+            this.rerunCounter = 0;
             do {
                 this.rerunGroup.Value = false;
                 base.OnUpdate();
-                ++updateCounter;
+                ++this.rerunCounter;
                 this.EntityManager.CompleteAllJobs();
-            } while (this.rerunGroup.Value && updateCounter < 3);
+            } while (this.rerunGroup.Value && this.rerunCounter < 3);
         }
 
         public ref NativeReference<bool> RerunGroup {
             get {
                 return ref this.rerunGroup;
+            }
+        }
+
+        public int RerunCounter {
+            get {
+                return this.rerunCounter;
             }
         }
     }

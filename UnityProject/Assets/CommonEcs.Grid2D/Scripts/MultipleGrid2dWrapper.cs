@@ -95,7 +95,7 @@ namespace CommonEcs {
             int yCoord = (int)(yDiff / this.grid.cellHeight);
             
             // Note that we don't determine the z here (the level)
-            return ValueTypeOption<GridCoord3>.Some(new GridCoord3(new int3(xCoord, yCoord, 0)));
+            return ValueTypeOption<GridCoord3>.Some(new GridCoord3(xCoord, yCoord, 0));
         }
     }
 }

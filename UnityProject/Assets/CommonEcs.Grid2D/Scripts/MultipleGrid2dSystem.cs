@@ -65,6 +65,11 @@ namespace CommonEcs {
             return this.gridWrapper.GetCellEntity(x, y, z);
         }
         
+        public ValueTypeOption<Entity> GetCellEntity(in GridCoord3 gridCoordinate) {
+            Assertion.IsTrue(this.resolved);
+            return this.gridWrapper.GetCellEntity(gridCoordinate.value);
+        }
+        
         public ValueTypeOption<Entity> GetCellEntity(int3 gridCoordinate) {
             Assertion.IsTrue(this.resolved);
             return this.gridWrapper.GetCellEntity(gridCoordinate.x, gridCoordinate.y, gridCoordinate.z);

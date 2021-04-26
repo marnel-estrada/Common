@@ -42,16 +42,24 @@ namespace CommonEcs {
             return ValueTypeOption<Entity>.None;
         }
 
-        public ValueTypeOption<Entity> GetCellEntity(int3 gridCoordinate) {
+        public ValueTypeOption<Entity> GetCellEntity(in GridCoord3 gridCoordinate) {
+            return GetCellEntity(gridCoordinate.value.x, gridCoordinate.value.y, gridCoordinate.value.z);
+        }
+        
+        public ValueTypeOption<Entity> GetCellEntity(in int3 gridCoordinate) {
             return GetCellEntity(gridCoordinate.x, gridCoordinate.y, gridCoordinate.z);
         }
 
-        public int ToIndex(int3 gridCoordinate) {
+        public int ToIndex(GridCoord3 gridCoordinate) {
             return this.grid.ToIndex(gridCoordinate);
         }
         
-        public bool IsInside(int3 worldCoordinate) {
-            return this.grid.IsInsideGrid(worldCoordinate.x, worldCoordinate.y, worldCoordinate.z);
+        public bool IsInside(in WorldCoord3 coordinate) {
+            return this.grid.IsInsideAsWorld(coordinate.value.x, coordinate.value.y, coordinate.value.z);
+        }
+
+        public bool IsInside(in GridCoord3 coordinate) {
+            return this.grid.IsInsideAsGrid(coordinate.value.x, coordinate.value.y, coordinate.value.z);
         }
 
         /// <summary>
@@ -59,25 +67,25 @@ namespace CommonEcs {
         /// </summary>
         /// <param name="worldPosition"></param>
         /// <returns></returns>
-        public ValueTypeOption<int3> ToGridCoordinate(float3 worldPosition) {
+        public ValueTypeOption<GridCoord3> ToGridCoordinate(float3 worldPosition) {
             if (worldPosition.x < this.worldBoundingBox.Min.x) {
                 // Outside of left side of bounds
-                return ValueTypeOption<int3>.None;
+                return ValueTypeOption<GridCoord3>.None;
             }
             
             if (worldPosition.x > this.worldBoundingBox.Max.x) {
                 // Outside of right side bounds
-                return ValueTypeOption<int3>.None;
+                return ValueTypeOption<GridCoord3>.None;
             }
             
             if (worldPosition.y < this.worldBoundingBox.Min.y) {
                 // Outside of bottom side of bounds
-                return ValueTypeOption<int3>.None;
+                return ValueTypeOption<GridCoord3>.None;
             }
             
             if (worldPosition.y > this.worldBoundingBox.Max.y) {
                 // Outside of top side bounds
-                return ValueTypeOption<int3>.None;
+                return ValueTypeOption<GridCoord3>.None;
             }
 
             float xDiff = worldPosition.x - this.worldBoundingBox.Min.x;
@@ -87,7 +95,7 @@ namespace CommonEcs {
             int yCoord = (int)(yDiff / this.grid.cellHeight);
             
             // Note that we don't determine the z here (the level)
-            return ValueTypeOption<int3>.Some(new int3(xCoord, yCoord, 0));
+            return ValueTypeOption<GridCoord3>.Some(new GridCoord3(new int3(xCoord, yCoord, 0)));
         }
     }
 }

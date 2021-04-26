@@ -11,7 +11,7 @@ namespace CommonEcs {
     /// Match().
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public readonly struct ValueTypeOption<T> : IEquatable<ValueTypeOption<T>> where T : struct {
+    public readonly struct ValueTypeOption<T> : IEquatable<ValueTypeOption<T>> where T : struct, IEquatable<T> {
         // We use property here as static member variable doesn't work for Burst
         public static ValueTypeOption<T> None {
             get {
@@ -70,6 +70,10 @@ namespace CommonEcs {
 
         public T ValueOr(T other) {
             return this.IsSome ? this.value : other;
+        }
+
+        public bool Equals(in T other) {
+            return this.IsSome && this.value.Equals(other);
         }
 
         public bool Equals(ValueTypeOption<T> other) {

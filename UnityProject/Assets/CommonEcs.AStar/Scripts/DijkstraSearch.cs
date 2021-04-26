@@ -129,7 +129,7 @@ namespace CommonEcs {
                     continue;
                 }
         
-                if (!this.gridWrapper.IsInside(neighborPosition)) {
+                if (!this.gridWrapper.IsInside(new GridCoord3(neighborPosition))) {
                     // No longer inside the map
                     continue;
                 }

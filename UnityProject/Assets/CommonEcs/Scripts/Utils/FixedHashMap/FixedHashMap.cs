@@ -5,7 +5,7 @@ using Unity.Collections;
 namespace CommonEcs {
     public struct FixedHashMap<K, V> 
         where K : unmanaged, IEquatable<K>
-        where V : unmanaged {
+        where V : unmanaged, IEquatable<V> {
         private FixedHashMapBuckets<K, V> buckets;
         private int count;
         

@@ -7,8 +7,8 @@ using Unity.Mathematics;
 namespace CommonEcs {
     [BurstCompile]
     public struct AStarSearchParallelFor<THeuristicCalculator, TReachability> : IJobParallelFor
-        where THeuristicCalculator : struct, IHeuristicCostCalculator<int3> 
-        where TReachability : struct, IReachability<int3> {
+        where THeuristicCalculator : struct, IHeuristicCostCalculator<GridCoord3> 
+        where TReachability : struct, IReachability<GridCoord3> {
         [ReadOnly]
         public NativeArray<Entity> entities; // The request entities
 
@@ -70,24 +70,24 @@ namespace CommonEcs {
 
             // This is the master container for all AStarNodes. The key is the hash code of the position.
             // This will be specified by client code
-            private NativeList<AStarNode<int3>> allNodes;
+            private NativeList<AStarNode<GridCoord3>> allNodes;
 
-            private OpenSet<int3> openSet;
+            private OpenSet<GridCoord3> openSet;
 
             // Only used for existence of position in closed set
             private NativeHashMap<int3, byte> closeSet;
 
-            private int3 goalPosition;
+            private GridCoord3 goalPosition;
 
             public void Execute() {
                 // Instantiate containers
-                this.allNodes = new NativeList<AStarNode<int3>>(10, Allocator.Temp);
+                this.allNodes = new NativeList<AStarNode<GridCoord3>>(10, Allocator.Temp);
                 
-                NativeList<HeapNode<int3>> heapList = new NativeList<HeapNode<int3>>(10, Allocator.Temp);
-                GrowingHeap<int3> heap = new GrowingHeap<int3>(heapList);
+                NativeList<HeapNode<GridCoord3>> heapList = new NativeList<HeapNode<GridCoord3>>(10, Allocator.Temp);
+                GrowingHeap<GridCoord3> heap = new GrowingHeap<GridCoord3>(heapList);
 
-                NativeHashMap<int3, AStarNode<int3>> openSetMap = new NativeHashMap<int3, AStarNode<int3>>(10, Allocator.Temp);
-                this.openSet = new OpenSet<int3>(heap, openSetMap);
+                NativeHashMap<GridCoord3, AStarNode<GridCoord3>> openSetMap = new NativeHashMap<GridCoord3, AStarNode<GridCoord3>>(10, Allocator.Temp);
+                this.openSet = new OpenSet<GridCoord3>(heap, openSetMap);
                 
                 this.closeSet = new NativeHashMap<int3, byte>(10, Allocator.Temp);
 
@@ -95,15 +95,15 @@ namespace CommonEcs {
                 this.goalPosition = parameters.goal;
 
                 float startNodeH = this.heuristicCalculator.ComputeCost(parameters.start, this.goalPosition);
-                AStarNode<int3> startNode = CreateNode(parameters.start, -1, 0, startNodeH);
+                AStarNode<GridCoord3> startNode = CreateNode(parameters.start, -1, 0, startNodeH);
                 this.openSet.Push(startNode);
 
                 float minH = float.MaxValue;
-                Maybe<AStarNode<int3>> minHPosition = Maybe<AStarNode<int3>>.Nothing;
+                Maybe<AStarNode<GridCoord3>> minHPosition = Maybe<AStarNode<GridCoord3>>.Nothing;
 
                 // Process while there are nodes in the open set
                 while (this.openSet.HasItems) {
-                    AStarNode<int3> current = this.openSet.Pop();
+                    AStarNode<GridCoord3> current = this.openSet.Pop();
                     if (current.position.Equals(this.goalPosition)) {
                         // Goal has been found
                         this.allPaths[this.entity] = new AStarPath(true);
@@ -113,12 +113,12 @@ namespace CommonEcs {
 
                     ProcessNode(current);
 
-                    this.closeSet.TryAdd(current.position, 0);
+                    this.closeSet.TryAdd(current.position.value, 0);
 
                     // We save the node with the least H so we could still try to locate
                     // the nearest position to the destination 
                     if (current.H < minH) {
-                        minHPosition = new Maybe<AStarNode<int3>>(current);
+                        minHPosition = new Maybe<AStarNode<GridCoord3>>(current);
                         minH = current.H;
                     }
                 }
@@ -139,16 +139,16 @@ namespace CommonEcs {
                 this.closeSet.Dispose();
             }
 
-            private AStarNode<int3> CreateNode(int3 position, int parent, float g, float h) {
+            private AStarNode<GridCoord3> CreateNode(GridCoord3 position, int parent, float g, float h) {
                 int nodeIndex = this.allNodes.Length;
-                AStarNode<int3> node = new AStarNode<int3>(nodeIndex, position, parent, g, h);
+                AStarNode<GridCoord3> node = new AStarNode<GridCoord3>(nodeIndex, position, parent, g, h);
                 this.allNodes.Add(node);
 
                 return node;
             }
 
-            private void ProcessNode(in AStarNode<int3> current) {
-                if (IsInCloseSet(current.position)) {
+            private void ProcessNode(in AStarNode<GridCoord3> current) {
+                if (IsInCloseSet(current.position.value)) {
                     // Already in closed set. We no longer process because the same node with lower F
                     // might have already been processed before. Note that we don't fix the heap. We just
                     // keep on pushing nodes with lower scores.
@@ -157,14 +157,14 @@ namespace CommonEcs {
 
                 // Process neighbors
                 for (int i = 0; i < this.neighborOffsets.Length; ++i) {
-                    int3 neighborPosition = current.position + this.neighborOffsets[i];
+                    int3 neighborPosition = current.position.value + this.neighborOffsets[i];
 
-                    if (current.position.Equals(neighborPosition)) {
+                    if (current.position.value.Equals(neighborPosition)) {
                         // No need to process if they are equal
                         continue;
                     }
 
-                    if (!this.gridWrapper.IsInside(neighborPosition)) {
+                    if (!this.gridWrapper.IsInside(new GridCoord3(neighborPosition))) {
                         // No longer inside the map
                         continue;
                     }
@@ -174,22 +174,22 @@ namespace CommonEcs {
                         continue;
                     }
 
-                    if (!this.reachability.IsReachable(current.position, neighborPosition)) {
+                    if (!this.reachability.IsReachable(current.position,  new GridCoord3(neighborPosition))) {
                         // Not reachable based from specified reachability
                         continue;
                     }
 
-                    float tentativeG = current.G + this.reachability.GetWeight(current.position, neighborPosition);
+                    float tentativeG = current.G + this.reachability.GetWeight(current.position, new GridCoord3(neighborPosition));
 
-                    float h = this.heuristicCalculator.ComputeCost(neighborPosition, this.goalPosition);
+                    float h = this.heuristicCalculator.ComputeCost(new GridCoord3(neighborPosition), this.goalPosition);
 
-                    if (this.openSet.TryGet(neighborPosition, out AStarNode<int3> existingNode)) {
+                    if (this.openSet.TryGet(new GridCoord3(neighborPosition), out AStarNode<GridCoord3> existingNode)) {
                         // This means that the node is already in the open set
                         // We update the node if the current movement is better than the one in the open set
                         if (tentativeG < existingNode.G) {
                             // Found a better path. Replace the values.
                             // Note that creation automatically replaces the node at that position
-                            AStarNode<int3> betterNode = CreateNode(neighborPosition, current.index, tentativeG, h);
+                            AStarNode<GridCoord3> betterNode = CreateNode(new GridCoord3(neighborPosition), current.index, tentativeG, h);
 
                             // Only add to open set if it's a better movement
                             // If we just push without checking, a node with the same g score will be pushed
@@ -197,29 +197,29 @@ namespace CommonEcs {
                             this.openSet.Push(betterNode);
                         }
                     } else {
-                        AStarNode<int3> neighborNode = CreateNode(neighborPosition, current.index, tentativeG, h);
+                        AStarNode<GridCoord3> neighborNode = CreateNode(new GridCoord3(neighborPosition), current.index, tentativeG, h);
                         this.openSet.Push(neighborNode);
                     }
                 }
             }
 
             // Returns the position count in the path
-            private int ConstructPath(AStarNode<int3> destination) {
+            private int ConstructPath(AStarNode<GridCoord3> destination) {
                 // Note here that we no longer need to reverse the ordering of the path
                 // We just add them as reversed in AStarPath
                 // AStarPath then knows how to handle this
                 DynamicBuffer<Int3BufferElement> pathList = this.allPathLists[this.entity];
                 pathList.Clear();
-                AStarNode<int3> current = this.allNodes[destination.index];
+                AStarNode<GridCoord3> current = this.allNodes[destination.index];
                 while (current.parent >= 0) {
-                    pathList.Add(new Int3BufferElement(current.position));
+                    pathList.Add(new Int3BufferElement(current.position.value));
                     current = this.allNodes[current.parent];
                 }
 
                 return pathList.Length;
             }
 
-            public bool IsInCloseSet(int3 position) {
+            public bool IsInCloseSet(in int3 position) {
                 return this.closeSet.TryGetValue(position, out _);
             }
         }

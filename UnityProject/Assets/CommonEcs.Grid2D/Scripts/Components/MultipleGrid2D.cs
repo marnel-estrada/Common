@@ -7,9 +7,11 @@ namespace CommonEcs {
     /// Its coordinates are 3D where the 3rd one refers to the floor
     /// </summary>
     public readonly struct MultipleGrid2D : IComponentData {
-        // These are world coordinates
-        public readonly int3 minCoordinate;
-        public readonly int3 maxCoordinte;
+        public readonly WorldCoord3 minWorldCoordinate;
+        public readonly WorldCoord3 maxWorldCoordinate;
+
+        public readonly GridCoord3 minGridCoordinate;
+        public readonly GridCoord3 maxGridCoordinate;
         
         public readonly int columns;
         public readonly int rows;
@@ -27,14 +29,17 @@ namespace CommonEcs {
             this.cellHeight = cellHeight;
             this.levels = levels;
 
+            this.minGridCoordinate = new GridCoord3(new int3(0, 0, 0));
+            this.maxGridCoordinate = new GridCoord3(new int3(this.columns - 1, this.rows - 1, this.levels - 1));
+
             int columnHalf = columns >> 1;
             int rowHalf = rows >> 1;
-            this.minCoordinate = new int3(-columnHalf, -rowHalf, 0);
-            this.maxCoordinte = new int3(columnHalf - 1, rowHalf - 1, levels - 1);
+            this.minWorldCoordinate = new WorldCoord3(new int3(-columnHalf, -rowHalf, 0));
+            this.maxWorldCoordinate = new WorldCoord3(new int3(columnHalf - 1, rowHalf - 1, levels - 1));
         }
 
-        public int ToIndex(int3 gridCoordinate) {
-            return ToIndex(gridCoordinate.x, gridCoordinate.y, gridCoordinate.z);
+        public int ToIndex(GridCoord3 gridCoordinate) {
+            return ToIndex(gridCoordinate.value.x, gridCoordinate.value.y, gridCoordinate.value.z);
         }
         
         public int ToIndex(int x, int y, int z) {
@@ -58,16 +63,32 @@ namespace CommonEcs {
             return index / (this.columns * this.rows);
         }
 
-        public readonly bool IsInsideGrid(int x, int y, int z) {
-            if (x < this.minCoordinate.x || x > this.maxCoordinte.x) {
+        public bool IsInsideAsWorld(int x, int y, int z) {
+            if (x < this.minWorldCoordinate.value.x || x > this.maxWorldCoordinate.value.x) {
                 return false;
             }
             
-            if (y < this.minCoordinate.y || y > this.maxCoordinte.y) {
+            if (y < this.minWorldCoordinate.value.y || y > this.maxWorldCoordinate.value.y) {
                 return false;
             }
             
-            if (z < this.minCoordinate.z || z > this.maxCoordinte.z) {
+            if (z < this.minWorldCoordinate.value.z || z > this.maxWorldCoordinate.value.z) {
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool IsInsideAsGrid(int x, int y, int z) {
+            if (x < this.minGridCoordinate.value.x || x > this.maxGridCoordinate.value.x) {
+                return false;
+            }
+            
+            if (y < this.minGridCoordinate.value.y || y > this.maxGridCoordinate.value.y) {
+                return false;
+            }
+            
+            if (z < this.minGridCoordinate.value.z || z > this.maxGridCoordinate.value.z) {
                 return false;
             }
 
@@ -86,12 +107,12 @@ namespace CommonEcs {
             }
         }
         
-        public int3 ToWorldCoordinate(int3 gridCoordinate) {
-            return new int3(gridCoordinate.xy + this.minCoordinate.xy, gridCoordinate.z);
+        public WorldCoord3 ToWorldCoordinate(in GridCoord3 gridCoordinate) {
+            return new WorldCoord3(new int3(gridCoordinate.value.xy + this.minWorldCoordinate.value.xy, gridCoordinate.value.z));
         }
 
-        public int3 ToGridCoordinate(int3 worldCoordinate) {
-            return new int3(worldCoordinate.xy - this.minCoordinate.xy, worldCoordinate.z);
+        public GridCoord3 ToGridCoordinate(in WorldCoord3 worldCoordinate) {
+            return new GridCoord3(new int3(worldCoordinate.value.xy - this.minWorldCoordinate.value.xy, worldCoordinate.value.z));
         }
     }
 }

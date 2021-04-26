@@ -10,6 +10,7 @@ namespace CommonEcs.Goap {
     [UpdateAfter(typeof(IdentifyConditionsToResolveSystem))]
     public class EndConditionResolversSystem : SystemBase {
         protected override void OnUpdate() {
+            // This can't run in parallel as we are writing to planner.conditionsMap
             ComponentDataFromEntity<GoapPlanner> allPlanners = GetComponentDataFromEntity<GoapPlanner>();
             this.Entities.ForEach(delegate(in ConditionResolver resolver) {
                 if (!resolver.resolved) {

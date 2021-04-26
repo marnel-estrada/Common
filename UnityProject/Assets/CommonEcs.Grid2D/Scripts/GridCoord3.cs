@@ -9,6 +9,9 @@ namespace CommonEcs {
         public GridCoord3(int3 value) {
             this.value = value;
         }
+        
+        public GridCoord3(int x, int y, int z) : this(new int3(x, y, z)) {
+        }
 
         public bool Equals(GridCoord3 other) {
             return this.value.Equals(other.value);

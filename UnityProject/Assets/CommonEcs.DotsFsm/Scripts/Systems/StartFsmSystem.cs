@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -19,6 +20,7 @@ namespace CommonEcs.DotsFsm {
             return job.ScheduleParallel(this.query, 1, inputDeps);
         }
         
+        [BurstCompile]
         private struct Job : IJobEntityBatch {
             public ComponentTypeHandle<DotsFsm> fsmType;
             

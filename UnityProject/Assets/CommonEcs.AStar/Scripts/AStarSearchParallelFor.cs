@@ -106,6 +106,7 @@ namespace CommonEcs {
                     AStarNode<GridCoord3> current = this.openSet.Pop();
                     if (current.position.Equals(this.goalPosition)) {
                         // Goal has been found
+                        ConstructPath(current);
                         this.allPaths[this.entity] = new AStarPath(true);
 
                         return;

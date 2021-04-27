@@ -10,7 +10,8 @@ namespace CommonEcs.Goap {
         private EntityQuery query;
 
         protected override void OnCreate() {
-            this.query = GetEntityQuery(typeof(GoapPlanner));
+            this.query = GetEntityQuery(typeof(GoapPlanner),
+                typeof(DynamicBufferHashMap<ConditionId, bool>.Entry<bool>));
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
@@ -35,12 +36,15 @@ namespace CommonEcs.Goap {
         [BurstCompile]
         private struct StartPlanningJob : IJobEntityBatch {
             public ComponentTypeHandle<GoapPlanner> plannerType;
+            public BufferTypeHandle<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> bucketType;
             
             [ReadOnly]
             public ComponentDataFromEntity<GoapAgent> allAgents;
             
             public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
                 NativeArray<GoapPlanner> planners = batchInChunk.GetNativeArray(this.plannerType);
+                BufferAccessor<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> buckets = batchInChunk.GetBufferAccessor(this.bucketType);
+                
                 for (int i = 0; i < planners.Length; ++i) {
                     GoapPlanner planner = planners[i];
                     
@@ -57,6 +61,10 @@ namespace CommonEcs.Goap {
                 
                     DotsAssert.IsTrue(planner.goalIndex >= 0 && planner.goalIndex < agent.goals.Count);
                     planner.StartPlanning(agent.GetGoal(planner.goalIndex));
+                    
+                    // Reset the condition values
+                    DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> bucket = buckets[i];
+                    ConditionsMap.ResetValues(ref bucket);
                     
                     // Modify
                     planners[i] = planner;

@@ -20,7 +20,7 @@ namespace CommonEcs {
         /// This should be called prior to usage so that all of the slots are prepared.
         /// </summary>
         /// <param name="bucket"></param>
-        public void Init(ref DynamicBuffer<Entry<V>> bucket) {
+        public static void Init(ref DynamicBuffer<Entry<V>> bucket) {
             bucket.EnsureCapacity(MAX_COUNT);
             for (int i = 0; i < MAX_COUNT; ++i) {
                 bucket.Add(Entry<V>.Nothing);
@@ -129,7 +129,7 @@ namespace CommonEcs {
             // When probedIndex is None, it just means that the item is not in the HashMap
         }
 
-        public ValueTypeOption<V> Find(in DynamicBuffer<Entry<V>> bucket, in K key) {
+        public readonly ValueTypeOption<V> Find(in DynamicBuffer<Entry<V>> bucket, in K key) {
             int hashCode = key.GetHashCode();
             int bucketIndex = FibonacciHash(hashCode);
             
@@ -218,6 +218,21 @@ namespace CommonEcs {
             }
 
             this.count = 0;
+        }
+
+        public static void ResetValues(ref DynamicBuffer<Entry<V>> bucket) {
+            // We are only resetting the values here
+            // Count remains the same
+            for (int i = 0; i < bucket.Length; ++i) {
+                Entry<V> entry = bucket[i];
+                if (!entry.HasValue) {
+                    // No value
+                    continue;
+                }
+                
+                // Reset value
+                bucket[i] = Entry<V>.Something(entry.HashCode, default);
+            }
         }
 
         /// <summary>

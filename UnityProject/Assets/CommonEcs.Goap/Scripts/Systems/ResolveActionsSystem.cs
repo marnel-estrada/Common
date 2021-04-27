@@ -12,13 +12,18 @@ namespace CommonEcs.Goap {
         private EntityQuery query;
 
         protected override void OnCreate() {
-            this.query = GetEntityQuery(typeof(GoapPlanner), typeof(ResolvedAction));
+            this.query = GetEntityQuery(typeof(GoapPlanner), typeof(ResolvedAction),
+                typeof(DynamicBufferHashMap<ConditionId, bool>), 
+                typeof(DynamicBufferHashMap<ConditionId, bool>.Entry<bool>));
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             Job job = new Job() {
+                entityType = GetEntityTypeHandle(),
                 plannerType = GetComponentTypeHandle<GoapPlanner>(),
                 resolvedActionType = GetBufferTypeHandle<ResolvedAction>(),
+                hashMapType = GetComponentTypeHandle<DynamicBufferHashMap<ConditionId, bool>>(),
+                bucketType = GetBufferTypeHandle<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>>(),
                 allAgents = GetComponentDataFromEntity<GoapAgent>(true)
             };
             
@@ -27,15 +32,27 @@ namespace CommonEcs.Goap {
         
         [BurstCompile]
         private struct Job : IJobEntityBatch {
+            [ReadOnly]
+            public EntityTypeHandle entityType;
+            
             public ComponentTypeHandle<GoapPlanner> plannerType;
             public BufferTypeHandle<ResolvedAction> resolvedActionType;
+            
+            [ReadOnly]
+            public ComponentTypeHandle<DynamicBufferHashMap<ConditionId, bool>> hashMapType;
+            
+            [ReadOnly]
+            public BufferTypeHandle<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> bucketType;
 
             [ReadOnly]
             public ComponentDataFromEntity<GoapAgent> allAgents;
             
             public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
+                NativeArray<Entity> entities = batchInChunk.GetNativeArray(this.entityType);
                 NativeArray<GoapPlanner> planners = batchInChunk.GetNativeArray(this.plannerType);
                 BufferAccessor<ResolvedAction> resolvedActionBuffers = batchInChunk.GetBufferAccessor(this.resolvedActionType);
+                NativeArray<DynamicBufferHashMap<ConditionId, bool>> hashMaps = batchInChunk.GetNativeArray(this.hashMapType);
+                BufferAccessor<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> buckets = batchInChunk.GetBufferAccessor(this.bucketType);
                 
                 for (int i = 0; i < batchInChunk.Count; ++i) {
                     GoapPlanner planner = planners[i];
@@ -49,10 +66,15 @@ namespace CommonEcs.Goap {
 
                     GoapAgent agent = this.allAgents[planner.agentEntity];
                     GoapDomain domain = agent.Domain;
-                    BoolHashMap conditionsMap = planner.conditionsMap;
+                    
+                    // Prepare conditions map. We convert it from the bucket.
+                    // The algorithm needs to use BoolHashMap so it can pass the hashmap around. 
+                    DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> bucket = buckets[i];
+                    BoolHashMap boolHashMap = ToBoolHashMap(bucket);
+                    
                     NativeList<ResolvedAction> actionList = new NativeList<ResolvedAction>(Allocator.Temp);
                     NativeHashSet<int> actionsBeingEvaluated = new NativeHashSet<int>(4, Allocator.Temp);
-                    bool result = SearchActions(planner.currentGoal, domain, ref conditionsMap, ref actionList, ref actionsBeingEvaluated);
+                    bool result = SearchActions(planner.currentGoal, domain, ref boolHashMap, ref actionList, ref actionsBeingEvaluated);
                     planner.state = result ? PlanningState.SUCCESS : PlanningState.FAILED;
 
                     // Add the actions to action buffer if search was a success
@@ -63,6 +85,24 @@ namespace CommonEcs.Goap {
                     // Modify
                     planners[i] = planner;
                 }
+            }
+
+            private static BoolHashMap ToBoolHashMap(
+                in DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> bucket) {
+                BoolHashMap hashMap = new BoolHashMap();
+                
+                // Add only those with value
+                for (int i = 0; i < bucket.Length; ++i) {
+                    DynamicBufferHashMap<ConditionId, bool>.Entry<bool> entry = bucket[i];
+                    if (!entry.HasValue) {
+                        // No value
+                        continue;
+                    }
+                    
+                    hashMap.AddOrSet(entry.HashCode, entry.Value);
+                }
+
+                return hashMap;
             }
 
             // Utility method. Do not remove.

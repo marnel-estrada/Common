@@ -8,27 +8,33 @@ namespace CommonEcs.Goap {
     /// the condition can filter which entities.
     /// </summary>
     public struct ConditionResolver : IComponentData {
-        public readonly ConditionId conditionId;
+        public readonly ConditionId id;
         public readonly Entity agentEntity;
         
         // We denormalize here for faster access
         public readonly Entity plannerEntity;
 
+        // This is the index to where it will write its result to its parent planner's dynamic buffer of 
+        // bool results.
+        // Note that the conditions map is maintained using DynamicBufferHashMap added to the GoapPlanner entity
+        public readonly int resultIndex;
+
         public bool resolved;
         public bool result;
 
-        public ConditionResolver(ConditionId conditionId, Entity agentEntity, Entity plannerEntity) : this() {
-            this.conditionId = conditionId;
+        public ConditionResolver(ConditionId id, Entity agentEntity, Entity plannerEntity, int resultIndex) : this() {
+            this.id = id;
             this.agentEntity = agentEntity;
             this.plannerEntity = plannerEntity;
+            this.resultIndex = resultIndex;
         }
         
-        public ConditionResolver(FixedString32 stringId, Entity agentEntity, Entity plannerEntity) 
-            : this(new ConditionId(stringId), agentEntity, plannerEntity) {
+        public ConditionResolver(FixedString32 stringId, Entity agentEntity, Entity plannerEntity, int resultIndex) 
+            : this(new ConditionId(stringId), agentEntity, plannerEntity, resultIndex) {
         }
         
-        public ConditionResolver(FixedString64 stringId, Entity agentEntity, Entity plannerEntity) 
-            : this(new ConditionId(stringId), agentEntity, plannerEntity) {
+        public ConditionResolver(FixedString64 stringId, Entity agentEntity, Entity plannerEntity, int resultIndex) 
+            : this(new ConditionId(stringId), agentEntity, plannerEntity, resultIndex) {
         }
     }
 }

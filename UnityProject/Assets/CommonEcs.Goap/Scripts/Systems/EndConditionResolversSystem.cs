@@ -1,4 +1,7 @@
+using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
+using Unity.Jobs;
 
 namespace CommonEcs.Goap {
     /// <summary>
@@ -8,28 +11,66 @@ namespace CommonEcs.Goap {
     /// </summary>
     [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(IdentifyConditionsToResolveSystem))]
-    public class EndConditionResolversSystem : SystemBase {
-        protected override void OnUpdate() {
-            // This can't run in parallel as we are writing to planner.conditionsMap
-            ComponentDataFromEntity<GoapPlanner> allPlanners = GetComponentDataFromEntity<GoapPlanner>();
-            this.Entities.ForEach(delegate(in ConditionResolver resolver) {
-                if (!resolver.resolved) {
-                    return;
-                }
+    public class EndConditionResolversSystem : JobSystemBase {
+        private EntityQuery resolversQuery;
+        private EntityQuery plannersQuery;
 
-                GoapPlanner planner = allPlanners[resolver.plannerEntity];
-                planner.conditionsMap.AddOrSet(resolver.conditionId.GetHashCode(), resolver.result);
-                    
-                // Modify
-                allPlanners[resolver.plannerEntity] = planner;
-            }).Schedule();
+        protected override void OnCreate() {
+            this.resolversQuery = GetEntityQuery(typeof(ConditionResolver));
+            this.plannersQuery = GetEntityQuery(typeof(GoapPlanner));
+        }
+
+        protected override JobHandle OnUpdate(JobHandle inputDeps) {
+            // This can run in parallel
+            SetResultsToPlannerBucketJob setResultsJob = new SetResultsToPlannerBucketJob() {
+                resolverType = GetComponentTypeHandle<ConditionResolver>(),
+                allBuckets = GetBufferFromEntity<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>>()
+            };
+            JobHandle handle = setResultsJob.ScheduleParallel(this.resolversQuery, 1, inputDeps);
+
+            SetPlannerToResolvingActionsJob setToResolvingActionsJob = new SetPlannerToResolvingActionsJob() {
+                plannerType = GetComponentTypeHandle<GoapPlanner>()
+            };
+            handle = setToResolvingActionsJob.ScheduleParallel(this.plannersQuery, 1, handle);
+
+            return handle;
+        }
+
+        private struct SetResultsToPlannerBucketJob : IJobEntityBatch {
+            [ReadOnly]
+            public ComponentTypeHandle<ConditionResolver> resolverType;
+
+            [NativeDisableParallelForRestriction]
+            public BufferFromEntity<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> allBuckets;
             
-            // Set planner state to RESOLVING_ACTIONS
-            this.Entities.ForEach(delegate(ref GoapPlanner planner) {
-                if (planner.state == PlanningState.RESOLVING_CONDITIONS) {
-                    planner.state = PlanningState.RESOLVING_ACTIONS;
+            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
+                NativeArray<ConditionResolver> resolvers = batchInChunk.GetNativeArray(this.resolverType);
+                for (int i = 0; i < resolvers.Length; ++i) {
+                    ConditionResolver resolver = resolvers[i];
+                    
+                    // Set the value
+                    DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> bucket = this.allBuckets[resolver.plannerEntity];
+                    bucket[resolver.resultIndex] = DynamicBufferHashMap<ConditionId, bool>.Entry<bool>.Something(resolver.id.hashCode, resolver.result);
                 }
-            }).ScheduleParallel();
+            }
+        }
+        
+        [BurstCompile]
+        private struct SetPlannerToResolvingActionsJob : IJobEntityBatch {
+            public ComponentTypeHandle<GoapPlanner> plannerType;
+            
+            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
+                NativeArray<GoapPlanner> planners = batchInChunk.GetNativeArray(this.plannerType);
+                for (int i = 0; i < planners.Length; ++i) {
+                    GoapPlanner planner = planners[i];
+                    if (planner.state == PlanningState.RESOLVING_CONDITIONS) {
+                        planner.state = PlanningState.RESOLVING_ACTIONS;
+                        
+                        // Modify
+                        planners[i] = planner;
+                    }
+                }
+            }
         }
     }
 }

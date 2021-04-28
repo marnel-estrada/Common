@@ -17,6 +17,7 @@ namespace CommonEcs.Goap {
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             StartPlanningJob job = new StartPlanningJob() {
                 plannerType = GetComponentTypeHandle<GoapPlanner>(),
+                bucketType = GetBufferTypeHandle<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>>(),
                 allAgents = GetComponentDataFromEntity<GoapAgent>()
             };
 

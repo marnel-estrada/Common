@@ -1,3 +1,5 @@
+using System;
+
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -19,7 +21,6 @@ namespace CommonEcs.Goap {
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             Job job = new Job() {
-                entityType = GetEntityTypeHandle(),
                 plannerType = GetComponentTypeHandle<GoapPlanner>(),
                 resolvedActionType = GetBufferTypeHandle<ResolvedAction>(),
                 hashMapType = GetComponentTypeHandle<DynamicBufferHashMap<ConditionId, bool>>(),
@@ -32,9 +33,6 @@ namespace CommonEcs.Goap {
         
         [BurstCompile]
         private struct Job : IJobEntityBatch {
-            [ReadOnly]
-            public EntityTypeHandle entityType;
-            
             public ComponentTypeHandle<GoapPlanner> plannerType;
             public BufferTypeHandle<ResolvedAction> resolvedActionType;
             
@@ -48,7 +46,6 @@ namespace CommonEcs.Goap {
             public ComponentDataFromEntity<GoapAgent> allAgents;
             
             public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<Entity> entities = batchInChunk.GetNativeArray(this.entityType);
                 NativeArray<GoapPlanner> planners = batchInChunk.GetNativeArray(this.plannerType);
                 BufferAccessor<ResolvedAction> resolvedActionBuffers = batchInChunk.GetBufferAccessor(this.resolvedActionType);
                 NativeArray<DynamicBufferHashMap<ConditionId, bool>> hashMaps = batchInChunk.GetNativeArray(this.hashMapType);
@@ -59,6 +56,10 @@ namespace CommonEcs.Goap {
                     if (planner.state != PlanningState.RESOLVING_ACTIONS) {
                         // No need to continue if planner is no longer resolving actions
                         continue;
+                    }
+
+                    if (planner.currentGoal.IsNone) {
+                        throw new Exception("Trying to plan without a goal.");
                     }
                     
                     DynamicBuffer<ResolvedAction> resolvedActions = resolvedActionBuffers[i];
@@ -74,7 +75,7 @@ namespace CommonEcs.Goap {
                     
                     NativeList<ResolvedAction> actionList = new NativeList<ResolvedAction>(Allocator.Temp);
                     NativeHashSet<int> actionsBeingEvaluated = new NativeHashSet<int>(4, Allocator.Temp);
-                    bool result = SearchActions(planner.currentGoal, domain, ref boolHashMap, ref actionList, ref actionsBeingEvaluated);
+                    bool result = SearchActions(planner.currentGoal.ValueOr(default), domain, ref boolHashMap, ref actionList, ref actionsBeingEvaluated);
                     planner.state = result ? PlanningState.SUCCESS : PlanningState.FAILED;
 
                     // Add the actions to action buffer if search was a success

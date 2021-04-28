@@ -1,3 +1,5 @@
+using System;
+
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -51,10 +53,15 @@ namespace CommonEcs.Goap {
                         continue;
                     }
 
-                    // We just reuse the hash set here to avoid frequent memory allocation
-                    addedActions.Clear();
-                    DynamicBuffer<RequiredCondition> requiredConditions = requiredConditionsList[i];
-                    Process(planner, ref requiredConditions, ref addedActions);
+                    if (planner.currentGoal.IsSome) {
+                        // We just reuse the hash set here to avoid frequent memory allocation
+                        addedActions.Clear();
+                        DynamicBuffer<RequiredCondition> requiredConditions = requiredConditionsList[i];
+                        Process(planner, ref requiredConditions, ref addedActions);
+                    } else {
+                        // Should have a current goal
+                        throw new Exception("Planner is trying to plan but doesn't have a current goal.");
+                    }
                 }
             }
 
@@ -66,10 +73,11 @@ namespace CommonEcs.Goap {
                 GoapDomain domain = agent.Domain;
                 
                 // Add the goal first since it may have a resolver
-                requiredConditions.Add(new RequiredCondition(planner.currentGoal.id));
+                Condition currentGoal = planner.currentGoal.ValueOr(default);
+                requiredConditions.Add(new RequiredCondition(currentGoal.id));
                 
                 // Recurse to all preconditions of the goal until there are no actions left
-                AddPreconditions(ref requiredConditions, ref addedActions, domain, planner.currentGoal);
+                AddPreconditions(ref requiredConditions, ref addedActions, domain, currentGoal);
             }
 
             private void AddPreconditions(ref DynamicBuffer<RequiredCondition> requiredConditions, ref NativeHashSet<int> addedActions, 

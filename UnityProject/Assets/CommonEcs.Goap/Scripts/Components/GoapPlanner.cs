@@ -6,7 +6,7 @@ namespace CommonEcs.Goap {
     /// add to the same entity as the GoapPlanner
     /// </summary>
     public struct GoapPlanner : IComponentData {
-        public Condition currentGoal;
+        public ValueTypeOption<Condition> currentGoal;
 
         public readonly Entity agentEntity;
 
@@ -24,7 +24,7 @@ namespace CommonEcs.Goap {
         /// </summary>
         /// <param name="goal"></param>
         public void StartPlanning(Condition goal) {
-            this.currentGoal = goal;
+            this.currentGoal = ValueTypeOption<Condition>.Some(goal);
             this.state = PlanningState.RESOLVING_CONDITIONS;
         }
     }

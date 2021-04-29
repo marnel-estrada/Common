@@ -36,6 +36,7 @@ namespace CommonEcs.Goap {
             return handle;
         }
 
+        [BurstCompile]
         private struct SetResultsToPlannerBucketJob : IJobEntityBatch {
             [ReadOnly]
             public ComponentTypeHandle<ConditionResolver> resolverType;

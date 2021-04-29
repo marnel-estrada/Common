@@ -3,7 +3,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 
 namespace CommonEcs.DotsFsm {
-    public struct MoveTo : IComponentData {
+    public struct MoveTo : IFsmActionComponent {
         public readonly ValueTypeOption<FsmEvent> finishEvent;
         
         public float3 start;

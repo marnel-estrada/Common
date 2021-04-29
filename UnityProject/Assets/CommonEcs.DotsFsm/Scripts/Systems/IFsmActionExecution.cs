@@ -1,7 +1,7 @@
 using Unity.Entities;
 
 namespace CommonEcs.DotsFsm {
-    public interface IFsmActionExecution<T> where T : struct, IComponentData {
+    public interface IFsmActionExecution<T> where T : struct, IFsmActionComponent {
         /// <summary>
         /// DotsFsm is passed here so that the action can send events
         /// </summary>

@@ -9,7 +9,7 @@ namespace CommonEcs.DotsFsm {
     [UpdateAfter(typeof(ConsumePendingEventSystem))]
     [UpdateAfter(typeof(IdentifyRunningActionsSystem))]
     public abstract class DotsFsmActionSystem<ActionType, ActionExecutionType> : JobSystemBase
-        where ActionType : struct, IComponentData 
+        where ActionType : struct, IFsmActionComponent 
         where ActionExecutionType : struct, IFsmActionExecution<ActionType> {
         private EntityQuery query;
         private DotsFsmSystemGroup systemGroup;

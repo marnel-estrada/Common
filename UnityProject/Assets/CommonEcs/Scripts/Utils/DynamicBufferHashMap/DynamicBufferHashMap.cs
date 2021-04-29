@@ -32,7 +32,7 @@ namespace CommonEcs {
         /// Returns the bucket index where the value is stored
         /// This could be used by child entities so they know where to write their data.
         /// </summary>
-        /// <param name="buckets"></param>
+        /// <param name="bucket"></param>
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -178,7 +178,7 @@ namespace CommonEcs {
         /// <param name="hashCode"></param>
         /// <param name="startingIndex"></param>
         /// <returns></returns>
-        private ValueTypeOption<int> LinearProbeForExistingEntry(in DynamicBuffer<Entry<V>> bucket, int hashCode, int startingIndex) {
+        private readonly ValueTypeOption<int> LinearProbeForExistingEntry(in DynamicBuffer<Entry<V>> bucket, int hashCode, int startingIndex) {
             for (int i = 0; i < MAX_COUNT; ++i) {
                 // Note here that we go back to zero when we hit the max count
                 // In other words, it continues to search from the start of the bucket
@@ -237,13 +237,12 @@ namespace CommonEcs {
 
         /// <summary>
         /// Holds the values in a DynamicBuffer
-        /// This is implemented like a Maybe.
+        /// This is implemented like a Maybe. A hashcode of zero is considered as a nothing.
         /// </summary>
         [InternalBufferCapacity(64)]
         public readonly struct Entry<T> : IBufferElementData where T : unmanaged, IEquatable<T> {
             private readonly T value;
             private readonly int hashCode;
-            private readonly bool hasValue;
 
             public static Entry<T> Nothing {
                 get {
@@ -252,18 +251,19 @@ namespace CommonEcs {
             }
 
             public static Entry<T> Something(int hashCode, in T value) {
+                // Hashcode can't be zero because it denotes a nothing value
+                DotsAssert.IsTrue(hashCode != 0);
                 return new Entry<T>(hashCode, value);
             }
 
             public Entry(int hashCode, T value) {
                 this.value = value;
                 this.hashCode = hashCode;
-                this.hasValue = true;
             }
 
             public T Value {
                 get {
-                    if (!this.hasValue) {
+                    if (!this.HasValue) {
                         throw new Exception("Trying to access the value when there is none.");
                     }
 
@@ -273,7 +273,7 @@ namespace CommonEcs {
 
             public int HashCode {
                 get {
-                    if (!this.hasValue) {
+                    if (!this.HasValue) {
                         throw new Exception("Trying to access hash code when there is none.");
                     }
 
@@ -283,7 +283,7 @@ namespace CommonEcs {
 
             public bool HasValue {
                 get {
-                    return this.hasValue;
+                    return this.hashCode != 0;
                 }
             }
         }

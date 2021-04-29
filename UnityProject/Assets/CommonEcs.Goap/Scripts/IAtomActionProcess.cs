@@ -1,11 +1,9 @@
-using Unity.Entities;
-
 namespace CommonEcs.Goap {
     /// <summary>
     /// An interface used to qualify structs as an atom action
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IAtomActionProcess<T> where T : unmanaged, IComponentData {
+    public interface IAtomActionProcess<T> where T : unmanaged, IAtomActionComponent {
         /// <summary>
         /// Start routines
         /// </summary>

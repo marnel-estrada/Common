@@ -8,7 +8,7 @@ namespace CommonEcs.Goap {
     [UpdateAfter(typeof(IdentifyConditionsToResolveSystem))]
     [UpdateBefore(typeof(EndConditionResolversSystem))]
     public abstract class ConditionResolverBaseSystem<TResolverFilter, TResolverProcessor> : JobSystemBase
-        where TResolverFilter : unmanaged, IComponentData
+        where TResolverFilter : unmanaged, IConditionResolverComponent
         where TResolverProcessor : unmanaged, IConditionResolverProcess<TResolverFilter> {
         private EntityQuery query;
         private bool isFilterZeroSized;

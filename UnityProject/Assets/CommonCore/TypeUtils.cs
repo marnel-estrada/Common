@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Reflection;
 
+#nullable enable
+
 namespace Common {
     /// <summary>
     /// Contains type related utility methods

@@ -1,5 +1,3 @@
-using Unity.Mathematics;
-
 namespace CommonEcs {
     public readonly struct AStarNode<T> where T : unmanaged {
         public readonly int index;

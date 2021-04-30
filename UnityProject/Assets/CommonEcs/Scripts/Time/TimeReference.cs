@@ -4,6 +4,10 @@ using Unity.Entities;
 
 using Common;
 
+using UnityEngine;
+
+#nullable enable
+
 namespace CommonEcs {
     public struct TimeReference : ISharedComponentData, IEquatable<TimeReference> {
         private readonly Internal instance;
@@ -21,11 +25,18 @@ namespace CommonEcs {
                 this.instance.timeScale = value;
             }
         }
-        
-        public bool IsNull {
+
+        public float DeltaTime {
             get {
-                return this.instance == null;
+                return Time.unscaledDeltaTime * this.instance.timeScale;
             }
+        }
+
+        /// <summary>
+        /// This can called on domain reload
+        /// </summary>
+        public void Reset() {
+            this.TimeScale = 1.0f;
         }
         
         public bool Equals(TimeReference other) {
@@ -33,15 +44,11 @@ namespace CommonEcs {
         }
 
         public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) {
-                return false;
-            }
-
             return obj is TimeReference other && Equals(other);
         }
 
         public override int GetHashCode() {
-            return (this.instance != null ? this.instance.GetHashCode() : 0);
+            return this.instance.GetHashCode();
         }
 
         public static bool operator ==(TimeReference left, TimeReference right) {

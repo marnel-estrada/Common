@@ -5,6 +5,7 @@ namespace CommonEcs {
     /// <summary>
     /// A struct that wraps an int3 for use in DynamicBuffer
     /// </summary>
+    [InternalBufferCapacity(64)]
     public readonly struct Int3BufferElement : IBufferElementData {
         public readonly int3 value;
 

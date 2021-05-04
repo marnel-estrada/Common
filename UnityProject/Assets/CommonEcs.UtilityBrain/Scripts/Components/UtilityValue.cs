@@ -13,10 +13,22 @@ namespace CommonEcs.UtilityBrain {
         public readonly float bonus;
         public readonly float multiplier;
 
-        public UtilityValue(int rank, float bonus, float multiplier) {
+        /// <summary>
+        /// Note here that default bonus and multiplier is one instead of zero.
+        /// </summary>
+        /// <param name="rank"></param>
+        /// <param name="bonus"></param>
+        /// <param name="multiplier"></param>
+        public UtilityValue(int rank, float bonus = 1.0f, float multiplier = 1.0f) {
             this.rank = rank;
             this.bonus = bonus;
             this.multiplier = multiplier;
+        }
+
+        public float Weight {
+            get {
+                return this.bonus * this.multiplier;
+            }
         }
 
         public bool Equals(UtilityValue other) {

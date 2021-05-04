@@ -3,7 +3,7 @@ using Unity.Entities;
 namespace CommonEcs.UtilityBrain {
     public struct UtilityBrain : IComponentData {
         public ValueTypeOption<Entity> currentBestOption;
-
+        
         public readonly Entity agentEntity;
         
         // Utilities are not computed every frame

@@ -1,7 +1,5 @@
 using Common;
 
-using CommonEcs;
-
 using Unity.Collections;
 using Unity.Entities;
 

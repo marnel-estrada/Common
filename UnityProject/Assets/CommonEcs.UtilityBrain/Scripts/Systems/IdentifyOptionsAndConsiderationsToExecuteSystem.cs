@@ -12,20 +12,20 @@ namespace CommonEcs.UtilityBrain {
         private EntityQuery considerationsQuery;
 
         protected override void OnCreate() {
-            this.optionsQuery = GetEntityQuery(typeof(Option));
+            this.optionsQuery = GetEntityQuery(typeof(UtilityOption));
             this.considerationsQuery = GetEntityQuery(typeof(Consideration));
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             IdentifyOptionsJob identifyOptionsJob = new IdentifyOptionsJob() {
-                optionType = GetComponentTypeHandle<Option>(), 
+                optionType = GetComponentTypeHandle<UtilityOption>(), 
                 allBrains = GetComponentDataFromEntity<UtilityBrain>()
             };
             JobHandle handle = identifyOptionsJob.ScheduleParallel(this.optionsQuery, 1, inputDeps);
 
             IdentifyConsiderationsJob identifyConsiderationsJob = new IdentifyConsiderationsJob() {
                 considerationType = GetComponentTypeHandle<Consideration>(),
-                allOptions = GetComponentDataFromEntity<Option>()
+                allOptions = GetComponentDataFromEntity<UtilityOption>()
             };
             handle = identifyConsiderationsJob.ScheduleParallel(this.considerationsQuery, 1, handle);
             
@@ -33,15 +33,15 @@ namespace CommonEcs.UtilityBrain {
         }
         
         private struct IdentifyOptionsJob : IJobEntityBatch {
-            public ComponentTypeHandle<Option> optionType;
+            public ComponentTypeHandle<UtilityOption> optionType;
 
             [ReadOnly]
             public ComponentDataFromEntity<UtilityBrain> allBrains;
             
             public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<Option> options = batchInChunk.GetNativeArray(this.optionType);
+                NativeArray<UtilityOption> options = batchInChunk.GetNativeArray(this.optionType);
                 for (int i = 0; i < options.Length; ++i) {
-                    Option option = options[i];
+                    UtilityOption option = options[i];
                     option.shouldExecute = this.allBrains[option.utilityBrainEntity].shouldExecute;
                     
                     // Modify
@@ -54,7 +54,7 @@ namespace CommonEcs.UtilityBrain {
             public ComponentTypeHandle<Consideration> considerationType;
 
             [ReadOnly]
-            public ComponentDataFromEntity<Option> allOptions;
+            public ComponentDataFromEntity<UtilityOption> allOptions;
             
             public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
                 NativeArray<Consideration> considerations = batchInChunk.GetNativeArray(this.considerationType);

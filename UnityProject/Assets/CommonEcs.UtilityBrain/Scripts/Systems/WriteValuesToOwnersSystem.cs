@@ -9,6 +9,7 @@ namespace CommonEcs.UtilityBrain {
     /// Writes the computed consideration values to their parent option then each option writes
     /// its value to its parent brain.
     /// </summary>
+    [UpdateBefore(typeof(ResolveBestOptionSystem))]
     public class WriteValuesToOwnersSystem : JobSystemBase {
         private EntityQuery considerationsQuery;
         private EntityQuery optionsQuery;
@@ -24,16 +25,19 @@ namespace CommonEcs.UtilityBrain {
                 allValueLists = GetBufferFromEntity<UtilityValue>()
             };
             JobHandle handle = writeConsiderationsToOptions.ScheduleParallel(this.considerationsQuery, 1, inputDeps);
+
+            ComponentTypeHandle<UtilityOption> optionType = GetComponentTypeHandle<UtilityOption>();
             
             ComputeOptionValuesJob computeOptionValues = new ComputeOptionValuesJob() {
-                optionType = GetComponentTypeHandle<UtilityOption>(),
+                optionType = optionType,
                 utilityValueType = GetBufferTypeHandle<UtilityValue>()
             };
             handle = computeOptionValues.ScheduleParallel(this.optionsQuery, 1, handle);
 
             WriteOptionsToBrainJob writeOptionsToBrain = new WriteOptionsToBrainJob() {
-                optionType = GetComponentTypeHandle<UtilityOption>(),
-                allBuckets = GetBufferFromEntity<DynamicBufferHashMap<OptionId, UtilityValue>.Entry<UtilityValue>>()
+                entityType = GetEntityTypeHandle(),
+                optionType = optionType,
+                allBrainValueBuffers = GetBufferFromEntity<UtilityValueWithOption>()
             };
             handle = writeOptionsToBrain.ScheduleParallel(this.optionsQuery, 1, handle);
             
@@ -119,13 +123,17 @@ namespace CommonEcs.UtilityBrain {
         [BurstCompile]
         private struct WriteOptionsToBrainJob : IJobEntityBatch {
             [ReadOnly]
+            public EntityTypeHandle entityType;
+            
+            [ReadOnly]
             public ComponentTypeHandle<UtilityOption> optionType;
 
-            // Note here that we write to the bucket of the parent UtilityBrain
+            // Note here that the value list of UtilityBrain entity is using UtilityValueWithOption 
             [NativeDisableParallelForRestriction]
-            public BufferFromEntity<DynamicBufferHashMap<OptionId, UtilityValue>.Entry<UtilityValue>> allBuckets; 
+            public BufferFromEntity<UtilityValueWithOption> allBrainValueBuffers; 
             
             public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
+                NativeArray<Entity> entities = batchInChunk.GetNativeArray(this.entityType);
                 NativeArray<UtilityOption> options = batchInChunk.GetNativeArray(this.optionType);
                 for (int i = 0; i < options.Length; ++i) {
                     UtilityOption option = options[i];
@@ -134,10 +142,11 @@ namespace CommonEcs.UtilityBrain {
                         continue;
                     }
 
+                    Entity optionEntity = entities[i];
+
                     // Write the value
-                    DynamicBuffer<DynamicBufferHashMap<OptionId, UtilityValue>.Entry<UtilityValue>> bucket = this.allBuckets[option.utilityBrainEntity];
-                    DynamicBufferHashMap<OptionId, UtilityValue>.Entry<UtilityValue> entry = bucket[option.brainIndex];
-                    bucket[option.brainIndex] = DynamicBufferHashMap<OptionId, UtilityValue>.Entry<UtilityValue>.Something(entry.HashCode, option.value);
+                    DynamicBuffer<UtilityValueWithOption> valueBuffer = this.allBrainValueBuffers[option.utilityBrainEntity];
+                    valueBuffer[option.brainIndex] = new UtilityValueWithOption(optionEntity, option.value);
                 }
             }
         }

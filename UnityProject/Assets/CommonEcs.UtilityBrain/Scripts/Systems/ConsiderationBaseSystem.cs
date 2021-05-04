@@ -5,6 +5,7 @@ using Unity.Jobs;
 namespace CommonEcs.UtilityBrain {
     [UpdateInGroup(typeof(UtilityBrainSystemGroup))]
     [UpdateAfter(typeof(IdentifyOptionsAndConsiderationsToExecuteSystem))]
+    [UpdateBefore(typeof(WriteValuesToOwnersSystem))]
     public abstract class ConsiderationBaseSystem<TFilter, TProcessor> : JobSystemBase
         where TFilter : unmanaged, IConsiderationComponent
         where TProcessor : unmanaged, IConsiderationProcess<TFilter> {

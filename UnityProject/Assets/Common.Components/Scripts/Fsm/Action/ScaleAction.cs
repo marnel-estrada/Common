@@ -38,7 +38,7 @@ namespace Common.Fsm.Action {
 				return;
 			}
 			
-			if(VectorUtils.Equals(this.scaleFrom, this.scaleTo)) {
+			if(this.scaleFrom.TolerantEquals(this.scaleTo)) {
 				// alphaFrom and alphaTo are already the same
 				Finish();
 				return;

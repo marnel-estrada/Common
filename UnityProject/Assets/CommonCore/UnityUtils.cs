@@ -187,14 +187,6 @@ namespace Common {
         }
 
         /**
-         * Returns whether or not the two vectors are approximately equal.
-         */
-        public static bool TolerantEquals(Vector3 a, Vector3 b) {
-            return a.x.TolerantEquals(b.x) && a.y.TolerantEquals(b.y) &&
-                a.z.TolerantEquals(b.z);
-        }
-
-        /**
         * Returns a random sign.
         */
         public static float RandomSign() {

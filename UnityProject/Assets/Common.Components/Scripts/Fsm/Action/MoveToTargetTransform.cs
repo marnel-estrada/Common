@@ -30,7 +30,7 @@ namespace Common.Fsm.Action {
                 return;
             }
 			
-            if(VectorUtils.Equals(this.agent.position, this.target.position)) {
+            if(this.agent.position.TolerantEquals(this.target.position)) {
                 // positionFrom and positionTo are already the same
                 Finish();
                 return;

@@ -21,46 +21,5 @@ namespace Common {
         public static readonly Vector3 FORWARD = new Vector3(0, 0, 1);
 
         public static readonly Vector2 ZERO_2D = new Vector2(0, 0);
-
-        /**
-         * Returns whether or not the specified vectors a and b are equal.
-         */
-        public static bool Equals(Vector3 a, Vector3 b) {
-            return a.x.TolerantEquals(b.x) && a.y.TolerantEquals(b.y) &&
-                a.z.TolerantEquals(b.z);
-        }
-
-        /// <summary>
-        /// Vector2 equals comparison
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
-        public static bool Equals(Vector2 a, Vector2 b) {
-            return a.x.TolerantEquals(b.x) && a.y.TolerantEquals(b.y);
-        }
-
-        /// <summary>
-        /// Returns a random vector that is between the specified extents
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
-        public static Vector2 RandomRange(Vector2 a, Vector2 b) {
-            float x = Random.Range(a.x, b.x);
-            float y = Random.Range(a.y, b.y);
-
-            return new Vector2(x, y);
-        }
-
-        /// <summary>
-        /// Adds a Vector2 to the Vector3
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
-        public static Vector3 Add(Vector3 a, Vector2 b) {
-            return new Vector3(a.x + b.x, a.y + b.y, a.z);
-        }
     }
 }

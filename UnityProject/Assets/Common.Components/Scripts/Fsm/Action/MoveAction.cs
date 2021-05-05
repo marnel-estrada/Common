@@ -57,7 +57,7 @@ namespace Common.Fsm.Action {
 				return;
 			}
 			
-			if(VectorUtils.Equals(this.positionFrom, this.positionTo)) {
+			if(this.positionFrom.TolerantEquals(this.positionTo)) {
 				// positionFrom and positionTo are already the same
 				Finish();
 				return;

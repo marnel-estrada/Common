@@ -30,12 +30,12 @@ namespace GoapBrain {
                 agentEntity, plannerEntity, resultIndex));
             conditionsMap.Commit(ref entityManager);
             
-            PrepareResolver(ref entityManager, agentEntity, resolverEntity);
+            PrepareResolverComponent(ref entityManager, agentEntity, resolverEntity);
 
             return resolverEntity;
         }
 
-        protected virtual void PrepareResolver(ref EntityManager entityManager, in Entity agentEntity,
+        protected virtual void PrepareResolverComponent(ref EntityManager entityManager, in Entity agentEntity,
             in Entity resolverEntity) {
             // May or may not be overridden by deriving class
             // This is needed for cases when the resolver filter has a custom constructor,

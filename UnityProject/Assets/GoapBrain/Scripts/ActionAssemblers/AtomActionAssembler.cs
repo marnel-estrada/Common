@@ -1,6 +1,4 @@
-﻿using CommonEcs;
-
-using Unity.Collections;
+﻿using Unity.Collections;
 using Unity.Entities;
 
 namespace GoapBrain {

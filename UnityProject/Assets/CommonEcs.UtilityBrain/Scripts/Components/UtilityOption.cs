@@ -20,10 +20,14 @@ namespace CommonEcs.UtilityBrain {
         // This will be replaced by enable/disable component when it it available.
         public bool shouldExecute;
 
-        public UtilityOption(OptionId id, Entity utilityBrainEntity, int brainIndex) : this() {
+        public UtilityOption(OptionId id, in Entity utilityBrainEntity, int brainIndex) : this() {
             this.id = id;
             this.utilityBrainEntity = utilityBrainEntity;
             this.brainIndex = brainIndex;
+        }
+
+        public UtilityOption(int id, in Entity utilityBrainEntity, int brainIndex) : 
+            this(new OptionId(id), utilityBrainEntity, brainIndex) {
         }
     }
 }

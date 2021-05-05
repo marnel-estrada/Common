@@ -23,7 +23,7 @@ namespace CommonEcs.UtilityBrain {
         // This will be replaced by enable/disable component when it it available.
         public bool shouldExecute;
 
-        public Consideration(Entity agentEntity, Entity optionEntity, int optionIndex) : this() {
+        public Consideration(in Entity agentEntity, in Entity optionEntity, int optionIndex) : this() {
             this.agentEntity = agentEntity;
             this.optionEntity = optionEntity;
             this.optionIndex = optionIndex;

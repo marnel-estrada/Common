@@ -14,5 +14,9 @@ namespace CommonEcs.UtilityBrain {
         public UtilityBrain(Entity agentEntity) : this() {
             this.agentEntity = agentEntity;
         }
+
+        public void MarkExecute() {
+            this.shouldExecute = true;
+        }
     }
 }

@@ -7,6 +7,7 @@ namespace CommonEcs.UtilityBrain {
     /// Identifies which options and considerations can run by setting their shouldExecute value.
     /// The value is whatever their parent UtilityBrain value is (when its shouldExecute is true).
     /// </summary>
+    [UpdateInGroup(typeof(UtilityBrainSystemGroup))]
     public class IdentifyOptionsAndConsiderationsToExecuteSystem : JobSystemBase {
         private EntityQuery optionsQuery;
         private EntityQuery considerationsQuery;

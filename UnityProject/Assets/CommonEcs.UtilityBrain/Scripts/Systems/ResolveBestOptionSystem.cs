@@ -4,6 +4,7 @@ using Unity.Entities;
 using Unity.Jobs;
 
 namespace CommonEcs.UtilityBrain {
+    [UpdateInGroup(typeof(UtilityBrainSystemGroup))]
     public class ResolveBestOptionSystem : JobSystemBase {
         private EntityQuery query;
 

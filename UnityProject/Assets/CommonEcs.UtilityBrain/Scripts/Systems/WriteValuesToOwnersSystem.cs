@@ -9,6 +9,7 @@ namespace CommonEcs.UtilityBrain {
     /// Writes the computed consideration values to their parent option then each option writes
     /// its value to its parent brain.
     /// </summary>
+    [UpdateInGroup(typeof(UtilityBrainSystemGroup))]
     [UpdateBefore(typeof(ResolveBestOptionSystem))]
     public class WriteValuesToOwnersSystem : JobSystemBase {
         private EntityQuery considerationsQuery;

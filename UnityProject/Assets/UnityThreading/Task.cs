@@ -20,8 +20,8 @@ namespace UnityThreading
         /// </summary>
         public volatile int Priority;
 
-        private ManualResetEvent abortEvent = new ManualResetEvent(false);
-        private ManualResetEvent endedEvent = new ManualResetEvent(false);
+        private readonly ManualResetEvent abortEvent = new ManualResetEvent(false);
+        private readonly ManualResetEvent endedEvent = new ManualResetEvent(false);
 		private bool hasStarted = false;
 
 		protected abstract IEnumerator Do();
@@ -34,7 +34,7 @@ namespace UnityThreading
         {
             get
 			{
-				return abortEvent.WaitOne(0, false); 
+				return this.abortEvent.WaitOne(0, false); 
 			}
         }
 
@@ -45,7 +45,7 @@ namespace UnityThreading
         {
             get 
 			{
-				return endedEvent.WaitOne(0, false); 
+				return this.endedEvent.WaitOne(0, false); 
 			}
         }
 
@@ -58,7 +58,7 @@ namespace UnityThreading
         {
             get
             {
-				return endedEvent.WaitOne(0, false) && !abortEvent.WaitOne(0, false);
+				return this.endedEvent.WaitOne(0, false) && !this.abortEvent.WaitOne(0, false);
             }
         }
 
@@ -70,7 +70,7 @@ namespace UnityThreading
         {
             get
             {
-				return endedEvent.WaitOne(0, false) && abortEvent.WaitOne(0, false);
+				return this.endedEvent.WaitOne(0, false) && this.abortEvent.WaitOne(0, false);
             }
         }
 
@@ -79,7 +79,7 @@ namespace UnityThreading
 		/// </summary>
         public void Abort()
         {
-			abortEvent.Set();
+	        this.abortEvent.Set();
         }
 
 		/// <summary>
@@ -108,7 +108,7 @@ namespace UnityThreading
 		/// </summary>
         public void Wait()
         {
-			endedEvent.WaitOne();
+	        this.endedEvent.WaitOne();
         }
 
 		/// <summary>
@@ -117,7 +117,7 @@ namespace UnityThreading
 		/// <param name="seconds">Time in seconds this method will max wait.</param>
         public void WaitForSeconds(float seconds)
         {
-			endedEvent.WaitOne(TimeSpan.FromSeconds(seconds));
+	        this.endedEvent.WaitOne(TimeSpan.FromSeconds(seconds));
         }
 
 		/// <summary>
@@ -155,17 +155,17 @@ namespace UnityThreading
 
         internal void DoInternal()
         {
-			hasStarted = true;
-            if (!ShouldAbort)
+	        this.hasStarted = true;
+            if (!this.ShouldAbort)
             {
                 var enumerator = Do();
                 if (enumerator == null)
                 {
-                    endedEvent.Set();
+	                this.endedEvent.Set();
                     return;
                 }
 
-                var currentThread = UnityThreading.ThreadBase.CurrentThread;
+                var currentThread = ThreadBase.CurrentThread;
                 do
                 {
                     var task = (TaskBase)enumerator.Current;
@@ -176,7 +176,8 @@ namespace UnityThreading
                 }
                 while (enumerator.MoveNext());
             }
-            endedEvent.Set();
+
+            this.endedEvent.Set();
         }
 
 		/// <summary>
@@ -184,16 +185,16 @@ namespace UnityThreading
 		/// </summary>
         public void Dispose()
         {
-			if (hasStarted)
+			if (this.hasStarted)
 				Wait();
-			endedEvent.Close();
-			abortEvent.Close();
+			this.endedEvent.Close();
+			this.abortEvent.Close();
         }
     }
 
     public class Task : TaskBase
     {
-        private Action action;
+        private readonly Action action;
 		
         public Task(Action action)
         {
@@ -202,14 +203,14 @@ namespace UnityThreading
 
         protected override IEnumerator Do()
         {
-            action();
+	        this.action();
             return null;
         }
     }
 
     public class Task<T> : TaskBase
     {
-        private Func<T> function;
+        private readonly Func<T> function;
         private T result;
 
         public Task(Func<T> function)
@@ -219,13 +220,13 @@ namespace UnityThreading
 
 		protected override IEnumerator Do()
         {
-            result = function();
+	        this.result = this.function();
             return null;
         }
 
 		public override TResult Wait<TResult>()
 		{
-			return (TResult)(object)Result;
+			return (TResult)(object) this.Result;
 		}
 
 		public override TResult WaitForSeconds<TResult>(float seconds)
@@ -235,10 +236,10 @@ namespace UnityThreading
 
 		public override TResult WaitForSeconds<TResult>(float seconds, TResult defaultReturnValue)
 		{
-			if (!HasEnded)
+			if (!this.HasEnded)
 				WaitForSeconds(seconds);
-			if (IsSucceeded)
-				return (TResult)(object)result;
+			if (this.IsSucceeded)
+				return (TResult)(object) this.result;
 			return defaultReturnValue;
 		}
         
@@ -249,9 +250,9 @@ namespace UnityThreading
         {
             get
             {
-                if (!HasEnded)
+                if (!this.HasEnded)
                     Wait();
-                return result;
+                return this.result;
             }
         }
     }

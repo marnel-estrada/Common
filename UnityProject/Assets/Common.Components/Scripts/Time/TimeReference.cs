@@ -7,7 +7,7 @@ namespace Common.Time {
 	 * For example, in a speed up tower defense game.
 	 */
 	public class TimeReference {		
-		private string name;
+		private readonly string name;
 		private float timeScale;
 		
 		/**
@@ -22,7 +22,7 @@ namespace Common.Time {
 		 */
 		public String Name {
 			get {
-				return name;
+				return this.name;
 			}
 		}
 		

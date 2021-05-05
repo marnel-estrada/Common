@@ -11,13 +11,13 @@ namespace DTCompileTimeTracker {
       get { return this._startTime; }
       set {
         this._startTime = value;
-        this.Save();
+        Save();
       }
     }
 
     public void AddCompileTimeKeyframe(CompileTimeKeyframe keyframe) {
       this._compileTimeHistory.Add(keyframe);
-      this.Save();
+      Save();
     }
 
     public IList<CompileTimeKeyframe> GetCompileTimeHistory() {
@@ -26,17 +26,17 @@ namespace DTCompileTimeTracker {
 
     public CompileTimeTrackerData(string editorPrefKey) {
       this._editorPrefKey = editorPrefKey;
-      this.Load();
+      Load();
     }
 
 
     [SerializeField] private int _startTime;
     [SerializeField] private List<CompileTimeKeyframe> _compileTimeHistory;
 
-    private string _editorPrefKey;
+    private readonly string _editorPrefKey;
 
     private void Save() {
-      while (this._compileTimeHistory.Count > CompileTimeTrackerData.kHistoryKeyframeMaxCount) {
+      while (this._compileTimeHistory.Count > kHistoryKeyframeMaxCount) {
         this._compileTimeHistory.RemoveAt(0);
       }
 

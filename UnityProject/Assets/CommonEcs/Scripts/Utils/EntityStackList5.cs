@@ -21,18 +21,18 @@ namespace Common {
             private readonly int m_Length;
 
             public Enumerator(Entity* elements, int* version, int length) {
-                m_Elements = elements;
-                m_Index = -1;
-                m_OriginalVersion = *version;
-                m_Version = version;
-                m_Length = length;
+                this.m_Elements = elements;
+                this.m_Index = -1;
+                this.m_OriginalVersion = *version;
+                this.m_Version = version;
+                this.m_Length = length;
             }
 
             public bool MoveNext() {
                 RequireVersionMatch();
-                m_Index++;
+                this.m_Index++;
 
-                return m_Index < m_Length;
+                return this.m_Index < this.m_Length;
             }
 
             public ref Entity Current {
@@ -40,21 +40,21 @@ namespace Common {
                     RequireVersionMatch();
                     RequireIndexInBounds();
 
-                    return ref m_Elements[m_Index];
+                    return ref this.m_Elements[this.m_Index];
                 }
             }
 
             [Unity.Burst.BurstDiscard]
             public void RequireVersionMatch() {
-                if (m_OriginalVersion != *m_Version) {
+                if (this.m_OriginalVersion != *this.m_Version) {
                     throw new System.InvalidOperationException("Buffer modified during enumeration");
                 }
             }
 
             [Unity.Burst.BurstDiscard]
             public void RequireIndexInBounds() {
-                if (m_Index < 0 || m_Index >= m_Length) {
-                    throw new System.InvalidOperationException("Index out of bounds: " + m_Index);
+                if (this.m_Index < 0 || this.m_Index >= this.m_Length) {
+                    throw new System.InvalidOperationException("Index out of bounds: " + this.m_Index);
                 }
             }
         }
@@ -82,20 +82,20 @@ namespace Common {
         }
 
         private ref Entity GetElement(int index) {
-            fixed (Entity* elements = &m_Element0) {
+            fixed (Entity* elements = &this.m_Element0) {
                 return ref elements[index];
             }
         }
 
         private void SetElement(int index, Entity value) {
-            fixed (Entity* elements = &m_Element0) {
+            fixed (Entity* elements = &this.m_Element0) {
                 elements[index] = value;
             }
         }
 
         public int Count {
             get {
-                return m_Length;
+                return this.m_Length;
             }
         }
 
@@ -103,49 +103,49 @@ namespace Common {
 
         public Enumerator GetEnumerator() {
             // Safe because Enumerator is a 'ref struct'
-            fixed (Entity* elements = &m_Element0) {
-                fixed (int* version = &m_Version) {
-                    return new Enumerator(elements, version, m_Length);
+            fixed (Entity* elements = &this.m_Element0) {
+                fixed (int* version = &this.m_Version) {
+                    return new Enumerator(elements, version, this.m_Length);
                 }
             }
         }
 
         public void Add(Entity item) {
             RequireNotFull();
-            SetElement(m_Length, item);
-            m_Length++;
-            m_Version++;
+            SetElement(this.m_Length, item);
+            this.m_Length++;
+            this.m_Version++;
         }
 
         public void Clear() {
-            for (int i = 0; i < m_Length; ++i) {
+            for (int i = 0; i < this.m_Length; ++i) {
                 SetElement(i, default(Entity));
             }
 
-            m_Length = 0;
-            m_Version++;
+            this.m_Length = 0;
+            this.m_Version++;
         }
 
         public void Insert(int index, Entity value) {
             RequireNotFull();
             RequireIndexInBounds(index);
-            for (int i = m_Length; i > index; --i) {
+            for (int i = this.m_Length; i > index; --i) {
                 SetElement(i, GetElement(i - 1));
             }
 
             SetElement(index, value);
-            m_Length++;
-            m_Version++;
+            this.m_Length++;
+            this.m_Version++;
         }
 
         public void RemoveAt(int index) {
             RequireIndexInBounds(index);
-            for (int i = index; i < m_Length - 1; ++i) {
+            for (int i = index; i < this.m_Length - 1; ++i) {
                 SetElement(i, GetElement(i + 1));
             }
 
-            m_Length--;
-            m_Version++;
+            this.m_Length--;
+            this.m_Version++;
         }
 
         public void RemoveRange(int index, int count) {
@@ -157,8 +157,8 @@ namespace Common {
             RequireIndexInBounds(index + count - 1);
             int indexAfter = index + count;
             int indexEndCopy = indexAfter + count;
-            if (indexEndCopy >= m_Length) {
-                indexEndCopy = m_Length;
+            if (indexEndCopy >= this.m_Length) {
+                indexEndCopy = this.m_Length;
             }
 
             int numCopies = indexEndCopy - indexAfter;
@@ -166,24 +166,24 @@ namespace Common {
                 SetElement(index + i, GetElement(index + count + i));
             }
 
-            for (int i = indexAfter; i < m_Length - 1; ++i) {
+            for (int i = indexAfter; i < this.m_Length - 1; ++i) {
                 SetElement(i, GetElement(i + 1));
             }
 
-            m_Length -= count;
-            m_Version++;
+            this.m_Length -= count;
+            this.m_Version++;
         }
 
         [Unity.Burst.BurstDiscard]
         public void RequireNotFull() {
-            if (m_Length == 5) {
+            if (this.m_Length == 5) {
                 throw new System.InvalidOperationException("Buffer overflow");
             }
         }
 
         [Unity.Burst.BurstDiscard]
         public void RequireIndexInBounds(int index) {
-            if (index < 0 || index >= m_Length) {
+            if (index < 0 || index >= this.m_Length) {
                 throw new System.InvalidOperationException("Index out of bounds: " + index);
             }
         }

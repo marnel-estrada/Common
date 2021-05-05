@@ -20,7 +20,7 @@ namespace Common {
 
         public K Key {
             get {
-                return key;
+                return this.key;
             }
 
             set {
@@ -30,7 +30,7 @@ namespace Common {
 
         public V Value {
             get {
-                return value;
+                return this.value;
             }
 
             set {

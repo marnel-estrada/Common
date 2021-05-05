@@ -15,7 +15,7 @@ namespace Common {
         [SerializeField]
         private int queueCount;
 
-        private Queue<Command> commandQueue = new Queue<Command>();
+        private readonly Queue<Command> commandQueue = new Queue<Command>();
 
         private ActionThread thread;
 
@@ -28,9 +28,9 @@ namespace Common {
         }
 
         void Update() {
-            if (thread == null || !thread.IsAlive) {
+            if (this.thread == null || !this.thread.IsAlive) {
                 if (this.thread != null) {
-                    thread.Exit();
+                    this.thread.Exit();
                 }
 
                 if (this.commandQueue.Count > 0) {

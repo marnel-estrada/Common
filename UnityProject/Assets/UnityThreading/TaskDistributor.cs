@@ -12,7 +12,7 @@ namespace UnityThreading
 	{
         private TaskWorker[] workerThreads;
 
-        internal WaitHandle NewDataWaitHandle { get { return dataEvent; } }
+        internal WaitHandle NewDataWaitHandle { get { return this.dataEvent; } }
 
 		private static TaskDistributor mainTaskDistributor;
 
@@ -66,11 +66,10 @@ namespace UnityThreading
 #endif
             }
 
-			workerThreads = new TaskWorker[workerThreadCount];
-			lock (workerThreads)
+            this.workerThreads = new TaskWorker[workerThreadCount];
+			lock (this.workerThreads)
 			{
-				for (var i = 0; i < workerThreadCount; ++i)
-					workerThreads[i] = new TaskWorker(this);
+				for (var i = 0; i < workerThreadCount; ++i) this.workerThreads[i] = new TaskWorker(this);
 			}
 
 			if (mainTaskDistributor == null)
@@ -85,14 +84,14 @@ namespace UnityThreading
 		/// </summary>
 		public void Start()
 		{
-			lock (workerThreads)
+			lock (this.workerThreads)
 			{
-				for (var i = 0; i < workerThreads.Length; ++i)
+				for (var i = 0; i < this.workerThreads.Length; ++i)
 				{
-					if (!workerThreads[i].IsAlive)
+					if (!this.workerThreads[i].IsAlive)
 					{
-						workerThreads[i].Dispatcher.AddTasks(this.SplitTasks(workerThreads.Length));
-						workerThreads[i].Start();
+						this.workerThreads[i].Dispatcher.AddTasks(SplitTasks(this.workerThreads.Length));
+						this.workerThreads[i].Start();
 					}
 				}
 			}
@@ -100,7 +99,7 @@ namespace UnityThreading
 
         internal void FillTasks(Dispatcher target)
         {
-			target.AddTasks(this.IsolateTasks(1));
+			target.AddTasks(IsolateTasks(1));
         }
 
 		protected override void CheckAccessLimitation()
@@ -123,12 +122,12 @@ namespace UnityThreading
 			while (true)
 			{
 				TaskBase currentTask;
-                lock (taskList)
+                lock (this.taskList)
                 {
-                    if (taskList.Count != 0)
+                    if (this.taskList.Count != 0)
                     {
-                        currentTask = taskList[0];
-                        taskList.RemoveAt(0);
+                        currentTask = this.taskList[0];
+                        this.taskList.RemoveAt(0);
                     }
                     else
                         break;
@@ -136,15 +135,14 @@ namespace UnityThreading
 				currentTask.Dispose();
 			}
 
-			lock (workerThreads)
+			lock (this.workerThreads)
 			{
-				for (var i = 0; i < workerThreads.Length; ++i)
-					workerThreads[i].Dispose();
-				workerThreads = new TaskWorker[0];
+				for (var i = 0; i < this.workerThreads.Length; ++i) this.workerThreads[i].Dispose();
+				this.workerThreads = new TaskWorker[0];
 			}
 
-			dataEvent.Close();
-			dataEvent = null;
+			this.dataEvent.Close();
+			this.dataEvent = null;
 
 			if (mainTaskDistributor == this)
 				mainTaskDistributor = null;
@@ -167,17 +165,17 @@ namespace UnityThreading
 
         protected override IEnumerator Do()
         {
-            while (!exitEvent.WaitOne(0, false))
+            while (!this.exitEvent.WaitOne(0, false))
             {
-                if (!Dispatcher.ProcessNextTask())
+                if (!this.Dispatcher.ProcessNextTask())
                 {
-					TaskDistributor.FillTasks(Dispatcher);
-                    if (Dispatcher.TaskCount == 0)
+	                this.TaskDistributor.FillTasks(this.Dispatcher);
+                    if (this.Dispatcher.TaskCount == 0)
                     {
-						var result = WaitHandle.WaitAny(new WaitHandle[] { exitEvent, TaskDistributor.NewDataWaitHandle });
+						var result = WaitHandle.WaitAny(new WaitHandle[] {this.exitEvent, this.TaskDistributor.NewDataWaitHandle });
                         if (result == 0)
                             return null;
-						TaskDistributor.FillTasks(Dispatcher);
+                        this.TaskDistributor.FillTasks(this.Dispatcher);
                     }
                 }
             }
@@ -187,9 +185,8 @@ namespace UnityThreading
         public override void Dispose()
         {
             base.Dispose();
-			if (Dispatcher != null)
-				Dispatcher.Dispose();
-			Dispatcher = null;
+			if (this.Dispatcher != null) this.Dispatcher.Dispose();
+			this.Dispatcher = null;
         }
     }
 }

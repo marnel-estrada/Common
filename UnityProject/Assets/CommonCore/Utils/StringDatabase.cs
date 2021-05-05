@@ -13,16 +13,16 @@ namespace Common {
     /// </summary>
     public class StringDatabase {
 
-        private QuickMap<string> intToStringMap = new QuickMap<string>();
+        private readonly QuickMap<string> intToStringMap = new QuickMap<string>();
 
-        private Dictionary<string, int> stringToIntMap = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> stringToIntMap = new Dictionary<string, int>();
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="buffer"></param>
         public StringDatabase(int buffer) {
-            intToStringMap = new QuickMap<string>(buffer);
+            this.intToStringMap = new QuickMap<string>(buffer);
         }
 
         /// <summary>

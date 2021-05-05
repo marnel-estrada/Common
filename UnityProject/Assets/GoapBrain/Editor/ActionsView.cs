@@ -9,8 +9,8 @@ using UnityEditor;
 namespace GoapBrain {
     class ActionsView {
 
-        private ActionsSidebarView sidebar = new ActionsSidebarView();
-        private ActionInspectorView inspector;
+        private readonly ActionsSidebarView sidebar = new ActionsSidebarView();
+        private readonly ActionInspectorView inspector;
 
         /// <summary>
         /// Constructor

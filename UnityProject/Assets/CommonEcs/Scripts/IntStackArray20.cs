@@ -13,28 +13,28 @@ namespace CommonEcs {
             private int m_Index;
 
             public Enumerator(int* elements) {
-                m_Elements = elements;
-                m_Index = -1;
+                this.m_Elements = elements;
+                this.m_Index = -1;
             }
 
             public bool MoveNext() {
-                m_Index++;
+                this.m_Index++;
 
-                return m_Index < 20;
+                return this.m_Index < 20;
             }
 
             public ref int Current {
                 get {
                     RequireIndexInBounds();
 
-                    return ref m_Elements[m_Index];
+                    return ref this.m_Elements[this.m_Index];
                 }
             }
 
             [Unity.Burst.BurstDiscard]
             public void RequireIndexInBounds() {
-                if (m_Index < 0 || m_Index >= 20) {
-                    throw new System.InvalidOperationException("Index out of bounds: " + m_Index);
+                if (this.m_Index < 0 || this.m_Index >= 20) {
+                    throw new System.InvalidOperationException("Index out of bounds: " + this.m_Index);
                 }
             }
         }
@@ -88,13 +88,13 @@ namespace CommonEcs {
         }
 
         private ref int GetElement(int index) {
-            fixed (int* elements = &m_Element0) {
+            fixed (int* elements = &this.m_Element0) {
                 return ref elements[index];
             }
         }
 
         private void SetElement(int index, int value) {
-            fixed (int* elements = &m_Element0) {
+            fixed (int* elements = &this.m_Element0) {
                 elements[index] = value;
             }
         }
@@ -103,7 +103,7 @@ namespace CommonEcs {
 
         public Enumerator GetEnumerator() {
             // Safe because Enumerator is a 'ref struct'
-            fixed (int* elements = &m_Element0) {
+            fixed (int* elements = &this.m_Element0) {
                 return new Enumerator(elements);
             }
         }

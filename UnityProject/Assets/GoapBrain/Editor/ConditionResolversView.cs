@@ -142,7 +142,7 @@ namespace GoapBrain {
             position.width = 400;
             position.height = 600;
 
-            ConditionResolverBrowserWindow browser = EditorWindow.CreateInstance<ConditionResolverBrowserWindow>();
+            ConditionResolverBrowserWindow browser = ScriptableObject.CreateInstance<ConditionResolverBrowserWindow>();
             browser.titleContent = new GUIContent("Condition Resolver Browser");
             browser.Init(OnResolverSelected);
             browser.position = position;

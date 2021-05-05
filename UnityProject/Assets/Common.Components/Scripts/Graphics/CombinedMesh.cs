@@ -186,7 +186,7 @@ namespace Common {
                     this.selfTransform = this.transform;
                 }
 
-                return selfTransform;
+                return this.selfTransform;
             }
         }
 

@@ -6,7 +6,7 @@ namespace Common.Fsm.Action {
         private Transform target;
         private float duration;
         private string finishEvent;
-        private CountdownTimer timer;
+        private readonly CountdownTimer timer;
         private Space space;
 
         private Vector3 start;
@@ -25,7 +25,7 @@ namespace Common.Fsm.Action {
         }
 
         public override void OnEnter() {
-            if(Comparison.TolerantEquals(duration, 0)) {
+            if(this.duration.TolerantEquals(0)) {
                 Finish();
                 return;
             }

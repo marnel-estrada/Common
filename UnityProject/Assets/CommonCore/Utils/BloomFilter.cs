@@ -119,11 +119,11 @@ namespace Common {
         }
 
         private static int EvaluateM(double n, double p) {
-            return (int) System.Math.Ceiling(-n * System.Math.Log(p) / System.Math.Pow(System.Math.Log(2), 2));
+            return (int) Math.Ceiling(-n * Math.Log(p) / Math.Pow(Math.Log(2), 2));
         }
 
         private static int EvaluateK(double m, double n) {
-            return (int) System.Math.Round(m / n * System.Math.Log(2));
+            return (int) Math.Round(m / n * Math.Log(2));
         }
 
         private void ComputeHashes(T item, int maxValue) {
@@ -136,7 +136,7 @@ namespace Common {
 
             for (int i = 0; i < this.hashes.Length; i++) {
                 unchecked {
-                    this.hashes[i] = System.Math.Abs(doubledHash * (i + 1)) % maxValue;
+                    this.hashes[i] = Math.Abs(doubledHash * (i + 1)) % maxValue;
                 }
             }
         }

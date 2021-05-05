@@ -21,24 +21,24 @@ namespace Common {
         /// </summary>
         public virtual void OnFinished() { }
 
-        public bool IsAborted { get { return aborted; } }
-        public bool IsStarted { get { return started; } }
-        public bool IsDataReady { get { return dataReady; } }
+        public bool IsAborted { get { return this.aborted; } }
+        public bool IsStarted { get { return this.started; } }
+        public bool IsDataReady { get { return this.dataReady; } }
 
         public void Execute() {
-            started = true;
+            this.started = true;
             DoWork();
-            dataReady = true;
+            this.dataReady = true;
         }
 
         public void AbortJob() {
-            aborted = true;
+            this.aborted = true;
         }
 
         public void ResetJobState() {
-            started = false;
-            dataReady = false;
-            aborted = false;
+            this.started = false;
+            this.dataReady = false;
+            this.aborted = false;
         }
 
     }

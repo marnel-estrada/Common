@@ -12,7 +12,7 @@ public class PixelScalerEditor : Editor {
     private PixelScaler scaler;
 
     void OnEnable() {
-        scaler = this.target as PixelScaler;
+        this.scaler = this.target as PixelScaler;
     }
 
     public override void OnInspectorGUI() {

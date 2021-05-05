@@ -17,7 +17,7 @@ namespace Common.Signal {
 	 */
 	public class StringToSignalMapper {
 	
-		private Dictionary<string, Signal> mapping;
+		private readonly Dictionary<string, Signal> mapping;
 	
 		/**
 		 * Constructor
@@ -30,16 +30,16 @@ namespace Common.Signal {
 		 * Adds a mapping
 		 */
 		public void Add(Signal signal) {
-			Assertion.IsTrue(!mapping.ContainsKey(signal.Name)); // signal should not be in the mapping yet
-			mapping[signal.Name] = signal;
+			Assertion.IsTrue(!this.mapping.ContainsKey(signal.Name)); // signal should not be in the mapping yet
+			this.mapping[signal.Name] = signal;
 		}
 		
 		/**
 		 * Looks for the signal with the specified name and dispatches it
 		 */
 		public void Dispatch(string signalName) {
-			Assertion.IsTrue(mapping.ContainsKey(signalName)); // there should be signal mapping
-			mapping[signalName].Dispatch();
+			Assertion.IsTrue(this.mapping.ContainsKey(signalName)); // there should be signal mapping
+			this.mapping[signalName].Dispatch();
 		}
 		
 		/**

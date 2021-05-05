@@ -18,7 +18,7 @@ namespace Common {
          * Returns a randomized boolean.
          */
         public static bool RandomBoolean() {
-            int random = UnityEngine.Random.Range(0, 2); // zero or one
+            int random = Random.Range(0, 2); // zero or one
 
             return random > 0; // returns true if one
         }
@@ -190,15 +190,15 @@ namespace Common {
          * Returns whether or not the two vectors are approximately equal.
          */
         public static bool TolerantEquals(Vector3 a, Vector3 b) {
-            return Comparison.TolerantEquals(a.x, b.x) && Comparison.TolerantEquals(a.y, b.y) &&
-                Comparison.TolerantEquals(a.z, b.z);
+            return a.x.TolerantEquals(b.x) && a.y.TolerantEquals(b.y) &&
+                a.z.TolerantEquals(b.z);
         }
 
         /**
         * Returns a random sign.
         */
         public static float RandomSign() {
-            float random = UnityEngine.Random.Range(-1, 1);
+            float random = Random.Range(-1, 1);
             if (random < 0) {
                 return -1;
             }

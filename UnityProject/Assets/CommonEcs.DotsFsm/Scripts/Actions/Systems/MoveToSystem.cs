@@ -28,7 +28,7 @@ namespace CommonEcs.DotsFsm {
                 };
                 
                 // Note here that the timer was already reset when MoveTo.Init() was invoked 
-                if (Comparison.IsZero(move.timer.duration)) {
+                if (move.timer.duration.IsZero()) {
                     // Duration is zero
                     // Let's finish right away
                     Finish(ref action, ref move);

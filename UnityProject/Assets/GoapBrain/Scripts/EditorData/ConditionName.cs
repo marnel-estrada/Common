@@ -17,7 +17,7 @@ namespace GoapBrain {
 
         public string Name {
             get {
-                return name;
+                return this.name;
             }
 
             set {
@@ -27,7 +27,7 @@ namespace GoapBrain {
 
         public bool RenameMode {
             get {
-                return renameMode;
+                return this.renameMode;
             }
 
             set {
@@ -37,7 +37,7 @@ namespace GoapBrain {
 
         public string NewName {
             get {
-                return newName;
+                return this.newName;
             }
 
             set {

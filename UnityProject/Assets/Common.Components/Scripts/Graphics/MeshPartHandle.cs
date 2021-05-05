@@ -28,17 +28,17 @@ namespace Common {
 
         public int VertexCount {
             get {
-                return vertexCount;
+                return this.vertexCount;
             }
         }
 
         public int StartIndex {
             get {
-                return startIndex;
+                return this.startIndex;
             }
 
             set {
-                startIndex = value;
+                this.startIndex = value;
             }
         }
 

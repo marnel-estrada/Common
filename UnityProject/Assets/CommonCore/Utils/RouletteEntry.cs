@@ -39,7 +39,7 @@ namespace Common {
 		 * interval.
 		 */
 		public bool IsWithinRoulette(float rouletteValue) {
-			return Comparison.TolerantLesserThanOrEquals(this.rouletteFrom, rouletteValue) && rouletteValue < this.rouletteTo;
+			return this.rouletteFrom.TolerantLesserThanOrEquals(rouletteValue) && rouletteValue < this.rouletteTo;
 		}
 
 		public float RouletteFrom {

@@ -86,7 +86,7 @@ namespace CommonEcs {
             
             set {
                 // Render order changed if the new render order is not the same as the previous one
-                this.renderOrderChanged.Value = !Comparison.TolerantEquals(this.renderOrder, value);                
+                this.renderOrderChanged.Value = !this.renderOrder.TolerantEquals(value);                
                 this.renderOrder = value;
             }
         }

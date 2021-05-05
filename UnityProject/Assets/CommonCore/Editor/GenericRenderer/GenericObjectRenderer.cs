@@ -9,7 +9,7 @@ namespace Common {
     /// A generic object renderer for editor
     /// </summary>
     public class GenericObjectRenderer {
-        private Type type;
+        private readonly Type type;
         private readonly PropertyInfo[] properties;
 
         private delegate void PropertyRenderer(PropertyInfo property, object instance);

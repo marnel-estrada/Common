@@ -99,7 +99,7 @@ namespace GoapBrain {
             position.width = 400;
             position.height = 600;
 
-            AtomActionBrowserWindow actionsBrowser = EditorWindow.CreateInstance<AtomActionBrowserWindow>();
+            AtomActionBrowserWindow actionsBrowser = ScriptableObject.CreateInstance<AtomActionBrowserWindow>();
             actionsBrowser.titleContent = new GUIContent("Atom Actions Browser");
             actionsBrowser.Init(OnAdd);
             actionsBrowser.position = position;

@@ -116,19 +116,19 @@ namespace GoapBrain {
 
         public List<ConditionResolverData> ConditionResolvers {
             get {
-                return conditionResolvers;
+                return this.conditionResolvers;
             }
         }
 
         public NamedValueLibrary Variables {
             get {
-                return variables;
+                return this.variables;
             }
         }
 
         public List<GoapExtensionData> Extensions {
             get {
-                return extensions;
+                return this.extensions;
             }
         }
 

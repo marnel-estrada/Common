@@ -28,7 +28,7 @@ namespace CommonEcs.Goap {
                 float currentCost = this.actions[indexList[i]].cost;
                 float previousCost = this.actions[indexList[i - 1]].cost;
 
-                if (Comparison.TolerantGreaterThanOrEquals(currentCost, previousCost)) {
+                if (currentCost.TolerantGreaterThanOrEquals(previousCost)) {
                     // This means that the action at i is already in its correct place
                     break;
                 }

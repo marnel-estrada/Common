@@ -15,7 +15,7 @@ namespace Common {
 
 		private void Start() {
 			// assign the main camera if camera was not assigned
-			if(selfCamera == null) {
+			if(this.selfCamera == null) {
 				this.selfCamera = Camera.main;
 			}
 			
@@ -24,7 +24,7 @@ namespace Common {
 			this.orthoCamera = this.selfCamera.GetComponent<OrthographicCamera>();
 			
 			// register self as observer if existing
-			if(orthoCamera != null) {
+			if(this.orthoCamera != null) {
 				this.orthoCamera.AddObserver(this);
 			}
 			
@@ -46,7 +46,7 @@ namespace Common {
 			this.selfTransform.localScale = newScale;
 			
 			Vector3 newPosition = this.originalPosition * scale;
-			newPosition.z = originalPosition.z; // we don't update Z as to remain consistent to the whole scene
+			newPosition.z = this.originalPosition.z; // we don't update Z as to remain consistent to the whole scene
 			this.selfTransform.position = newPosition;
 		}
 		//#endregion

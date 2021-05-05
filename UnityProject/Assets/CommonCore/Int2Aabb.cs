@@ -23,13 +23,13 @@ namespace Common {
 
         public int2 Min {
             get {
-                return min;
+                return this.min;
             }
         }
 
         public int2 Max {
             get {
-                return max;
+                return this.max;
             }
         }
 
@@ -95,7 +95,7 @@ namespace Common {
             }
 
             if(y > this.max.y) {
-                max.y = y;
+                this.max.y = y;
             }
         }
 
@@ -163,7 +163,7 @@ namespace Common {
             this.min.x = this.min.x + units;
 
             // Client code should be careful that shrinking bounds should not lead to empty bounds
-            Assertion.IsTrue(!IsEmpty);
+            Assertion.IsTrue(!this.IsEmpty);
         }
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace Common {
             this.max.x = this.max.x - units;
 
             // Client code should be careful that shrinking bounds should not lead to empty bounds
-            Assertion.IsTrue(!IsEmpty);
+            Assertion.IsTrue(!this.IsEmpty);
         }
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace Common {
             this.min.y = this.min.y + units;
 
             // Client code should be careful that shrinking bounds should not lead to empty bounds
-            Assertion.IsTrue(!IsEmpty);
+            Assertion.IsTrue(!this.IsEmpty);
         }
 
         /// <summary>
@@ -220,7 +220,7 @@ namespace Common {
             this.max.y = this.max.y - units;
 
             // Client code should be careful that shrinking bounds should not lead to empty bounds
-            Assertion.IsTrue(!IsEmpty);
+            Assertion.IsTrue(!this.IsEmpty);
         }
 
         /// <summary>
@@ -243,7 +243,7 @@ namespace Common {
         }
 
         public override string ToString() {
-            return "min: " + min + "; max: " + max;
+            return "min: " + this.min + "; max: " + this.max;
         }
     }
 }

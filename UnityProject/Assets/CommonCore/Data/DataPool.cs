@@ -37,7 +37,7 @@ namespace Common {
             }
 
             if (this.map == null) {
-                this.map = new Dictionary<string, T>(10, System.StringComparer.Ordinal);
+                this.map = new Dictionary<string, T>(10, StringComparer.Ordinal);
             }
 
             for (int i = 0; i < this.dataList.Count; ++i) {

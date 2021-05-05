@@ -52,7 +52,7 @@ namespace Common.Fsm.Action {
 		}
 
 		public override void OnEnter() {
-			if(Comparison.TolerantEquals(duration, 0)) {
+			if(duration.IsZero()) {
 				Finish();
 				return;
 			}

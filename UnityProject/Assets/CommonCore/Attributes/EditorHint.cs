@@ -26,7 +26,7 @@ namespace Common {
 
         public string Hint {
             get {
-                return hint;
+                return this.hint;
             }
         }
 

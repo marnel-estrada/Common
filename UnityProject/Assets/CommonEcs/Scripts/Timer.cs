@@ -28,7 +28,7 @@ namespace CommonEcs {
 
         public bool HasElapsed {
             get {
-                return Comparison.TolerantGreaterThanOrEquals(this.polledTime, this.duration);
+                return this.polledTime.TolerantGreaterThanOrEquals(this.duration);
             }
         }
 

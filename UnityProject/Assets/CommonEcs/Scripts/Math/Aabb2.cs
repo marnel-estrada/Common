@@ -113,10 +113,10 @@ namespace Common {
         /// <param name="v"></param>
         /// <returns></returns>
         public readonly bool Contains(float2 v) {
-            return Comparison.TolerantLesserThanOrEquals(this.min.x, v.x) &&
-                Comparison.TolerantLesserThanOrEquals(v.x, this.max.x) &&
-                Comparison.TolerantLesserThanOrEquals(this.min.y, v.y) &&
-                Comparison.TolerantLesserThanOrEquals(v.y, this.max.y);
+            return this.min.x.TolerantLesserThanOrEquals(v.x) &&
+                v.x.TolerantLesserThanOrEquals(this.max.x) &&
+                this.min.y.TolerantLesserThanOrEquals(v.y) &&
+                v.y.TolerantLesserThanOrEquals(this.max.y);
         }
 
         /// <summary>

@@ -36,28 +36,28 @@ namespace Common.Fsm.Action {
 		}
 		
 		public override void OnEnter() {
-			if(waitTime <= 0) {
+			if(this.waitTime <= 0) {
 				Finish();
 			}
 		}
 		
 		public override void OnUpdate() {
-			timer.Update();
+			this.timer.Update();
 			
-			if(timer.HasElapsed()) {
+			if(this.timer.HasElapsed()) {
 				Finish();
 			}
 		}
 		
 		private void Finish() {
-			GetOwner().SendEvent(finishEvent);
+			GetOwner().SendEvent(this.finishEvent);
 		}
 		
 		/**
 		 * Returns the time duration ratio.
 		 */
 		public float GetRatio() {
-			return timer.GetRatio();
+			return this.timer.GetRatio();
 		}
 		
 	}

@@ -1,9 +1,4 @@
-using System;
-
 using UnityEngine;
-
-using Common.Fsm;
-using Common.Time;
 
 namespace Common.Fsm.Action {
 	/**
@@ -17,13 +12,13 @@ namespace Common.Fsm.Action {
 		private float duration;
 		private string finishEvent;
 		
-		private CountdownTimer timer;
+		private readonly CountdownTimer timer;
 		
 		/**
 		 * Constructor
 		 */
 		public ScaleAction(FsmState owner, string timeReference) : base(owner) {
-			timer = new CountdownTimer(1, timeReference); // dummy time only here, will be set in Init()
+			this.timer = new CountdownTimer(1, timeReference); // dummy time only here, will be set in Init()
 		}
 		
 		/**
@@ -38,38 +33,38 @@ namespace Common.Fsm.Action {
 		}
 		
 		public override void OnEnter() {	
-			if(Comparison.TolerantEquals(duration, 0)) {
+			if(this.duration.TolerantEquals(0)) {
 				Finish();
 				return;
 			}
 			
-			if(VectorUtils.Equals(scaleFrom, scaleTo)) {
+			if(VectorUtils.Equals(this.scaleFrom, this.scaleTo)) {
 				// alphaFrom and alphaTo are already the same
 				Finish();
 				return;
 			}
-			
-			transform.localScale = scaleFrom;
-			timer.Reset(this.duration);
+
+			this.transform.localScale = this.scaleFrom;
+			this.timer.Reset(this.duration);
 		}
 		
 		public override void OnUpdate() {
-			timer.Update();
+			this.timer.Update();
 			
-			if(timer.HasElapsed()) {
+			if(this.timer.HasElapsed()) {
 				Finish();
 				return;
 			}
 			
 			// interpolate scale
-			transform.localScale = Vector3.Lerp(scaleFrom, scaleTo, timer.GetRatio());
+			this.transform.localScale = Vector3.Lerp(this.scaleFrom, this.scaleTo, this.timer.GetRatio());
 		}
 		
 		private void Finish() {
-			this.transform.localScale = scaleTo;
+			this.transform.localScale = this.scaleTo;
 			
-			if(!string.IsNullOrEmpty(finishEvent)) {
-				GetOwner().SendEvent(finishEvent);
+			if(!string.IsNullOrEmpty(this.finishEvent)) {
+				GetOwner().SendEvent(this.finishEvent);
 			}
 		}
 		

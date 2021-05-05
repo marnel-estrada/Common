@@ -39,7 +39,7 @@ namespace Common {
 
         public T First {
             get {
-                return first;
+                return this.first;
             }
 
             set {
@@ -49,7 +49,7 @@ namespace Common {
 
         public U Second {
             get {
-                return second;
+                return this.second;
             }
 
             set {

@@ -29,7 +29,7 @@ namespace Common {
         /// </summary>
         public void ApplyPixelScale() {
             float halfScreenHeight = this.preferredScreenHeight * 0.5f;
-            float unitsPerPixel = orthographicSize / halfScreenHeight;
+            float unitsPerPixel = this.orthographicSize / halfScreenHeight;
 
             float widthInUnits = this.width * unitsPerPixel;
             float heightInUnits = this.height * unitsPerPixel;

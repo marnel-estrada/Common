@@ -8,9 +8,9 @@ namespace Common.Fsm {
 		
 		public delegate void FsmActionRoutine(FsmState owner);
 		
-		private FsmActionRoutine onEnterRoutine;
-		private FsmActionRoutine onUpdateRoutine;
-		private FsmActionRoutine onExitRoutine;
+		private readonly FsmActionRoutine onEnterRoutine;
+		private readonly FsmActionRoutine onUpdateRoutine;
+		private readonly FsmActionRoutine onExitRoutine;
 		
 		/**
 		 * Constructor with OnEnter routine.
@@ -28,20 +28,20 @@ namespace Common.Fsm {
 		}
 		
 		public override void OnEnter() {
-			if(onEnterRoutine != null) {
-				onEnterRoutine(GetOwner());
+			if(this.onEnterRoutine != null) {
+				this.onEnterRoutine(GetOwner());
 			}
 		}
 		
 		public override void OnUpdate() {
-			if(onUpdateRoutine != null) {
-				onUpdateRoutine(GetOwner());
+			if(this.onUpdateRoutine != null) {
+				this.onUpdateRoutine(GetOwner());
 			}
 		}
 		
 		public override void OnExit() {
-			if(onExitRoutine != null) {
-				onExitRoutine(GetOwner());
+			if(this.onExitRoutine != null) {
+				this.onExitRoutine(GetOwner());
 			}
 		}
 

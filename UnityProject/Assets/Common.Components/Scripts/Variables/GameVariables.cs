@@ -54,7 +54,7 @@ namespace Common {
             string xmlText;
 
             if (this.useStreamingSource) {
-                string xmlPath = Application.streamingAssetsPath + "/" + gameVarXmlPath;
+                string xmlPath = Application.streamingAssetsPath + "/" + this.gameVarXmlPath;
                 xmlText = File.ReadAllText(xmlPath);
             } else {
                 // Not using the streaming source (the secret one)

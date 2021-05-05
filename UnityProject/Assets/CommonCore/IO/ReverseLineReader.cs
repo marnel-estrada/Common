@@ -88,16 +88,16 @@ namespace Common {
             this.bufferSize = bufferSize;
             if (encoding.IsSingleByte) {
                 // For a single byte encoding, every byte is the start (and end) of a character
-                characterStartDetector = (pos, data) => true;
+                this.characterStartDetector = (pos, data) => true;
             } else if (encoding is UnicodeEncoding) {
                 // For UTF-16, even-numbered positions are the start of a character.
                 // TODO: This assumes no surrogate pairs. More work required
                 // to handle that.
-                characterStartDetector = (pos, data) => (pos & 1) == 0;
+                this.characterStartDetector = (pos, data) => (pos & 1) == 0;
             } else if (encoding is UTF8Encoding) {
                 // For UTF-8, bytes with the top bit clear or the second bit set are the start of a character
                 // See http://www.cl.cam.ac.uk/~mgk25/unicode.html
-                characterStartDetector = (pos, data) => (data & 0x80) == 0 || (data & 0x40) != 0;
+                this.characterStartDetector = (pos, data) => (data & 0x80) == 0 || (data & 0x40) != 0;
             } else {
                 throw new ArgumentException("Only single byte, UTF-8 and Unicode encodings are permitted");
             }
@@ -108,7 +108,7 @@ namespace Common {
         /// the returned stream is either unreadable or unseekable, a NotSupportedException is thrown.
         /// </summary>
         public IEnumerator<string> GetEnumerator() {
-            Stream stream = streamSource();
+            Stream stream = this.streamSource();
             if (!stream.CanSeek) {
                 stream.Dispose();
 
@@ -128,14 +128,14 @@ namespace Common {
             try {
                 long position = stream.Length;
 
-                if (encoding is UnicodeEncoding && (position & 1) != 0) {
+                if (this.encoding is UnicodeEncoding && (position & 1) != 0) {
                     throw new InvalidDataException("UTF-16 encoding provided, but stream has odd length.");
                 }
 
                 // Allow up to two bytes for data from the start of the previous
                 // read which didn't quite make it as full characters
-                byte[] buffer = new byte[bufferSize + 2];
-                char[] charBuffer = new char[encoding.GetMaxCharCount(buffer.Length)];
+                byte[] buffer = new byte[this.bufferSize + 2];
+                char[] charBuffer = new char[this.encoding.GetMaxCharCount(buffer.Length)];
                 int leftOverData = 0;
                 String previousEnd = null;
                 // TextReader doesn't return an empty string if there's line break at the end
@@ -149,25 +149,25 @@ namespace Common {
                 bool swallowCarriageReturn = false;
 
                 while (position > 0) {
-                    int bytesToRead = Mathf.Min(position > int.MaxValue ? bufferSize : (int) position, bufferSize);
+                    int bytesToRead = Mathf.Min(position > int.MaxValue ? this.bufferSize : (int) position, this.bufferSize);
 
                     position -= bytesToRead;
                     stream.Position = position;
                     ReadExactly(stream, buffer, bytesToRead);
                     // If we haven't read a full buffer, but we had bytes left
                     // over from before, copy them to the end of the buffer
-                    if (leftOverData > 0 && bytesToRead != bufferSize) {
+                    if (leftOverData > 0 && bytesToRead != this.bufferSize) {
                         // Buffer.BlockCopy doesn't document its behaviour with respect
                         // to overlapping data: we *might* just have read 7 bytes instead of
                         // 8, and have two bytes to copy...
-                        Array.Copy(buffer, bufferSize, buffer, bytesToRead, leftOverData);
+                        Array.Copy(buffer, this.bufferSize, buffer, bytesToRead, leftOverData);
                     }
 
                     // We've now *effectively* read this much data.
                     bytesToRead += leftOverData;
 
                     int firstCharPosition = 0;
-                    while (!characterStartDetector(position + firstCharPosition, buffer[firstCharPosition])) {
+                    while (!this.characterStartDetector(position + firstCharPosition, buffer[firstCharPosition])) {
                         firstCharPosition++;
                         // Bad UTF-8 sequences could trigger this. For UTF-8 we should always
                         // see a valid character start in every 3 bytes, and if this is the start of the file
@@ -180,7 +180,7 @@ namespace Common {
 
                     leftOverData = firstCharPosition;
 
-                    int charsRead = encoding.GetChars(buffer, firstCharPosition, bytesToRead - firstCharPosition,
+                    int charsRead = this.encoding.GetChars(buffer, firstCharPosition, bytesToRead - firstCharPosition,
                         charBuffer, 0);
                     int endExclusive = charsRead;
 
@@ -221,7 +221,7 @@ namespace Common {
 
                     // If we didn't decode the start of the array, put it at the end for next time
                     if (leftOverData != 0) {
-                        Buffer.BlockCopy(buffer, 0, buffer, bufferSize, leftOverData);
+                        Buffer.BlockCopy(buffer, 0, buffer, this.bufferSize, leftOverData);
                     }
                 }
 

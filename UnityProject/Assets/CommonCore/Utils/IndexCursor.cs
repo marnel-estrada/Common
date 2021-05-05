@@ -9,7 +9,7 @@ namespace Common {
     /// </summary>
     public class IndexCursor {
 
-        private int count;
+        private readonly int count;
         private int currentIndex = 0;
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Common {
 
         public int CurrentIndex {
             get {
-                return currentIndex;
+                return this.currentIndex;
             }
 
             set {

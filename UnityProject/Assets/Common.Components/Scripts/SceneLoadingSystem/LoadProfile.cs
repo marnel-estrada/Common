@@ -1,6 +1,6 @@
 ﻿namespace Common {
     internal class LoadProfile {
-        private IdentifiableSet<string> set;
+        private readonly IdentifiableSet<string> set;
         
         // These are scenes that are not in a set
         private SimpleList<string> scenes;

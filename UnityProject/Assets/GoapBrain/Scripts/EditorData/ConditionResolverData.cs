@@ -14,7 +14,7 @@ namespace GoapBrain {
 
         public string ConditionName {
             get {
-                return conditionName;
+                return this.conditionName;
             }
 
             set {
@@ -24,7 +24,7 @@ namespace GoapBrain {
 
         public ClassData ResolverClass {
             get {
-                return resolver;
+                return this.resolver;
             }
 
             set {

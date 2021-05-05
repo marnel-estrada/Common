@@ -113,7 +113,7 @@ namespace Common {
 
         [MenuItem("Common/QuickLogger #&q")]
         public static void OpenWindow() {
-            EditorWindow.GetWindow<QuickLoggerWindow>("Quick Logger");
+            GetWindow<QuickLoggerWindow>("Quick Logger");
         }
 
     }

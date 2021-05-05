@@ -105,8 +105,8 @@ namespace Common {
         /// Performs the rendering in editor
         /// </summary>
         public void Render() {
-            this.scrollPos = GUILayout.BeginScrollView(scrollPos);
-            foreach (TypeGroupView view in groupViewList) {
+            this.scrollPos = GUILayout.BeginScrollView(this.scrollPos);
+            foreach (TypeGroupView view in this.groupViewList) {
                 view.Render();
             }
             GUILayout.EndScrollView();

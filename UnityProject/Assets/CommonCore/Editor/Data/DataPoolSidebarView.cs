@@ -50,7 +50,7 @@ namespace Common {
             if(GUILayout.Button("Add", GUILayout.Width(40), GUILayout.Height(15))) {
                 if(!string.IsNullOrEmpty(this.newItemId)) {
                     // See if it already exists
-                    if(pool.Contains(newItemId.Trim())) {
+                    if(pool.Contains(this.newItemId.Trim())) {
                         // An item with the same ID exists
                         EditorUtility.DisplayDialog("Add Data Class", "Can't add. An item with the same ID already exists.", "OK");
                         return;

@@ -8,7 +8,7 @@ namespace Common {
 			base.OnInspectorGUI();
 			
 			if(GUILayout.Button("Generate Mesh")) {
-				ProceduralTexturedQuad quad = (ProceduralTexturedQuad) target;
+				ProceduralTexturedQuad quad = (ProceduralTexturedQuad) this.target;
 				quad.GenerateMesh();
 			}
 		}

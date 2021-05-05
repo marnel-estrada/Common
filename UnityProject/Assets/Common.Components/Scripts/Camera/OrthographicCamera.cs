@@ -13,7 +13,7 @@ public class OrthographicCamera : MonoBehaviour {
 	
 	void Start() {
 		// cache
-		this.selfCamera = this.GetComponent<Camera>();
+		this.selfCamera = GetComponent<Camera>();
 	}
 	
 	/**
@@ -30,7 +30,7 @@ public class OrthographicCamera : MonoBehaviour {
 		this.selfCamera.orthographicSize = size;
 		
 		// invoke observers
-		foreach(OrthographicCameraObserver observer in observerList) {
+		foreach(OrthographicCameraObserver observer in this.observerList) {
 			observer.OnChangeOrthoSize(size);
 		}
 	}

@@ -40,8 +40,8 @@ namespace Common {
 		 * Resolves for the index of the specified value in the set.
 		 */
 		public int ResolveIndex(string textValue) {
-			for(int i = 0; i < valueList.Length; ++i) {
-				if(valueList[i].Equals(textValue)) {
+			for(int i = 0; i < this.valueList.Length; ++i) {
+				if(this.valueList[i].Equals(textValue)) {
 					return i;
 				}
 			}

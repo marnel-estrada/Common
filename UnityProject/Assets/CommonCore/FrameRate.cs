@@ -10,16 +10,16 @@ public class FrameRate {
 	 * Update routines.
 	 */
 	public void Update(float timeElapsed) {
-		++numFrames;
-		polledTime += timeElapsed;
+		++this.numFrames;
+		this.polledTime += timeElapsed;
 		
-		if(Comparison.TolerantGreaterThanOrEquals(polledTime, 1.0f)) {
+		if(this.polledTime.TolerantGreaterThanOrEquals(1.0f)) {
 			// update frame rate
-			frameRate = numFrames;
+			this.frameRate = this.numFrames;
 			
 			// reset states
-			numFrames = 0;
-			polledTime = 0;
+			this.numFrames = 0;
+			this.polledTime = 0;
 		}
 	}
 	
@@ -27,6 +27,6 @@ public class FrameRate {
 	 * Returns the frame rate.
 	 */
 	public int GetFrameRate() {
-		return frameRate;
+		return this.frameRate;
 	}
 }

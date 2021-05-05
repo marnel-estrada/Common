@@ -26,8 +26,8 @@ namespace UnityThreading
         {
             get
             {
-                lock (taskList)
-                    return taskList.Count;
+                lock (this.taskList)
+                    return this.taskList.Count;
             }
         }
 
@@ -75,41 +75,40 @@ namespace UnityThreading
 
 		internal void AddTask(TaskBase task)
         {
-            lock (taskList)
+            lock (this.taskList)
             {
-                taskList.Add(task);
+	            this.taskList.Add(task);
                 
-                if (TaskSortingSystem == UnityThreading.TaskSortingSystem.ReorderWhenAdded ||
-                    TaskSortingSystem == UnityThreading.TaskSortingSystem.ReorderWhenExecuted)
+                if (this.TaskSortingSystem == TaskSortingSystem.ReorderWhenAdded || this.TaskSortingSystem == TaskSortingSystem.ReorderWhenExecuted)
                     ReorderTasks();
             }
-			dataEvent.Set();
+
+            this.dataEvent.Set();
         }
 
         internal void AddTasks(IEnumerable<TaskBase> tasks)
         {
-            lock (taskList)
+            lock (this.taskList)
             {
-                foreach (var task in tasks)
-                    taskList.Add(task);
+                foreach (var task in tasks) this.taskList.Add(task);
 
-                if (TaskSortingSystem == UnityThreading.TaskSortingSystem.ReorderWhenAdded ||
-                    TaskSortingSystem == UnityThreading.TaskSortingSystem.ReorderWhenExecuted)
+                if (this.TaskSortingSystem == TaskSortingSystem.ReorderWhenAdded || this.TaskSortingSystem == TaskSortingSystem.ReorderWhenExecuted)
                     ReorderTasks();
             }
-			dataEvent.Set();
+
+            this.dataEvent.Set();
         }
 
         protected void ReorderTasks()
         {
-            taskList.Sort((a, b) => -a.Priority.CompareTo(b.Priority));
+	        this.taskList.Sort((a, b) => -a.Priority.CompareTo(b.Priority));
         }
 
 		internal IEnumerable<TaskBase> SplitTasks(int divisor)
         {
 			if (divisor == 0)
 				divisor = 2;
-			var count = TaskCount / divisor;
+			var count = this.TaskCount / divisor;
             return IsolateTasks(count);
         }
 
@@ -118,19 +117,18 @@ namespace UnityThreading
 			List<TaskBase> newTasks = new List<TaskBase>();
 
 			if (count == 0)
-				count = taskList.Count;
+				count = this.taskList.Count;
 
-            lock (taskList)
+            lock (this.taskList)
             {
-                newTasks.AddRange(taskList.Take(count));
-                taskList.RemoveRange(0, Math.Min(count, taskList.Count));
+                newTasks.AddRange(this.taskList.Take(count));
+                this.taskList.RemoveRange(0, Math.Min(count, this.taskList.Count));
 
-                if (TaskSortingSystem == TaskSortingSystem.ReorderWhenExecuted)
+                if (this.TaskSortingSystem == TaskSortingSystem.ReorderWhenExecuted)
                     ReorderTasks();
             }
 
-			if (TaskCount == 0)
-				dataEvent.Reset();
+			if (this.TaskCount == 0) this.dataEvent.Reset();
 
 			return newTasks;
         }
@@ -144,12 +142,12 @@ namespace UnityThreading
 			while (true)
 			{
 				TaskBase currentTask;
-                lock (taskList)
+                lock (this.taskList)
 				{
-                    if (taskList.Count != 0)
+                    if (this.taskList.Count != 0)
                     {
-                        currentTask = taskList[0];
-                        taskList.RemoveAt(0);
+                        currentTask = this.taskList[0];
+                        this.taskList.RemoveAt(0);
                     }
                     else
                         break;
@@ -157,8 +155,8 @@ namespace UnityThreading
 				currentTask.Dispose();
 			}
 
-			dataEvent.Close();
-			dataEvent = null;
+			this.dataEvent.Close();
+			this.dataEvent = null;
         }
 
         #endregion
@@ -292,7 +290,7 @@ namespace UnityThreading
 		/// </summary>
         public void ProcessTasks()
         {
-			if (dataEvent.WaitOne(0, false))
+			if (this.dataEvent.WaitOne(0, false))
 				ProcessTasksInternal();
         }
 
@@ -305,7 +303,7 @@ namespace UnityThreading
 		/// <returns>False when the exitHandle has been set, true otherwise.</returns>
         public bool ProcessTasks(WaitHandle exitHandle)
         {
-            var result = WaitHandle.WaitAny(new WaitHandle[] { exitHandle, dataEvent });
+            var result = WaitHandle.WaitAny(new WaitHandle[] { exitHandle, this.dataEvent });
             if (result == 0)
                 return false;
             ProcessTasksInternal();
@@ -319,16 +317,15 @@ namespace UnityThreading
 		/// <returns>True when a task to process has been processed, false otherwise.</returns>
         public bool ProcessNextTask()
         {
-            lock (taskList)
+            lock (this.taskList)
             {
-                if (taskList.Count == 0)
+                if (this.taskList.Count == 0)
                     return false;
                 else
                     ProcessSingleTask();
             }
 
-			if (TaskCount == 0)
-				dataEvent.Reset();
+			if (this.TaskCount == 0) this.dataEvent.Reset();
 
             return true;
         }
@@ -342,39 +339,37 @@ namespace UnityThreading
 		/// <returns>False when the exitHandle has been set, true otherwise.</returns>
         public bool ProcessNextTask(WaitHandle exitHandle)
         {
-            var result = WaitHandle.WaitAny(new WaitHandle[] { exitHandle, dataEvent });
+            var result = WaitHandle.WaitAny(new WaitHandle[] { exitHandle, this.dataEvent });
             if (result == 0)
                 return false;
 
-            lock (taskList)
+            lock (this.taskList)
                 ProcessSingleTask();
-			if (TaskCount == 0)
-				dataEvent.Reset();
+			if (this.TaskCount == 0) this.dataEvent.Reset();
             return true;
         }
 
         private void ProcessTasksInternal()
         {
-            lock (taskList)
+            lock (this.taskList)
             {
-                while (taskList.Count != 0)
+                while (this.taskList.Count != 0)
                     ProcessSingleTask();
 			}
 
-			if (TaskCount == 0)
-				dataEvent.Reset();
+			if (this.TaskCount == 0) this.dataEvent.Reset();
 		}
 
         private void ProcessSingleTask()
         {
-            if (taskList.Count == 0)
+            if (this.taskList.Count == 0)
                 return;
 
-            var task = taskList[0];
-            taskList.RemoveAt(0);
+            var task = this.taskList[0];
+            this.taskList.RemoveAt(0);
             RunTask(task);
 
-            if (TaskSortingSystem == TaskSortingSystem.ReorderWhenExecuted)
+            if (this.TaskSortingSystem == TaskSortingSystem.ReorderWhenExecuted)
                 ReorderTasks();
         }
 
@@ -401,12 +396,12 @@ namespace UnityThreading
         {
 			while (true)
 			{
-				lock (taskList)
+				lock (this.taskList)
 				{
-                    if (taskList.Count != 0)
+                    if (this.taskList.Count != 0)
                     {
-                        currentTask = taskList[0];
-                        taskList.RemoveAt(0);
+                        currentTask = this.taskList[0];
+                        this.taskList.RemoveAt(0);
                     }
                     else
                         break;
@@ -414,8 +409,8 @@ namespace UnityThreading
 				currentTask.Dispose();
 			}
 
-			dataEvent.Close();
-			dataEvent = null;
+			this.dataEvent.Close();
+			this.dataEvent = null;
 
 			if (currentDispatcher == this)
 				currentDispatcher = null;

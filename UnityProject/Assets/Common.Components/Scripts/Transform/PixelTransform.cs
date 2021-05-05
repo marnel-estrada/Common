@@ -26,8 +26,8 @@ namespace Common {
         void Reset() {
             // set pixel positions to that of current transform
             Vector3 worldPosition = this.transform.position;
-            this.x = Mathf.FloorToInt(worldPosition.x / UnitsPerPixel);
-            this.y = Mathf.FloorToInt(worldPosition.y / UnitsPerPixel);
+            this.x = Mathf.FloorToInt(worldPosition.x / this.UnitsPerPixel);
+            this.y = Mathf.FloorToInt(worldPosition.y / this.UnitsPerPixel);
 
             SnapToPixelPosition();
         }
@@ -56,7 +56,7 @@ namespace Common {
                 localTransform = this.transform;
             }
 
-            float unitsPerPixel = UnitsPerPixel;
+            float unitsPerPixel = this.UnitsPerPixel;
             newPosition.x = this.x * unitsPerPixel;
             newPosition.y = this.y * unitsPerPixel;
             newPosition.z = localTransform.position.z; // just copy
@@ -69,8 +69,8 @@ namespace Common {
         /// </summary>
         /// <param name="world"></param>
         public void SetFromWorldPosition(Vector3 world) {
-            this.x = Mathf.FloorToInt(world.x / UnitsPerPixel);
-            this.y = Mathf.FloorToInt(world.y / UnitsPerPixel);
+            this.x = Mathf.FloorToInt(world.x / this.UnitsPerPixel);
+            this.y = Mathf.FloorToInt(world.y / this.UnitsPerPixel);
 
             SnapToPixelPosition();
         }

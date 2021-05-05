@@ -28,13 +28,13 @@ namespace Common {
 
         public bool Assigned {
             get {
-                return assigned;
+                return this.assigned;
             }
         }
 
         public T Value {
             get {
-                return value;
+                return this.value;
             }
 
             set {

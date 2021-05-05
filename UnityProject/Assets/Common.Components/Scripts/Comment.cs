@@ -14,7 +14,7 @@ namespace Common {
 
 		public string Text {
 			get {
-				return text;
+				return this.text;
 			}
 
 			set {

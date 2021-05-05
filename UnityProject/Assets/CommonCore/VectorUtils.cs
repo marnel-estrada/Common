@@ -26,8 +26,8 @@ namespace Common {
          * Returns whether or not the specified vectors a and b are equal.
          */
         public static bool Equals(Vector3 a, Vector3 b) {
-            return Comparison.TolerantEquals(a.x, b.x) && Comparison.TolerantEquals(a.y, b.y) &&
-                Comparison.TolerantEquals(a.z, b.z);
+            return a.x.TolerantEquals(b.x) && a.y.TolerantEquals(b.y) &&
+                a.z.TolerantEquals(b.z);
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace Common {
         /// <param name="b"></param>
         /// <returns></returns>
         public static bool Equals(Vector2 a, Vector2 b) {
-            return Comparison.TolerantEquals(a.x, b.x) && Comparison.TolerantEquals(a.y, b.y);
+            return a.x.TolerantEquals(b.x) && a.y.TolerantEquals(b.y);
         }
 
         /// <summary>
@@ -47,8 +47,8 @@ namespace Common {
         /// <param name="b"></param>
         /// <returns></returns>
         public static Vector2 RandomRange(Vector2 a, Vector2 b) {
-            float x = UnityEngine.Random.Range(a.x, b.x);
-            float y = UnityEngine.Random.Range(a.y, b.y);
+            float x = Random.Range(a.x, b.x);
+            float y = Random.Range(a.y, b.y);
 
             return new Vector2(x, y);
         }

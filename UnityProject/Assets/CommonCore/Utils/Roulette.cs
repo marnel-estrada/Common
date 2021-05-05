@@ -46,7 +46,7 @@ namespace Common {
 			this.entries.Add(entry);
 
 			currentStartingInterval += probability;
-			Assertion.IsTrue(Comparison.TolerantLesserThanOrEquals(currentStartingInterval, 1.0f)); // Can't exceed 1. If it does then there's something wrong with the whole population in the roulette
+			Assertion.IsTrue(currentStartingInterval.TolerantLesserThanOrEquals(1.0f)); // Can't exceed 1. If it does then there's something wrong with the whole population in the roulette
 		}
 
 		/**
@@ -85,7 +85,7 @@ namespace Common {
                     if(random < entry.RouletteFrom) {
                         // this means that item is to the left of the mid entry
                         maxIndex = midIndex - 1;
-                    } else if(Comparison.TolerantLesserThanOrEquals(entry.RouletteTo, random)) {
+                    } else if(entry.RouletteTo.TolerantGreaterThanOrEquals(random)) {
                         // this means that the item is to the right of the mid entry
                         minIndex = midIndex + 1;
                     }

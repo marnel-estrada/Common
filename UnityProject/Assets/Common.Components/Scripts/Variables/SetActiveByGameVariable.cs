@@ -27,7 +27,7 @@ namespace Game {
         }
 
         private void SetTargets(bool active) {
-            for(int i = 0; i < targets.Length; ++i) {
+            for(int i = 0; i < this.targets.Length; ++i) {
                 this.targets[i].SetActive(active);
             }
         }

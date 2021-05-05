@@ -43,7 +43,7 @@ namespace Common {
         /// Moves to the next item
         /// </summary>
         public void MoveToNext() {
-            this.currentIndex = (currentIndex + 1) % this.items.Count;
+            this.currentIndex = (this.currentIndex + 1) % this.items.Count;
             NotifyObservers();
         }
 
@@ -97,7 +97,7 @@ namespace Common {
 
         public int CurrentIndex {
             get {
-                return currentIndex;
+                return this.currentIndex;
             }
         }
 

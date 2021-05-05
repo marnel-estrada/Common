@@ -4,15 +4,15 @@ namespace CommonEcs {
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct IntStackArray10 {
         private int item0;
-        private int item1;
-        private int item2;
-        private int item3;
-        private int item4;
-        private int item5;
-        private int item6;
-        private int item7;
-        private int item8;
-        private int item9;
+        private readonly int item1;
+        private readonly int item2;
+        private readonly int item3;
+        private readonly int item4;
+        private readonly int item5;
+        private readonly int item6;
+        private readonly int item7;
+        private readonly int item8;
+        private readonly int item9;
 
         public const int Length = 10;
 

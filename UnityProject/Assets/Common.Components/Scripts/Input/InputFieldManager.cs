@@ -67,7 +67,7 @@ namespace Common {
 
         public bool HasFocus {
             get {
-                return hasFocus;
+                return this.hasFocus;
             }
         }
     }

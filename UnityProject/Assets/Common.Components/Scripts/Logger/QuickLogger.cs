@@ -12,7 +12,7 @@ namespace Common.Logger {
     /// </summary>
     public class QuickLogger {
 
-        private List<Log> logList;
+        private readonly List<Log> logList;
 
         /// <summary>
         /// Constructor

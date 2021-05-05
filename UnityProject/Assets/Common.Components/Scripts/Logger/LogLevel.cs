@@ -10,7 +10,7 @@ namespace Common.Logger {
 		public static LogLevel WARNING = new LogLevel("WARNING");
 		public static LogLevel ERROR = new LogLevel("ERROR");
 		
-		private string name;
+		private readonly string name;
 		
 		/**
 		 * Constructor with specified name
@@ -24,7 +24,7 @@ namespace Common.Logger {
 		 */
 		public string Name {
 			get {
-				return name;
+				return this.name;
 			}
 		}
 		

@@ -35,7 +35,7 @@ namespace Common {
 
         public void Add(T item) {
             // Remove older items if cap has been reached
-            while (this.list.Count + 1 > cap) {
+            while (this.list.Count + 1 > this.cap) {
                 this.list.RemoveAt(0);
             }
             

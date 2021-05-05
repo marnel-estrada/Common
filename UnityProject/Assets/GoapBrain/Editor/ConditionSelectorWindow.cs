@@ -59,7 +59,7 @@ namespace GoapBrain {
                 for(int i = 0; i < this.filteredList.Count; ++i) {
                     if(GUILayout.Button(this.filteredList[i].Name, GUILayout.Width(400))) {
                         this.onSelect(this.filteredList[i].Name);
-                        this.Close();
+                        Close();
                     }
                 }
             }

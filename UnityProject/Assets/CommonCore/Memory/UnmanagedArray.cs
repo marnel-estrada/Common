@@ -29,9 +29,9 @@ namespace Common {
         /// <param name="length">Number of elements in the array</param>
         /// <param name="elementSize">The size of one element of the array in bytes</param>
         public UnmanagedArray(int length, int elementSize) {
-            Memory = (void*)UnmanagedMemory.Alloc(length * elementSize);
-            Length = length;
-            ElementSize = elementSize;
+            this.Memory = (void*)UnmanagedMemory.Alloc(length * elementSize);
+            this.Length = length;
+            this.ElementSize = elementSize;
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Common {
         /// <param name="index">Index of the element to get a pointer to</param>
         public void* this[int index] {
             get {
-                return ((byte*)Memory) + ElementSize * index;
+                return ((byte*) this.Memory) + this.ElementSize * index;
             }
         }
 
@@ -49,9 +49,9 @@ namespace Common {
         /// and <see cref="Length"/> to zero.
         /// </summary>
         public void Destroy() {
-            UnmanagedMemory.Free((IntPtr)Memory);
-            Memory = null;
-            Length = 0;
+            UnmanagedMemory.Free((IntPtr) this.Memory);
+            this.Memory = null;
+            this.Length = 0;
         }
 
     }

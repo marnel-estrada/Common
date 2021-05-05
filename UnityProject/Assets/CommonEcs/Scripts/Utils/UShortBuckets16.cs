@@ -13,28 +13,28 @@ namespace CommonEcs {
             private int m_Index;
 
             public Enumerator(UShortList16* elements) {
-                m_Elements = elements;
-                m_Index = -1;
+                this.m_Elements = elements;
+                this.m_Index = -1;
             }
 
             public bool MoveNext() {
-                m_Index++;
+                this.m_Index++;
 
-                return m_Index < 16;
+                return this.m_Index < 16;
             }
 
             public ref UShortList16 Current {
                 get {
                     RequireIndexInBounds();
 
-                    return ref m_Elements[m_Index];
+                    return ref this.m_Elements[this.m_Index];
                 }
             }
 
             [Unity.Burst.BurstDiscard]
             public void RequireIndexInBounds() {
-                if (m_Index < 0 || m_Index >= 16) {
-                    throw new System.InvalidOperationException("Index out of bounds: " + m_Index);
+                if (this.m_Index < 0 || this.m_Index >= 16) {
+                    throw new System.InvalidOperationException("Index out of bounds: " + this.m_Index);
                 }
             }
         }
@@ -80,13 +80,13 @@ namespace CommonEcs {
         }
 
         private ref UShortList16 GetElement(int index) {
-            fixed (UShortList16* elements = &m_Element0) {
+            fixed (UShortList16* elements = &this.m_Element0) {
                 return ref elements[index];
             }
         }
 
         private void SetElement(int index, UShortList16 value) {
-            fixed (UShortList16* elements = &m_Element0) {
+            fixed (UShortList16* elements = &this.m_Element0) {
                 elements[index] = value;
             }
         }
@@ -95,7 +95,7 @@ namespace CommonEcs {
 
         public Enumerator GetEnumerator() {
             // Safe because Enumerator is a 'ref struct'
-            fixed (UShortList16* elements = &m_Element0) {
+            fixed (UShortList16* elements = &this.m_Element0) {
                 return new Enumerator(elements);
             }
         }

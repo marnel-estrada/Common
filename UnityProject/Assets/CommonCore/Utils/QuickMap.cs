@@ -6,8 +6,8 @@
     /// <typeparam name="T"></typeparam>
     public class QuickMap<T> {
 
-        private SimpleList<T> items;
-        private SimpleList<int> freeIds;
+        private readonly SimpleList<T> items;
+        private readonly SimpleList<int> freeIds;
 
         /// <summary>
         /// Constructor

@@ -77,7 +77,7 @@ namespace Common {
 
         public NamedStringMap Strings {
             get {
-                return stringMap;
+                return this.stringMap;
             }
         }
 
@@ -195,7 +195,7 @@ namespace Common {
                 for (int i = 0; i < container.Count; ++i) {
                     Named named = (Named)container.GetAt(i);
 
-                    if(this.Contains(named.Name, valueType)) {
+                    if(Contains(named.Name, valueType)) {
                         // Already exists
                         continue;
                     }

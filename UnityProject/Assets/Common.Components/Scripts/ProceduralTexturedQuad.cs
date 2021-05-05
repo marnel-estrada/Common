@@ -42,26 +42,26 @@ namespace Common {
                 new Vector3(-0.5f, 0.5f, 0), new Vector3(0.5f, 0.5f, 0), new Vector3(0.5f, -0.5f, 0),
                 new Vector3(-0.5f, -0.5f, 0)
             };
-            mesh.vertices = vertices;
+            this.mesh.vertices = vertices;
 
             Vector2[] textureCoordinates = {
                 this.topLeftUv, this.topRightUv, this.bottomRightUv, this.bottomLeftUv
             };
-            mesh.uv = textureCoordinates;
+            this.mesh.uv = textureCoordinates;
 
             int[] triangleIndeces = {
                 1, 0, 3, 1, 3, 2
             };
-            mesh.triangles = triangleIndeces;
+            this.mesh.triangles = triangleIndeces;
 
             // assign to filter
             MeshFilter meshFilter = GetComponent<MeshFilter>();
-            meshFilter.mesh = mesh;
+            meshFilter.mesh = this.mesh;
 
             if (this.material == null) {
                 // no material set, we create a default one
                 this.material = new Material(Shader.Find("NoCullingTransparent"));
-                this.material.SetFloat("_Cutoff", alphaCutoff);
+                this.material.SetFloat("_Cutoff", this.alphaCutoff);
             }
 
             // set material

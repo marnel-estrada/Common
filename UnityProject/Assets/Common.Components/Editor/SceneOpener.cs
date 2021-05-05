@@ -8,7 +8,7 @@ public class SceneOpener : EditorWindow {
 
 	[MenuItem("Window/SceneOpener #%r")]
 	public static void Init() {
-		SceneOpener window = EditorWindow.GetWindow<SceneOpener>();
+		SceneOpener window = GetWindow<SceneOpener>();
 	}
 	
 	private string sceneToOpen = "";

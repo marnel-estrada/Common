@@ -32,8 +32,8 @@ namespace CommonEcs.UtilityBrain {
         }
 
         public bool Equals(UtilityValue other) {
-            return this.rank == other.rank && Comparison.TolerantEquals(this.bonus, other.bonus) && 
-                Comparison.TolerantEquals(this.multiplier, other.multiplier);
+            return this.rank == other.rank && this.bonus.TolerantEquals(other.bonus) && 
+                this.multiplier.TolerantEquals(other.multiplier);
         }
 
         public override bool Equals(object? obj) {

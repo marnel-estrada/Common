@@ -17,13 +17,13 @@ public class RotationInRadiansEditor : Editor {
 		GUILayout.BeginHorizontal();
 		
 		GUILayout.Label("X: ", GUILayout.Width(10));
-		GUILayout.Label(ToRadians(transform.eulerAngles.x).ToString());
+		GUILayout.Label(ToRadians(this.transform.eulerAngles.x).ToString());
 		
 		GUILayout.Label("Y: ", GUILayout.Width(10));
-		GUILayout.Label(ToRadians(transform.eulerAngles.y).ToString());
+		GUILayout.Label(ToRadians(this.transform.eulerAngles.y).ToString());
 		
 		GUILayout.Label("Z: ", GUILayout.Width(10));
-		GUILayout.Label(ToRadians(transform.eulerAngles.z).ToString());
+		GUILayout.Label(ToRadians(this.transform.eulerAngles.z).ToString());
 		
 		GUILayout.EndHorizontal();
 	}

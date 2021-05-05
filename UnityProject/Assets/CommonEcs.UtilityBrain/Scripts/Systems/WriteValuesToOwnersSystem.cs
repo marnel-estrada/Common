@@ -105,7 +105,7 @@ namespace CommonEcs.UtilityBrain {
                 
                 for (int i = 0; i < considerationValues.Length; ++i) {
                     UtilityValue current = considerationValues[i];
-                    if (Comparison.IsZero(current.multiplier)) {
+                    if (current.multiplier.IsZero()) {
                         // This means that the consideration made the option invalid
                         // We can stop the loop right away and return a zero utility value.
                         return new UtilityValue(0, 0, 0);

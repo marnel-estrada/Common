@@ -15,7 +15,7 @@ namespace Common {
 
         public string Name {
             get {
-                return name;
+                return this.name;
             }
         }
     }

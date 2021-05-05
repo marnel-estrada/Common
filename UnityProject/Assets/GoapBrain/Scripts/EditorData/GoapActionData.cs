@@ -41,7 +41,7 @@ namespace GoapBrain {
 
         public string Name {
             get {
-                return name;
+                return this.name;
             }
 
             set {
@@ -51,19 +51,19 @@ namespace GoapBrain {
 
         public List<ConditionData> Preconditions {
             get {
-                return preconditions;
+                return this.preconditions;
             }
         }
 
         public List<ClassData> AtomActions {
             get {
-                return atomActions;
+                return this.atomActions;
             }
         }
 
         public float Cost {
             get {
-                return cost;
+                return this.cost;
             }
 
             set {
@@ -73,7 +73,7 @@ namespace GoapBrain {
 
         public string Comment {
             get {
-                return comment;
+                return this.comment;
             }
 
             set {
@@ -83,7 +83,7 @@ namespace GoapBrain {
 
         public bool EditComment {
             get {
-                return editComment;
+                return this.editComment;
             }
 
             set {
@@ -93,7 +93,7 @@ namespace GoapBrain {
 
         public bool ShowComment {
             get {
-                return showComment;
+                return this.showComment;
             }
 
             set {
@@ -103,7 +103,7 @@ namespace GoapBrain {
 
         public bool Enabled {
             get {
-                return enabled;
+                return this.enabled;
             }
 
             set {
@@ -113,11 +113,11 @@ namespace GoapBrain {
 
         public bool Cancellable {
             get {
-                return cancellable;
+                return this.cancellable;
             }
 
             set {
-                cancellable = value;
+                this.cancellable = value;
             }
         }
 

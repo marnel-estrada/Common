@@ -9,13 +9,13 @@ namespace DTCompileTimeTracker {
     private const string kKeyframeDelimiter = "@";
     private const string kListDelimiter = "#";
 
-    private static readonly string[] kKeyframeDelimiterArray = new string[] { CompileTimeKeyframe.kKeyframeDelimiter };
-    private static readonly string[] kListDelimiterArray = new string[] { CompileTimeKeyframe.kListDelimiter };
+    private static readonly string[] kKeyframeDelimiterArray = new string[] { kKeyframeDelimiter };
+    private static readonly string[] kListDelimiterArray = new string[] { kListDelimiter };
 
     public static CompileTimeKeyframe Deserialize(string serialized) {
-      string[] tokens = serialized.Split(CompileTimeKeyframe.kKeyframeDelimiterArray, StringSplitOptions.None);
+      string[] tokens = serialized.Split(kKeyframeDelimiterArray, StringSplitOptions.None);
       if (tokens.Length != 3) {
-        Debug.LogError("Failed to deserialize CompileTimeKeyframe because splitting by " + CompileTimeKeyframe.kKeyframeDelimiter + " did not result in 3 tokens!");
+        Debug.LogError("Failed to deserialize CompileTimeKeyframe because splitting by " + kKeyframeDelimiter + " did not result in 3 tokens!");
         return null;
       }
 
@@ -33,18 +33,18 @@ namespace DTCompileTimeTracker {
         return "";
       }
 
-      return string.Format("{1}{0}{2}{0}{3}", CompileTimeKeyframe.kKeyframeDelimiter, keyframe.elapsedCompileTimeInMS, keyframe.serializedDate, keyframe.hadErrors);
+      return string.Format("{1}{0}{2}{0}{3}", kKeyframeDelimiter, keyframe.elapsedCompileTimeInMS, keyframe.serializedDate, keyframe.hadErrors);
     }
 
     public static List<CompileTimeKeyframe> DeserializeList(string serialized) {
-      string[] serializedKeyframes = serialized.Split(CompileTimeKeyframe.kListDelimiterArray, StringSplitOptions.None);
+      string[] serializedKeyframes = serialized.Split(kListDelimiterArray, StringSplitOptions.None);
 
-      return serializedKeyframes.Select(s => CompileTimeKeyframe.Deserialize(s)).Where(k => k != null).ToList();
+      return serializedKeyframes.Select(s => Deserialize(s)).Where(k => k != null).ToList();
     }
 
     public static string SerializeList(List<CompileTimeKeyframe> keyframes) {
-      string[] serializedKeyframes = keyframes.Where(k => k != null).Select(k => CompileTimeKeyframe.Serialize(k)).ToArray();
-      return string.Join(CompileTimeKeyframe.kListDelimiter, serializedKeyframes);
+      string[] serializedKeyframes = keyframes.Where(k => k != null).Select(k => Serialize(k)).ToArray();
+      return string.Join(kListDelimiter, serializedKeyframes);
     }
 
 

@@ -10,7 +10,7 @@ using Common;
 namespace GoapBrain {
     class ActionsSidebarView {
 
-        private ActionSelectionView selectionView = new ActionSelectionView();
+        private readonly ActionSelectionView selectionView = new ActionSelectionView();
 
         private Vector2 scrollPos = new Vector2();
 

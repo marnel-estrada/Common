@@ -74,26 +74,26 @@ public class SwarmItem : MonoBehaviour
 	{
 		get
 		{
-			return _state;
+			return this._state;
 		}
 		set
 		{
 			// save whether the state was changed
-			bool _stateChanged = (_state != value);
+			bool _stateChanged = (this._state != value);
+
+			this._state = value;
 			
-			_state = value;
-			
-			switch (_state)
+			switch (this._state)
 			{
 			case STATE.Inactive:
 				// turn off the item
-				gameObject.SetActive(false);
+				this.gameObject.SetActive(false);
 				break;
 				
 			case STATE.Active:
 				// turn on the item and reset its life span
-				gameObject.SetActive(true);
-				_lifeSpanLeft = UnityEngine.Random.Range(minimumLifeSpan, maximumLifeSpan);
+				this.gameObject.SetActive(true);
+				this._lifeSpanLeft = Random.Range(this.minimumLifeSpan, this.maximumLifeSpan);
 				break;
 			}
 			
@@ -118,11 +118,11 @@ public class SwarmItem : MonoBehaviour
 	{
 		get
 		{
-			if(_thisTransform == null) {
-				_thisTransform = this.transform;
+			if(this._thisTransform == null) {
+				this._thisTransform = this.transform;
 			}
 
-			return _thisTransform;
+			return this._thisTransform;
 		}
 	}
 	
@@ -133,11 +133,11 @@ public class SwarmItem : MonoBehaviour
 	{
 		get
 		{
-			return _thisTransform.position;
+			return this._thisTransform.position;
 		}
 		set
 		{
-			_thisTransform.position = value;
+			this._thisTransform.position = value;
 		}
 	}	
 	
@@ -148,7 +148,7 @@ public class SwarmItem : MonoBehaviour
 	{
 		get
 		{
-			return _prefabIndex;
+			return this._prefabIndex;
 		}
 	}
 	
@@ -159,13 +159,13 @@ public class SwarmItem : MonoBehaviour
 	/// <param name="prefabIndex">The index of the manager's prefab</param>
 	public virtual void Initialize(SwarmItemManager swarmItemManager, int prefabIndex, bool debugEvents)
 	{
-		_swarmItemManager = swarmItemManager;
-		_prefabIndex = prefabIndex;
-		_debugEvents = debugEvents;
-		
-		_thisTransform = this.transform;
-		
-		State = STATE.Inactive;
+		this._swarmItemManager = swarmItemManager;
+		this._prefabIndex = prefabIndex;
+		this._debugEvents = debugEvents;
+
+		this._thisTransform = this.transform;
+
+		this.State = STATE.Inactive;
 	}
 	
 	/// <summary>
@@ -183,9 +183,9 @@ public class SwarmItem : MonoBehaviour
 	/// </summary>
 	public virtual void Kill()
 	{
-		State = STATE.Inactive;
+		this.State = STATE.Inactive;
 
-		_swarmItemManager.DeactiveItem(this);
+		this._swarmItemManager.DeactiveItem(this);
 	}
 
     /// <summary>

@@ -5,7 +5,7 @@
     /// </summary>
     public class SignalIntegrity {
 
-        private SimpleList<SignalListenerPair> pairList;
+        private readonly SimpleList<SignalListenerPair> pairList;
 
         /// <summary>
         /// Constructor

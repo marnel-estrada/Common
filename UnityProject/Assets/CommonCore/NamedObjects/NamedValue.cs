@@ -36,10 +36,10 @@ namespace Common {
 		
 		public string Name {
 			get {
-				return name;
+				return this.name;
 			}
 			set {
-				name = value;
+				this.name = value;
 			}
 		}
 
@@ -65,7 +65,7 @@ namespace Common {
 
         public virtual T Value {
 			get {
-				return varValue;
+				return this.varValue;
 			}
 			
 			set {
@@ -75,7 +75,7 @@ namespace Common {
 
         protected T VariableInstance {
             get {
-                return varValue;
+                return this.varValue;
             }
 
             set {

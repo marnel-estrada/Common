@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using UnityEngine;
-using UnityEngine.UI;
-
-using Common;
-using Common.Fsm;
+﻿using UnityEngine;
 
 namespace Common.Fsm.Action {
     /// <summary>
@@ -21,7 +12,7 @@ namespace Common.Fsm.Action {
         private float duration;
         private string finishEvent;
 
-        private CountdownTimer timer;
+        private readonly CountdownTimer timer;
 
         /// <summary>
         /// Constructor with specified time reference name
@@ -54,7 +45,7 @@ namespace Common.Fsm.Action {
         }
 
         public override void OnEnter() {
-            if (Comparison.TolerantEquals(this.duration, 0)) {
+            if (this.duration.TolerantEquals(0)) {
                 Finish();
                 return;
             }
@@ -66,27 +57,27 @@ namespace Common.Fsm.Action {
             }
 
             SetPosition(this.start);
-            timer.Reset(this.duration);
+            this.timer.Reset(this.duration);
         }
 
         public override void OnUpdate() {
-            timer.Update();
+            this.timer.Update();
 
-            if (timer.HasElapsed()) {
+            if (this.timer.HasElapsed()) {
                 Finish();
                 return;
             }
 
             // interpolate position
-            SetPosition(Vector2.Lerp(this.start, this.destination, timer.GetRatio()));
+            SetPosition(Vector2.Lerp(this.start, this.destination, this.timer.GetRatio()));
         }
 
         private void Finish() {
             // snap to destination
             SetPosition(this.destination);
 
-            if (!string.IsNullOrEmpty(finishEvent)) {
-                GetOwner().SendEvent(finishEvent);
+            if (!string.IsNullOrEmpty(this.finishEvent)) {
+                GetOwner().SendEvent(this.finishEvent);
             }
         }
 

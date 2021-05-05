@@ -18,7 +18,7 @@ namespace Common {
         private CountdownTimer timer;
 
         public CountdownTimer Timer {
-            get => timer;
+            get => this.timer;
         }
 
         private bool ticking;

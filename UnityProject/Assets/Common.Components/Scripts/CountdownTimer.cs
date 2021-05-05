@@ -62,7 +62,7 @@ namespace Common {
          * Returns whether or not the countdown has elapsed.
          */
         public bool HasElapsed() {
-            return Comparison.TolerantGreaterThanOrEquals(this.polledTime, this.countdownTime);
+            return this.polledTime.TolerantGreaterThanOrEquals(this.countdownTime);
         }
 
         /**
@@ -114,7 +114,7 @@ namespace Common {
          * Gets the countdown time as a string.
          */
         public string GetCountdownTimeString() {
-            float timeRemaining = countdownTime - polledTime;
+            float timeRemaining = this.countdownTime - this.polledTime;
             int minutes = (int) (timeRemaining / 60.0f);
             int seconds = ((int) timeRemaining) % 60;
 
@@ -123,7 +123,7 @@ namespace Common {
 
         public TimeReference TimeReference {
             get {
-                return timeReference;
+                return this.timeReference;
             }
         }
     }

@@ -8,9 +8,9 @@
     /// </summary>
     public static class TextColorDisplayUtils {
 
-        private static Color32 FAIL_COLOR = new Color32(234, 86, 22, 255);
-        private static Color32 PASS_COLOR = new Color32(138, 178, 0, 255);
-        private static Color32 EQUAL_COLOR = FAIL_COLOR;
+        private static readonly Color32 FAIL_COLOR = new Color32(234, 86, 22, 255);
+        private static readonly Color32 PASS_COLOR = new Color32(138, 178, 0, 255);
+        private static readonly Color32 EQUAL_COLOR = FAIL_COLOR;
 
         /// <summary>
         /// Returns the corresponding color

@@ -58,7 +58,7 @@ namespace CommonEcs.UtilityBrain {
                 for (int i = 0; i < values.Length; ++i) {
                     UtilityValueWithOption current = values[i];
                     UtilityValue currentValue = current.value;
-                    if (Comparison.IsZero(currentValue.multiplier)) {
+                    if (currentValue.multiplier.IsZero()) {
                         // Skip options that has zero multiplier
                         // It means that they are not to be selected
                         continue;

@@ -95,25 +95,25 @@ namespace Common {
 
         public Type PropertyType {
             get {
-                return propertyType;
+                return this.propertyType;
             }
         }
 
         public Type ValueType {
             get {
-                return valueType;
+                return this.valueType;
             }
         }
 
         public string Label {
             get {
-                return label;
+                return this.label;
             }
         }
 
         public string ValueTypeLabel {
             get {
-                return valueTypeLabel;
+                return this.valueTypeLabel;
             }
         }
 

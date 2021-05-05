@@ -18,7 +18,7 @@ namespace Common.Fsm.Action {
         private float duration;
         private string finishEvent;
 
-        private CountdownTimer timer;
+        private readonly CountdownTimer timer;
 
         /// <summary>
         /// Constructor
@@ -48,7 +48,7 @@ namespace Common.Fsm.Action {
         }
 
         public override void OnEnter() {
-            if(Comparison.TolerantEquals(this.duration, 0)) {
+            if(this.duration.TolerantEquals(0)) {
                 // zero duration was specified finish immediately
                 Finish();
                 return;
@@ -74,7 +74,7 @@ namespace Common.Fsm.Action {
 
         private void Finish() {
             // snap to end color
-            image.color = this.endColor;
+            this.image.color = this.endColor;
 
             // send finishEvent if specified
             if (!string.IsNullOrEmpty(this.finishEvent)) {

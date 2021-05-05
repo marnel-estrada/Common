@@ -8,7 +8,7 @@ namespace GoapBrain {
     /// </summary>
     class ConditionNamesDatabase {
 
-        private StringDatabase stringDb = new StringDatabase(1000);
+        private readonly StringDatabase stringDb = new StringDatabase(1000);
 
         /// <summary>
         /// Used private constructor because this is a singleton

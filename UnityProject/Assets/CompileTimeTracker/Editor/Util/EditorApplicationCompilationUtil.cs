@@ -9,7 +9,7 @@ namespace DTCompileTimeTracker {
     public static event Action FinishedCompiling = delegate {};
 
     static EditorApplicationCompilationUtil() {
-      EditorApplication.update += EditorApplicationCompilationUtil.OnEditorUpdate;
+      EditorApplication.update += OnEditorUpdate;
     }
 
 
@@ -19,14 +19,14 @@ namespace DTCompileTimeTracker {
     }
 
     private static void OnEditorUpdate() {
-      if (EditorApplication.isCompiling && EditorApplicationCompilationUtil.StoredCompilingState == false) {
-        EditorApplicationCompilationUtil.StoredCompilingState = true;
-        EditorApplicationCompilationUtil.StartedCompiling.Invoke();
+      if (EditorApplication.isCompiling && StoredCompilingState == false) {
+        StoredCompilingState = true;
+        StartedCompiling.Invoke();
       }
 
-      if (!EditorApplication.isCompiling && EditorApplicationCompilationUtil.StoredCompilingState == true) {
-        EditorApplicationCompilationUtil.StoredCompilingState = false;
-        EditorApplicationCompilationUtil.FinishedCompiling.Invoke();
+      if (!EditorApplication.isCompiling && StoredCompilingState == true) {
+        StoredCompilingState = false;
+        FinishedCompiling.Invoke();
       }
     }
   }

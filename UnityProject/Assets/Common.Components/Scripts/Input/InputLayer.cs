@@ -20,7 +20,7 @@ namespace Common {
 		 */
 		public bool IsModal {
 			get {
-				return modal;
+				return this.modal;
 			}
 		}
 
@@ -29,7 +29,7 @@ namespace Common {
 		 */
 		public bool IsActive {
 			get {
-				return active;
+				return this.active;
 			}
 		}
 
@@ -37,14 +37,14 @@ namespace Common {
 		 * Activates the input layer.
 		 */
 		public void Activate() {
-			active = true;
+			this.active = true;
 		}
 
 		/**
 		 * Deactivates the input layer.
 		 */
 		public void Deactivate() {
-			active = false;
+			this.active = false;
 		}
 
 		/**

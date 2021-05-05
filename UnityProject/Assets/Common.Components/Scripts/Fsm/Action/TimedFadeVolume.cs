@@ -23,7 +23,7 @@ namespace Common.Fsm.Action {
 		private float duration;
 		private string finishEvent;
 		
-		private CountdownTimer timer;
+		private readonly CountdownTimer timer;
 	
 		/**
 		 * Constructor
@@ -68,7 +68,7 @@ namespace Common.Fsm.Action {
 			this.audioSource.volume = this.volumeTo;
 			
 			if(!string.IsNullOrEmpty(this.finishEvent)) {
-				GetOwner().SendEvent(finishEvent);
+				GetOwner().SendEvent(this.finishEvent);
 			}
 		}
 		

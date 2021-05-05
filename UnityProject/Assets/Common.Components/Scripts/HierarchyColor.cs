@@ -19,7 +19,7 @@ namespace Common {
 
 		public Color Color {
 			get {
-				return color;
+				return this.color;
 			}
 		}
 

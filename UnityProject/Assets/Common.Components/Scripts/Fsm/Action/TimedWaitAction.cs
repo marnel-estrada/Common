@@ -25,7 +25,7 @@ namespace Common.Fsm.Action {
 		}
 		
 		public override void OnEnter() {
-			if(Comparison.TolerantLesserThanOrEquals(this.waitTime, 0)) {
+			if(this.waitTime.TolerantLesserThanOrEquals(0)) {
 				Finish();
 			}
 

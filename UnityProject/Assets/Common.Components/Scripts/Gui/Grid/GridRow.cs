@@ -46,7 +46,7 @@ namespace Common {
 
         public string RowId {
             get {
-                return rowId;
+                return this.rowId;
             }
         }
 

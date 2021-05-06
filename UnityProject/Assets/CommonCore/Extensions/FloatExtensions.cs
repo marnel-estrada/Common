@@ -1,15 +1,14 @@
-using UnityEngine;
+using Unity.Mathematics;
 
 /**
  * Class for comparing floating point values 
  */
 public static class FloatExtensions {
-
 	/**
 	 * Returns whether or not a == b
 	 */
 	public static bool TolerantEquals(this float a, float b) {
-		return Mathf.Abs(a - b) < 0.0001f;
+		return math.abs(a - b) < 0.0001f;
 	}
 
 	/**

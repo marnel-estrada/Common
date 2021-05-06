@@ -5,5 +5,5 @@ namespace CommonEcs.UtilityBrain {
     /// A custom interface to differentiate a component as a consideration component
     /// </summary>
     public interface IConsiderationComponent : IComponentData {
-    }
+    } 
 }

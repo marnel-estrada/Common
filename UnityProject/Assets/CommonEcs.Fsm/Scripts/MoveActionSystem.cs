@@ -1,4 +1,5 @@
 ﻿using CommonEcs;
+using CommonEcs.Scripts.Math;
 
 using Unity.Collections;
 using Unity.Entities;
@@ -70,7 +71,7 @@ namespace Common.Ecs.Fsm {
                     return;
                 }
 
-                if (VectorUtils.Equals(moveAction.from, moveAction.to)) {
+                if (moveAction.from.TolerantEquals(moveAction.to)) { 
                     // from position and to position are already the same
                     Finish(index, ref action);
                     return;

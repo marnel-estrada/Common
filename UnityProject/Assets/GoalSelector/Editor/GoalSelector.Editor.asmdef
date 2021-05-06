@@ -1,0 +1,21 @@
+{
+    "name": "GoalSelector.Editor",
+    "rootNamespace": "",
+    "references": [
+        "CommonCore",
+        "CommonCore.Editor",
+        "GoalSelector",
+        "CommonEcs.UtilityBrain"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

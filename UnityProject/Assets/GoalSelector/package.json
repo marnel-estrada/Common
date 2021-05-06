@@ -1,0 +1,20 @@
+{
+  "name": "com.coffeebrain.common.goalselector",
+  "displayName": "GoalSelector",
+  "version": "0.0.1",
+  "unity": "2020.3",
+  "description": "Contains the data scripts and editor for goal selector",
+  "dependencies": {
+    "com.unity.entities": "0.0.17",
+    "com.unity.burst": "1.0.1",
+    "com.unity.mathematics": "1.0.1",
+    "com.unity.collections": "1.0.1",
+    "com.squeakywheel.common.core": "1.0.0",
+    "com.squeakywheel.common.ecs": "1.0.0",
+    "com.coffeebrain.common.ecs.utilitybrain" : "0.0.1"
+  },
+  "keywords": [
+    "unity"
+  ],
+  "category": "Unity"
+}

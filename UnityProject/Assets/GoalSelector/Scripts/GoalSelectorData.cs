@@ -1,11 +1,9 @@
-using System.Collections.Generic;
+using Common;
 
 using UnityEngine;
 
 namespace GoalSelector {
     [CreateAssetMenu(menuName = "GoalSelector/GoalSelector")]
-    public class GoalSelectorData : ScriptableObject {
-        [SerializeField]
-        private List<GoalData> goals = new List<GoalData>();
+    public class GoalSelectorData : DataPool<GoalData> {
     }
 }

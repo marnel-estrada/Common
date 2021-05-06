@@ -11,9 +11,12 @@ namespace GoalSelector {
     /// This is implemented as a UtilityOption upon parsing.
     /// </summary>
     [Serializable]
-    public class GoalData {
+    public class GoalData : IDataPoolItem, IDuplicable<GoalData> {
         [SerializeField]
         private string id;
+
+        [SerializeField]
+        private int intId;
 
         [SerializeField]
         private string conditionName;
@@ -91,6 +94,21 @@ namespace GoalSelector {
             get {
                 return this.considerations;
             }
+        }
+
+        public int IntId {
+            get {
+                return this.intId;
+            }
+
+            set {
+                this.intId = value;
+            }
+        }
+
+        public GoalData Duplicate() {
+            // Not really implemented for now
+            return new GoalData();
         }
     }
 }

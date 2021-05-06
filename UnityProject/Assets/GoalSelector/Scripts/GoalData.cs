@@ -1,0 +1,96 @@
+using System;
+using System.Collections.Generic;
+
+using Common;
+
+using UnityEngine;
+
+namespace GoalSelector {
+    /// <summary>
+    /// Represents an option amongst different options in a goal selector.
+    /// This is implemented as a UtilityOption upon parsing.
+    /// </summary>
+    [Serializable]
+    public class GoalData {
+        [SerializeField]
+        private string id;
+
+        [SerializeField]
+        private string conditionName;
+
+        [SerializeField]
+        private bool conditionValue;
+
+        [SerializeField]
+        private string comment;
+
+        [SerializeField]
+        private bool showComment;
+
+        [SerializeField]
+        private bool editComment;
+
+        [SerializeField]
+        private List<ClassData> considerations = new List<ClassData>();
+
+        public string Id {
+            get {
+                return this.id;
+            }
+            set {
+                this.id = value;
+            }
+        }
+
+        public string ConditionName {
+            get {
+                return this.conditionName;
+            }
+            set {
+                this.conditionName = value;
+            }
+        }
+
+        public bool ConditionValue {
+            get {
+                return this.conditionValue;
+            }
+            set {
+                this.conditionValue = value;
+            }
+        }
+
+        public string Comment1 {
+            get {
+                return this.comment;
+            }
+            set {
+                this.comment = value;
+            }
+        }
+
+        public bool ShowComment {
+            get {
+                return this.showComment;
+            }
+            set {
+                this.showComment = value;
+            }
+        }
+
+        public bool EditComment {
+            get {
+                return this.editComment;
+            }
+            set {
+                this.editComment = value;
+            }
+        }
+
+        public List<ClassData> Considerations {
+            get {
+                return this.considerations;
+            }
+        }
+    }
+}

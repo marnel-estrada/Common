@@ -69,7 +69,7 @@ namespace Common {
 
                 // At this point the property has a renderer
                 // We check if it has a property group
-                PropertyGroup group = TypeUtils.GetCustomAttribute<PropertyGroup>(property);
+                PropertyGroup? group = TypeUtils.GetCustomAttribute<PropertyGroup>(property);
                 if(group == null) {
                     // No group. Just add to ungrouped list
                     this.ungroupedList.Add(property);
@@ -92,7 +92,7 @@ namespace Common {
 
         private bool HasRenderer(PropertyInfo property) {
             // Check if property has a custom renderer
-            Common.PropertyRenderer propertyRenderer = TypeUtils.GetCustomAttribute<Common.PropertyRenderer>(property);
+            Common.PropertyRenderer? propertyRenderer = TypeUtils.GetCustomAttribute<Common.PropertyRenderer>(property);
             
             if (propertyRenderer == null || string.IsNullOrEmpty(propertyRenderer.RendererType)) {
                 // No custom renderer
@@ -119,7 +119,7 @@ namespace Common {
                 PropertyInfo property = propertyList[i];
                 
                 // Check if it has a custom renderer
-                Common.PropertyRenderer propertyRenderer = TypeUtils.GetCustomAttribute<Common.PropertyRenderer>(property);
+                Common.PropertyRenderer? propertyRenderer = TypeUtils.GetCustomAttribute<Common.PropertyRenderer>(property);
                 if (propertyRenderer == null || string.IsNullOrEmpty(propertyRenderer.RendererType)) {
                     // No renderer type specified
                     RenderAsDefault(property, instance);
@@ -132,7 +132,7 @@ namespace Common {
         }
 
         private static void RenderAsDefault(PropertyInfo property, object instance) {
-            ReadOnlyFieldAttribute readOnlyAttribute = TypeUtils.GetCustomAttribute<ReadOnlyFieldAttribute>(property);
+            ReadOnlyFieldAttribute? readOnlyAttribute = TypeUtils.GetCustomAttribute<ReadOnlyFieldAttribute>(property);
 
             if (readOnlyAttribute == null) {
                 // It's an editable field
@@ -143,17 +143,15 @@ namespace Common {
             }
         }
 
-        private Action<EditorPropertyRenderer> customRenderMatcher;
+        private Action<EditorPropertyRenderer>? customRenderMatcher;
         
         private void CustomRender(PropertyInfo property, object instance, Common.PropertyRenderer propRenderer) {
             Option<EditorPropertyRenderer> resolvedRenderer = ResolveRenderer(propRenderer.RendererType);
             Assertion.IsSome(resolvedRenderer);
 
-            if (this.customRenderMatcher == null) {
-                this.customRenderMatcher = delegate(EditorPropertyRenderer renderer) {
-                    renderer.Render(property, instance);
-                };
-            }
+            this.customRenderMatcher ??= delegate(EditorPropertyRenderer renderer) {
+                renderer.Render(property, instance);
+            };
 
             resolvedRenderer.Match(this.customRenderMatcher);
         }
@@ -225,7 +223,7 @@ namespace Common {
         }
 
         private static void RenderString(PropertyInfo property, object instance) {
-            string value = property.GetGetMethod().Invoke(instance, null) as string;
+            string? value = property.GetGetMethod().Invoke(instance, null) as string;
             value = string.IsNullOrEmpty(value) ? "" : value; // Prevent null
 
             GUILayout.BeginHorizontal();

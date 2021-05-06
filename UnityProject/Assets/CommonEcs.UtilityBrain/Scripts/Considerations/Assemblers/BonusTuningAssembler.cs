@@ -3,6 +3,7 @@ using Common;
 using Unity.Entities;
 
 namespace CommonEcs.UtilityBrain {
+    [Group("CommonEcs.UtilityBrain")]
     public class BonusTuningAssembler : SingleComponentConsiderationAssembler<BonusTuning> {
         // The bonus to set
         public NamedFloat bonus { get; set; }

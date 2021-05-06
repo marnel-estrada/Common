@@ -36,7 +36,7 @@ namespace Common {
             
             // Add new
             GUI.backgroundColor = ColorUtils.GREEN;
-            if (GUILayout.Button($"Add {this.classDataTypeName}...", GUILayout.Width(140))) {
+            if (GUILayout.Button($"Add {this.classDataTypeName}...", GUILayout.Width(300))) {
                 OpenTypeBrowser();
             }
 
@@ -45,8 +45,8 @@ namespace Common {
             GUILayout.Space(5);
 
             // Render all class data
-            if (dataList == null || dataList.Count <= 0) {
-                GUILayout.Label($"(no {this.classDataTypeName.ToLowerInvariant()} yet)");
+            if (dataList.Count <= 0) {
+                GUILayout.Label($"(no {this.classDataTypeName} yet)");
             } else {
                 RenderAllClassData();
             }

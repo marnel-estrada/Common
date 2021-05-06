@@ -45,6 +45,7 @@ namespace GoalSelector {
             }
         }
 
+        [PropertyGroup("Effect")]
         public string ConditionName {
             get {
                 return this.conditionName;
@@ -54,6 +55,7 @@ namespace GoalSelector {
             }
         }
 
+        [PropertyGroup("Effect")]
         public bool ConditionValue {
             get {
                 return this.conditionValue;
@@ -63,7 +65,8 @@ namespace GoalSelector {
             }
         }
 
-        public string Comment1 {
+        [Hidden]
+        public string Comment {
             get {
                 return this.comment;
             }
@@ -72,6 +75,7 @@ namespace GoalSelector {
             }
         }
 
+        [Hidden]
         public bool ShowComment {
             get {
                 return this.showComment;
@@ -81,6 +85,7 @@ namespace GoalSelector {
             }
         }
 
+        [Hidden]
         public bool EditComment {
             get {
                 return this.editComment;
@@ -96,6 +101,8 @@ namespace GoalSelector {
             }
         }
 
+        [ReadOnlyField]
+        [PropertyGroup("ID")]
         public int IntId {
             get {
                 return this.intId;

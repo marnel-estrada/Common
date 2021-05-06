@@ -53,7 +53,7 @@ namespace Common {
             GUILayout.Space(5);
 
             GUILayout.Label("Selected: " + (this.selectedType == null ? "(none)" : this.selectedType.Name));
-            if (GUILayout.Button($"Add {this.baseTypeName}", GUILayout.Width(120))) {
+            if (GUILayout.Button($"Add {this.baseTypeName}", GUILayout.Width(300))) {
                 AddSelectedType();
             }
 

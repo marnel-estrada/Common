@@ -10,8 +10,8 @@ namespace CommonEcs.Test {
     public class GrowingHeapTest : ECSTestsFixture {
         [Test]
         public void TestPush() {
-            NativeList<HeapNode> list = new NativeList<HeapNode>(Allocator.TempJob);
-            GrowingHeap heap = new GrowingHeap(list);
+            NativeList<HeapNode<int2>> list = new NativeList<HeapNode<int2>>(Allocator.TempJob);
+            GrowingHeap<int2> heap = new GrowingHeap<int2>(list);
             
             heap.Push(CreateNode(0, 0, 0));
             Assert.True(heap.ElementCount == 1);
@@ -24,8 +24,8 @@ namespace CommonEcs.Test {
         
         [Test]
         public void TestElementCount() {
-            NativeList<HeapNode> list = new NativeList<HeapNode>(Allocator.TempJob);
-            GrowingHeap heap = new GrowingHeap(list);
+            NativeList<HeapNode<int2>> list = new NativeList<HeapNode<int2>>(Allocator.TempJob);
+            GrowingHeap<int2> heap = new GrowingHeap<int2>(list);
             
             heap.Push(CreateNode(0, 0, 0));
             Assert.True(heap.ElementCount == 1);
@@ -54,8 +54,8 @@ namespace CommonEcs.Test {
         
         [Test]
         public void TestPop() {
-            NativeList<HeapNode> list = new NativeList<HeapNode>(Allocator.TempJob);
-            GrowingHeap heap = new GrowingHeap(list);
+            NativeList<HeapNode<int2>> list = new NativeList<HeapNode<int2>>(Allocator.TempJob);
+            GrowingHeap<int2> heap = new GrowingHeap<int2>(list);
             
             heap.Push(CreateNode(0, 0, 0));
             heap.Push(CreateNode(1, 1, 1));
@@ -66,7 +66,7 @@ namespace CommonEcs.Test {
 
             float previousCost = int.MinValue;
             while (heap.HasItems) {
-                AStarNode top = heap.Top;
+                AStarNode<int2> top = heap.Top;
                 Assert.True(previousCost < top.F);
                 previousCost = top.F;
                 heap.Pop();
@@ -77,8 +77,8 @@ namespace CommonEcs.Test {
         
         [Test]
         public void TestIndexAccess() {
-            NativeList<HeapNode> list = new NativeList<HeapNode>(Allocator.TempJob);
-            GrowingHeap heap = new GrowingHeap(list);
+            NativeList<HeapNode<int2>> list = new NativeList<HeapNode<int2>>(Allocator.TempJob);
+            GrowingHeap<int2> heap = new GrowingHeap<int2>(list);
             
             heap.Push(CreateNode(0, 0, 0));
             heap.Push(CreateNode(1, 1, 1));
@@ -88,7 +88,7 @@ namespace CommonEcs.Test {
             heap.Push(CreateNode(5, 5, 5));
 
             for (int i = 0; i < heap.ElementCount; ++i) {
-                HeapNode node = heap[i];
+                HeapNode<int2> node = heap[i];
                 Assert.True(Comparison.TolerantEquals(i, node.cost));
             }
             
@@ -97,8 +97,8 @@ namespace CommonEcs.Test {
         
         [Test]
         public void TestHasItems() {
-            NativeList<HeapNode> list = new NativeList<HeapNode>(Allocator.TempJob);
-            GrowingHeap heap = new GrowingHeap(list);
+            NativeList<HeapNode<int2>> list = new NativeList<HeapNode<int2>>(Allocator.TempJob);
+            GrowingHeap<int2> heap = new GrowingHeap<int2>(list);
             Assert.False(heap.HasItems);
             
             heap.Push(CreateNode(0, 0, 0));
@@ -125,8 +125,8 @@ namespace CommonEcs.Test {
         
         [Test]
         public void TestClear() {
-            NativeList<HeapNode> list = new NativeList<HeapNode>(Allocator.TempJob);
-            GrowingHeap heap = new GrowingHeap(list);
+            NativeList<HeapNode<int2>> list = new NativeList<HeapNode<int2>>(Allocator.TempJob);
+            GrowingHeap<int2> heap = new GrowingHeap<int2>(list);
 
             const int count = 1000;
             for (int i = 0; i < count; ++i) {
@@ -144,8 +144,8 @@ namespace CommonEcs.Test {
         // Test preventing infinite loop while pushing
         [Test]
         public void TestNextNotPointingToItself() {
-            NativeList<HeapNode> list = new NativeList<HeapNode>(Allocator.TempJob);
-            GrowingHeap heap = new GrowingHeap(list);
+            NativeList<HeapNode<int2>> list = new NativeList<HeapNode<int2>>(Allocator.TempJob);
+            GrowingHeap<int2> heap = new GrowingHeap<int2>(list);
             
             // The values here are derived from a bug that happened during A* search
             heap.Push(CreateNode(-2, 0, 24));
@@ -170,9 +170,9 @@ namespace CommonEcs.Test {
             list.Dispose();
         }
 
-        private bool CheckIntegrity(GrowingHeap heap) {
+        private bool CheckIntegrity(GrowingHeap<int2> heap) {
             for (int i = 0; i < heap.Length; ++i) {
-                HeapNode node = heap[i];
+                HeapNode<int2> node = heap[i];
                 if (node.next == i) {
                     // This causes infinite loop
                     // It must be avoided
@@ -183,8 +183,8 @@ namespace CommonEcs.Test {
             return true;
         }
 
-        private static AStarNode CreateNode(int x, int y, int cost) {
-            return new AStarNode(0, new int2(x, y), -1, cost, 0);
+        private static AStarNode<int2> CreateNode(int x, int y, int cost) {
+            return new AStarNode<int2>(0, new int2(x, y), -1, cost, 0);
         }
     }
 }

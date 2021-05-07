@@ -11,8 +11,9 @@ namespace CommonEcs.UtilityBrain {
         // This will be replaced by enable/disable component when it it available.
         public bool shouldExecute;
 
-        public UtilityBrain(Entity agentEntity) : this() {
+        public UtilityBrain(Entity agentEntity, bool shouldExecute = false) : this() {
             this.agentEntity = agentEntity;
+            this.shouldExecute = shouldExecute;
         }
 
         public void MarkExecute() {

@@ -6,7 +6,7 @@ namespace CommonEcs.UtilityBrain {
         public virtual void Init(ref EntityManager entityManager) {
         }
 
-        public abstract void Prepare(ref EntityManager entityManager, in Entity agentEntity, in Entity optionEntity, 
+        public abstract Entity Prepare(ref EntityManager entityManager, in Entity agentEntity, in Entity optionEntity, 
             int optionIndex, ref NativeList<Entity> linkedEntities);
     }
 }

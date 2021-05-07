@@ -10,12 +10,16 @@ namespace CommonEcs.UtilityBrain {
             this.archetype = entityManager.CreateArchetype(typeof(Consideration), typeof(T));
         }
 
-        public override void Prepare(ref EntityManager entityManager, in Entity agentEntity, in Entity optionEntity, 
+        public override Entity Prepare(ref EntityManager entityManager, in Entity agentEntity, in Entity optionEntity, 
             int optionIndex, ref NativeList<Entity> linkedEntities) {
             Entity considerationEntity = entityManager.CreateEntity(this.archetype);
             entityManager.SetComponentData(considerationEntity, new Consideration(agentEntity, optionEntity, optionIndex));
+
+            PrepareConsiderationComponent(ref entityManager, agentEntity, considerationEntity);
             
             linkedEntities.Add(considerationEntity);
+
+            return considerationEntity;
         }
 
         protected virtual void PrepareConsiderationComponent(ref EntityManager entityManager, in Entity agentEntity,

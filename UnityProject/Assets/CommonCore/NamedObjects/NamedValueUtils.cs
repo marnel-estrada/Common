@@ -13,7 +13,7 @@ namespace Common {
         /// <param name="localVariables"></param>
         /// <param name="type"></param>
         /// <param name="instance"></param>
-        public static void InjectNamedProperties(NamedValueLibrary parentVariables, NamedValueLibrary localVariables, Type type, object instance) {
+        public static void InjectNamedProperties(NamedValueLibrary? parentVariables, NamedValueLibrary localVariables, Type type, object instance) {
             PropertyInfo[] properties = CACHED_PROPERTIES.GetProperties(type);
             foreach (PropertyInfo property in properties) {
                 if (!TypeUtils.IsVariableProperty(property)) {

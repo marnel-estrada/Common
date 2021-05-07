@@ -131,7 +131,7 @@ namespace Common {
         /// <param name="parentVariables"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static Option<T> Instantiate<T>(ClassData data, NamedValueLibrary parentVariables) where T : class {
+        public static Option<T> Instantiate<T>(ClassData data, NamedValueLibrary? parentVariables) where T : class {
             Option<Type> type = TypeIdentifier.GetType(data.ClassName);
             Assertion.IsSome(type, data.ClassName);
 
@@ -140,9 +140,9 @@ namespace Common {
 
         private readonly struct InstantiateMatcher<T> : IFuncOptionMatcher<Type, Option<T>> where T : class {
             private readonly ClassData data;
-            private readonly NamedValueLibrary parentVariables;
+            private readonly NamedValueLibrary? parentVariables;
 
-            public InstantiateMatcher(ClassData data, NamedValueLibrary parentVariables) {
+            public InstantiateMatcher(ClassData data, NamedValueLibrary? parentVariables) {
                 this.data = data;
                 this.parentVariables = parentVariables;
             }

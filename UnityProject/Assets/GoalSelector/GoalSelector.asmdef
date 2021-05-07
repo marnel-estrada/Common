@@ -5,6 +5,7 @@
         "CommonCore",
         "CommonEcs",
         "CommonEcs.UtilityBrain",
+        "CommonEcs.Goap",
         "Unity.Entities",
         "Unity.Collections",
         "Unity.Mathematics",

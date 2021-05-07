@@ -29,6 +29,8 @@ namespace CommonEcs {
         /// <param name="owner"></param>
         /// <param name="name"></param>
         public static void SetName(ref EntityManager entityManager, Entity owner, FixedString64 name) {
+            entityManager.SetName(owner, name.ToString());
+            
             Entity nameEntity = entityManager.CreateEntity(NAME_ARCHETYPE);
             entityManager.SetComponentData(nameEntity, new Name(name));
             
@@ -40,8 +42,13 @@ namespace CommonEcs {
             // and that the owner itself is already added to the list
             DynamicBuffer<LinkedEntityGroup> linkedEntities = entityManager.GetBuffer<LinkedEntityGroup>(owner);
             
-            // Ensure that the first entity of the list is the owner
-            Assertion.IsTrue(linkedEntities.Length > 0 && linkedEntities[0].Value == owner);
+            // Ensure that the first entity of linked entities is the owner
+            if (linkedEntities.Length == 0) {
+                linkedEntities.Add(new LinkedEntityGroup() {
+                    Value = owner
+                });    
+            }
+            
             linkedEntities.Add(new LinkedEntityGroup() {
                 Value = nameEntity
             });

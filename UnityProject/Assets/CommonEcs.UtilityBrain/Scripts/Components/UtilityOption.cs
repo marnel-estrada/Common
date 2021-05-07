@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Entities;
 
 namespace CommonEcs.UtilityBrain {
@@ -28,6 +29,10 @@ namespace CommonEcs.UtilityBrain {
 
         public UtilityOption(int id, in Entity utilityBrainEntity, int brainIndex) : 
             this(new OptionId(id), utilityBrainEntity, brainIndex) {
+        }
+
+        public UtilityOption(in FixedString64 textId, in Entity utilityBrainEntity, int brainIndex) : this(
+            textId.GetHashCode(), utilityBrainEntity, brainIndex) {
         }
     }
 }

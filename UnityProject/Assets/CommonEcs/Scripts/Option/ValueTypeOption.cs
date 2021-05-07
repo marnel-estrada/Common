@@ -72,6 +72,14 @@ namespace CommonEcs {
             return this.IsSome ? this.value : other;
         }
 
+        public T ValueOrError() {
+            if (this.IsSome) {
+                return this.value;
+            }
+
+            throw new Exception("Trying to access value from a None option.");
+        }
+
         public bool Equals(in T other) {
             return this.IsSome && this.value.Equals(other);
         }

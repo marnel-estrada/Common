@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -41,6 +42,7 @@ namespace CommonEcs.UtilityBrain {
         
         protected abstract TProcessor PrepareProcessor();
         
+        [BurstCompile]
         public struct Job : IJobEntityBatch {
             public ComponentTypeHandle<Consideration> considerationType;
             public ComponentTypeHandle<TFilter> filterType;

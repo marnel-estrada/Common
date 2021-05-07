@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -33,6 +34,7 @@ namespace CommonEcs.UtilityBrain {
             return handle;
         }
         
+        [BurstCompile]
         private struct IdentifyOptionsJob : IJobEntityBatch {
             public ComponentTypeHandle<UtilityOption> optionType;
 
@@ -51,6 +53,7 @@ namespace CommonEcs.UtilityBrain {
             }
         }
 
+        [BurstCompile]
         private struct IdentifyConsiderationsJob : IJobEntityBatch {
             public ComponentTypeHandle<Consideration> considerationType;
 

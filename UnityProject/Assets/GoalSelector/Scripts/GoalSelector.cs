@@ -13,5 +13,11 @@ namespace GoalSelector {
                 return new ReadOnlySimpleList<Goal>(this.goals);
             }
         }
+
+        public int GoalCount {
+            get {
+                return this.goals.Count;
+            }
+        }
     }
 }

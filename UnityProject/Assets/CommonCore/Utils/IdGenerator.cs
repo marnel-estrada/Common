@@ -11,12 +11,12 @@ namespace Common {
         private const int DEFAULT_STARTING_ID = 1;
         
         [SerializeField]
-        private int counter = DEFAULT_STARTING_ID;
+        private int counter;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public IdGenerator() {
+        public IdGenerator() : this(DEFAULT_STARTING_ID) {
         }
 
         /// <summary>

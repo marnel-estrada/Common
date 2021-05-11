@@ -6,40 +6,43 @@ using UnityEngine;
 namespace Common {
 	public class InputProcessor : MonoBehaviour {
 		[SerializeField]
-		private List<string> inputLayerNameList;
+		private List<string>? inputLayerNameList;
 		
-		private SimpleList<InputLayer> inputLayerList;
+		private readonly SimpleList<InputLayer> inputLayerList = new SimpleList<InputLayer>();
 		
 		[SerializeField]
-		private string referenceCameraName; // note that we are using a string because the actual camera object may be found in another scene
+		private string? referenceCameraName; // note that we are using a string because the actual camera object may be found in another scene
 
-		private Camera referenceCamera;
+		private Camera? referenceCamera;
 		
 		public delegate void InputProcess();
 		
-		private InputProcess inputProcess;
+		private InputProcess? inputProcess;
 
         // This is usually used to cancel existing mouse related states when input is no longer valid
         // Like for example, when mouse moves to an area that covers this InputProcessor
-        private InputProcess inputRemovedProcess; // may be null
+        private InputProcess? inputRemovedProcess; // may be null
 
 		// We keep an instance of this so we don't invoke InputProcessorManager.Instance in OnDestroy().
 		// This is bad because InputProcessorManager.Instance creates a GameObject. Will cause problems if
 		// application is being closed
-		private InputProcessorManager manager;
+		private InputProcessorManager? manager;
 
         private void Awake() {
+	        Assertion.NotEmpty(this.referenceCameraName);
+	        
 	        this.manager = InputProcessorManager.Instance;
             this.manager.Add(this);
         }
 
         private void OnDestroy() {
-	        this.manager.Remove(this);
+	        if (this.manager != null) {
+		        this.manager.Remove(this);
+	        }
         }
 
         private void Start() {
 			// populate input layer list
-			this.inputLayerList = new SimpleList<InputLayer>();
 			if(this.inputLayerNameList != null && this.inputLayerNameList.Count > 0) {
 				foreach(string layerName in this.inputLayerNameList) {
 					InputLayer layer = UnityUtils.GetRequiredComponent<InputLayer>(layerName);
@@ -48,7 +51,7 @@ namespace Common {
 			}
 			
 			// resolve reference camera
-	        this.referenceCamera = UnityUtils.GetRequiredComponent<Camera>(this.referenceCameraName);
+	        this.referenceCamera = UnityUtils.GetRequiredComponent<Camera>(this.referenceCameraName ?? throw new InvalidOperationException());
 		}
 		
         /// <summary>
@@ -82,12 +85,7 @@ namespace Common {
 		}
 		
 		private Option<InputLayer> GetActiveLayer() {
-			if(this.inputLayerList == null) {
-				// input layer list was not populated yet
-				return Option<InputLayer>.NONE;
-			}
-
-            int count = this.inputLayerList.Count;
+			int count = this.inputLayerList.Count;
             for (int i = 0; i < count; ++i) {
                 if(this.inputLayerList[i].IsActive) {
                     return Option<InputLayer>.Some(this.inputLayerList[i]);
@@ -115,7 +113,11 @@ namespace Common {
 		
 		public Camera ReferenceCamera {
 			get {
-				return this.referenceCamera;
+				if (this.referenceCamera != null) {
+					return this.referenceCamera;
+				}
+
+				throw new Exception("ReferenceCamera can't be null");
 			}
 		}
 	}

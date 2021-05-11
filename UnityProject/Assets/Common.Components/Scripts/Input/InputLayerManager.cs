@@ -114,14 +114,14 @@ namespace Common {
 
         public static void PushInputLayer(string inputLayerName) {
             Signal.Signal signal = PUSH_INPUT_LAYER;
-            signal.ClearListeners();
+            signal.ClearParameters();
             signal.AddParameter(INPUT_LAYER_NAME, inputLayerName);
             signal.Dispatch();
         }
         
         public static void PopInputLayer(string inputLayerName) {
             Signal.Signal signal = POP_INPUT_LAYER;
-            signal.ClearListeners();
+            signal.ClearParameters();
             signal.AddParameter(INPUT_LAYER_NAME, inputLayerName);
             signal.Dispatch();
         }

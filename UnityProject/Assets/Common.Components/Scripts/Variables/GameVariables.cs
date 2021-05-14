@@ -61,8 +61,7 @@ namespace Common {
                 xmlText = this.nonStreamingSource.text;
             }
 
-            SimpleXmlReader reader = new SimpleXmlReader();
-            SimpleXmlNode root = reader.Read(xmlText).FindFirstNodeInChildren("GameVariables");
+            SimpleXmlNode root = SimpleXmlReader.Read(xmlText).FindFirstNodeInChildren("GameVariables");
 
             // Use custom override if it exists
             // Otherwise, use the override from XML

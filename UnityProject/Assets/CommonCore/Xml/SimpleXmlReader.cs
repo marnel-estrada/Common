@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System;
 
 namespace Common.Xml {
-
-	public class SimpleXmlReader {
-	
+	public static class SimpleXmlReader {
 	    private const char TAG_START = '<';
 	    private const char TAG_END = '>';
 	    private const char SPACE = ' ';
@@ -17,7 +15,7 @@ namespace Common.Xml {
         private const char QUESTION_MARK = '?';
 	    private static readonly string BEGIN_QUOTE = "" + EQUALS + QUOTE;
 	
-	    public SimpleXmlNode Read(string xml) {
+	    public static SimpleXmlNode Read(string xml) {
 	        int tagEndIndex = 0;
 	        SimpleXmlNode rootNode = new SimpleXmlNode();
 	        SimpleXmlNode currentNode = rootNode;
@@ -126,7 +124,7 @@ namespace Common.Xml {
             return xml[tagEndIndex - 2] == DASH && xml[tagEndIndex - 1] == DASH;
         }
 	
-	    public SimpleXmlNode ParseTag(string xmlTag) {
+	    private static SimpleXmlNode ParseTag(string xmlTag) {
 	        SimpleXmlNode node = new SimpleXmlNode();
 	
 	        int nameEnd = xmlTag.IndexOf(SPACE, 0);
@@ -141,9 +139,8 @@ namespace Common.Xml {
 	        string attrString = xmlTag.Substring(nameEnd, xmlTag.Length - nameEnd);
 	        return ParseAttributes(attrString, node);
 	    }
-	
-	    public SimpleXmlNode ParseAttributes(string xmlTag, SimpleXmlNode node) {
-	
+
+	    private static SimpleXmlNode ParseAttributes(string xmlTag, SimpleXmlNode node) {
 	        int lastIndex = 0;
 	
 	        while (true) {
@@ -172,7 +169,7 @@ namespace Common.Xml {
 	        return node;
 	    }
 	
-	    public void PrintXML(SimpleXmlNode node, int indent) {
+	    public static void PrintXML(SimpleXmlNode node, int indent) {
 	        indent++;
 	
 	        foreach (SimpleXmlNode n in node.Children) {

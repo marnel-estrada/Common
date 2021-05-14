@@ -10,7 +10,6 @@ public class XmlTest : MonoBehaviour {
     private void Awake() {
         Assertion.NotNull(this.sampleXml, "sampleXml");
 
-        SimpleXmlReader reader = new SimpleXmlReader();
-        reader.PrintXML(reader.Read(this.sampleXml.text), 0);
+        SimpleXmlReader.PrintXML(SimpleXmlReader.Read(this.sampleXml.text), 0);
     }
 }

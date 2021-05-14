@@ -39,11 +39,10 @@ namespace Common.Xml {
 
             // not found
             // try to look for it in children
+            // It's found or error
             for (int i = 0; i < node.children.Count; ++i) {
                 SimpleXmlNode found = FindFirstNodeInChildren(node.children[i], tagName);
-                if (found != null) {
-                    return found;
-                }
+                return found;
             }
 
             // not found

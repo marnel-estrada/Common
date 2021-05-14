@@ -51,8 +51,7 @@ namespace Common {
                 return;
             }
             
-            SimpleXmlReader reader = new SimpleXmlReader();
-            SimpleXmlNode root = reader.Read(this.configXml.text).FindFirstNodeInChildren("SceneLoadingSystem");
+            SimpleXmlNode root = SimpleXmlReader.Read(this.configXml.text).FindFirstNodeInChildren("SceneLoadingSystem");
 
             for(int i = 0; i < root.Children.Count; ++i) {
                 SimpleXmlNode child = root.Children[i];

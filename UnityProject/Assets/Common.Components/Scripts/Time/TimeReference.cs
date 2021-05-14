@@ -8,7 +8,7 @@ namespace Common.Time {
 	 */
 	public class TimeReference {		
 		private readonly string name;
-		private float timeScale;
+		private float timeScale = 1.0f;
 		
 		/**
 		 * Constructor

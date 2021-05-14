@@ -25,7 +25,11 @@ namespace CommonEcs.DotsFsm {
                 this.rerunGroup.Value = false;
                 base.OnUpdate();
                 ++this.rerunCounter;
-                this.EntityManager.CompleteAllJobs();
+
+                if (this.rerunGroup.Value) {
+                    // Force complete only if rerun was requested
+                    this.EntityManager.CompleteAllJobs();
+                }
             } while (this.rerunGroup.Value && this.rerunCounter < 3);
         }
 

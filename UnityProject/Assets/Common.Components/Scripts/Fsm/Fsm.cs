@@ -6,13 +6,13 @@ namespace Common.Fsm {
 	public class Fsm {
 		private readonly string name;
 		
-		private FsmState currentState;
+		private FsmState? currentState;
 		private readonly Dictionary<string, FsmState> stateMap = new Dictionary<string, FsmState>();
         
         private readonly StateActionProcessor onExitProcessor;
 
         private readonly bool delayTransitionToNextFrame;
-        private FsmState delayedTransitionState;
+        private FsmState? delayedTransitionState;
 		
 		/**
 		 * Constructor
@@ -23,7 +23,7 @@ namespace Common.Fsm {
 			this.currentState = null;
 
             this.onExitProcessor = delegate (FsmAction action) {
-                FsmState currentStateOnInvoke = this.currentState;
+                FsmState? currentStateOnInvoke = this.currentState;
                 action.OnExit();
                 if (this.currentState != currentStateOnInvoke || this.delayedTransitionState != null) {
                     // this means that the action's OnExit() causes the FSM to change state
@@ -57,7 +57,7 @@ namespace Common.Fsm {
 		private delegate void StateActionProcessor(FsmAction action);
 		
 		private void ProcessStateActions(FsmState state, StateActionProcessor actionProcessor) {
-			FsmState stateOnInvoke = this.currentState;
+			FsmState? stateOnInvoke = this.currentState;
 
             SimpleList<FsmAction> actionList = state.ActionList;
             FsmAction[] actions = actionList.Buffer;
@@ -95,7 +95,7 @@ namespace Common.Fsm {
             ChangeToState(null);
         }
 		
-		private void ChangeToState(FsmState state) {
+		private void ChangeToState(FsmState? state) {
 			if(this.currentState != null) {
 				// if there's an active current state, we exit that first
 				ExitState(this.currentState);
@@ -105,14 +105,14 @@ namespace Common.Fsm {
 			EnterState(this.currentState);
 		}
 		
-		private void EnterState(FsmState state) {
+		private void EnterState(FsmState? state) {
             if(state == null) {
                 // Null may be specified to stop the FSM
                 return;
             }
 
             // We inlined ProcessStateActions() here so it would be faster
-            FsmState stateOnInvoke = this.currentState;
+            FsmState? stateOnInvoke = this.currentState;
 
             SimpleList<FsmAction> actionList = state.ActionList;
             FsmAction[] actions = actionList.Buffer;
@@ -180,9 +180,11 @@ namespace Common.Fsm {
 		/**
 		 * Returns the current state.
 		 */
-		public FsmState GetCurrentState() {
+		public FsmState? GetCurrentState() {
 			return this.currentState;
 		}
+
+		private IOptionMatcher<FsmState>? changeStateMatcher;
 		
 		/**
 		 * Sends an event which may cause state change.
@@ -197,35 +199,24 @@ namespace Common.Fsm {
                 return;
 			}
 
-			Option<FsmState> transitionState = this.currentState.GetTransition(eventId);
-			transitionState.Match(new ChangeStateMatcher(this, eventId));
-		}
-
-		private struct ChangeStateMatcher : IOptionMatcher<FsmState> {
-			private readonly Fsm fsm;
-			private readonly string eventId;
-
-			public ChangeStateMatcher(Fsm fsm, string eventId) {
-				this.fsm = fsm;
-				this.eventId = eventId;
-			}
-			
-			public void OnSome(FsmState state) {
-				if (this.fsm.delayTransitionToNextFrame) {
+			// We use a non struct matcher here so it's faster
+			this.changeStateMatcher ??= new DelegateOptionMatcher<FsmState>(delegate(FsmState state) {
+				if (this.delayTransitionToNextFrame) {
 					// Do transition to next frame
-					this.fsm.delayedTransitionState = state;
+					this.delayedTransitionState = state;
 				} else {
 					// No delay. Change transition right away.
-					this.fsm.ChangeToState(state);
+					ChangeToState(state);
 				}
-			}
-
-			public void OnNone() {
+			}, delegate {
 #if UNITY_EDITOR
 				// log only in Unity Editor since it lags the game even if done in build
-				Debug.Log($"The current state {this.fsm.currentState.GetName()} has no transition for event {this.eventId}.");
+				Debug.Log($"The current state {this.currentState?.GetName()} has no transition for event {eventId}.");
 #endif
-			}
+			});
+			
+			Option<FsmState> transitionState = this.currentState.GetTransition(eventId);
+			transitionState.Match(this.changeStateMatcher);
 		}
 	}
 }

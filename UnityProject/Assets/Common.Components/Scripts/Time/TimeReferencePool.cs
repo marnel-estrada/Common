@@ -13,16 +13,12 @@ namespace Common.Time {
 			this.instanceMap = new Dictionary<string, TimeReference>();
 		}
 		
-		private static TimeReferencePool ONLY_INSTANCE = null;
+		private static readonly TimeReferencePool ONLY_INSTANCE = new TimeReferencePool();
 		
 		/**
 		 * Returns the only TimeReferencePool instance.
 		 */
 		public static TimeReferencePool GetInstance() {
-			if(ONLY_INSTANCE == null) {
-				ONLY_INSTANCE = new TimeReferencePool();
-			}
-			
 			return ONLY_INSTANCE;
 		}
 		
@@ -51,6 +47,13 @@ namespace Common.Time {
 		 */
 		public TimeReference GetDefault() {
 			return TimeReference.GetDefaultInstance();
+		}
+
+		/// <summary>
+		/// Used for domain reload.
+		/// </summary>
+		public void Reset() {
+			this.instanceMap.Clear();
 		}
 	}
 }

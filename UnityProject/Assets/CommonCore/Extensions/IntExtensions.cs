@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Common {
     public static class IntExtensions {
-        private static readonly StringBuilder? STRING_BUILDER = new StringBuilder();
+        private static readonly StringBuilder STRING_BUILDER = new StringBuilder();
 
         private static readonly Dictionary<int, string> NUMBER_ROMAN_DICTIONARY = new Dictionary<int, string> {
             {1000, "M"},

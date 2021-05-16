@@ -56,7 +56,7 @@ namespace Common {
             for(int i = 0; i < root.Children.Count; ++i) {
                 SimpleXmlNode child = root.Children[i];
 
-                switch(child.TagName) {
+                switch(child.tagName) {
                     case LOAD_PROFILE:
                         ParseLoadProfile(child);
                         break;
@@ -82,12 +82,12 @@ namespace Common {
             for(int i = 0; i < node.Children.Count; ++i) {
                 SimpleXmlNode child = node.Children[i];
 
-                if(SCENE_SET.EqualsFast(child.TagName)) {
+                if(SCENE_SET.EqualsFast(child.tagName)) {
                     // add the id
                     profile.AddSceneSet(child.GetAttribute(ID));
                 }
 
-                if (SCENE.EqualsFast(child.TagName)) {
+                if (SCENE.EqualsFast(child.tagName)) {
                     profile.AddScene(child.GetAttribute(NAME));
                 }
             }
@@ -103,7 +103,7 @@ namespace Common {
             // parse scenes in the set
             for(int i = 0; i < node.Children.Count; ++i) {
                 SimpleXmlNode child = node.Children[i];
-                if(SCENE.Equals(child.TagName)) {
+                if(SCENE.Equals(child.tagName)) {
                     sceneSet.Add(child.GetAttribute(NAME));
                 }
             }

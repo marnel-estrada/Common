@@ -82,7 +82,7 @@ namespace Common.Xml {
 	
 		        // if the tag starts with a </ then it is an end tag
 		        if (xmlTag[0] == SLASH){
-			        currentNode = currentNode.ParentNode;
+			        currentNode = currentNode.parentNode;
 			        continue;
 		        }
 	
@@ -98,7 +98,7 @@ namespace Common.Xml {
 		        }
 	
 		        SimpleXmlNode node = ParseTag(xmlTag);
-		        node.ParentNode = currentNode;
+		        node.parentNode = currentNode;
 		        node.InnerText = innerText.Trim();
 		        currentNode.AddChild(node);
 
@@ -129,12 +129,12 @@ namespace Common.Xml {
 	
 	        int nameEnd = xmlTag.IndexOf(SPACE, 0);
 	        if (nameEnd < 0) {
-	            node.TagName = xmlTag;
+	            node.tagName = xmlTag;
 	            return node;
 	        }
 	
 	        string tagName = xmlTag.Substring(0, nameEnd);
-	        node.TagName = tagName;
+	        node.tagName = tagName;
 	
 	        string attrString = xmlTag.Substring(nameEnd, xmlTag.Length - nameEnd);
 	        return ParseAttributes(attrString, node);
@@ -181,7 +181,7 @@ namespace Common.Xml {
 	            for (int i = 0; i < indent; i++)
 	                indentString += "/";
 	
-	            Debug.Log(indentString + " " + n.TagName + attr);
+	            Debug.Log(indentString + " " + n.tagName + attr);
 	            PrintXML(n, indent);
 	        }
 	    }

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 
+#nullable disable
+
 namespace Common.Xml {
     public class SimpleXmlNode {
         public delegate void NodeProcessor(SimpleXmlNode node);
@@ -10,13 +12,13 @@ namespace Common.Xml {
         private const string TRUE = "true";
         private readonly Dictionary<string, string> attributes;
         private readonly List<SimpleXmlNode> children;
-        public SimpleXmlNode ParentNode;
+        public SimpleXmlNode parentNode;
 
-        public string TagName;
+        public string tagName;
 
         public SimpleXmlNode() {
-            this.TagName = "NONE";
-            this.ParentNode = null;
+            this.tagName = "NONE";
+            this.parentNode = null;
             this.children = new List<SimpleXmlNode>();
             this.attributes = new Dictionary<string, string>();
         }
@@ -32,7 +34,7 @@ namespace Common.Xml {
 
         private static SimpleXmlNode FindFirstNodeInChildren(SimpleXmlNode node, string tagName) {
             for (int i = 0; i < node.children.Count; ++i) {
-                if (node.children[i].TagName.EqualsFast(tagName)) {
+                if (node.children[i].tagName.EqualsFast(tagName)) {
                     return node.children[i];
                 }
             }

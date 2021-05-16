@@ -93,14 +93,14 @@ namespace Common {
 
             for (int i = 0; i < root.Children.Count; ++i) {
                 SimpleXmlNode child = root.Children[i];
-                if (ENTRY.EqualsFast(child.TagName)) {
+                if (ENTRY.EqualsFast(child.tagName)) {
                     // parse key-value pair
                     string key = child.GetAttribute(KEY);
                     string value = child.GetAttribute(VALUE);
                     this.defaultVariables.Add(key, value);
                 }
 
-                if ("Override".EqualsFast(child.TagName) && child.GetAttribute("id").EqualsFast(overrideToUse)) {
+                if ("Override".EqualsFast(child.tagName) && child.GetAttribute("id").EqualsFast(overrideToUse)) {
                     overrideNode = child;
                 }
             }
@@ -127,7 +127,7 @@ namespace Common {
         private void ParseOverride(SimpleXmlNode node) {
             for (int i = 0; i < node.Children.Count; ++i) {
                 SimpleXmlNode child = node.Children[i];
-                if (ENTRY.Equals(child.TagName)) {
+                if (ENTRY.Equals(child.tagName)) {
                     // parse key-value pair
                     string key = child.GetAttribute(KEY);
                     string value = child.GetAttribute(VALUE);

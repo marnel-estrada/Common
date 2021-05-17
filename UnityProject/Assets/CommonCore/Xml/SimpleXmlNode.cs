@@ -81,6 +81,14 @@ namespace Common.Xml {
             return int.Parse(GetAttribute(attributeKey), NumberFormatInfo.InvariantInfo);
         }
 
+        public uint GetAttributeAsUint(string attributeKey) {
+            if (!ContainsAttribute(attributeKey)) {
+                return 0;
+            }
+
+            return uint.Parse(GetAttribute(attributeKey), NumberFormatInfo.InvariantInfo);
+        }
+
         /**
          * Returns an attribute as a float.
          */

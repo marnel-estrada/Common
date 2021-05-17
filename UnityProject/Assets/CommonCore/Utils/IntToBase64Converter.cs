@@ -30,12 +30,12 @@ namespace Common {
             byte[] bytes = Convert.FromBase64String(base64String);
             int integerCount = bytes.Length / INTEGER_SIZE;
 
-            int index = 0; // Index to bytes
+            int byteArrayIndex = 0; // Index to bytes
             for (int i = 0; i < integerCount; ++i) {
-                int value = BitConverter.ToInt32(bytes, index);
+                int value = BitConverter.ToInt32(bytes, byteArrayIndex);
                 container.Add(value);
                 
-                index += INTEGER_SIZE; // Jump to next integer
+                byteArrayIndex += INTEGER_SIZE; // Jump to next integer
             }
         }
     }

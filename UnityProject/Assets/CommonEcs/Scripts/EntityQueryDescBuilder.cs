@@ -40,7 +40,7 @@ namespace CommonEcs {
         }
 
         public EntityQueryDescBuilder WithNone<T>() where T : IComponentData {
-            this.none.Add(ComponentType.Exclude<T>());
+            this.none.Add(typeof(T));
             return this;
         }
 

@@ -7,6 +7,7 @@ namespace CommonEcs {
     /// Name component. We did it this way to avoid filling up the chunk when names are added
     /// to entities.
     /// </summary>
+    [GenerateAuthoringComponent]
     public readonly struct NameReference : IComponentData {
         public readonly Entity nameEntity;
 

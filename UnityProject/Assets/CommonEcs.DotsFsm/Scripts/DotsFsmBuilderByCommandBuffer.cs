@@ -26,7 +26,7 @@ namespace CommonEcs.DotsFsm {
                 Value = fsmEntity
             });
             
-            Name.SetName(ref this.commandBuffer, fsmEntity, name);
+            Name.SetupName(ref this.commandBuffer, fsmEntity, name);
 
             return fsmEntity;
         }
@@ -47,7 +47,7 @@ namespace CommonEcs.DotsFsm {
                 Value = stateEntity
             });
             
-            Name.SetName(ref this.commandBuffer, stateEntity, name);
+            Name.SetupName(ref this.commandBuffer, stateEntity, name);
             
             // Link fsm owner to this state
             this.commandBuffer.AppendToBuffer(fsmEntityOwner, new LinkedEntityGroup() {

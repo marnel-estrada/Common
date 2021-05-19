@@ -147,7 +147,7 @@ namespace GoalSelector {
             Entity option = entityManager.CreateEntity(this.optionArchetype);
             entityManager.SetComponentData(option, new UtilityOption(goal.Id, parentBrain, brainIndex));
             entityManager.SetComponentData(option, new GoalCondition(goal.ConditionName, goal.ConditionValue));
-            Name.SetName(ref entityManager, option, goal.Id);
+            Name.SetupName(ref entityManager, option, goal.Id);
 
             ReadOnlySimpleList<ConsiderationAssembler> assemblers = goal.Assemblers;
             

@@ -36,7 +36,7 @@ namespace CommonEcs.DotsFsm {
                 Value = fsmEntity
             });
             
-            Name.SetName(ref this.entityManager, fsmEntity, name);
+            Name.SetupName(ref this.entityManager, fsmEntity, name);
 
             return fsmEntity;
         }
@@ -51,7 +51,7 @@ namespace CommonEcs.DotsFsm {
                 Value = stateEntity
             });
             
-            Name.SetName(ref this.entityManager, stateEntity, name);
+            Name.SetupName(ref this.entityManager, stateEntity, name);
             
             DynamicBuffer<LinkedEntityGroup> fsmLinkedEntities = this.entityManager.GetBuffer<LinkedEntityGroup>(fsmOwnerEntity);
             fsmLinkedEntities.Add(new LinkedEntityGroup() {

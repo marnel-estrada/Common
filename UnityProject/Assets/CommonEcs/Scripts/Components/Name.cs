@@ -26,7 +26,7 @@ namespace CommonEcs {
         /// <param name="entityManager"></param>
         /// <param name="owner"></param>
         /// <param name="name"></param>
-        public static void SetName(ref EntityManager entityManager, Entity owner, FixedString64 name) {
+        public static void SetupName(ref EntityManager entityManager, Entity owner, FixedString64 name) {
             entityManager.SetName(owner, name.ToString());
             
             Entity nameEntity = entityManager.CreateEntity(NAME_ARCHETYPE);
@@ -37,7 +37,6 @@ namespace CommonEcs {
             entityManager.SetComponentData(owner, new NameReference(nameEntity));
             
             // It also assumes that the owner entity has LinkedEntityGroup in its archetype
-            // and that the owner itself is already added to the list
             DynamicBuffer<LinkedEntityGroup> linkedEntities = entityManager.GetBuffer<LinkedEntityGroup>(owner);
             
             // Ensure that the first entity of linked entities is the owner
@@ -52,7 +51,7 @@ namespace CommonEcs {
             });
         }
 
-        public static void SetName(ref EntityCommandBuffer commandBuffer, Entity owner, FixedString64 name) {
+        public static void SetupName(ref EntityCommandBuffer commandBuffer, Entity owner, FixedString64 name) {
             Entity nameEntity = commandBuffer.CreateEntity();
             commandBuffer.AddComponent(nameEntity, new Name(name));
             

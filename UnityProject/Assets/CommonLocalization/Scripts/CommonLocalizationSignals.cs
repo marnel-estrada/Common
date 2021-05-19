@@ -17,6 +17,7 @@ namespace Common {
         public static readonly Signal.Signal PARSE_LANGUAGE_XML = new Signal.Signal("ParseLanguageXml");
 
         public static readonly Signal.Signal PARSE_DEFAULT_LANGUAGE = new Signal.Signal("ParseDefaultLanguage");
-
+        
+        public static readonly Signal.Signal LANGUAGE_CHANGED = new Signal.Signal("LanguageChanged");
     }
 }

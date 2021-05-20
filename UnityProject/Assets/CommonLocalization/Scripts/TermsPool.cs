@@ -10,10 +10,10 @@ namespace Common {
     public class TermsPool : MonoBehaviour {
         [SerializeField]
         private string xmlPath = "BaseGame/Data/EnglishMaster.xml"; // Relative to StreamingAssets
-        
-        private TranslationContainer currentTranslation;
 
-        private Action<string> parseMatcher;
+        private TranslationContainer? currentTranslation;
+
+        private Action<string>? parseMatcher;
 
         private void Awake() {
             Assertion.NotEmpty(this.xmlPath);
@@ -44,6 +44,11 @@ namespace Common {
 
         private void Parse(ISignalParameters parameters) {
             Option<string> parameterPath = parameters.GetParameter<string>(CommonLocalizationParams.XML_PATH);
+
+            if (this.parseMatcher == null) {
+                return;
+            }
+
             parameterPath.Match(this.parseMatcher);
         }
 
@@ -99,11 +104,11 @@ namespace Common {
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Category GetCategory(string id) {
-            return this.currentTranslation.GetCategoryById(id);
+        public Category? GetCategory(string id) {
+            return this.currentTranslation?.GetCategoryById(id);
         }
 
-        private static TermsPool INSTANCE;
+        private static TermsPool? INSTANCE;
 
         public static TermsPool Instance {
             get {
@@ -115,7 +120,7 @@ namespace Common {
                 TermsPool[] foundPools = FindObjectsOfType<TermsPool>();
                 Assertion.IsTrue(foundPools.Length <= 1); // Should not be more than 2
 
-                if(foundPools.Length > 0) {
+                if (foundPools.Length > 0) {
                     INSTANCE = foundPools[0]; // Get only the first one
                 } else {
                     // There's no instance ever

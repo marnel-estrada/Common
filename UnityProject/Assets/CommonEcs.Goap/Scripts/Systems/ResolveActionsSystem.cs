@@ -75,12 +75,13 @@ namespace CommonEcs.Goap {
                     
                     NativeList<ResolvedAction> actionList = new NativeList<ResolvedAction>(Allocator.Temp);
                     NativeHashSet<int> actionsBeingEvaluated = new NativeHashSet<int>(4, Allocator.Temp);
-                    bool result = SearchActions(planner.currentGoal.ValueOr(default), domain, ref boolHashMap, ref actionList, ref actionsBeingEvaluated);
+                    bool result = SearchActions(planner.currentGoal.ValueOrError(), domain, ref boolHashMap, ref actionList, ref actionsBeingEvaluated);
                     planner.state = result ? PlanningState.SUCCESS : PlanningState.FAILED;
 
                     // Add the actions to action buffer if search was a success
                     if (result) {
                         AddActions(ref resolvedActions, ref actionList);
+                        PrintActions(planner, resolvedActions);
                     }
                     
                     // Modify
@@ -118,7 +119,7 @@ namespace CommonEcs.Goap {
                 ref NativeList<ResolvedAction> actionList, ref NativeHashSet<int> actionsBeingEvaluated) {
                 // Check if goal was already specified in the current conditionsMap
                 ValueTypeOption<bool> foundGoalValue = conditionsMap.Find(goal.id.hashCode);
-                if (foundGoalValue.IsSome && foundGoalValue.ValueOr(default) == goal.value) {
+                if (foundGoalValue.IsSome && foundGoalValue.ValueOrError() == goal.value) {
                     // Goal is already satisfied. No need for further search.
                     return true;
                 }
@@ -129,7 +130,7 @@ namespace CommonEcs.Goap {
                     return false;
                 }
 
-                FixedList32<int> actionIndices = foundActionIndices.ValueOr(default);
+                FixedList32<int> actionIndices = foundActionIndices.ValueOrError();
                 for (int i = 0; i < actionIndices.Length; ++i) {
                     GoapAction action = domain.GetAction(actionIndices[i]);
                     if (actionsBeingEvaluated.Contains(action.id)) {

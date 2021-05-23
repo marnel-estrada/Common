@@ -81,7 +81,6 @@ namespace CommonEcs.Goap {
                     // Add the actions to action buffer if search was a success
                     if (result) {
                         AddActions(ref resolvedActions, ref actionList);
-                        PrintActions(planner, resolvedActions);
                     }
                     
                     // Modify
@@ -124,6 +123,13 @@ namespace CommonEcs.Goap {
                     return true;
                 }
 
+                if (foundGoalValue.IsNone && !goal.value) {
+                    // This means that the goal is false and is not found in the conditionsMap.
+                    // Since conditions default to false, then there's no need to look for actions.
+                    // The false goal is already satisfied.
+                    return true;
+                }
+                
                 ValueTypeOption<FixedList32<int>> foundActionIndices = domain.GetActionIndices(goal);
                 if (foundActionIndices.IsNone) {
                     // There are no actions to satisfy the goal

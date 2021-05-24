@@ -1,6 +1,5 @@
 using System;
 
-using Unity.Assertions;
 using Unity.Collections;
 
 namespace CommonEcs {
@@ -65,13 +64,13 @@ namespace CommonEcs {
             this.unusedKeys.Push(index);
         }
 
-        public T this[int index] {
+        public readonly T this[int index] {
             get {
                 return this.itemList[index];
             }
         }
 
-        public bool TryGetValue(int index, out T value) {
+        public readonly bool TryGetValue(int index, out T value) {
             if (0 <= index && index < this.itemList.Length) {
                 value = this.itemList[index];
 

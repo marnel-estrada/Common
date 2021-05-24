@@ -72,6 +72,7 @@ namespace Common {
 
             // Dispatch this signal after parsing to change the text    
             CommonLocalizationSignals.TERMS_CHANGED.Dispatch();
+            CommonLocalizationSignals.LANGUAGE_CHANGED.Dispatch();
         }
 
         /// <summary>
@@ -141,6 +142,22 @@ namespace Common {
         /// <returns></returns>
         public static Option<string> GetTermTranslation(string termId) {
             return Instance.GetTranslation(termId);
+        }
+        
+        /// <summary>
+        /// Add a listener for when the game's language changes
+        /// </summary>
+        /// <param name="listener"></param>
+        public static void AddLanguageChangedListener(Signal.Signal.SignalListener listener) {
+            CommonLocalizationSignals.LANGUAGE_CHANGED.AddListener(listener);
+        }
+        
+        /// <summary>
+        /// Remove a listener for when the game's language changes
+        /// </summary>
+        /// <param name="listener"></param>
+        public static void RemoveLanguageChangedListener(Signal.Signal.SignalListener listener) {
+            CommonLocalizationSignals.LANGUAGE_CHANGED.RemoveListener(listener);
         }
     }
 }

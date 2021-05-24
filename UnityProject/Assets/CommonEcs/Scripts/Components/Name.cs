@@ -82,10 +82,6 @@ namespace CommonEcs {
             entityManager.SetName(owner, name.ToString());
             NameReference nameReference = entityManager.GetComponentData<NameReference>(owner);
             entityManager.SetComponentData(nameReference.nameEntity, new Name(name));
-
-            // Set the reference to owner
-            // This assumes that the owner has NameReference in its archetype
-            entityManager.SetComponentData(owner, new NameReference(nameReference.nameEntity));
         }
 
         /// <summary>

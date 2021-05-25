@@ -7,7 +7,7 @@ namespace Common {
     /// This is implemented as a singleton
     /// </summary>
     public class LocalizerManager : MonoBehaviour {
-        private TermsPool termsPool;
+        private TermsPool? termsPool;
 
         private readonly SimpleList<Localizer> localizers = new SimpleList<Localizer>(500);
 
@@ -19,7 +19,7 @@ namespace Common {
             CommonLocalizationSignals.TERMS_CHANGED.RemoveListener(UpdateLocalizers);
         }
 
-        private TermsPool TermsPool {
+        private TermsPool? TermsPool {
             get {
                 if (this.termsPool == null) {
                     TermsPool[] pools = FindObjectsOfType<TermsPool>();
@@ -35,8 +35,8 @@ namespace Common {
         }
 
         private void UpdateLocalizers(ISignalParameters parameters) {
-            TermsPool pool = this.TermsPool;
-            if(pool == null) {
+            TermsPool? pool = this.TermsPool;
+            if (pool == null) {
                 // There's no pool yet
                 return;
             }
@@ -55,7 +55,15 @@ namespace Common {
         public void Add(Localizer localizer) {
             // Update the text on add so that it will be updated with the latest loaded terms
             string termId = localizer.TermId;
-            Option<string> translation = this.TermsPool.GetTranslation(termId);
+
+            TermsPool? pool = this.TermsPool;
+
+            if (pool == null) {
+                // There's no pool yet
+                return;
+            }
+
+            Option<string> translation = pool.GetTranslation(termId);
             localizer.UpdateText(translation);
             this.localizers.Add(localizer);
         }
@@ -68,11 +76,11 @@ namespace Common {
             this.localizers.Remove(localizer);
         }
 
-        private static LocalizerManager INSTANCE;
+        private static LocalizerManager? INSTANCE;
 
         public static LocalizerManager Instance {
             get {
-                if(INSTANCE == null) {
+                if (INSTANCE == null) {
                     // Create a new one
                     GameObject go = new GameObject("LocalizerManager");
                     go.AddComponent<DontDestroyOnLoadComponent>();

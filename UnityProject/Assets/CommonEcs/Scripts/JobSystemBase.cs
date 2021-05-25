@@ -12,5 +12,9 @@ namespace CommonEcs {
         }
 
         protected abstract JobHandle OnUpdate(JobHandle inputDeps);
+
+        protected T GetOrCreateSystem<T>() where T : ComponentSystemBase {
+            return this.World.GetOrCreateSystem<T>();
+        }
     }
 }

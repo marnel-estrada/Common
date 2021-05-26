@@ -14,7 +14,7 @@ namespace CommonEcs.Goap {
     [UpdateBefore(typeof(EndAtomActionsSystem))]
     public abstract class AtomActionBaseSystem<TActionFilter, TProcessor> : JobSystemBase 
         where TActionFilter : unmanaged, IAtomActionComponent
-        where TProcessor : unmanaged, IAtomActionProcess<TActionFilter> {
+        where TProcessor : struct, IAtomActionProcess<TActionFilter> {
         private EntityQuery query;
         private bool isActionFilterZeroSized;
 

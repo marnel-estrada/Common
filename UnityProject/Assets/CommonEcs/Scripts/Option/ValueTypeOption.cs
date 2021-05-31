@@ -8,7 +8,7 @@ namespace CommonEcs {
     /// it can be used inside jobs.
     ///
     /// We don't provide an accessor to the value so that user would be forced to use
-    /// Match().
+    /// Match(), ValueOr() or ValueOrError().
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public readonly struct ValueTypeOption<T> : IEquatable<ValueTypeOption<T>> where T : struct, IEquatable<T> {

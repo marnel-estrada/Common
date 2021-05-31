@@ -5,7 +5,7 @@ using Unity.Entities;
 
 namespace GoapBrain {
     public abstract class SingleComponentResolverAssembler<T> : ConditionResolverAssembler 
-        where T : unmanaged, IComponentData {
+        where T : unmanaged, IConditionResolverComponent {
         private EntityArchetype archetype;
 
         public override void Init(ref EntityManager entityManager) {

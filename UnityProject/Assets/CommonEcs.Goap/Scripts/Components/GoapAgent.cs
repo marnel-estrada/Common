@@ -52,7 +52,13 @@ namespace CommonEcs.Goap {
         }
 
         public void AddGoal(Condition goalCondition) {
-            this.goals.Add(goalCondition);
+            if (this.goals.Count == 0) {
+                // We add twice here because the first is space for the main goal
+                this.goals.Add(goalCondition);
+                this.goals.Add(goalCondition);
+            } else {
+                this.goals.Add(goalCondition);
+            }
         }
 
         public readonly GoapDomain Domain {

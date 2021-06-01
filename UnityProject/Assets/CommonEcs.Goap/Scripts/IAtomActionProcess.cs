@@ -13,23 +13,26 @@ namespace CommonEcs.Goap {
         /// <param name="batchInChunk"></param>
         /// <param name="batchIndex"></param>
         void BeforeChunkIteration(ArchetypeChunk batchInChunk, int batchIndex);
-        
+
         /// <summary>
         /// Start routines
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="action"></param>
         /// <param name="actionComponent"></param>
+        /// <param name="indexOfFirstEntityInQuery"></param>
+        /// <param name="iterIndex"></param>
         /// <returns></returns>
-        GoapResult Start(ref AtomAction atomAction, ref T actionComponent, int index);
-        
+        GoapResult Start(ref AtomAction atomAction, ref T actionComponent, int indexOfFirstEntityInQuery, int iterIndex);
+
         /// <summary>
         /// Update routines
         /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="action"></param>
+        /// <param name="atomAction"></param>
         /// <param name="actionComponent"></param>
+        /// <param name="indexOfFirstEntityInQuery"></param>
+        /// <param name="iterIndex"></param>
         /// <returns></returns>
-        GoapResult Update(ref AtomAction atomAction, ref T actionComponent, int index);
+        GoapResult Update(ref AtomAction atomAction, ref T actionComponent, int indexOfFirstEntityInQuery, int iterIndex);
     }
 }

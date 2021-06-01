@@ -53,13 +53,13 @@ namespace CommonEcs.Goap {
         
         // We need this to be public so it can be referenced in AssemblyInfo
         [BurstCompile]
-        public struct Job : IJobEntityBatch {
+        public struct Job : IJobEntityBatchWithIndex {
             public ComponentTypeHandle<AtomAction> atomActionType;
             public ComponentTypeHandle<TActionFilter> actionFilterType;
             public bool actionFilterHasArray;
             public TProcessor processor;
             
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
+            public void Execute(ArchetypeChunk batchInChunk, int batchIndex, int indexOfFirstEntityInQuery) {
                 NativeArray<AtomAction> atomActions = batchInChunk.GetNativeArray(this.atomActionType);
 
                 NativeArray<TActionFilter> filterActions = this.actionFilterHasArray ? batchInChunk.GetNativeArray(this.actionFilterType) : default;
@@ -76,7 +76,7 @@ namespace CommonEcs.Goap {
 
                     if (this.actionFilterHasArray) {
                         TActionFilter actionFilter = filterActions[i];
-                        ExecuteAction(ref atomAction, ref actionFilter, i);
+                        ExecuteAction(ref atomAction, ref actionFilter, indexOfFirstEntityInQuery, i);
 
                         // Modify
                         atomActions[i] = atomAction;
@@ -84,7 +84,7 @@ namespace CommonEcs.Goap {
                     } else {
                         // There's no array for the TActionFilter. It must be a tag component.
                         // Use a default filter component
-                        ExecuteAction(ref atomAction, ref defaultActionFilter, i);
+                        ExecuteAction(ref atomAction, ref defaultActionFilter, indexOfFirstEntityInQuery, i);
 
                         // Modify
                         atomActions[i] = atomAction;
@@ -92,10 +92,10 @@ namespace CommonEcs.Goap {
                 }
             }
 
-            private void ExecuteAction(ref AtomAction atomAction, ref TActionFilter actionFilter, int index) {
+            private void ExecuteAction(ref AtomAction atomAction, ref TActionFilter actionFilter, int indexOfFirstEntityInQuery, int index) {
                 if (!atomAction.started) {
                     // We call Start() if not yet started
-                    atomAction.result = this.processor.Start(ref atomAction, ref actionFilter, index);
+                    atomAction.result = this.processor.Start(ref atomAction, ref actionFilter, indexOfFirstEntityInQuery, index);
                     atomAction.started = true;
 
                     if (atomAction.result == GoapResult.FAILED || atomAction.result == GoapResult.SUCCESS) {
@@ -104,7 +104,7 @@ namespace CommonEcs.Goap {
                     }
                 }
 
-                atomAction.result = this.processor.Update(ref atomAction, ref actionFilter, index);
+                atomAction.result = this.processor.Update(ref atomAction, ref actionFilter, indexOfFirstEntityInQuery, index);
             }
         }
     }

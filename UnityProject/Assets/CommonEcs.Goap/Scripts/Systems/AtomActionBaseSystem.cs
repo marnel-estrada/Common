@@ -19,8 +19,12 @@ namespace CommonEcs.Goap {
         private bool isActionFilterZeroSized;
 
         protected override void OnCreate() {
-            this.query = GetEntityQuery(typeof(AtomAction), typeof(TActionFilter));
+            this.query = PrepareQuery();
             this.isActionFilterZeroSized = TypeManager.GetTypeInfo(TypeManager.GetTypeIndex<TActionFilter>()).IsZeroSized;
+        }
+
+        protected virtual EntityQuery PrepareQuery() {
+            return GetEntityQuery(typeof(AtomAction), typeof(TActionFilter));
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
@@ -72,7 +76,7 @@ namespace CommonEcs.Goap {
 
                     if (this.actionFilterHasArray) {
                         TActionFilter actionFilter = filterActions[i];
-                        ExecuteAction(ref atomAction, ref actionFilter);
+                        ExecuteAction(ref atomAction, ref actionFilter, i);
 
                         // Modify
                         atomActions[i] = atomAction;
@@ -80,7 +84,7 @@ namespace CommonEcs.Goap {
                     } else {
                         // There's no array for the TActionFilter. It must be a tag component.
                         // Use a default filter component
-                        ExecuteAction(ref atomAction, ref defaultActionFilter);
+                        ExecuteAction(ref atomAction, ref defaultActionFilter, i);
 
                         // Modify
                         atomActions[i] = atomAction;
@@ -88,10 +92,10 @@ namespace CommonEcs.Goap {
                 }
             }
 
-            private void ExecuteAction(ref AtomAction atomAction, ref TActionFilter actionFilter) {
+            private void ExecuteAction(ref AtomAction atomAction, ref TActionFilter actionFilter, int index) {
                 if (!atomAction.started) {
                     // We call Start() if not yet started
-                    atomAction.result = this.processor.Start(ref atomAction, ref actionFilter);
+                    atomAction.result = this.processor.Start(ref atomAction, ref actionFilter, index);
                     atomAction.started = true;
 
                     if (atomAction.result == GoapResult.FAILED || atomAction.result == GoapResult.SUCCESS) {
@@ -100,7 +104,7 @@ namespace CommonEcs.Goap {
                     }
                 }
 
-                atomAction.result = this.processor.Update(ref atomAction, ref actionFilter);
+                atomAction.result = this.processor.Update(ref atomAction, ref actionFilter, index);
             }
         }
     }

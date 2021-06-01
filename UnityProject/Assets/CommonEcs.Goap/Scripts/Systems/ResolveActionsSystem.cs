@@ -81,6 +81,7 @@ namespace CommonEcs.Goap {
                     // Add the actions to action buffer if search was a success
                     if (result) {
                         AddActions(ref resolvedActions, ref actionList);
+                        //PrintActions(planner, resolvedActions);
                     }
                     
                     // Modify

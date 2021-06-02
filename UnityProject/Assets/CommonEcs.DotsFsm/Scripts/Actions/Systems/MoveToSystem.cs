@@ -21,7 +21,10 @@ namespace CommonEcs.DotsFsm {
             
             public float deltaTime;
             
-            public void OnEnter(Entity actionEntity, ref DotsFsmAction action, ref MoveTo move) {
+            public void BeforeChunkIteration(ArchetypeChunk batchInChunk, int batchIndex) {
+            }
+            
+            public void OnEnter(Entity actionEntity, ref DotsFsmAction action, ref MoveTo move, int indexOfFirstEntityInQuery, int iterIndex) {
                 // Set to start position
                 this.allTranslation[move.targetEntity] = new Translation() {
                     Value = move.start
@@ -35,7 +38,7 @@ namespace CommonEcs.DotsFsm {
                 }
             }
 
-            public void OnUpdate(Entity actionEntity, ref DotsFsmAction action, ref MoveTo move) {
+            public void OnUpdate(Entity actionEntity, ref DotsFsmAction action, ref MoveTo move, int indexOfFirstEntityInQuery, int iterIndex) {
                 move.timer.Update(this.deltaTime);
                 
                 if (move.timer.HasElapsed) {
@@ -52,7 +55,7 @@ namespace CommonEcs.DotsFsm {
                 };
             }
 
-            public void OnExit(Entity actionEntity, DotsFsmAction action, ref MoveTo move) {
+            public void OnExit(Entity actionEntity, DotsFsmAction action, ref MoveTo move, int indexOfFirstEntityInQuery, int iterIndex) {
             }
             
             private void Finish(ref DotsFsmAction action, ref MoveTo moveTo) {

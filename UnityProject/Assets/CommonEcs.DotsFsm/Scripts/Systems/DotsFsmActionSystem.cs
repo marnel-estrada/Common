@@ -59,8 +59,11 @@ namespace CommonEcs.DotsFsm {
                 NativeArray<Entity> entities = batchInChunk.GetNativeArray(this.entityHandle);
                 NativeArray<DotsFsmAction> fsmActions = batchInChunk.GetNativeArray(this.fsmActionHandle);
                 NativeArray<ActionType> customActions = batchInChunk.GetNativeArray(this.customActionHandle);
+                
+                this.execution.BeforeChunkIteration(batchInChunk, batchIndex);
 
-                for (int i = 0; i < batchInChunk.Count; ++i) {
+                int count = batchInChunk.Count;
+                for (int i = 0; i < count; ++i) {
                     Entity actionEntity = entities[i];
                     DotsFsmAction fsmAction = fsmActions[i];
                     ActionType customAction = customActions[i];

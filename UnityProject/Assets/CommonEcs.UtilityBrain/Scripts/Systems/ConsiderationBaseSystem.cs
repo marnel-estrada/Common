@@ -43,17 +43,19 @@ namespace CommonEcs.UtilityBrain {
         protected abstract TProcessor PrepareProcessor();
         
         [BurstCompile]
-        public struct Job : IJobEntityBatch {
+        public struct Job : IJobEntityBatchWithIndex {
             public ComponentTypeHandle<Consideration> considerationType;
             public ComponentTypeHandle<TFilter> filterType;
             public bool filterHasArray;
             public TProcessor processor;
             
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
+            public void Execute(ArchetypeChunk batchInChunk, int batchIndex, int indexOfFirstEntityInQuery) {
                 NativeArray<Consideration> considerations = batchInChunk.GetNativeArray(this.considerationType);
                 
                 NativeArray<TFilter> filters = this.filterHasArray ? batchInChunk.GetNativeArray(this.filterType) : default;
                 TFilter defaultFilter = default; // This will be used if TActionFilter has no chunk (it's a tag component)
+                
+                this.processor.BeforeChunkIteration(batchInChunk, batchIndex);
                 
                 int count = batchInChunk.Count;
                 for (int i = 0; i < count; ++i) {
@@ -67,10 +69,10 @@ namespace CommonEcs.UtilityBrain {
                     if (this.filterHasArray) {
                         // Use filter component if it has data
                         TFilter filter = filters[i];
-                        consideration.value = this.processor.ComputeUtility(consideration.agentEntity, filter);
+                        consideration.value = this.processor.ComputeUtility(consideration.agentEntity, filter, indexOfFirstEntityInQuery, i);
                     } else {
                         // Filter has no component. Just use default data.
-                        consideration.value = this.processor.ComputeUtility(consideration.agentEntity, defaultFilter);
+                        consideration.value = this.processor.ComputeUtility(consideration.agentEntity, defaultFilter, indexOfFirstEntityInQuery, i);
                     }
                     
                     // Modify

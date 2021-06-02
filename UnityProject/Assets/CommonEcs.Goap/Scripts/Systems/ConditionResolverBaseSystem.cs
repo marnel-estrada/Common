@@ -55,6 +55,8 @@ namespace CommonEcs.Goap {
                 NativeArray<TResolverFilter> filters = this.filterHasArray ? batchInChunk.GetNativeArray(this.filterType) : default;
                 TResolverFilter defaultFilter = default; // This will be used if TActionFilter has no chunk (it's a tag component)
                 
+                this.processor.BeforeChunkIteration(batchInChunk, batchIndex);
+                
                 int count = batchInChunk.Count;
                 for (int i = 0; i < count; ++i) {
                     ConditionResolver resolver = resolvers[i];

@@ -63,7 +63,7 @@ namespace CommonEcs {
                 lastSystemVersion = this.LastSystemVersion
             };
 
-            job.Schedule(this.query, inputDeps).Complete();
+            job.ScheduleParallel(this.query, inputDeps).Complete();
 
             // Process the result
             for (int i = 1; i < this.managers.Count; ++i) {

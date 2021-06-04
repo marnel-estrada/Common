@@ -4,10 +4,11 @@ using UnityEngine;
 
 using Common;
 
+using Unity.Collections;
+
 namespace GoapBrain {
     [Serializable]
     public class GoapActionData {
-
         [SerializeField]
         private string name;
 
@@ -46,6 +47,12 @@ namespace GoapBrain {
 
             set {
                 this.name = value;
+            }
+        }
+
+        public int ActionId {
+            get {
+                return new FixedString64(this.name).GetHashCode();
             }
         }
 

@@ -14,11 +14,9 @@ namespace Common {
 	 * A common interface for a class satisfying a condition on a certain type
 	 */
 	public interface ICondition<T> {
-
 		/**
 		 * Returns whether or not a certain condition is met on a certain instance
 		 */
 		bool IsMet(T instance);
-
 	}
 }

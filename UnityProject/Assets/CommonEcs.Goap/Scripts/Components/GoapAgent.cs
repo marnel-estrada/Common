@@ -45,7 +45,8 @@ namespace CommonEcs.Goap {
             // It will cause out of bounds exception if we set element at zero when the list
             // has no items yet
             if (this.goals.Count == 0) {
-                AddGoal(condition);
+                // We don't use AddGoal() here because it adds twice to make room for main goal.
+                this.goals.Add(condition);
             } else {
                 this.goals[0] = condition;
             }

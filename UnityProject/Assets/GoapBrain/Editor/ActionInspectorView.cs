@@ -62,6 +62,12 @@ namespace GoapBrain {
             GUILayout.Label("Name: ", GUILayout.Width(100));
             GUILayout.Label(action.Name, GUILayout.Width(150));
             GUILayout.EndHorizontal();
+            
+            // Action Id
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Action ID: ", GUILayout.Width(100));
+            GUILayout.Label(action.ActionId.ToString(), GUILayout.Width(150));
+            GUILayout.EndHorizontal();
 
             // Cost
             GUILayout.BeginHorizontal();

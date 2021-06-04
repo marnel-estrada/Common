@@ -23,7 +23,13 @@ namespace CommonEcs {
         public float3 v3;
         public float3 v4;
         
-        public Entity spriteManagerEntity;
+        // Transformed vertices
+        // Used as temporary variable to hold the result when computed in a system
+        // We can't easily assign directly to a mesh while in system
+        public float3 transformedV1;
+        public float3 transformedV2;
+        public float3 transformedV3;
+        public float3 transformedV4;
 
         public Vector2 uv_1;
         public Vector2 uv_2;
@@ -34,14 +40,12 @@ namespace CommonEcs {
         public Vector2 uv2_2;
         public Vector2 uv2_3;
         public Vector2 uv2_4;
+
+        // We store the pivot here so that when we change sprites, we still have the original
+        // pivot value
+        public float2 pivot;
         
-        // Transformed vertices
-        // Used as temporary variable to hold the result when computed in a system
-        // We can't easily assign directly to a mesh while in system
-        public float3 transformedV1;
-        public float3 transformedV2;
-        public float3 transformedV3;
-        public float3 transformedV4;
+        public Entity spriteManagerEntity;
         
         public float width;
         public float height;
@@ -96,7 +100,7 @@ namespace CommonEcs {
         /// </summary>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        public void Init(Entity spriteManagerEntity, float width, float height, float2 pivot) {
+        public void Init(in Entity spriteManagerEntity, float width, float height, float2 pivot) {
             this.spriteManagerEntity = spriteManagerEntity;
             
             this.width = width;
@@ -124,6 +128,7 @@ namespace CommonEcs {
         public void SetLocalVertices(float width, float height, float2 pivot) {
             this.width = width;
             this.height = height;
+            this.pivot = pivot;
             
             float halfWidth = width * 0.5f;
             float halfHeight = height * 0.5f;

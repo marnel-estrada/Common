@@ -43,17 +43,19 @@ namespace CommonEcs.Goap {
         protected abstract TResolverProcessor PrepareProcessor();
         
         [BurstCompile]
-        public struct Job : IJobEntityBatch {
+        public struct Job : IJobEntityBatchWithIndex {
             public ComponentTypeHandle<ConditionResolver> resolverType;
             public ComponentTypeHandle<TResolverFilter> filterType;
             public bool filterHasArray;
             public TResolverProcessor processor;
             
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
+            public void Execute(ArchetypeChunk batchInChunk, int batchIndex, int indexOfFirstEntityInQuery) {
                 NativeArray<ConditionResolver> resolvers = batchInChunk.GetNativeArray(this.resolverType);
                 
                 NativeArray<TResolverFilter> filters = this.filterHasArray ? batchInChunk.GetNativeArray(this.filterType) : default;
                 TResolverFilter defaultFilter = default; // This will be used if TActionFilter has no chunk (it's a tag component)
+                
+                this.processor.BeforeChunkIteration(batchInChunk, batchIndex);
                 
                 int count = batchInChunk.Count;
                 for (int i = 0; i < count; ++i) {
@@ -65,7 +67,7 @@ namespace CommonEcs.Goap {
 
                     if (this.filterHasArray) {
                         TResolverFilter filter = filters[i];
-                        ExecuteResolver(ref resolver, ref filter);
+                        ExecuteResolver(ref resolver, ref filter, indexOfFirstEntityInQuery, i);
                         
                         // Modify
                         resolvers[i] = resolver;
@@ -73,7 +75,7 @@ namespace CommonEcs.Goap {
                     } else {
                         // There's no array for the TResolverFilter. It must be a tag component.
                         // Use a default filter component
-                        ExecuteResolver(ref resolver, ref defaultFilter);
+                        ExecuteResolver(ref resolver, ref defaultFilter, indexOfFirstEntityInQuery, i);
                         
                         // Modify
                         resolvers[i] = resolver;
@@ -81,8 +83,8 @@ namespace CommonEcs.Goap {
                 }
             }
 
-            private void ExecuteResolver(ref ConditionResolver resolver, ref TResolverFilter resolverFilter) {
-                resolver.result = this.processor.IsMet(resolver.agentEntity, ref resolverFilter);
+            private void ExecuteResolver(ref ConditionResolver resolver, ref TResolverFilter resolverFilter, int indexOfFirstEntityInQuery, int iterIndex) {
+                resolver.result = this.processor.IsMet(resolver.agentEntity, ref resolverFilter, indexOfFirstEntityInQuery, iterIndex);
                 resolver.resolved = true;
             }
         }

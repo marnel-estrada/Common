@@ -34,9 +34,16 @@ namespace CommonEcs.Goap {
                 actionFilterHasArray = !this.isActionFilterZeroSized, // Action filter has array if it's not zero sized
                 processor = PrepareProcessor()
             };
-            
-            return this.ShouldScheduleParallel ? 
+
+            JobHandle handle = this.ShouldScheduleParallel ? 
                 job.ScheduleParallel(this.query, 1, inputDeps) : job.Schedule(this.query, inputDeps);
+            AfterJobScheduling(handle);
+
+            return handle;
+        }
+
+        protected virtual void AfterJobScheduling(in JobHandle handle) {
+            // Routines like calling AddJobHandleForProducer() may be placed here
         }
 
         /// <summary>

@@ -66,13 +66,6 @@ namespace CommonEcs {
 
             for (int i = 0; i < chunk.Count; ++i) {
                 AddToSpriteLayer addToLayer = this.addToLayers[i];
-                
-                // Must have a layer entity
-#if UNITY_EDITOR
-                Assertion.IsTrue(addToLayer.layerEntity != Entity.Null, this.entities[i].ToString());
-#else
-                Assertion.IsTrue(addToLayer.layerEntity != Entity.Null);
-#endif
                 if (addToLayer.layerEntity == Entity.Null) {
                     // Might not be prepared yet
                     continue;

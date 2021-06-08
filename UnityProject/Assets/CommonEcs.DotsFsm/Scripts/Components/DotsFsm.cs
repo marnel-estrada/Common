@@ -27,6 +27,13 @@ namespace CommonEcs.DotsFsm {
 
         public void Start(Entity stateEntity) {
             this.startState = ValueTypeOption<Entity>.Some(stateEntity);
+            
+            // We set the currentState to None when we start an FSM to remove the retained value
+            // in currentState. This is because setting the currentState is done in systems.
+            // There may be a case that a code will check the currentState after starting the FSM
+            // and they find out that it still retained the value from the previous runs. This
+            // results to bugs.
+            this.currentState = ValueTypeOption<Entity>.None;
         }
 
         public void SendEvent(in FsmEvent fsmEvent) {

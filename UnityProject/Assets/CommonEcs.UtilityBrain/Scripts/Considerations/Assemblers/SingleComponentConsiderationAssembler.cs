@@ -7,7 +7,11 @@ namespace CommonEcs.UtilityBrain {
         private EntityArchetype archetype;
 
         public override void Init(ref EntityManager entityManager) {
-            this.archetype = entityManager.CreateArchetype(typeof(Consideration), typeof(T));
+            this.archetype = CreateArchetype(ref entityManager);
+        }
+
+        protected virtual EntityArchetype CreateArchetype(ref EntityManager entityManager) {
+            return entityManager.CreateArchetype(typeof(Consideration), typeof(T));
         }
 
         public override Entity Prepare(ref EntityManager entityManager, in Entity agentEntity, in Entity optionEntity, 

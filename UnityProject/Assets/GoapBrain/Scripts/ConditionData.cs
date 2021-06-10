@@ -42,7 +42,7 @@ namespace GoapBrain {
             this.value = value;
         }
 
-        public string Name {
+        public string? Name {
             get {
                 return this.name;
             }

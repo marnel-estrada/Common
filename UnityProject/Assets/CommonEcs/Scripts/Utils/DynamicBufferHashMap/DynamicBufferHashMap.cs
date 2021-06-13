@@ -15,6 +15,7 @@ namespace CommonEcs {
         private int count;
 
         public const int MAX_COUNT = 64;
+        private const int MAX_COUNT_MINUS_ONE = MAX_COUNT - 1;
 
         /// <summary>
         /// This should be called prior to usage so that all of the slots are prepared.
@@ -42,7 +43,9 @@ namespace CommonEcs {
             }
             
             int hashCode = key.GetHashCode();
-            int bucketIndex = FibonacciHash(hashCode);
+            
+            // This is the same as hashCode % MAX_COUNT
+            int bucketIndex = hashCode & MAX_COUNT_MINUS_ONE;
 
             if (!bucket[bucketIndex].HasValue) {
                 // This means that it's an empty slot. We can place the value here.
@@ -104,7 +107,9 @@ namespace CommonEcs {
 
         public void Remove(ref DynamicBuffer<Entry<V>> bucket, in K key) {
             int hashCode = key.GetHashCode();
-            int bucketIndex = FibonacciHash(hashCode);
+            
+            // This is the same as hashCode % MAX_COUNT
+            int bucketIndex = hashCode & MAX_COUNT_MINUS_ONE;
             
             // Check of the slot at the resolve index is already the item
             Entry<V> entry = bucket[bucketIndex];
@@ -131,7 +136,9 @@ namespace CommonEcs {
 
         public readonly ValueTypeOption<V> Find(in DynamicBuffer<Entry<V>> bucket, in K key) {
             int hashCode = key.GetHashCode();
-            int bucketIndex = FibonacciHash(hashCode);
+            
+            // This is the same as hashCode % MAX_COUNT
+            int bucketIndex = hashCode & MAX_COUNT_MINUS_ONE;
             
             // Check if key is already at the resolved index
             Entry<V> entry = bucket[bucketIndex];
@@ -154,7 +161,9 @@ namespace CommonEcs {
 
         public bool Contains(in DynamicBuffer<Entry<V>> bucket, in K key) {
             int hashCode = key.GetHashCode();
-            int bucketIndex = FibonacciHash(hashCode);
+            
+            // This is the same as hashCode % MAX_COUNT
+            int bucketIndex = hashCode & MAX_COUNT_MINUS_ONE;
             
             // Check if key is already at the resolved index
             Entry<V> entry = bucket[bucketIndex];
@@ -192,16 +201,6 @@ namespace CommonEcs {
             
             // We've checked all entries. We can't find a suitable slot.
             return ValueTypeOption<int>.None;
-        }
-        
-        // This is taken from https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/
-        private static int FibonacciHash(int hash) {
-            // This is 2^64 / 1.6180339 (Fibonacci constant)
-            const ulong magicNumber = 11400714819323198485;
-            
-            // We shift 58 bits here as we only need 6 bits (0-63)
-            // Note that the bucket count is 64
-            return (int)(((ulong)hash * magicNumber) >> 58);
         }
         
         public int Count {

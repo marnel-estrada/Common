@@ -3,7 +3,7 @@ using Unity.Entities;
 
 namespace CommonEcs.Goap {
     /// <summary>
-    /// A utility for eas of handling with conditions map which is managed by a DynamicBufferHashMap
+    /// A utility for ease of handling with conditions map which is managed by a DynamicBufferHashMap
     /// </summary>
     public struct ConditionsMap {
         private readonly Entity plannerEntity;

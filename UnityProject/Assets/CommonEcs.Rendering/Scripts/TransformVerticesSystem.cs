@@ -42,7 +42,7 @@ namespace CommonEcs {
                 matrixType = this.matrixType
             };
 
-            return job.Schedule(this.query, inputDeps);
+            return job.ScheduleParallel(this.query, inputDeps);
         }
 
         [BurstCompile]

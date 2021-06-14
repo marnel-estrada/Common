@@ -65,7 +65,7 @@ namespace CommonEcs {
                     lastSystemVersion = this.LastSystemVersion
                 };
 
-                lastHandle = job.Schedule(this.query, lastHandle);
+                lastHandle = job.ScheduleParallel(this.query, lastHandle);
             }
             
             return lastHandle;

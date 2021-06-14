@@ -10,11 +10,6 @@ namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class UseYAsSortOrderSystem : JobComponentSystem {
         private EntityQuery query;
-        private ComponentTypeHandle<Sprite> spriteType;
-        private ComponentTypeHandle<Translation> translationType;
-
-        [ReadOnly]
-        private ComponentTypeHandle<UseYAsSortOrder> useYType;
 
         protected override void OnCreate() {
             this.query = GetEntityQuery(this.ConstructQuery(null, new ComponentType[] {
@@ -24,11 +19,18 @@ namespace CommonEcs {
             }));
         }
 
-        /// <summary>
-        /// Job for ECS sprites
-        /// </summary>
+        protected override JobHandle OnUpdate(JobHandle inputDeps) {
+            Job job = new Job() {
+                spriteType = GetComponentTypeHandle<Sprite>(),
+                translationType = GetComponentTypeHandle<Translation>(true),
+                useYType = GetComponentTypeHandle<UseYAsSortOrder>(true)
+            };
+            
+            return job.ScheduleParallel(this.query, 1, inputDeps);
+        }
+        
         [BurstCompile]
-        private struct Job : IJobParallelFor {
+        private struct Job : IJobEntityBatch {
             public ComponentTypeHandle<Sprite> spriteType;
             
             [ReadOnly]
@@ -36,22 +38,13 @@ namespace CommonEcs {
             
             [ReadOnly]
             public ComponentTypeHandle<UseYAsSortOrder> useYType;
-
-            [ReadOnly]
-            [DeallocateOnJobCompletion]
-            public NativeArray<ArchetypeChunk> chunks;
             
-            public void Execute(int index) {
-                ArchetypeChunk chunk = this.chunks[index];
-                Process(ref chunk);                
-            }
+            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
+                NativeArray<Sprite> sprites = batchInChunk.GetNativeArray(this.spriteType);
+                NativeArray<Translation> translations = batchInChunk.GetNativeArray(this.translationType);
+                NativeArray<UseYAsSortOrder> useYArray = batchInChunk.GetNativeArray(this.useYType);
 
-            private void Process(ref ArchetypeChunk chunk) {
-                NativeArray<Sprite> sprites = chunk.GetNativeArray(this.spriteType);
-                NativeArray<Translation> translations = chunk.GetNativeArray(this.translationType);
-                NativeArray<UseYAsSortOrder> useYArray = chunk.GetNativeArray(this.useYType);
-
-                for (int i = 0; i < chunk.Count; ++i) {
+                for (int i = 0; i < batchInChunk.Count; ++i) {
                     UseYAsSortOrder useY = useYArray[i];
                     
                     // We set the order by modifying the z position
@@ -64,22 +57,6 @@ namespace CommonEcs {
                     sprites[i] = sprite; // Modify
                 }
             }
-        }
-
-        protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            this.spriteType = GetComponentTypeHandle<Sprite>();
-            this.translationType = GetComponentTypeHandle<Translation>();
-            this.useYType = GetComponentTypeHandle<UseYAsSortOrder>(true);
-            NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
-            
-            Job job = new Job() {
-                spriteType = this.spriteType,
-                translationType = this.translationType,
-                useYType = this.useYType,
-                chunks = chunks
-            };
-            
-            return job.Schedule(chunks.Length, 64, inputDeps);
         }
     }
 }

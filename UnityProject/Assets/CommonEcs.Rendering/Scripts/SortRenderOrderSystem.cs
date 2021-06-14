@@ -46,7 +46,7 @@ namespace CommonEcs {
                     sortList = entries
                 };
 
-                lastHandle = addJob.Schedule(this.query, lastHandle);
+                lastHandle = addJob.ScheduleParallel(this.query, lastHandle);
                 
                 // Sort
                 lastHandle = MultithreadedSort.Sort(entries, lastHandle);

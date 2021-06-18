@@ -1,18 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using UnityEngine;
-
-namespace Common {
+﻿namespace Common {
     /// <summary>
     /// Abstract base class for objects that can query a game variable
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public abstract class GameVariable<T> {
-
         private readonly string key;
         private bool valueResolved;
         private T value;
@@ -37,5 +28,11 @@ namespace Common {
         // Resolves the value of the specified key
         protected abstract T ResolveValue(string key);
 
+        /// <summary>
+        /// This is called to disable domain reload
+        /// </summary>
+        public void Reset() {
+            this.valueResolved = false;
+        }
     }
 }

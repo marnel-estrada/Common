@@ -285,6 +285,10 @@ namespace CommonEcs {
                     return this.hashCode != 0;
                 }
             }
+
+            public Entry<V> WithOtherValue(in V otherValue) {
+                return Entry<V>.Something(this.hashCode, otherValue); 
+            }
         }
     }
 }

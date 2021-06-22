@@ -286,8 +286,8 @@ namespace CommonEcs {
                 }
             }
 
-            public Entry<V> WithOtherValue(in V otherValue) {
-                return Entry<V>.Something(this.hashCode, otherValue); 
+            public Entry<V> WithValue(in V newValue) {
+                return Entry<V>.Something(this.hashCode, newValue); 
             }
         }
     }

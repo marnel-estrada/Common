@@ -5,7 +5,6 @@ using Unity.Mathematics;
 using Common;
 
 namespace CommonEcs {
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class Grid2dSystem : ComponentSystem {
         private EntityQuery query;
         private ComponentTypeHandle<Grid2D> gridType;

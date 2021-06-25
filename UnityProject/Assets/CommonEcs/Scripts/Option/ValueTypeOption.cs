@@ -19,14 +19,14 @@ namespace CommonEcs {
             }
         }
         
-        public static ValueTypeOption<T> Some(T value) {
+        public static ValueTypeOption<T> Some(in T value) {
             return new ValueTypeOption<T>(value);
         }
         
         private readonly T value;
         private readonly byte hasValue;
 
-        private ValueTypeOption(T value) {
+        private ValueTypeOption(in T value) {
             this.value = value;
             this.hasValue = 1;
         }

@@ -115,11 +115,10 @@ namespace CommonEcs {
             // At this point, the entry at the resolved index is a different item
             // Let's linear probe for the item
             // We pass true as we only check slots with values.
-            ValueTypeOption<int> probedIndex = LinearProbeForExistingEntry(bucket, hashCode, bucketIndex + 1);
-            if (probedIndex.IsSome) {
-                // We found the item
-                int probedIndexValue = probedIndex.ValueOr(-1);
-                bucket[probedIndexValue] = Entry<V>.Nothing;
+            int probedIndex = LinearProbeForExistingEntry(bucket, hashCode, bucketIndex + 1);
+            if (probedIndex >= 0) {
+                // We found the item as the found index is not negative
+                bucket[probedIndex] = Entry<V>.Nothing;
                 --this.count;
             }
             
@@ -141,10 +140,9 @@ namespace CommonEcs {
             
             // At this point, the item in bucketIndex is a different item.
             // Let's do a linear probe
-            ValueTypeOption<int> probedIndex = LinearProbeForExistingEntry(bucket, hashCode, bucketIndex + 1);
-            if (probedIndex.IsSome) {
-                int probedIndexValue = probedIndex.ValueOr(-1);
-                return ValueTypeOption<V>.Some(bucket[probedIndexValue].Value);
+            int probedIndex = LinearProbeForExistingEntry(bucket, hashCode, bucketIndex + 1);
+            if (probedIndex >= 0) {
+                return ValueTypeOption<V>.Some(bucket[probedIndex].Value);
             }
             
             // At this point, we didn't find the item
@@ -166,10 +164,10 @@ namespace CommonEcs {
             
             // At this point, the item in bucketIndex is a different item.
             // Let's do a linear probe
-            ValueTypeOption<int> probedIndex = LinearProbeForExistingEntry(bucket, hashCode, bucketIndex + 1);
+            int probedIndex = LinearProbeForExistingEntry(bucket, hashCode, bucketIndex + 1);
 
-            // The hashmap contains the value if we found it during linear probing
-            return probedIndex.IsSome;
+            // The hashmap contains the value if it's not negative
+            return probedIndex >= 0;
         }
         
         /// <summary>
@@ -179,7 +177,7 @@ namespace CommonEcs {
         /// <param name="hashCode"></param>
         /// <param name="startingIndex"></param>
         /// <returns></returns>
-        private readonly ValueTypeOption<int> LinearProbeForExistingEntry(in DynamicBuffer<Entry<V>> bucket, int hashCode, int startingIndex) {
+        private readonly int LinearProbeForExistingEntry(in DynamicBuffer<Entry<V>> bucket, int hashCode, int startingIndex) {
             for (int i = 0; i < MAX_COUNT; ++i) {
                 // Note here that we go back to zero when we hit the max count
                 // In other words, it continues to search from the start of the bucket
@@ -187,12 +185,13 @@ namespace CommonEcs {
                 
                 Entry<V> entry = bucket[checkIndex];
                 if (entry.HasValue && entry.HashCode == hashCode) {
-                    return ValueTypeOption<int>.Some(checkIndex);
+                    return checkIndex;
                 }
             }
             
             // We've checked all entries. We can't find a suitable slot.
-            return ValueTypeOption<int>.None;
+            // We return a negative index to denote that we didn't find a suitable slot.
+            return -1;
         }
         
         public int Count {

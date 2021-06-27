@@ -66,19 +66,11 @@ namespace CommonEcs {
             // At this point, the item at the resolved index is a different item
             // Let's do linear probing
             // Note here that we start on the next index because bucketIndex is already checked
-            ValueTypeOption<int> probedIndex = LinearProbeForAdding(bucket, hashCode, bucketIndex + 1);
-            if(probedIndex.IsSome) {
-                // We pass -1 here to cause an array index exception if probedIndex turned out to be a None
-                int probedIndexValue = probedIndex.ValueOr(-1);
-                bucket[probedIndexValue] = Entry<V>.Something(hashCode, value);
-                ++this.count;
+            int probedIndex = LinearProbeForAdding(bucket, hashCode, bucketIndex + 1);
+            bucket[probedIndex] = Entry<V>.Something(hashCode, value);
+            ++this.count;
 
-                return probedIndexValue;
-            }
-            
-            // At this point, the returned probed index is a none
-            // This means that the bucket is full.
-            throw new Exception("Bucket is full");
+            return probedIndex;
         }
         
         /// <summary>
@@ -88,21 +80,21 @@ namespace CommonEcs {
         /// <param name="hashCode"></param>
         /// <param name="startingIndex"></param>
         /// <returns></returns>
-        private ValueTypeOption<int> LinearProbeForAdding(in DynamicBuffer<Entry<V>> bucket, int hashCode, int startingIndex) {
+        private readonly int LinearProbeForAdding(in DynamicBuffer<Entry<V>> bucket, int hashCode, int startingIndex) {
             for (int i = 0; i < MAX_COUNT; ++i) {
                 // Note here that we go back to zero when we hit the max count
                 // In other words, it continues to search from the start of the bucket
                 // Using bitwise operator is faster instead of using modulo
-                int checkIndex = (startingIndex + i) & ~MAX_COUNT;
-                
+                int checkIndex = (startingIndex + i) & MAX_COUNT_MINUS_ONE;
+            
                 Entry<V> entry = bucket[checkIndex];
                 if (!entry.HasValue || entry.HashCode == hashCode) {
-                    return ValueTypeOption<int>.Some(checkIndex);
+                    return checkIndex;
                 }
             }
-            
+        
             // We've checked all entries. We can't find a suitable slot.
-            return ValueTypeOption<int>.None;
+            throw new Exception("Bucket is full. Can't find an empty or an existing slot with the same hash code.");
         }
 
         public void Remove(ref DynamicBuffer<Entry<V>> bucket, in K key) {

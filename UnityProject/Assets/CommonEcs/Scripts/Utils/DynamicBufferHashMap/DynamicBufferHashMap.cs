@@ -114,7 +114,6 @@ namespace CommonEcs {
             
             // At this point, the entry at the resolved index is a different item
             // Let's linear probe for the item
-            // We pass true as we only check slots with values.
             int probedIndex = LinearProbeForExistingEntry(bucket, hashCode, bucketIndex + 1);
             if (probedIndex >= 0) {
                 // We found the item as the found index is not negative

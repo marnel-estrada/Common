@@ -8,7 +8,7 @@ namespace Common.Xml {
     public class SimpleXmlNode {
         public delegate void NodeProcessor(SimpleXmlNode node);
 
-        private const string YES = "yes";
+        private const string YES = "y";
         private const string TRUE = "true";
         private readonly Dictionary<string, string> attributes;
         private readonly List<SimpleXmlNode> children;
@@ -87,6 +87,14 @@ namespace Common.Xml {
             }
 
             return uint.Parse(GetAttribute(attributeKey), NumberFormatInfo.InvariantInfo);
+        }
+        
+        public byte GetAttributeAsByte(string attributeKey) {
+            if (!ContainsAttribute(attributeKey)) {
+                return 0;
+            }
+
+            return byte.Parse(GetAttribute(attributeKey), NumberFormatInfo.InvariantInfo);
         }
 
         /**

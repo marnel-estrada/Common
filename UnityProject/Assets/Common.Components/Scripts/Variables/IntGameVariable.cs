@@ -3,7 +3,6 @@
     /// A utility class that caches an int game variable
     /// </summary>
     public class IntGameVariable : GameVariable<int> {
-
         /// <summary>
         /// Constructor
         /// </summary>
@@ -14,6 +13,5 @@
         protected override int ResolveValue(string key) {
             return GameVariablesQuery.GetInt(key);
         }
-
     }
 }

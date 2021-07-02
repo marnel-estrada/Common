@@ -12,15 +12,15 @@ namespace Common {
 
         [Tooltip("Relative to StreamingAssets")]
         [SerializeField]
-        private string gameVarXmlPath;
+        private string? gameVarXmlPath;
 
         [SerializeField]
-        private TextAsset nonStreamingSource;
+        private TextAsset? nonStreamingSource;
 
         [SerializeField]
-        private GameVariableOverrideResolver overrideResolver; // May be null
+        private GameVariableOverrideResolver? overrideResolver; // May be null
 
-        private GameVariableSet defaultVariables;
+        private readonly GameVariableSet defaultVariables = new GameVariableSet();
 
         private void Awake() {
             Assertion.NotEmpty(this.gameVarXmlPath);
@@ -37,10 +37,6 @@ namespace Common {
         }
 
         private void PopulateVariables() {
-            if (this.defaultVariables == null) {
-                this.defaultVariables = new GameVariableSet();
-            }
-
             Parse();
         }
 
@@ -58,6 +54,10 @@ namespace Common {
                 xmlText = File.ReadAllText(xmlPath);
             } else {
                 // Not using the streaming source (the secret one)
+                if (this.nonStreamingSource == null) {
+                    throw new CantBeNullException(nameof(this.nonStreamingSource));
+                }
+                
                 xmlText = this.nonStreamingSource.text;
             }
 
@@ -89,7 +89,7 @@ namespace Common {
         } 
 
         private void ParseOverride(SimpleXmlNode root, string overrideToUse) {
-            SimpleXmlNode overrideNode = null;
+            SimpleXmlNode? overrideNode = null;
 
             for (int i = 0; i < root.Children.Count; ++i) {
                 SimpleXmlNode child = root.Children[i];
@@ -139,7 +139,7 @@ namespace Common {
         }
 
         private bool HasVariables() {
-            return this.defaultVariables != null && this.defaultVariables.Count > 0;
+            return this.defaultVariables.Count > 0;
         }
 
         /**
@@ -179,7 +179,9 @@ namespace Common {
 
             if (TRUE.Equals(rawBool)) {
                 return true;
-            } else if (FALSE.Equals(rawBool)) {
+            } 
+            
+            if (FALSE.Equals(rawBool)) {
                 return false;
             }
 

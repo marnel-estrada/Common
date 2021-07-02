@@ -52,5 +52,11 @@ namespace CommonEcs.DotsFsm {
             
             SendEvent(new FsmEvent(eventAsString));
         }
+
+        public void Stop() {
+            // To stop, we just set the currentState to None. By doing this, IdentifyRunningActionsSystem
+            // won't be able to tell which action entities should run.
+            this.currentState = ValueTypeOption<Entity>.None;
+        }
     }
 }

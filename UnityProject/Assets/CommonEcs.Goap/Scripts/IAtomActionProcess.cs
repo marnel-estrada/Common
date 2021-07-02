@@ -34,5 +34,15 @@ namespace CommonEcs.Goap {
         /// <param name="iterIndex"></param>
         /// <returns></returns>
         GoapResult Update(ref AtomAction atomAction, ref T actionComponent, int indexOfFirstEntityInQuery, int iterIndex);
+
+        /// <summary>
+        /// Cleanup routine.
+        /// Reverting to previous state when action fails or succeeds can be executed here.
+        /// </summary>
+        /// <param name="atomAction"></param>
+        /// <param name="actionComponent"></param>
+        /// <param name="indexOfFirstEntityInQuery"></param>
+        /// <param name="iterIndex"></param>
+        void Cleanup(ref AtomAction atomAction, ref T actionComponent, int indexOfFirstEntityInQuery, int iterIndex);
     }
 }

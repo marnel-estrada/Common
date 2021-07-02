@@ -38,7 +38,7 @@ namespace CommonEcs.Goap {
                 // We also reset other values here to ensure that they are in correct values
                 // such they would replan again
                 agent.lastResult = GoapResult.FAILED;
-                agent.state = AgentState.IDLE;
+                agent.state = AgentState.CLEANUP;
                 
                 agent.replanRequested = false;
             }).ScheduleParallel(handle);

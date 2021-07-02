@@ -32,7 +32,8 @@ namespace CommonEcs.Goap {
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
                 actionFilterType = GetComponentTypeHandle<TActionFilter>(),
                 actionFilterHasArray = !this.isActionFilterZeroSized, // Action filter has array if it's not zero sized
-                processor = PrepareProcessor()
+                processor = PrepareProcessor(),
+                allAgents = GetComponentDataFromEntity<GoapAgent>()
             };
 
             JobHandle handle = this.ShouldScheduleParallel ? 
@@ -65,6 +66,9 @@ namespace CommonEcs.Goap {
             public ComponentTypeHandle<TActionFilter> actionFilterType;
             public bool actionFilterHasArray;
             public TProcessor processor;
+
+            [ReadOnly]
+            public ComponentDataFromEntity<GoapAgent> allAgents;
             
             public void Execute(ArchetypeChunk batchInChunk, int batchIndex, int indexOfFirstEntityInQuery) {
                 NativeArray<AtomAction> atomActions = batchInChunk.GetNativeArray(this.atomActionType);
@@ -75,6 +79,13 @@ namespace CommonEcs.Goap {
                 int count = batchInChunk.Count;
                 for (int i = 0; i < count; ++i) {
                     AtomAction atomAction = atomActions[i];
+                    GoapAgent agent = this.allAgents[atomAction.agentEntity];
+                    if (agent.state == AgentState.CLEANUP) {
+                        // Time to cleanup
+                        Cleanup(ref atomAction, ref atomActions, ref filterActions, indexOfFirstEntityInQuery, i);
+                        continue;
+                    }
+                    
                     if (!atomAction.canExecute) {
                         // The current atom action cannot execute yet
                         // Or not yet time to execute
@@ -97,6 +108,23 @@ namespace CommonEcs.Goap {
                         atomActions[i] = atomAction;
                     }
                 }
+            }
+
+            private void Cleanup(ref AtomAction atomAction, ref NativeArray<AtomAction> atomActions, ref NativeArray<TActionFilter> filterActions, int indexOfFirstEntityInQuery, int index) {
+                if (this.actionFilterHasArray) {
+                    TActionFilter actionFilter = filterActions[index];
+                    this.processor.Cleanup(ref atomAction, ref actionFilter, indexOfFirstEntityInQuery, index);
+                    
+                    // Modify
+                    filterActions[index] = actionFilter;
+                } else {
+                    // Filter action has no data. Only a tag. We pass default.
+                    TActionFilter actionFilter = default;
+                    this.processor.Cleanup(ref atomAction, ref actionFilter, indexOfFirstEntityInQuery, index);
+                }
+                
+                // Modify
+                atomActions[index] = atomAction;
             }
 
             private void ExecuteAction(ref AtomAction atomAction, ref TActionFilter actionFilter, int indexOfFirstEntityInQuery, int index) {

@@ -76,8 +76,8 @@ namespace CommonEcs.Goap {
             this.replanRequested = true;
             this.lastResult = GoapResult.FAILED;
             
-            // We set to Idle so agent will plan on the next frame
-            this.state = AgentState.IDLE;
+            // We set to Cleanup so actions have a chance to cleanup before planning again
+            this.state = AgentState.CLEANUP;
         }
     }
 }

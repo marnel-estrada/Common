@@ -24,22 +24,31 @@ namespace CommonEcs.Goap {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
+            ComponentTypeHandle<GoapAgent> agentType = GetComponentTypeHandle<GoapAgent>();
+            
+            ChangeStateFromCleanupToIdleJob changeFromCleanupToIdleJob = new ChangeStateFromCleanupToIdleJob() {
+                agentType = agentType
+            };
+            JobHandle handle = changeFromCleanupToIdleJob.ScheduleParallel(this.agentsQuery, 1, inputDeps);
+
+            ComponentDataFromEntity<GoapAgent> allAgents = GetComponentDataFromEntity<GoapAgent>();
+            
             ProcessAtomActionsJob processAtomActionsJob = new ProcessAtomActionsJob() {
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
-                allAgents = GetComponentDataFromEntity<GoapAgent>()
+                allAgents = allAgents
             };
-            JobHandle handle = processAtomActionsJob.ScheduleParallel(this.atomActionsQuery, 1, inputDeps);
+            handle = processAtomActionsJob.ScheduleParallel(this.atomActionsQuery, 1, handle);
             
             // We try to reset the goal index first so that GoapAgent.state remains Executing.
             // Note that it is set to Idle in MoveToNextActionJob when last action failed or ended
             ResetPlannerGoalIndexJob resetGoalIndexJob = new ResetPlannerGoalIndexJob() {
                 plannerType = GetComponentTypeHandle<GoapPlanner>(), 
-                allAgents = GetComponentDataFromEntity<GoapAgent>()
+                allAgents = allAgents
             };
             handle = resetGoalIndexJob.ScheduleParallel(this.plannersQuery, 1, handle);
 
             MoveToNextActionJob moveToNextActionJob = new MoveToNextActionJob() {
-                agentType = GetComponentTypeHandle<GoapAgent>(), 
+                agentType = agentType, 
                 allActionSets = GetBufferFromEntity<ResolvedAction>()
             };
             handle = moveToNextActionJob.ScheduleParallel(this.agentsQuery, 1, handle);
@@ -47,6 +56,34 @@ namespace CommonEcs.Goap {
             return handle;
         }
         
+        /// <summary>
+        /// This is the system that changes the agent state from Cleanup to Idle
+        /// We added Cleanup state so that actions have a chance to revert state after agent
+        /// has completed executing an action.
+        ///
+        /// We execute this first to mark that the agent's actions have finished cleanup and can
+        /// proceed to planning. Note that the jobs after this are the ones setting the state to
+        /// Cleanup. After one frame, atom actions should have already executed their cleanup.
+        /// </summary>
+        [BurstCompile]
+        private struct ChangeStateFromCleanupToIdleJob : IJobEntityBatch {
+            public ComponentTypeHandle<GoapAgent> agentType;
+        
+            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
+                NativeArray<GoapAgent> agents = batchInChunk.GetNativeArray(this.agentType);
+                for (int i = 0; i < agents.Length; ++i) {
+                    GoapAgent agent = agents[i];
+                    if (agent.state != AgentState.CLEANUP) {
+                        // Not yet cleaning up. Skip.
+                        continue;
+                    }
+
+                    agent.state = AgentState.IDLE;
+                    agents[i] = agent; // Modify
+                } 
+            }
+        }
+
         /// <summary>
         /// Routines like setting AtomAction.executing and setting GoapAgent.lastResult is done here
         /// </summary>
@@ -85,67 +122,6 @@ namespace CommonEcs.Goap {
         }
         
         [BurstCompile]
-        private struct MoveToNextActionJob : IJobEntityBatch {
-            public ComponentTypeHandle<GoapAgent> agentType;
-
-            [ReadOnly]
-            public BufferFromEntity<ResolvedAction> allActionSets;
-            
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<GoapAgent> agents = batchInChunk.GetNativeArray(this.agentType);
-                for (int i = 0; i < agents.Length; ++i) {
-                    GoapAgent agent = agents[i];
-                    if (agent.state != AgentState.EXECUTING) {
-                        // Skip agents that are not executing
-                        continue;
-                    }
-
-                    if (agent.lastResult == GoapResult.RUNNING) {
-                        // Can't move or bail if the last result was running
-                        continue;
-                    }
-
-                    if (agent.lastResult == GoapResult.FAILED) {
-                        // Bail the subsequent actions
-                        // Agent should replan again
-                        agent.state = AgentState.IDLE;
-                    }
-
-                    if (agent.lastResult == GoapResult.SUCCESS) {
-                        MoveToNextAction(ref agent);
-                    }
-                    
-                    // Modify
-                    agents[i] = agent;
-                }
-            }
-
-            private void MoveToNextAction(ref GoapAgent agent) {
-                DynamicBuffer<ResolvedAction> actionSet = this.allActionSets[agent.plannerEntity];
-                ResolvedAction currentAction = actionSet[agent.currentActionIndex];
-                ++agent.currentAtomActionIndex;
-                if (agent.currentAtomActionIndex < currentAction.atomActionCount) {
-                    // This means that there are still more atoms to execute
-                    // We can't move to the next action
-                    return;
-                }
-
-                // At this point, it means that we've reached the end of the atom actions of the action
-                // We move to the next action
-                ++agent.currentActionIndex;
-                if (agent.currentActionIndex >= actionSet.Length) {
-                    // This means that there are no more actions to execute
-                    // Execution is done. We set state to Idle so that the agent will plan again.
-                    agent.state = AgentState.IDLE;
-                    return;
-                }
-
-                // We set to zero here as it is a new action to execute
-                agent.currentAtomActionIndex = 0;
-            }
-        }
-
-        [BurstCompile]
         private struct ResetPlannerGoalIndexJob : IJobEntityBatch {
             public ComponentTypeHandle<GoapPlanner> plannerType;
 
@@ -174,6 +150,67 @@ namespace CommonEcs.Goap {
                         planners[i] = planner;
                     }
                 }
+            }
+        }
+        
+        [BurstCompile]
+        private struct MoveToNextActionJob : IJobEntityBatch {
+            public ComponentTypeHandle<GoapAgent> agentType;
+
+            [ReadOnly]
+            public BufferFromEntity<ResolvedAction> allActionSets;
+            
+            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
+                NativeArray<GoapAgent> agents = batchInChunk.GetNativeArray(this.agentType);
+                for (int i = 0; i < agents.Length; ++i) {
+                    GoapAgent agent = agents[i];
+                    if (agent.state != AgentState.EXECUTING) {
+                        // Skip agents that are not executing
+                        continue;
+                    }
+
+                    if (agent.lastResult == GoapResult.RUNNING) {
+                        // Can't move or bail if the last result was running
+                        continue;
+                    }
+
+                    if (agent.lastResult == GoapResult.FAILED) {
+                        // Bail the subsequent actions
+                        // Agent should replan again
+                        agent.state = AgentState.CLEANUP;
+                    }
+
+                    if (agent.lastResult == GoapResult.SUCCESS) {
+                        MoveToNextAction(ref agent);
+                    }
+                    
+                    // Modify
+                    agents[i] = agent;
+                }
+            }
+
+            private void MoveToNextAction(ref GoapAgent agent) {
+                DynamicBuffer<ResolvedAction> actionSet = this.allActionSets[agent.plannerEntity];
+                ResolvedAction currentAction = actionSet[agent.currentActionIndex];
+                ++agent.currentAtomActionIndex;
+                if (agent.currentAtomActionIndex < currentAction.atomActionCount) {
+                    // This means that there are still more atoms to execute
+                    // We can't move to the next action
+                    return;
+                }
+
+                // At this point, it means that we've reached the end of the atom actions of the action
+                // We move to the next action
+                ++agent.currentActionIndex;
+                if (agent.currentActionIndex >= actionSet.Length) {
+                    // This means that there are no more actions to execute
+                    // Execution is done. We set state to Cleanup so that the agent will plan again.
+                    agent.state = AgentState.CLEANUP;
+                    return;
+                }
+
+                // We set to zero here as it is a new action to execute
+                agent.currentAtomActionIndex = 0;
             }
         }
     }

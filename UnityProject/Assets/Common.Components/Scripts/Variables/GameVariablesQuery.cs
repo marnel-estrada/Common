@@ -5,7 +5,6 @@ namespace Common {
 	 * Wraps a GameVariable through queries
 	 */
     public class GameVariablesQuery : MonoBehaviour {
-
         [SerializeField]
         private GameVariables gameVariables;
         
@@ -72,6 +71,5 @@ namespace Common {
         public static bool GetBool(string key) {
             return GET_BOOL_GAME_VARIABLE.Execute(key);
         }
-
     }
 }

@@ -90,7 +90,7 @@ namespace Common {
             }
         }
 
-        private bool HasRenderer(PropertyInfo property) {
+        private static bool HasRenderer(PropertyInfo property) {
             // Check if property has a custom renderer
             Common.PropertyRenderer? propertyRenderer = TypeUtils.GetCustomAttribute<Common.PropertyRenderer>(property);
             
@@ -142,18 +142,29 @@ namespace Common {
                 RenderReadOnly(property, instance);
             }
         }
-
-        private Action<EditorPropertyRenderer>? customRenderMatcher;
         
         private void CustomRender(PropertyInfo property, object instance, Common.PropertyRenderer propRenderer) {
             Option<EditorPropertyRenderer> resolvedRenderer = ResolveRenderer(propRenderer.RendererType);
             Assertion.IsSome(resolvedRenderer);
 
-            this.customRenderMatcher ??= delegate(EditorPropertyRenderer renderer) {
-                renderer.Render(property, instance);
-            };
+            resolvedRenderer.Match(new CustomRenderPropertyMatcher(property, instance));
+        }
 
-            resolvedRenderer.Match(this.customRenderMatcher);
+        private readonly struct CustomRenderPropertyMatcher : IOptionMatcher<EditorPropertyRenderer> {
+            private readonly PropertyInfo property;
+            private readonly object instance;
+
+            public CustomRenderPropertyMatcher(PropertyInfo property, object instance) {
+                this.property = property;
+                this.instance = instance;
+            }
+
+            public void OnSome(EditorPropertyRenderer renderer) {
+                renderer.Render(this.property, instance);
+            }
+
+            public void OnNone() {
+            }
         }
 
         private readonly struct CreateEditorPropertyRendererMatcher : IFuncOptionMatcher<Type, Option<EditorPropertyRenderer>> {

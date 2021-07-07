@@ -59,7 +59,6 @@ namespace CommonEcs {
             if (bucket[bucketIndex].HashCode == hashCode) {
                 // It's the same item. Let's replace the value.
                 bucket[bucketIndex] = Entry<V>.Something(hashCode, value);
-                ++this.count;
                 return bucketIndex;
             }
             

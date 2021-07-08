@@ -5,7 +5,7 @@ namespace CommonEcs {
     /// A bit array that wraps an int which has 4 bytes (32 bits so 32 slots)
     /// </summary>
     public struct BitArray32 {
-        private int bitArray;
+        private int internalValue;
 
         private const int MAX = 32;
 
@@ -15,7 +15,7 @@ namespace CommonEcs {
                     throw new Exception("Invalid index");
                 }
                 
-                return (this.bitArray & (1 << index)) != 0;
+                return (this.internalValue & (1 << index)) != 0;
             }
 
             set {
@@ -25,17 +25,23 @@ namespace CommonEcs {
                 
                 if (value) {
                     // Turn on bit
-                    this.bitArray |= 1 << index;
+                    this.internalValue |= 1 << index;
                 } else {
                     // Turn off bit
                     int mask = ~(1 << index);
-                    this.bitArray &= mask;
+                    this.internalValue &= mask;
                 }
             }
         }
 
+        public int InternalValue {
+            get {
+                return this.internalValue;
+            }
+        }
+
         public void Clear() {
-            this.bitArray = 0;
+            this.internalValue = 0;
         }
     }
 }

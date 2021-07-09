@@ -49,8 +49,8 @@ namespace CommonEcs {
                     
                     // We set the order by modifying the RenderOrder
                     // The higher the y, the lower its RenderOrder. It will be rendered earlier (painter's algorithm).
-                    // Note here that we used the position from LocalToWorld so that entities that are children
-                    // will get their actual world position
+                    // Note here that we used the position from LocalToWorld instead of Translation so that entities
+                    // that are children will get their actual world position
                     LocalToWorld localToWorld = localToWorldList[i];
     
                     // We use negative of y here because the higher y should be ordered first

@@ -2,6 +2,7 @@
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
 using Unity.Transforms;
 
 namespace CommonEcs {
@@ -15,7 +16,7 @@ namespace CommonEcs {
             this.query = GetEntityQuery(this.ConstructQuery(null, new ComponentType[] {
                 typeof(Static)
             }, new ComponentType[] {
-                typeof(Sprite), typeof(Translation), typeof(UseYAsSortOrder)
+                typeof(Sprite), typeof(Translation), typeof(LocalToWorld), typeof(UseYAsSortOrder)
             }));
         }
 
@@ -23,6 +24,7 @@ namespace CommonEcs {
             Job job = new Job() {
                 spriteType = GetComponentTypeHandle<Sprite>(),
                 translationType = GetComponentTypeHandle<Translation>(true),
+                localToWorldType = GetComponentTypeHandle<LocalToWorld>(true),
                 useYType = GetComponentTypeHandle<UseYAsSortOrder>(true)
             };
             
@@ -35,6 +37,9 @@ namespace CommonEcs {
             
             [ReadOnly]
             public ComponentTypeHandle<Translation> translationType;
+
+            [ReadOnly]
+            public ComponentTypeHandle<LocalToWorld> localToWorldType;
             
             [ReadOnly]
             public ComponentTypeHandle<UseYAsSortOrder> useYType;
@@ -42,18 +47,23 @@ namespace CommonEcs {
             public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
                 NativeArray<Sprite> sprites = batchInChunk.GetNativeArray(this.spriteType);
                 NativeArray<Translation> translations = batchInChunk.GetNativeArray(this.translationType);
+                NativeArray<LocalToWorld> localToWorldList = batchInChunk.GetNativeArray(this.localToWorldType);
                 NativeArray<UseYAsSortOrder> useYArray = batchInChunk.GetNativeArray(this.useYType);
 
                 for (int i = 0; i < batchInChunk.Count; ++i) {
                     UseYAsSortOrder useY = useYArray[i];
                     
                     // We set the order by modifying the z position
-                    // The higher the y, the higher it's z. It will be rendered first (painter's algorithm). 
+                    // The higher the y, the higher it's z. It will be rendered first (painter's algorithm).
+                    // Note here that we used the transformed position so that entities that are children
+                    // will get their actual world position
                     Translation translation = translations[i];
+                    LocalToWorld localToWorld = localToWorldList[i];
+                    float4 transformed = math.mul(localToWorld.Value, new float4(translation.Value, 1));
     
-                    // We use negative of z here because the higher z should be ordered first
+                    // We use negative of y here because the higher y should be ordered first
                     Sprite sprite = sprites[i];
-                    sprite.RenderOrder = -(translation.Value.y + useY.offset);
+                    sprite.RenderOrder = -(transformed.y + useY.offset);
                     sprites[i] = sprite; // Modify
                 }
             }

@@ -22,13 +22,13 @@ namespace CommonEcs {
             this.values[index] = true; // Maintain tag as a bit mask
         }
 
-        public bool Contains(in TagSet tagSet, int tagHashCode) {
+        public readonly bool Contains(in TagSet tagSet, int tagHashCode) {
             DotsAssert.IsTrue(tagSet.id == this.tagSetId); // Ensure that we don't use another TagSet
             int index = tagSet.GetIndex(tagHashCode);
             return this.values[index];
         }
 
-        public bool Contains(in TagSet tagSet, in Tags tagsToCheck) {
+        public readonly bool Contains(in TagSet tagSet, in Tags tagsToCheck) {
             DotsAssert.IsTrue(tagSet.id == this.tagSetId); // Ensure that we don't use another TagSet
             DotsAssert.IsTrue(tagSet.id == tagsToCheck.tagSetId); // Ensure that we don't use another TagSet
             

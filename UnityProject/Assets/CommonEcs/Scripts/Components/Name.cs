@@ -27,7 +27,10 @@ namespace CommonEcs {
         /// <param name="owner"></param>
         /// <param name="name"></param>
         public static void SetupName(ref EntityManager entityManager, Entity owner, FixedString64 name) {
+#if UNITY_EDITOR
+            // We use compiler directive because SetName() is only available on editor
             entityManager.SetName(owner, name.ToString());
+#endif
 
             Entity nameEntity = entityManager.CreateEntity(NAME_ARCHETYPE);
             entityManager.SetComponentData(nameEntity, new Name(name));
@@ -79,7 +82,11 @@ namespace CommonEcs {
         /// <param name="owner"></param>
         /// <param name="name"></param>
         public static void SetName(ref EntityManager entityManager, Entity owner, FixedString64 name) {
+#if UNITY_EDITOR
+            // We use compiler directive because SetName() is only available on editor
             entityManager.SetName(owner, name.ToString());
+#endif
+            
             NameReference nameReference = entityManager.GetComponentData<NameReference>(owner);
             entityManager.SetComponentData(nameReference.nameEntity, new Name(name));
         }

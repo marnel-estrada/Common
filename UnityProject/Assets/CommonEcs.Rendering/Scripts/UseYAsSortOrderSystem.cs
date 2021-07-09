@@ -53,8 +53,8 @@ namespace CommonEcs {
                 for (int i = 0; i < batchInChunk.Count; ++i) {
                     UseYAsSortOrder useY = useYArray[i];
                     
-                    // We set the order by modifying the z position
-                    // The higher the y, the higher it's z. It will be rendered first (painter's algorithm).
+                    // We set the order by modifying the RenderOrder
+                    // The higher the y, the lower its RenderOrder. It will be rendered earlier (painter's algorithm).
                     // Note here that we used the transformed position so that entities that are children
                     // will get their actual world position
                     Translation translation = translations[i];

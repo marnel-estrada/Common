@@ -24,7 +24,7 @@ namespace CommonEcs {
             return this;
         }
 
-        public EntityQueryDescBuilder WithReadOnly<T>() where T : unmanaged, IComponentData {
+        public EntityQueryDescBuilder WithReadOnly<T>() where T : struct, IComponentData {
             this.all.Add(ComponentType.ReadOnly<T>());
             return this;
         }
@@ -34,7 +34,7 @@ namespace CommonEcs {
             return this;
         }
 
-        public EntityQueryDescBuilder WithAnyReadOnly<T>() where T : unmanaged, IComponentData {
+        public EntityQueryDescBuilder WithAnyReadOnly<T>() where T : struct, IComponentData {
             this.any.Add(ComponentType.ReadOnly<T>());
             return this;
         }

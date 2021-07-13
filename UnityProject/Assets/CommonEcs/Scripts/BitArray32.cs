@@ -4,7 +4,7 @@ namespace CommonEcs {
     /// <summary>
     /// A bit array that wraps an int which has 4 bytes (32 bits so 32 slots)
     /// </summary>
-    public struct BitArray32 {
+    public struct BitArray32 : IEquatable<BitArray32> {
         private int internalValue;
 
         private const int MAX = 32;
@@ -42,6 +42,26 @@ namespace CommonEcs {
 
         public void Clear() {
             this.internalValue = 0;
+        }
+
+        public bool Equals(BitArray32 other) {
+            return this.internalValue == other.internalValue;
+        }
+
+        public override bool Equals(object? obj) {
+            return obj is BitArray32 other && Equals(other);
+        }
+
+        public override int GetHashCode() {
+            return this.internalValue;
+        }
+
+        public static bool operator ==(BitArray32 left, BitArray32 right) {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(BitArray32 left, BitArray32 right) {
+            return !left.Equals(right);
         }
     }
 }

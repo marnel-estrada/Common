@@ -1,8 +1,10 @@
+using System;
+
 namespace CommonEcs {
     /// <summary>
     /// A utility data that maintains tags in an integer bitmask.
     /// </summary>
-    public struct Tags {
+    public struct Tags : IEquatable<Tags> {
         // We need this to ensure that the TagSet used for it is the intended one
         private readonly int tagSetId;
         private BitArray32 values;
@@ -35,6 +37,28 @@ namespace CommonEcs {
             // We can simply check if the tags in tagsToCheck are contained
             // by using & on the bit array and check if it's equal (meaning all bits were retained)
             return (this.values.InternalValue & tagsToCheck.values.InternalValue) == tagsToCheck.values.InternalValue;
+        }
+
+        public bool Equals(Tags other) {
+            return this.tagSetId == other.tagSetId && this.values.Equals(other.values);
+        }
+
+        public override bool Equals(object? obj) {
+            return obj is Tags other && Equals(other);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                return (this.tagSetId * 397) ^ this.values.GetHashCode();
+            }
+        }
+
+        public static bool operator ==(Tags left, Tags right) {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Tags left, Tags right) {
+            return !left.Equals(right);
         }
     }
 }

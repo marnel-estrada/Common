@@ -4,8 +4,9 @@ namespace CommonEcs {
     /// <summary>
     /// A bit array that wraps an int which has 4 bytes (32 bits so 32 slots)
     /// </summary>
+    [Serializable]
     public struct BitArray32 : IEquatable<BitArray32> {
-        private int internalValue;
+        public int internalValue;
 
         private const int MAX = 32;
 

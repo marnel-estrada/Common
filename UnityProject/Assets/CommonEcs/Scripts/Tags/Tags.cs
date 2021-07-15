@@ -4,10 +4,12 @@ namespace CommonEcs {
     /// <summary>
     /// A utility data that maintains tags in an integer bitmask.
     /// </summary>
+    [Serializable]
     public struct Tags : IEquatable<Tags> {
+        // These members are set to public so that we can check them in the entity debugger
         // We need this to ensure that the TagSet used for it is the intended one
-        private readonly int tagSetId;
-        private BitArray32 values;
+        public readonly int tagSetId;
+        public BitArray32 values;
 
         public Tags(in TagSet tagSet) : this() {
             this.tagSetId = tagSet.id;
@@ -33,7 +35,7 @@ namespace CommonEcs {
         public readonly bool Contains(in TagSet tagSet, in Tags tagsToCheck) {
             DotsAssert.IsTrue(tagSet.id == this.tagSetId); // Ensure that we don't use another TagSet
             DotsAssert.IsTrue(tagSet.id == tagsToCheck.tagSetId); // Ensure that we don't use another TagSet
-            
+
             // We can simply check if the tags in tagsToCheck are contained
             // by using & on the bit array and check if it's equal (meaning all bits were retained)
             return (this.values.InternalValue & tagsToCheck.values.InternalValue) == tagsToCheck.values.InternalValue;

@@ -66,8 +66,10 @@ namespace CommonEcs {
             // Let's do linear probing
             // Note here that we start on the next index because bucketIndex is already checked
             int probedIndex = LinearProbeForAdding(bucket, hashCode, bucketIndex + 1);
+            
+            // Note here that we don't add to count if it was a replacement
+            this.count += bucket[probedIndex].HasValue ? 0 : 1;
             bucket[probedIndex] = Entry<V>.Something(hashCode, value);
-            ++this.count;
 
             return probedIndex;
         }
@@ -102,7 +104,7 @@ namespace CommonEcs {
             // This is the same as hashCode % MAX_COUNT
             int bucketIndex = hashCode & MAX_COUNT_MINUS_ONE;
             
-            // Check of the slot at the resolve index is already the item
+            // Check if the slot at the resolved index is already the item
             Entry<V> entry = bucket[bucketIndex];
             if (entry.HasValue && entry.HashCode == hashCode) {
                 // This is the item. We remove it.
@@ -179,7 +181,7 @@ namespace CommonEcs {
             for (int i = 0; i < MAX_COUNT; ++i) {
                 // Note here that we go back to zero when we hit the max count
                 // In other words, it continues to search from the start of the bucket
-                int checkIndex = (startingIndex + i) & ~MAX_COUNT;
+                int checkIndex = (startingIndex + i) & MAX_COUNT_MINUS_ONE;
                 
                 Entry<V> entry = bucket[checkIndex];
                 if (entry.HasValue && entry.HashCode == hashCode) {

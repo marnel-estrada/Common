@@ -38,10 +38,6 @@ namespace CommonEcs {
         /// <param name="value"></param>
         /// <returns></returns>
         public int AddOrSet(ref DynamicBuffer<Entry<V>> bucket, in K key, in V value) {
-            if (this.count == MAX_COUNT) {
-                throw new Exception("Bucket is full");
-            }
-            
             int hashCode = key.GetHashCode();
             
             // This is the same as hashCode % MAX_COUNT

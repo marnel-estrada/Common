@@ -44,5 +44,9 @@ namespace Common {
 
             return color;
         }
+
+        public static Color WithAlpha(this Color self, float alpha) {
+	        return new Color(self.r, self.g, self.b, alpha);
+        }
 	}
 }

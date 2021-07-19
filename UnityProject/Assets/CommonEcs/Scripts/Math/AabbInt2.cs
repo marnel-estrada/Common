@@ -1,3 +1,5 @@
+using System;
+
 using Unity.Mathematics;
 
 namespace CommonEcs {
@@ -5,7 +7,7 @@ namespace CommonEcs {
     /// An axis aligned bounding box that uses int2 coordinates
     /// This may be used as bounding box for tile based coordinates
     /// </summary>
-    public struct AabbInt2 {
+    public struct AabbInt2 : IEquatable<AabbInt2> {
         private int2 min;
         private int2 max;
 
@@ -111,6 +113,28 @@ namespace CommonEcs {
             }
 
             return false;
+        }
+
+        public bool Equals(AabbInt2 other) {
+            return this.min.Equals(other.min) && this.max.Equals(other.max);
+        }
+
+        public override bool Equals(object? obj) {
+            return obj is AabbInt2 other && Equals(other);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                return (this.min.GetHashCode() * 397) ^ this.max.GetHashCode();
+            }
+        }
+
+        public static bool operator ==(AabbInt2 left, AabbInt2 right) {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(AabbInt2 left, AabbInt2 right) {
+            return !left.Equals(right);
         }
     }
 }

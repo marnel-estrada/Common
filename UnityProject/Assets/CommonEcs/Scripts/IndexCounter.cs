@@ -3,7 +3,6 @@
     /// A utility struct that keeps track of an index
     /// </summary>
     public struct IndexCounter {
-
         private uint currentIndex;
 
         /// <summary>
@@ -22,6 +21,5 @@
         public void Reset() {
             this.currentIndex = 0;
         }
-
     }
 }

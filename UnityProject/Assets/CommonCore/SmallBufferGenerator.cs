@@ -929,11 +929,10 @@ namespace Common {
             output.AppendLine();
             if (enableBurst) {
                 output.Append(OneIndent, indentLevel);
-                output.AppendLine("[Unity.Burst.BurstDiscard]");
             }
 
             output.Append(OneIndent, indentLevel);
-            output.AppendLine("public void RequireIndexInBounds(int index)");
+            output.AppendLine("private static void RequireIndexInBounds(int index)");
             output.Append(OneIndent, indentLevel);
             output.AppendLine("{");
             indentLevel++;
@@ -997,12 +996,13 @@ namespace Common {
                     output.AppendLine("{");
                     indentLevel++;
                     output.Append(OneIndent, indentLevel);
-                    output.AppendLine("throw new System.InvalidOperationException(");
+                    output.AppendLine("// ReSharper disable once UseStringInterpolation (due to Burst)");
+                    output.AppendLine("throw new System.Exception(");
                     indentLevel++;
                     output.Append(OneIndent, indentLevel);
-                    output.Append("\"Index out of bounds: \" + ");
+                    output.Append("string.Format(\"Index out of bounds: {0}\", ");
                     output.Append(indexName);
-                    output.AppendLine(");");
+                    output.AppendLine("));");
                     indentLevel--;
                     indentLevel--;
                     output.Append(OneIndent, indentLevel);

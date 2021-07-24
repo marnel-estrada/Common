@@ -3,7 +3,6 @@ using Unity.Entities;
 
 namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    [UpdateBefore(typeof(EndInitializationEntityCommandBufferSystem))]
     public class DestroyUnownedEntityReferencesSystem : ComponentSystem {
         private EntityQuery query;
         

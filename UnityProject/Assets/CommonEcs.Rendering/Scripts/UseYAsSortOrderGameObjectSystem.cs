@@ -10,7 +10,6 @@ using UnityEngine.Jobs;
 
 namespace CommonEcs {
     [UpdateBefore(typeof(TransformGameObjectSpriteVerticesSystem))]
-    [UpdateBefore(typeof(EndSimulationEntityCommandBufferSystem))]
     [UpdateBefore(typeof(SortRenderOrderSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class UseYAsSortOrderGameObjectSystem : JobComponentSystem {

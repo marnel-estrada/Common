@@ -9,11 +9,8 @@ namespace CommonEcs {
         private EntityTypeHandle entityType;
         private ComponentTypeHandle<EntityReference> referenceType;
     
-        private EndInitializationEntityCommandBufferSystem barrier;
-    
         protected override void OnCreate() {
             this.query = GetEntityQuery(typeof(EntityReference));
-            this.barrier = this.World.GetOrCreateSystem<EndInitializationEntityCommandBufferSystem>();
         }
     
         protected override void OnUpdate() {

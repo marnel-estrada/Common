@@ -36,6 +36,8 @@ namespace CommonEcs {
             this.managerIndices.Clear();
             this.EntityManager.GetAllUniqueSharedComponentData(this.managers, this.managerIndices);
             
+            // Note here that we used NativeHashSet and pass it as parallel writer to the job
+            // so that we can run the job in parallel. This is the safest way to do it.
             int entityCount = this.query.CalculateEntityCount();
             Unity.Collections.NativeHashSet<Entity> verticesChangedMap = new Unity.Collections.NativeHashSet<Entity>(entityCount, Allocator.TempJob);
             Unity.Collections.NativeHashSet<Entity> trianglesChangedMap = new Unity.Collections.NativeHashSet<Entity>(entityCount, Allocator.TempJob);

@@ -63,7 +63,10 @@ namespace CommonEcs {
                 lastSystemVersion = this.LastSystemVersion
             };
 
-            job.ScheduleParallel(this.query, inputDeps).Complete();
+            // We can't use ScheduleParallel() here because we're accessing the changed arrays like
+            // a hashmap. It's not reliable to use ScheduleParallel() as evident when playing a sprite
+            // animation. The uvChanged map is not set to true consistently.
+            job.Schedule(this.query, inputDeps).Complete();
 
             // Process the result
             for (int i = 1; i < this.managers.Count; ++i) {
@@ -97,37 +100,33 @@ namespace CommonEcs {
         }
         
         [BurstCompile]
-        private struct Job : IJobChunk {
+        private struct Job : IJobEntityBatchWithIndex {
             [ReadOnly]
             public ComponentTypeHandle<Sprite> spriteType;
             
             [ReadOnly]
             public NativeHashMap<Entity, int> managerToIndexMap;
 
-            [NativeDisableParallelForRestriction]
             public NativeArray<bool> verticesChangedMap;
             
-            [NativeDisableParallelForRestriction]
             public NativeArray<bool> trianglesChangedMap;
             
-            [NativeDisableParallelForRestriction]
             public NativeArray<bool> uvChangedMap;
             
-            [NativeDisableParallelForRestriction]
             public NativeArray<bool> colorChangedMap;
 
             public uint lastSystemVersion;
 
-            public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {
-                if (!chunk.DidChange(this.spriteType, this.lastSystemVersion)) {
+            public void Execute(ArchetypeChunk batchInChunk, int batchIndex, int indexOfFirstEntityInQuery) {
+                if (!batchInChunk.DidChange(this.spriteType, this.lastSystemVersion)) {
                     // This means that the sprites in the chunk have not been queried with write access
                     // There must be no changes at the least
                     return;
                 }
                 
-                NativeArray<Sprite> sprites = chunk.GetNativeArray(this.spriteType);
+                NativeArray<Sprite> sprites = batchInChunk.GetNativeArray(this.spriteType);
 
-                for (int i = 0; i < chunk.Count; ++i) {
+                for (int i = 0; i < batchInChunk.Count; ++i) {
                     Sprite sprite = sprites[i];
                     int changedIndex = this.managerToIndexMap[sprite.spriteManagerEntity];
 

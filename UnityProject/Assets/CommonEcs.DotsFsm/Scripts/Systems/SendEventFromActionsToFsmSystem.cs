@@ -49,7 +49,7 @@ namespace CommonEcs.DotsFsm {
                 for (int i = 0; i < actions.Length; ++i) {
                     DotsFsmAction action = actions[i];
                     if (action.pendingEvent.IsSome) {
-                        DotsFsm fsm = this.allFsms[action.fsmOwner];
+                        DotsFsm fsm = this.allFsms[action.fsmEntity];
                         if (fsm.pendingEvent.IsSome) {
                             // Can't replace existing event
                             // This means that there may more than one action that sent an
@@ -58,7 +58,7 @@ namespace CommonEcs.DotsFsm {
                         }
                         
                         fsm.pendingEvent = action.pendingEvent;
-                        this.allFsms[action.fsmOwner] = fsm; // Modify
+                        this.allFsms[action.fsmEntity] = fsm; // Modify
                     }
                     
                     // Clear the pending event

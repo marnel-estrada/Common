@@ -84,7 +84,7 @@ namespace CommonEcs {
         }
         
         [BurstCompile]
-        private struct Job : IJobEntityBatchWithIndex {
+        private struct Job : IJobEntityBatch {
             [ReadOnly]
             public ComponentTypeHandle<Sprite> spriteType;
 
@@ -95,7 +95,7 @@ namespace CommonEcs {
 
             public uint lastSystemVersion;
 
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex, int indexOfFirstEntityInQuery) {
+            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
                 if (!batchInChunk.DidChange(this.spriteType, this.lastSystemVersion)) {
                     // This means that the sprites in the chunk have not been queried with write access
                     // There must be no changes at the least

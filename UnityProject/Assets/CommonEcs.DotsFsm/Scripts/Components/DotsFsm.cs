@@ -45,6 +45,10 @@ namespace CommonEcs.DotsFsm {
             this.pendingEvent = ValueTypeOption<FsmEvent>.Some(fsmEvent);
         }
 
+        public void ClearPendingEvent() {
+            this.pendingEvent = ValueTypeOption<FsmEvent>.None;
+        }
+
         public void SendEvent(in FixedString64 eventAsString) {
             if (eventAsString.Length == 0) {
                 throw new Exception("Can't send empty events");

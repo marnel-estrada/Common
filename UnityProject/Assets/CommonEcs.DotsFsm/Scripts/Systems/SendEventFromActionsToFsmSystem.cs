@@ -22,14 +22,6 @@ namespace CommonEcs.DotsFsm {
         }
 
         protected override void OnUpdate() {
-            ValueTypeOption<FsmEvent> nonePendingEvent = ValueTypeOption<FsmEvent>.None;
-            
-            // Clear pending events from FSMs first
-            // We do this because pending events should only be set once
-            this.Entities.ForEach(delegate(ref DotsFsm fsm) {
-                fsm.pendingEvent = nonePendingEvent;
-            }).ScheduleParallel();
-
             Job job = new Job() {
                 actionType = GetComponentTypeHandle<DotsFsmAction>(),
                 allFsms = GetComponentDataFromEntity<DotsFsm>()
@@ -54,10 +46,10 @@ namespace CommonEcs.DotsFsm {
                             // Can't replace existing event
                             // This means that there may more than one action that sent an
                             // event
-                            throw new Exception("Can't replace existing event");
+                            continue;
                         }
                         
-                        fsm.pendingEvent = action.pendingEvent;
+                        fsm.SendEvent(action.pendingEvent.ValueOrError());
                         this.allFsms[action.fsmEntity] = fsm; // Modify
                     }
                     

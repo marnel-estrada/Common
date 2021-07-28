@@ -126,7 +126,7 @@ namespace CommonEcs.DotsFsm {
                     }
                         
                     // Don't forget to clear the pending event so that actions will run
-                    this.fsm.pendingEvent = ValueTypeOption<FsmEvent>.None;
+                    this.fsm.ClearPendingEvent();
                         
                     return this.fsm;
                 }

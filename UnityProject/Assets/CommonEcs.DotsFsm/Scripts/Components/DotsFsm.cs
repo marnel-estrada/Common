@@ -38,11 +38,16 @@ namespace CommonEcs.DotsFsm {
 
         public void SendEvent(in FsmEvent fsmEvent) {
             if (this.pendingEvent.IsSome) {
-                // This means that there could be two actions that sent events
-                throw new Exception("Can't replace existing pending event");
+                // Can't replace existing pending event
+                // This means that there's an event that was not consumed yet.
+                return;
             }
             
             this.pendingEvent = ValueTypeOption<FsmEvent>.Some(fsmEvent);
+        }
+
+        public void ClearPendingEvent() {
+            this.pendingEvent = ValueTypeOption<FsmEvent>.None;
         }
 
         public void SendEvent(in FixedString64 eventAsString) {

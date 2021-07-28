@@ -36,61 +36,45 @@ namespace CommonEcs {
             this.managerIndices.Clear();
             this.EntityManager.GetAllUniqueSharedComponentData(this.managers, this.managerIndices);
             
-            // Populate index map
-            // This is a mapping of the SpriteManager entity to its index in the NativeArray that will 
-            // represent if something changed to sprites belonging to a draw instance.
-            // This used to be implemented as a NativeHashMap. We changed it to NativeArray so we can
-            // run it in parallel
-            NativeHashMap<Entity, int> managerToIndexMap = new NativeHashMap<Entity, int>(4, Allocator.TempJob);
-            for (int i = 1; i < this.managers.Count; ++i) {
-                managerToIndexMap.TryAdd(this.managers[i].Owner, i - 1);
-            }
-            
-            // We minus 1 because the first entry is always the default entry
-            int managerLength = this.managers.Count - 1;
-            NativeArray<bool> verticesChangedMap = new NativeArray<bool>(managerLength, Allocator.TempJob);
-            NativeArray<bool> trianglesChangedMap = new NativeArray<bool>(managerLength, Allocator.TempJob);
-            NativeArray<bool> uvChangedMap = new NativeArray<bool>(managerLength, Allocator.TempJob);
-            NativeArray<bool> colorChangedMap = new NativeArray<bool>(managerLength, Allocator.TempJob);
+            // Note here that we used NativeHashSet and pass it as parallel writer to the job
+            // so that we can run the job in parallel. This is the safest way to do it.
+            int entityCount = this.query.CalculateEntityCount();
+            Unity.Collections.NativeHashSet<Entity> verticesChangedMap = new Unity.Collections.NativeHashSet<Entity>(entityCount, Allocator.TempJob);
+            Unity.Collections.NativeHashSet<Entity> trianglesChangedMap = new Unity.Collections.NativeHashSet<Entity>(entityCount, Allocator.TempJob);
+            Unity.Collections.NativeHashSet<Entity> uvChangedMap = new Unity.Collections.NativeHashSet<Entity>(entityCount, Allocator.TempJob);
+            Unity.Collections.NativeHashSet<Entity> colorChangedMap = new Unity.Collections.NativeHashSet<Entity>(entityCount, Allocator.TempJob);
 
             Job job = new Job() {
                 spriteType = this.spriteType,
-                managerToIndexMap = managerToIndexMap,
-                verticesChangedMap = verticesChangedMap,
-                trianglesChangedMap = trianglesChangedMap,
-                uvChangedMap = uvChangedMap,
-                colorChangedMap = colorChangedMap,
+                verticesChangedMap = verticesChangedMap.AsParallelWriter(),
+                trianglesChangedMap = trianglesChangedMap.AsParallelWriter(),
+                uvChangedMap = uvChangedMap.AsParallelWriter(),
+                colorChangedMap = colorChangedMap.AsParallelWriter(),
                 lastSystemVersion = this.LastSystemVersion
             };
-
-            // We can't use ScheduleParallel() here because we're accessing the changed arrays like
-            // a hashmap. It's not reliable to use ScheduleParallel() as evident when playing a sprite
-            // animation. The uvChanged map is not set to true consistently.
-            job.Schedule(this.query, inputDeps).Complete();
+            job.ScheduleParallel(this.query, 1, inputDeps).Complete();
 
             // Process the result
             for (int i = 1; i < this.managers.Count; ++i) {
                 SpriteManager manager = this.managers[i];
 
-                if (manager.Owner == Entity.Null) {
+                Entity owner = manager.Owner;
+                if (owner == Entity.Null) {
                     // The owner for the manager has not been assigned yet
                     // We can skip this
                     continue;
                 }
 
-                int changedIndex = managerToIndexMap[manager.Owner];
-
                 // Note that we're only checking for existence here
                 // We used OR here because the flags might have been already set to true prior to
                 // calling this system
-                manager.VerticesChanged = manager.VerticesChanged || verticesChangedMap[changedIndex];
-                manager.RenderOrderChanged = manager.RenderOrderChanged || trianglesChangedMap[changedIndex];
-                manager.UvChanged = manager.UvChanged || uvChangedMap[changedIndex];
-                manager.ColorsChanged = manager.ColorsChanged || colorChangedMap[changedIndex];
+                manager.VerticesChanged = verticesChangedMap.Contains(owner);
+                manager.RenderOrderChanged = trianglesChangedMap.Contains(owner);
+                manager.UvChanged = uvChangedMap.Contains(owner);
+                manager.ColorsChanged = colorChangedMap.Contains(owner);
             }
 
             // Dispose
-            managerToIndexMap.Dispose();
             verticesChangedMap.Dispose();
             trianglesChangedMap.Dispose();
             uvChangedMap.Dispose();
@@ -100,24 +84,18 @@ namespace CommonEcs {
         }
         
         [BurstCompile]
-        private struct Job : IJobEntityBatchWithIndex {
+        private struct Job : IJobEntityBatch {
             [ReadOnly]
             public ComponentTypeHandle<Sprite> spriteType;
-            
-            [ReadOnly]
-            public NativeHashMap<Entity, int> managerToIndexMap;
 
-            public NativeArray<bool> verticesChangedMap;
-            
-            public NativeArray<bool> trianglesChangedMap;
-            
-            public NativeArray<bool> uvChangedMap;
-            
-            public NativeArray<bool> colorChangedMap;
+            public Unity.Collections.NativeHashSet<Entity>.ParallelWriter verticesChangedMap;
+            public Unity.Collections.NativeHashSet<Entity>.ParallelWriter trianglesChangedMap;
+            public Unity.Collections.NativeHashSet<Entity>.ParallelWriter uvChangedMap;
+            public Unity.Collections.NativeHashSet<Entity>.ParallelWriter colorChangedMap;
 
             public uint lastSystemVersion;
 
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex, int indexOfFirstEntityInQuery) {
+            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
                 if (!batchInChunk.DidChange(this.spriteType, this.lastSystemVersion)) {
                     // This means that the sprites in the chunk have not been queried with write access
                     // There must be no changes at the least
@@ -128,16 +106,23 @@ namespace CommonEcs {
 
                 for (int i = 0; i < batchInChunk.Count; ++i) {
                     Sprite sprite = sprites[i];
-                    int changedIndex = this.managerToIndexMap[sprite.spriteManagerEntity];
+                    Entity spriteManagerEntity = sprite.spriteManagerEntity;
+                    
+                    if (sprite.verticesChanged.Value) {
+                        this.verticesChangedMap.Add(spriteManagerEntity);
+                    }
 
-                    this.verticesChangedMap[changedIndex] =
-                        this.verticesChangedMap[changedIndex] || sprite.verticesChanged.Value; 
+                    if (sprite.renderOrderChanged.Value) {
+                        this.trianglesChangedMap.Add(spriteManagerEntity);
+                    }
     
-                    this.trianglesChangedMap[changedIndex] = this.trianglesChangedMap[changedIndex] || sprite.renderOrderChanged.Value;
-    
-                    this.uvChangedMap[changedIndex] = this.uvChangedMap[changedIndex] || sprite.uvChanged.Value;
-    
-                    this.colorChangedMap[changedIndex] = this.colorChangedMap[changedIndex] || sprite.colorChanged.Value;
+                    if (sprite.uvChanged.Value) {
+                        this.uvChangedMap.Add(spriteManagerEntity);
+                    }
+
+                    if (sprite.colorChanged.Value) {
+                        this.colorChangedMap.Add(spriteManagerEntity);
+                    }
                 }
             }
         }

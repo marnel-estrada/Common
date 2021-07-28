@@ -31,7 +31,7 @@ namespace CommonEcs.DotsFsm {
                 NativeArray<DotsFsmAction> actions = batchInChunk.GetNativeArray(this.actionType);
                 for (int i = 0; i < actions.Length; ++i) {
                     DotsFsmAction action = actions[i];
-                    DotsFsm fsm = this.allFsms[action.fsmOwner];
+                    DotsFsm fsm = this.allFsms[action.fsmEntity];
                     
                     // Action can run if the FSM's current state is the action's state owner and
                     // the fsm has no pending event

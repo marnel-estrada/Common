@@ -10,15 +10,15 @@ namespace CommonEcs.DotsFsm {
         // There will be a system that will consume this value.
         public ValueTypeOption<FsmEvent> pendingEvent;
 
-        public readonly Entity fsmOwner;
+        public readonly Entity fsmEntity;
         public readonly Entity stateOwner;
 
         public bool running;
         public bool entered;
         public bool exited;
 
-        public DotsFsmAction(Entity fsmOwner, Entity stateOwner) : this() {
-            this.fsmOwner = fsmOwner;
+        public DotsFsmAction(Entity fsmEntity, Entity stateOwner) : this() {
+            this.fsmEntity = fsmEntity;
             this.stateOwner = stateOwner;
         }
 

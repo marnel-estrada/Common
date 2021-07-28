@@ -132,13 +132,11 @@ namespace CommonEcs.DotsFsm {
                 }
                 
                 // At this point, there are no transitions found
-                // We log a warning
-                NameReference currentStateNameReference = this.allNameReferences[currentStateEntity];
-                Name currentStateName = this.allNames[currentStateNameReference.nameEntity];
+                // We still clear the pending event because it may have already been outdated
+                this.fsm.ClearPendingEvent();
                 
-                // Burst doesn't like any other string format methods
-                // ReSharper disable once UseStringInterpolation
-                Debug.LogWarning(string.Format("{0}.{1} does not have transition for event {2}", this.fsmName, currentStateName.value, this.fsmEvent));
+                // Note here that we removed logging the warning because it's annoying.
+                // It pauses the editor when it Burst is enabled.
                 
                 return this.fsm;
             }

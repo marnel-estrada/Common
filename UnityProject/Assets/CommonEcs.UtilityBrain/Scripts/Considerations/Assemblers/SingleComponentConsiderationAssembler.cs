@@ -3,7 +3,7 @@ using Unity.Entities;
 
 namespace CommonEcs.UtilityBrain {
     public abstract class SingleComponentConsiderationAssembler<T> : ConsiderationAssembler
-        where T : unmanaged, IConsiderationComponent {
+        where T : struct, IConsiderationComponent {
         private EntityArchetype archetype;
 
         public override void Init(ref EntityManager entityManager) {

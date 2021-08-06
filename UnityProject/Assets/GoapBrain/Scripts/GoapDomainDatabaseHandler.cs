@@ -72,6 +72,10 @@ namespace GoapBrain {
         private static void AddActions(ref GoapDomain domain, GoapDomainData data, HashSet<string> addedActions) {
             for (int i = 0; i < data.ActionCount; ++i) {
                 GoapActionData actionData = data.GetActionAt(i);
+                if (!actionData.Enabled) {
+                    // Not enabled. Skip adding the action.
+                    continue;
+                }
                 
                 // Check that the action is unique (not been added before)
                 Assertion.IsTrue(!addedActions.Contains(actionData.Name), actionData.Name);

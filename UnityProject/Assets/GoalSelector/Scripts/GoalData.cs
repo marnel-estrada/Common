@@ -48,7 +48,7 @@ namespace GoalSelector {
         [PropertyGroup("Effect")]
         public string ConditionName {
             get {
-                return this.conditionName;
+                return this.conditionName.Trim();
             }
             set {
                 this.conditionName = value;

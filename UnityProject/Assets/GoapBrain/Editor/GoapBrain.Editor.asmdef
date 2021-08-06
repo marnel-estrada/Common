@@ -5,7 +5,8 @@
         "GoapBrain",
         "Common.Editor",
         "CommonCore",
-        "CommonCore.Editor"
+        "CommonCore.Editor",
+        "Unity.Collections"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [

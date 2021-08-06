@@ -2,6 +2,8 @@
 
 using Common;
 
+using Unity.Collections;
+
 using UnityEditor;
 
 using UnityEngine;
@@ -82,7 +84,7 @@ namespace GoapBrain {
                         name.RenameMode = true;
                     }
 
-                    GUILayout.Label(name.Name, GUILayout.Width(400));
+                    GUILayout.Label($"{name.Name} ({new FixedString64(name.Name).GetHashCode()})");
                 }
 
                 GUILayout.EndHorizontal();

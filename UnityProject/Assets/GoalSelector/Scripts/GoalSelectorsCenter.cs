@@ -54,6 +54,7 @@ namespace GoalSelector {
             // Parse each goal
             for (int i = 0; i < data.Count; ++i) {
                 GoalData goalData = data.GetAt(i);
+                Assertion.NotEmpty(goalData.ConditionName); // Condition name must not be empty
                 Goal goal = new Goal(goalData.Id, goalData.ConditionName, goalData.ConditionValue);
                 ParseConsiderations(goalData, goal);
                 

@@ -15,7 +15,8 @@ namespace CommonEcs.UtilityBrain {
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             ResolveBestOptionJob resolveBestOptionJob = new ResolveBestOptionJob() {
                 brainType = GetComponentTypeHandle<UtilityBrain>(),
-                valueBufferType = GetBufferTypeHandle<UtilityValueWithOption>()
+                valueBufferType = GetBufferTypeHandle<UtilityValueWithOption>(),
+                allDebug = GetComponentDataFromEntity<DebugEntity>()
             };
             return resolveBestOptionJob.ScheduleParallel(this.query, 1, inputDeps);
         }
@@ -26,6 +27,9 @@ namespace CommonEcs.UtilityBrain {
             
             [ReadOnly]
             public BufferTypeHandle<UtilityValueWithOption> valueBufferType;
+
+            [ReadOnly]
+            public ComponentDataFromEntity<DebugEntity> allDebug;
             
             public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
                 NativeArray<UtilityBrain> brains = batchInChunk.GetNativeArray(this.brainType);
@@ -35,6 +39,11 @@ namespace CommonEcs.UtilityBrain {
                     if (!brain.shouldExecute) {
                         // It did not execute. Skip.
                         continue;
+                    }
+
+                    if (this.allDebug[brain.agentEntity].isDebug) {
+                        int breakpoint = 0;
+                        ++breakpoint;
                     }
 
                     DynamicBuffer<UtilityValueWithOption> values = valuesList[i];

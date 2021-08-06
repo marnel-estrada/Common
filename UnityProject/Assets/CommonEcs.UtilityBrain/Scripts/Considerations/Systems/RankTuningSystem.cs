@@ -12,7 +12,7 @@ namespace CommonEcs.UtilityBrain {
 
             public UtilityValue ComputeUtility(in Entity agentEntity, in RankTuning filterComponent, int indexOfFirstEntityInQuery,
                 int iterIndex) {
-                return new UtilityValue(filterComponent.rankToSet);
+                return new UtilityValue(filterComponent.rankToSet, 0);
             }
         }
     }

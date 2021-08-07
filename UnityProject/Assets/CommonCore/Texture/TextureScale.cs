@@ -5,7 +5,6 @@ using UnityEngine;
 namespace Common {
     // Only works on ARGB32, RGB24 and Alpha8 textures that are marked readable
     public class TextureScale {
-
         private static Color[]? texColors;
         private static Color[]? newColors;
         private static int w;

@@ -50,7 +50,7 @@ namespace CommonEcs {
         public float width;
         public float height;
 
-        private float renderOrder;
+        public float renderOrder;
         
         // Indices of the vertex to the central mesh
         public int index1;

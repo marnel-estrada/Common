@@ -42,11 +42,11 @@ namespace Common {
 			IsTrue(pointer != null, DEFAULT_MESSAGE, context);
 		}
 		
-		public static void IsSome<T>(Option<T> option, UnityEngine.Object? context = null) where T : class {
+		public static void IsSome<T>(Option<T> option, UnityEngine.Object? context = null) {
 			IsTrue(option.IsSome, "Option should be Some. Got a None instead.", context);
 		}
 
-		public static void IsSome<T>(Option<T> option, string name, UnityEngine.Object? context = null) where T : class {
+		public static void IsSome<T>(Option<T> option, string name, UnityEngine.Object? context = null) {
 			IsTrue(option.IsSome, name, context);
 		}
 		

@@ -39,10 +39,8 @@ namespace Common {
                 // The type of the field does not matter. As long it has the named method,
                 // it will be invoked
                 object instance = field.GetValue(null);
-                MethodInfo? clearMethod = field.FieldType.GetMethod(methodName);
-                if (clearMethod != null) {
-                    clearMethod.Invoke(instance, EMPTY_PARAMETERS);
-                }
+                MethodInfo? method = field.FieldType.GetMethod(methodName);
+                method?.Invoke(instance, EMPTY_PARAMETERS);
             }
         }
     }

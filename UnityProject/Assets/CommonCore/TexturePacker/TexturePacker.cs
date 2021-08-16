@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using Unity.Collections;
@@ -18,15 +19,15 @@ namespace Common {
         private readonly SimpleList<Vector2Int> originalDimensions = new SimpleList<Vector2Int>(BUFFER_SIZE);
 
         // Keeps track of the packed entries
-        private NativeHashMap<FixedString64, PackedTextureEntry> entriesMap;
+        private NativeHashMap<int, PackedTextureEntry> entriesMap;
 
-        private Texture2D atlas;
+        private Texture2D? atlas;
 
         /// <summary>
         /// Constructor
         /// </summary>
         public TexturePacker() {
-            this.entriesMap = new NativeHashMap<FixedString64, PackedTextureEntry>(BUFFER_SIZE, Allocator.Persistent);
+            this.entriesMap = new NativeHashMap<int, PackedTextureEntry>(BUFFER_SIZE, Allocator.Persistent);
         }
 
         public void Dispose() {
@@ -62,7 +63,8 @@ namespace Common {
             for (int i = 0; i < this.names.Count; ++i) {
                 int originalWidth = this.originalDimensions[i].x;
                 int originalHeight = this.originalDimensions[i].y;
-                this.entriesMap[this.names[i]] =
+                int hashcode = new FixedString64(this.names[i]).GetHashCode();
+                this.entriesMap[hashcode] =
                     new PackedTextureEntry(rects[i], this.atlas.width, this.atlas.height, originalWidth, originalHeight);
             }
 
@@ -75,6 +77,10 @@ namespace Common {
         /// Compresses the atlas
         /// </summary>
         public void Compress() {
+            if (this.atlas == null) {
+                throw new Exception("Atlas is not prepared yet.");
+            }
+            
             this.atlas.Compress(false);
             this.atlas.Apply(false, true);
         }
@@ -86,11 +92,15 @@ namespace Common {
         /// <param name="key"></param>
         /// <returns></returns>
         public PackedTextureEntry GetEntry(string key) {
-            return this.entriesMap[key];
+            return this.entriesMap[new FixedString64(key).GetHashCode()];
         }
 
         public Texture2D Atlas {
             get {
+                if (this.atlas == null) {
+                    throw new Exception("Atlas is not prepared yet.");
+                }
+                
                 return this.atlas;
             }
         }

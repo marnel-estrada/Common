@@ -52,6 +52,12 @@ namespace CommonEcs {
 
         public float renderOrder;
         
+        // We differentiate this from Sprite.renderOrder so that renderOrder would now be an ordering
+        // of higher precedence than renderOrderDueToPosition.
+        // This is to avoid conflict when there are sprites that are positioned the same but one must
+        // be rendered on top of the other. This is the case for face and head in agents or characters.
+        public float renderOrderDueToPosition;
+        
         // Indices of the vertex to the central mesh
         public int index1;
         public int index2;
@@ -92,6 +98,18 @@ namespace CommonEcs {
                 // Render order changed if the new render order is not the same as the previous one
                 this.renderOrderChanged.Value = !this.renderOrder.TolerantEquals(value);                
                 this.renderOrder = value;
+            }
+        }
+
+        public float RenderOrderDueToPosition {
+            get {
+                return this.renderOrderDueToPosition;
+            }
+
+            set {
+                // Render order changed if the new render order is not the same as the previous one
+                this.renderOrderChanged.Value = !this.renderOrderDueToPosition.TolerantEquals(value);
+                this.renderOrderDueToPosition = value;
             }
         }
 

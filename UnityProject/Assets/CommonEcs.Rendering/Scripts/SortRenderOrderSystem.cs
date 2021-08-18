@@ -91,7 +91,7 @@ namespace CommonEcs {
                     Sprite sprite = sprites[i];
                     int index = firstEntityIndex + i;
                     this.sortList[index] = new SortedSpriteEntry(sprite.managerIndex, sprite.LayerOrder,
-                        sprite.RenderOrder);
+                        sprite.renderOrder, sprite.renderOrderDueToPosition);
                 }
             }
         }

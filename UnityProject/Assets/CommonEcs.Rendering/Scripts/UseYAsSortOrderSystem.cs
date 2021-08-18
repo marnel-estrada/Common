@@ -54,8 +54,12 @@ namespace CommonEcs {
                     LocalToWorld localToWorld = localToWorldList[i];
     
                     // We use negative of y here because the higher y should be ordered first
+                    // Note here that we update RenderOrderDueToPosition instead of RenderOrder
+                    // RenderOrder now has higher precedence than RenderOrderDueToPosition.
+                    // This is to avoid conflict when there are sprites that are positioned the same but one must
+                    // be rendered on top of the other. This is the case for face and head in agents or characters.
                     Sprite sprite = sprites[i];
-                    sprite.RenderOrder = -(localToWorld.Position.y + useY.offset);
+                    sprite.RenderOrderDueToPosition = -(localToWorld.Position.y + useY.offset);
                     sprites[i] = sprite; // Modify
                 }
             }

@@ -17,7 +17,7 @@ namespace CommonEcs {
         // We need a mechanism such that the head sprite and body sprite have the same y value.
         public float offset;
 
-        public UseYAsSortOrder(float offset) {
+        public UseYAsSortOrder(float offset) : this() {
             this.offset = offset;
         }
     }

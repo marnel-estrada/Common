@@ -55,7 +55,7 @@ namespace Common {
         /// </summary>
         public void Pack() {
             this.atlas = new Texture2D(2, 2, TextureFormat.ARGB32, false); // Will expand on packing
-            Rect[] rects = this.atlas.PackTextures(this.textures.ToArray(), 1, 8192, false);
+            Rect[] rects = this.atlas.PackTextures(this.textures.ToArray(), 0, 8192, false);
 
             // Populate entries
             this.entriesMap.Clear();

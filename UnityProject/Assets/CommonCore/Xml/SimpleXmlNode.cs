@@ -2,28 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 
-#nullable disable
-
 namespace Common.Xml {
     public class SimpleXmlNode {
-        public delegate void NodeProcessor(SimpleXmlNode node);
-
         private const string YES = "y";
         private const string TRUE = "true";
-        private readonly Dictionary<string, string> attributes;
-        private readonly List<SimpleXmlNode> children;
-        public SimpleXmlNode parentNode;
+        private readonly Dictionary<string, string> attributes = new Dictionary<string, string>();
+        private readonly List<SimpleXmlNode> children = new List<SimpleXmlNode>();
+        public SimpleXmlNode? parentNode;
 
         public string tagName;
 
         public SimpleXmlNode() {
             this.tagName = "NONE";
-            this.parentNode = null;
-            this.children = new List<SimpleXmlNode>();
-            this.attributes = new Dictionary<string, string>();
         }
 
-        public string InnerText { get; set; }
+        public string? InnerText { get; set; }
 
         /**
          * Finds the first node along the node tree with the same name as the specified one.
@@ -51,6 +44,31 @@ namespace Common.Xml {
             throw new Exception($"Can't find any node named \"{tagName}\".");
         }
 
+        public Option<SimpleXmlNode> FindFirstNodeInChildrenAsOption(string tagName) {
+            return FindFirstNodeInChildrenAsOption(this, tagName);
+        }
+        
+        private static Option<SimpleXmlNode> FindFirstNodeInChildrenAsOption(SimpleXmlNode node, string tagName) {
+            for (int i = 0; i < node.children.Count; ++i) {
+                if (node.children[i].tagName.EqualsFast(tagName)) {
+                    return Option<SimpleXmlNode>.Some(node.children[i]);
+                }
+            }
+
+            // not found
+            // try to look for it in children
+            // It's found or error
+            for (int i = 0; i < node.children.Count; ++i) {
+                Option<SimpleXmlNode> found = FindFirstNodeInChildrenAsOption(node.children[i], tagName);
+                if (found.IsSome) {
+                    return found;
+                }
+            }
+
+            // not found
+            return Option<SimpleXmlNode>.NONE;
+        }
+
         /**
          * Returns whether or not the node contains the specified attribute.
          */
@@ -62,7 +80,11 @@ namespace Common.Xml {
          * Returns the attribute value with the specified key.
          */
         public string GetAttribute(string attributeKey) {
-            return this.attributes[attributeKey].Trim();
+            if (!this.attributes.TryGetValue(attributeKey, out string value)) {
+                throw new Exception($"Attribute '{attributeKey}' can't be found.");
+            }
+            
+            return value?.Trim() ?? string.Empty;
         }
 
         public Option<string> GetAttributeAsOption(string attributeKey) {

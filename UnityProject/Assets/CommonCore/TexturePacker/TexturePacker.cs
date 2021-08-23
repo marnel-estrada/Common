@@ -93,7 +93,11 @@ namespace Common {
         /// <param name="key"></param>
         /// <returns></returns>
         public PackedTextureEntry GetEntry(string key) {
-            return this.entriesMap[new FixedString64(key).GetHashCode()];
+            if (this.entriesMap.TryGetValue(new FixedString64(key).GetHashCode(), out PackedTextureEntry entry)) {
+                return entry;
+            }
+
+            throw new Exception($"PackedTextureEntry for {key} can't be found.");
         }
 
         public Texture2D Atlas {

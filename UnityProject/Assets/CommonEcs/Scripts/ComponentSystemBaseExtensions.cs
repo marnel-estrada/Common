@@ -67,5 +67,9 @@
                 All = all ?? Array.Empty<ComponentType>()
             };
         }
+
+        public static T GetOrCreateSystem<T>(this ComponentSystemBase self) where T : ComponentSystemBase {
+            return self.World.GetOrCreateSystem<T>();
+        }
     }
 }

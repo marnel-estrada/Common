@@ -1,3 +1,5 @@
+using Common;
+
 using Unity.Collections;
 
 namespace CommonEcs {
@@ -8,6 +10,7 @@ namespace CommonEcs {
         /// <param name="stringId"></param>
         /// <returns></returns>
         public static int ToIntId(string stringId) {
+            Assertion.NotEmpty(stringId);
             return new FixedString64(stringId).GetHashCode();
         }
     }

@@ -68,7 +68,8 @@ namespace CommonEcs.Goap {
                     GoapDomain domain = agent.Domain;
                     
                     // Used for debugging
-                    if (this.allDebug[planner.agentEntity].isDebug) {
+                    DebugEntity debug = this.allDebug[planner.agentEntity];
+                    if (debug.enabled) {
                         int breakpoint = 0;
                         ++breakpoint;
                     }
@@ -88,7 +89,10 @@ namespace CommonEcs.Goap {
                     // Add the actions to action buffer if search was a success
                     if (planner.state == PlanningState.SUCCESS) {
                         AddActions(ref resolvedActions, ref actionList);
-                        //PrintActions(planner, resolvedActions);
+
+                        if (debug.enabled) {
+                            PrintActions(planner, resolvedActions);
+                        }
                     }
                     
                     // Modify
@@ -115,6 +119,7 @@ namespace CommonEcs.Goap {
             }
 
             // Utility method. Do not remove.
+            [BurstDiscard]
             private static void PrintActions(in GoapPlanner planner, in DynamicBuffer<ResolvedAction> resolvedActions) {
                 Debug.Log($"Resolved actions for agent {planner.agentEntity}");
                 for (int a = 0; a < resolvedActions.Length; ++a) {

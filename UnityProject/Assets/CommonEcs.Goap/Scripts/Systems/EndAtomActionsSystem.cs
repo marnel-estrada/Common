@@ -49,6 +49,7 @@ namespace CommonEcs.Goap {
 
             MoveToNextActionJob moveToNextActionJob = new MoveToNextActionJob() {
                 agentType = agentType, 
+                debugEntityType = GetComponentTypeHandle<DebugEntity>(),
                 allActionSets = GetBufferFromEntity<ResolvedAction>()
             };
             handle = moveToNextActionJob.ScheduleParallel(this.agentsQuery, 1, handle);
@@ -157,11 +158,15 @@ namespace CommonEcs.Goap {
         private struct MoveToNextActionJob : IJobEntityBatch {
             public ComponentTypeHandle<GoapAgent> agentType;
 
+            public ComponentTypeHandle<DebugEntity> debugEntityType;
+
             [ReadOnly]
             public BufferFromEntity<ResolvedAction> allActionSets;
             
             public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
                 NativeArray<GoapAgent> agents = batchInChunk.GetNativeArray(this.agentType);
+                NativeArray<DebugEntity> debugEntities = batchInChunk.GetNativeArray(this.debugEntityType);
+                
                 for (int i = 0; i < agents.Length; ++i) {
                     GoapAgent agent = agents[i];
                     if (agent.state != AgentState.EXECUTING) {
@@ -181,7 +186,7 @@ namespace CommonEcs.Goap {
                     }
 
                     if (agent.lastResult == GoapResult.SUCCESS) {
-                        MoveToNextAction(ref agent);
+                        MoveToNextAction(ref agent, debugEntities[i]);
                     }
                     
                     // Modify
@@ -189,9 +194,15 @@ namespace CommonEcs.Goap {
                 }
             }
 
-            private void MoveToNextAction(ref GoapAgent agent) {
+            private void MoveToNextAction(ref GoapAgent agent, in DebugEntity debugEntity) {
                 DynamicBuffer<ResolvedAction> actionSet = this.allActionSets[agent.plannerEntity];
                 ResolvedAction currentAction = actionSet[agent.currentActionIndex];
+                
+                if (debugEntity.enabled) {
+                    int breakpoint = 0;
+                    ++breakpoint;
+                }
+                
                 ++agent.currentAtomActionIndex;
                 if (agent.currentAtomActionIndex < currentAction.atomActionCount) {
                     // This means that there are still more atoms to execute

@@ -3,6 +3,7 @@
 using Unity.Entities;
 
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace CommonEcs {
     /// <summary>
@@ -11,11 +12,12 @@ namespace CommonEcs {
     [Serializable]
     [GenerateAuthoringComponent]
     public struct DebugEntity : IComponentData {
+        [FormerlySerializedAs("isDebug")]
         [SerializeField]
-        public bool isDebug;
+        public bool enabled;
 
-        public DebugEntity(bool isDebug) {
-            this.isDebug = isDebug;
+        public DebugEntity(bool enabled) {
+            this.enabled = enabled;
         }
     }
 }

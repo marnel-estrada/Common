@@ -41,7 +41,7 @@ namespace CommonEcs.UtilityBrain {
                         continue;
                     }
 
-                    if (this.allDebug[brain.agentEntity].isDebug) {
+                    if (this.allDebug[brain.agentEntity].enabled) {
                         int breakpoint = 0;
                         ++breakpoint;
                     }

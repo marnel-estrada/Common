@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 
 namespace CommonEcs {
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct LinearHashMapBucket<K, V> 
+    public unsafe struct LinearHashMapBucket128<K, V> 
         where K : unmanaged, IEquatable<K> 
         where V : unmanaged {
         public ref struct Enumerator {

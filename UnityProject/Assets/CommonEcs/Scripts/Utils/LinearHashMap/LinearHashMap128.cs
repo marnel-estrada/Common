@@ -1,15 +1,15 @@
 using System;
 
 namespace CommonEcs {
-    public struct LinearHashMap<K, V> 
+    public struct LinearHashMap128<K, V> 
         where K : unmanaged, IEquatable<K>
         where V : unmanaged, IEquatable<V> {
-        private LinearHashMapBucket<K, V> bucket;
+        private LinearHashMapBucket128<K, V> bucket;
         private int count;
         
         public void AddOrSet(in K key, in V value) {
             int hashCode = key.GetHashCode();
-            int bucketIndex = FibonacciHash(hashCode);
+            int bucketIndex = ComputeBucketIndex(hashCode);
 
             if (!this.bucket[bucketIndex].hasValue) {
                 // This means that it's an empty slot. We can place the value here.
@@ -37,7 +37,7 @@ namespace CommonEcs {
         }
 
         private readonly int LinearProbeForAdding(int hashCode, int startingIndex) {
-            const int maxCount = LinearHashMapBucket<K, V>.LENGTH;
+            const int maxCount = LinearHashMapBucket128<K, V>.LENGTH;
             const int maxCountMinusOne = maxCount - 1;
             
             for (int i = 0; i < maxCount; ++i) {
@@ -57,7 +57,7 @@ namespace CommonEcs {
         
         public void Remove(in K key) {
             int hashCode = key.GetHashCode();
-            int bucketIndex = FibonacciHash(hashCode);
+            int bucketIndex = ComputeBucketIndex(hashCode);
             
             // Check if the slot at the resolved index is already the item
             LinearHashMapEntry<K, V> entry = this.bucket[bucketIndex];
@@ -88,7 +88,7 @@ namespace CommonEcs {
         /// <param name="startingIndex"></param>
         /// <returns></returns>
         private readonly int LinearProbeForExistingEntry(int hashCode, int startingIndex) {
-            const int maxCount = LinearHashMapBucket<K, V>.LENGTH;
+            const int maxCount = LinearHashMapBucket128<K, V>.LENGTH;
             const int maxCountMinusOne = maxCount - 1;
             
             for (int i = 0; i < maxCount; ++i) {
@@ -109,7 +109,7 @@ namespace CommonEcs {
         
         public readonly ValueTypeOption<V> Find(in K key) {
             int hashCode = key.GetHashCode();
-            int bucketIndex = FibonacciHash(hashCode);
+            int bucketIndex = ComputeBucketIndex(hashCode);
             
             // Check if key is already at the resolved index
             LinearHashMapEntry<K, V> entry = this.bucket[bucketIndex];
@@ -131,7 +131,7 @@ namespace CommonEcs {
 
         public bool ContainsKey(in K key) {
             int hashCode = key.GetHashCode();
-            int bucketIndex = FibonacciHash(hashCode);
+            int bucketIndex = ComputeBucketIndex(hashCode);
             
             // Check if key is already at the resolved index
             LinearHashMapEntry<K, V> entry = this.bucket[bucketIndex];
@@ -151,14 +151,10 @@ namespace CommonEcs {
             return false;
         }
 
-        // This is taken from https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/
-        private static int FibonacciHash(int hash) {
-            // This is 2^64 / 1.6180339 (Fibonacci constant)
-            const ulong magicNumber = 11400714819323198485;
-            
-            // We shift 57 bits here as we only need 7 bits (0 - 127)
-            // Note that the bucket count is 128
-            return (int)(((ulong)hash * magicNumber) >> 57);
+        private static int ComputeBucketIndex(int hash) {
+            // This assumes that the length of the bucket is a power of 2
+            // This is the same as hash % Length
+            return hash & (LinearHashMapBucket128<K, V>.LENGTH - 1);
         }
         
         public int Count {
@@ -168,14 +164,14 @@ namespace CommonEcs {
         }
 
         public void Clear() {
-            for (int i = 0; i < FixedHashMapBuckets<K, V>.Length; ++i) {
+            for (int i = 0; i < LinearHashMapBucket128<K, V>.LENGTH; ++i) {
                 this.bucket[i] = default;
             }
             
             this.count = 0;
         }
 
-        public LinearHashMapBucket<K, V>.Enumerator Entries {
+        public LinearHashMapBucket128<K, V>.Enumerator Entries {
             get {
                 return this.bucket.GetEnumerator();
             }

@@ -13,19 +13,19 @@ namespace GoalSelector {
     [Serializable]
     public class GoalData : IDataPoolItem, IDuplicable<GoalData> {
         [SerializeField]
-        private string id;
+        private string? id;
 
         [SerializeField]
         private int intId;
 
         [SerializeField]
-        private string conditionName;
+        private string? conditionName;
 
         [SerializeField]
         private bool conditionValue;
 
         [SerializeField]
-        private string comment;
+        private string? comment;
 
         [SerializeField]
         private bool showComment;
@@ -36,7 +36,7 @@ namespace GoalSelector {
         [SerializeField]
         private List<ClassData> considerations = new List<ClassData>();
 
-        public string Id {
+        public string? Id {
             get {
                 return this.id;
             }
@@ -46,9 +46,9 @@ namespace GoalSelector {
         }
 
         [PropertyGroup("Effect")]
-        public string ConditionName {
+        public string? ConditionName {
             get {
-                return this.conditionName.Trim();
+                return this.conditionName?.Trim();
             }
             set {
                 this.conditionName = value;
@@ -66,7 +66,7 @@ namespace GoalSelector {
         }
 
         [Hidden]
-        public string Comment {
+        public string? Comment {
             get {
                 return this.comment;
             }

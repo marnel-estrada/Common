@@ -5,7 +5,7 @@ namespace CommonEcs.UtilityBrain {
     /// Common interface that will compute a utility.
     /// This is like the IConsideration implementation in OOP UtilityBrain.
     /// </summary>
-    public interface IConsiderationProcess<T> where T : unmanaged, IConsiderationComponent {
+    public interface IConsiderationProcess<T> where T : struct, IConsiderationComponent {
         /// <summary>
         /// Routines before chunk iteration. Calling ArchetypeChunk.GetNativeArray()
         /// can be called here.

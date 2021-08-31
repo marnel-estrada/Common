@@ -8,7 +8,7 @@ namespace CommonEcs.UtilityBrain {
     [UpdateAfter(typeof(IdentifyOptionsAndConsiderationsToExecuteSystem))]
     [UpdateBefore(typeof(WriteValuesToOwnersSystem))]
     public abstract class ConsiderationBaseSystem<TFilter, TProcessor> : JobSystemBase
-        where TFilter : unmanaged, IConsiderationComponent
+        where TFilter : struct, IConsiderationComponent
         where TProcessor : struct, IConsiderationProcess<TFilter> {
         private EntityQuery query;
         private bool isFilterZeroSized;

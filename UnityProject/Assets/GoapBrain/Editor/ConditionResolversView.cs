@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 using UnityEngine;
 using UnityEditor;
@@ -9,7 +7,6 @@ using Common;
 
 namespace GoapBrain {
     class ConditionResolversView {
-
         private readonly EditorWindow parent;
 
         private Vector2 scrollPos = new Vector2();
@@ -19,7 +16,7 @@ namespace GoapBrain {
         private string newResolverName = "";
         private string newResolverClassName = ""; // This is the full class name
 
-        private readonly ClassPropertiesRenderer propertiesRenderer = new ClassPropertiesRenderer(150);
+        private readonly ClassPropertiesRenderer propertiesRenderer = new ClassPropertiesRenderer(250);
 
         private readonly ConditionResolverFiltering filterHandler = new ConditionResolverFiltering();
 
@@ -235,6 +232,5 @@ namespace GoapBrain {
             EditorUtility.SetDirty(domain);
             GoapEditorSignals.REPAINT.Dispatch();
         }
-
     }
 }

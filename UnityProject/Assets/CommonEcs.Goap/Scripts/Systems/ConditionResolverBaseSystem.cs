@@ -11,7 +11,7 @@ namespace CommonEcs.Goap {
         where TResolverFilter : unmanaged, IConditionResolverComponent
         where TResolverProcessor : struct, IConditionResolverProcess<TResolverFilter> {
         private EntityQuery query;
-        private bool isFilterZeroSized;
+        protected bool isFilterZeroSized;
 
         protected override void OnCreate() {
             this.query = GetEntityQuery(typeof(ConditionResolver), typeof(TResolverFilter));
@@ -46,7 +46,13 @@ namespace CommonEcs.Goap {
                 return true;
             }
         }
-        
+
+        protected ref readonly EntityQuery Query {
+            get {
+                return ref this.query;
+            }
+        }
+
         protected abstract TResolverProcessor PrepareProcessor();
         
         [BurstCompile]

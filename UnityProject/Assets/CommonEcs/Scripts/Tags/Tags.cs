@@ -14,6 +14,16 @@ namespace CommonEcs {
         public Tags(in TagSet tagSet) : this() {
             this.tagSetId = tagSet.id;
         }
+        
+        /// <summary>
+        /// Constructor with a single tag value
+        /// </summary>
+        /// <param name="tagSet"></param>
+        /// <param name="tagHashCode"></param>
+        public Tags(in TagSet tagSet, int tagHashCode) : this() {
+            this.tagSetId = tagSet.id;
+            Add(tagSet, tagHashCode);
+        }
 
         /// <summary>
         /// Adds a tag

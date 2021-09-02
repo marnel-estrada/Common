@@ -3,6 +3,8 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 
+using UnityEngine;
+
 namespace CommonEcs.Goap {
     [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(IdentifyConditionsToResolveSystem))]
@@ -22,6 +24,7 @@ namespace CommonEcs.Goap {
             Job job = new Job() {
                 resolverType = GetComponentTypeHandle<ConditionResolver>(),
                 filterType = GetComponentTypeHandle<TResolverFilter>(),
+                allDebugEntity = GetComponentDataFromEntity<DebugEntity>(),
                 filterHasArray = !this.isFilterZeroSized, // Filter has array if it's not zero sized
                 processor = PrepareProcessor()
             };
@@ -59,6 +62,10 @@ namespace CommonEcs.Goap {
         public struct Job : IJobEntityBatchWithIndex {
             public ComponentTypeHandle<ConditionResolver> resolverType;
             public ComponentTypeHandle<TResolverFilter> filterType;
+
+            [ReadOnly]
+            public ComponentDataFromEntity<DebugEntity> allDebugEntity;
+            
             public bool filterHasArray;
             public TResolverProcessor processor;
             
@@ -99,6 +106,14 @@ namespace CommonEcs.Goap {
             private void ExecuteResolver(ref ConditionResolver resolver, ref TResolverFilter resolverFilter, int indexOfFirstEntityInQuery, int iterIndex) {
                 resolver.result = this.processor.IsMet(resolver.agentEntity, ref resolverFilter, indexOfFirstEntityInQuery, iterIndex);
                 resolver.resolved = true;
+
+#if UNITY_EDITOR
+                if (this.allDebugEntity[resolver.agentEntity].enabled) {
+                    // Debugging is enabled
+                    // ReSharper disable once UseStringInterpolation (due to Burst)
+                    Debug.Log(string.Format("Condition {0}: {1}", resolver.id.hashCode, resolver.result));
+                }
+#endif
             }
         }
     }

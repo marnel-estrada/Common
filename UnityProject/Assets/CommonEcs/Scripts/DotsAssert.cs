@@ -52,5 +52,9 @@ namespace CommonEcs {
         public static void NotNullEntity(in Entity entity) {
             IsTrue(entity != Entity.Null);
         }
+
+        public static void IsSome<T>(in ValueTypeOption<T> option) where T : struct, IEquatable<T> {
+            IsTrue(option.IsSome);
+        }
     }
 }

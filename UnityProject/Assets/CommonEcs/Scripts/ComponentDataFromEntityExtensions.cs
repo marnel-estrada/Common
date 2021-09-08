@@ -22,16 +22,5 @@ namespace CommonEcs {
             component = self[entity];
             return true;
         }
-
-        [BurstCompile]
-        public static ValueTypeOption<T> GetAsOption<T>(this ref ComponentDataFromEntity<T> self, in Entity entity)
-            where T : struct, IComponentData {
-            if (!self.HasComponent(entity)) {
-                return ValueTypeOption<T>.None;
-            }
-
-            T component = self[entity];
-            return ValueTypeOption<T>.Some(component);
-        }
     }
 }

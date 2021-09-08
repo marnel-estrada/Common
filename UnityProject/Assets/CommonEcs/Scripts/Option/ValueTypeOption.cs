@@ -2,6 +2,8 @@ using System;
 
 using Common;
 
+using Unity.Burst;
+
 namespace CommonEcs {
     /// <summary>
     /// This is the same for Option but for value types. We used a different type such that
@@ -98,6 +100,7 @@ namespace CommonEcs {
             return this.hasValue == other.hasValue && this.value.Equals(other.value);
         }
 
+        [BurstDiscard]
         public override bool Equals(object obj) {
             return obj is ValueTypeOption<T> other && Equals(other);
         }

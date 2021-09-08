@@ -13,7 +13,7 @@ namespace CommonEcs {
     /// Match(), ValueOr() or ValueOrError().
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public readonly struct ValueTypeOption<T> : IEquatable<ValueTypeOption<T>> where T : struct {
+    public readonly struct ValueTypeOption<T> : IEquatable<ValueTypeOption<T>> where T : struct, IEquatable<T> {
         // We use property here as static member variable doesn't work for Burst
         public static ValueTypeOption<T> None {
             get {
@@ -83,16 +83,12 @@ namespace CommonEcs {
         }
 
         /// <summary>
-        /// Note here that this method filters type that implements IEquatable. This means that
-        /// types that implements IEquatable are the only ones usable with this method.
-        /// We did it this way so that ValueTypeOption doesn't need to have its T implement
-        /// IEquatable but using this method does. 
+        /// An equality method that compares the value right away. We provided this so that
+        /// client code won't have to convert to ValueTypeOption when checking for equality.
         /// </summary>
         /// <param name="other"></param>
-        /// <typeparam name="U"></typeparam>
         /// <returns></returns>
-        public bool Equals<U>(in U other) 
-            where U : struct, IEquatable<U> {
+        public bool Equals(in T other) {
             return this.IsSome && this.value.Equals(other);
         }
 

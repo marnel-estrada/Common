@@ -16,7 +16,7 @@ namespace CommonEcs.Goap {
         where TActionFilter : unmanaged, IAtomActionComponent
         where TProcessor : struct, IAtomActionProcess<TActionFilter> {
         private EntityQuery query;
-        private bool isActionFilterZeroSized;
+        protected bool isActionFilterZeroSized;
 
         protected override void OnCreate() {
             this.query = PrepareQuery();
@@ -54,6 +54,12 @@ namespace CommonEcs.Goap {
         protected virtual bool ShouldScheduleParallel {
             get {
                 return true;
+            }
+        }
+        
+        protected ref readonly EntityQuery Query {
+            get {
+                return ref this.query;
             }
         }
 

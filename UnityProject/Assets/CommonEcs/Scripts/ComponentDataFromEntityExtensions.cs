@@ -12,7 +12,7 @@ namespace CommonEcs {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         [BurstCompile]
-        public static bool TryGet<T>(this ref ComponentDataFromEntity<T> self, in Entity entity, out T component)
+        public static bool TryGet<T>(this in ComponentDataFromEntity<T> self, in Entity entity, out T component)
             where T : struct, IComponentData {
             if (!self.HasComponent(entity)) {
                 component = default;

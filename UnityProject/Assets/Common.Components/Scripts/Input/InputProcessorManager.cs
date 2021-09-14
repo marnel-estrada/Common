@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Common {
     [RequireComponent(typeof(InputFieldManager))]
     public class InputProcessorManager : UpdateManager<InputProcessor> {
-        private InputFieldManager inputFieldManager;
+        private InputFieldManager? inputFieldManager;
 
         private void Awake() {
             this.inputFieldManager = this.GetRequiredComponent<InputFieldManager>();
@@ -19,7 +19,7 @@ namespace Common {
             });
         }
 
-        private static InputProcessorManager INSTANCE;
+        private static InputProcessorManager? INSTANCE;
 
         public static InputProcessorManager Instance {
             get {

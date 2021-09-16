@@ -3,6 +3,8 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 
+using UnityEngine;
+
 namespace CommonEcs.Goap {
     /// <summary>
     /// Atom actions should execute prior to this system
@@ -178,15 +180,23 @@ namespace CommonEcs.Goap {
                         // Can't move or bail if the last result was running
                         continue;
                     }
+                    
+                    DebugEntity debug = debugEntities[i];
 
                     if (agent.lastResult == GoapResult.FAILED) {
                         // Bail the subsequent actions
                         // Agent should replan again
                         agent.state = AgentState.CLEANUP;
+
+                        if (debug.enabled) {
+                            // ReSharper disable once UseStringInterpolation (due to Burst)
+                            Debug.Log(string.Format("Failed at action: {0}, atomAction: {1}", agent.currentActionIndex, 
+                                agent.currentAtomActionIndex));
+                        }
                     }
 
                     if (agent.lastResult == GoapResult.SUCCESS) {
-                        MoveToNextAction(ref agent, debugEntities[i]);
+                        MoveToNextAction(ref agent, debug);
                     }
                     
                     // Modify

@@ -33,7 +33,7 @@ namespace CommonEcs.Goap {
             Job job = new Job() {
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
                 actionFilterType = GetComponentTypeHandle<TActionFilter>(),
-                actionFilterHasArray = this.isActionFilterHasArray, // Action filter has array if it's not zero sized
+                isActionFilterHasArray = this.isActionFilterHasArray, // Action filter has array if it's not zero sized
                 processor = PrepareProcessor(),
                 allAgents = GetComponentDataFromEntity<GoapAgent>()
             };
@@ -72,7 +72,7 @@ namespace CommonEcs.Goap {
         public struct Job : IJobEntityBatchWithIndex {
             public ComponentTypeHandle<AtomAction> atomActionType;
             public ComponentTypeHandle<TActionFilter> actionFilterType;
-            public bool actionFilterHasArray;
+            public bool isActionFilterHasArray;
             public TProcessor processor;
 
             [ReadOnly]
@@ -81,7 +81,7 @@ namespace CommonEcs.Goap {
             public void Execute(ArchetypeChunk batchInChunk, int batchIndex, int indexOfFirstEntityInQuery) {
                 NativeArray<AtomAction> atomActions = batchInChunk.GetNativeArray(this.atomActionType);
 
-                NativeArray<TActionFilter> filterActions = this.actionFilterHasArray ? batchInChunk.GetNativeArray(this.actionFilterType) : default;
+                NativeArray<TActionFilter> filterActions = this.isActionFilterHasArray ? batchInChunk.GetNativeArray(this.actionFilterType) : default;
                 TActionFilter defaultActionFilter = default; // This will be used if TActionFilter has no chunk (it's a tag component)
                 
                 int count = batchInChunk.Count;
@@ -100,7 +100,7 @@ namespace CommonEcs.Goap {
                         continue;
                     }
 
-                    if (this.actionFilterHasArray) {
+                    if (this.isActionFilterHasArray) {
                         TActionFilter actionFilter = filterActions[i];
                         ExecuteAction(ref atomAction, ref actionFilter, indexOfFirstEntityInQuery, i);
 
@@ -119,7 +119,7 @@ namespace CommonEcs.Goap {
             }
 
             private void Cleanup(ref AtomAction atomAction, ref NativeArray<AtomAction> atomActions, ref NativeArray<TActionFilter> filterActions, int indexOfFirstEntityInQuery, int index) {
-                if (this.actionFilterHasArray) {
+                if (this.isActionFilterHasArray) {
                     TActionFilter actionFilter = filterActions[index];
                     this.processor.Cleanup(ref atomAction, ref actionFilter, indexOfFirstEntityInQuery, index);
                     

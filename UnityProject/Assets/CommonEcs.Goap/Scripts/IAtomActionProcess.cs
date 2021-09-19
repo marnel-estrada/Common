@@ -7,7 +7,7 @@ namespace CommonEcs.Goap {
     /// <typeparam name="T"></typeparam>
     public interface IAtomActionProcess<T> where T : struct, IAtomActionComponent {
         /// <summary>
-        /// Routines before chunk iteration. Calling ArchetypeChunk.GetNativeArray()
+        /// Routines before chunk iteration. Methods like ArchetypeChunk.GetNativeArray()
         /// can be called here.
         /// </summary>
         /// <param name="batchInChunk"></param>

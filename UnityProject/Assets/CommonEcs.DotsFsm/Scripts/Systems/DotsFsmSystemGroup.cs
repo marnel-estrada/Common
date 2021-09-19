@@ -30,7 +30,7 @@ namespace CommonEcs.DotsFsm {
                     // Force complete only if rerun was requested
                     this.EntityManager.CompleteAllJobs();
                 }
-            } while (this.rerunGroup.Value && this.rerunCounter < 3);
+            } while (this.rerunGroup.Value && this.rerunCounter <= 2);
         }
 
         public ref NativeReference<bool> RerunGroup {

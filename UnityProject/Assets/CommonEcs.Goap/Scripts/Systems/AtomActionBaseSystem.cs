@@ -16,11 +16,13 @@ namespace CommonEcs.Goap {
         where TActionFilter : struct, IAtomActionComponent
         where TProcessor : struct, IAtomActionProcess<TActionFilter> {
         private EntityQuery query;
-        protected bool isActionFilterZeroSized;
+        protected bool isActionFilterHasArray;
 
         protected override void OnCreate() {
             this.query = PrepareQuery();
-            this.isActionFilterZeroSized = TypeManager.GetTypeInfo(TypeManager.GetTypeIndex<TActionFilter>()).IsZeroSized;
+            
+            // Action has array if it's not zero sized
+            this.isActionFilterHasArray = !TypeManager.GetTypeInfo(TypeManager.GetTypeIndex<TActionFilter>()).IsZeroSized;
         }
 
         protected virtual EntityQuery PrepareQuery() {
@@ -31,7 +33,7 @@ namespace CommonEcs.Goap {
             Job job = new Job() {
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
                 actionFilterType = GetComponentTypeHandle<TActionFilter>(),
-                actionFilterHasArray = !this.isActionFilterZeroSized, // Action filter has array if it's not zero sized
+                actionFilterHasArray = this.isActionFilterHasArray, // Action filter has array if it's not zero sized
                 processor = PrepareProcessor(),
                 allAgents = GetComponentDataFromEntity<GoapAgent>()
             };

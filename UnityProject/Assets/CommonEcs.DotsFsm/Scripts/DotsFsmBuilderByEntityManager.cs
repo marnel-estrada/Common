@@ -9,10 +9,6 @@ namespace CommonEcs.DotsFsm {
 
         private readonly EntityArchetype fsmArchetype;
         private readonly EntityArchetype stateArchetype;
-        
-        // Instead of adding the name together with the entity of FSM or state, we use a different entity
-        // instead so it wouldn't fill up a chunk
-        private readonly EntityArchetype nameArchetype;
 
         public DotsFsmBuilderByEntityManager(ref EntityManager entityManager) {
             this.entityManager = entityManager;
@@ -23,8 +19,6 @@ namespace CommonEcs.DotsFsm {
             
             this.stateArchetype = this.entityManager.CreateArchetype(typeof(DotsFsmState), 
                 typeof(NameReference), typeof(LinkedEntityGroup), typeof(EntityBufferElement));
-
-            this.nameArchetype = this.entityManager.CreateArchetype(typeof(Name));
         }
         
         public Entity CreateFsm(in FixedString64 name, bool isDebug = false) {

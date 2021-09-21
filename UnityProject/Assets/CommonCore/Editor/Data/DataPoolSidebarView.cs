@@ -22,7 +22,7 @@ namespace Common {
         /// </summary>
         /// <param name="pool"></param>
         public void Render(DataPool<T> pool) {
-            GUILayout.BeginVertical(GUILayout.Width(300));
+            GUILayout.BeginVertical(GUILayout.Width(250));
 
             // Render existing
             GUILayout.Label("Items: ", EditorStyles.boldLabel);

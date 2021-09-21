@@ -10,7 +10,7 @@ namespace Common {
     ///     A class that handles rendering of named properties of a certain class
     /// </summary>
     public class ClassPropertiesRenderer {
-        private const int LABEL_WIDTH = 250;
+        private const int LABEL_WIDTH = 200;
 
         private readonly int fieldWidth;
 

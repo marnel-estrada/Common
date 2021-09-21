@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+
+using Unity.Mathematics;
+
 using UnityEngine;
 using UnityEditor;
 
@@ -19,6 +22,7 @@ namespace Common {
             { typeof(float), RenderFloat },
             { typeof(bool), RenderBool },
             { typeof(Vector2), RenderVector2 },
+            { typeof(float2), RenderFloat2 },
             { typeof(Color), RenderColor }
         };
 
@@ -284,6 +288,18 @@ namespace Common {
 
         private static void RenderVector2(PropertyInfo property, object instance) {
             Vector2 value = (Vector2)property.GetGetMethod().Invoke(instance, null);
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(property.Name + ":", GUILayout.Width(150));
+            value = EditorGUILayout.Vector2Field("", value, GUILayout.Width(150));
+            GUILayout.EndHorizontal();
+
+            // Set the value back
+            property.GetSetMethod().Invoke(instance, new object[] { value });
+        }
+
+        private static void RenderFloat2(PropertyInfo property, object instance) {
+            float2 value = (float2)property.GetGetMethod().Invoke(instance, null);
 
             GUILayout.BeginHorizontal();
             GUILayout.Label(property.Name + ":", GUILayout.Width(150));

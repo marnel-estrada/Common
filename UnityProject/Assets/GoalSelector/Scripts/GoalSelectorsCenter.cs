@@ -1,13 +1,10 @@
 using System.Collections.Generic;
-
 using Common;
-
 using CommonEcs;
 using CommonEcs.UtilityBrain;
-
+using Game;
 using Unity.Collections;
 using Unity.Entities;
-
 using UnityEngine;
 
 namespace GoalSelector {
@@ -16,51 +13,77 @@ namespace GoalSelector {
     /// </summary>
     public class GoalSelectorsCenter : MonoBehaviour {
         [SerializeField]
-        private GoalSelectorData[] dataList;
+        private GoalSelectorContainer? goalSelectorContainer;
 
         // These are already the parsed data
-        private GoalSelector[] selectors;
+        private GoalSelector[]? selectors;
 
         private EntityArchetype brainArchetype;
         private EntityArchetype optionArchetype;
 
+        public GoalSelectorContainer? DataList => this.goalSelectorContainer;
+
         private void Awake() {
-            this.selectors = new GoalSelector[this.dataList.Length];
+            if (this.goalSelectorContainer == null) {
+                throw new CantBeNullException(nameof(this.goalSelectorContainer));
+            }
+
+            List<GoalSelectorData>? goalSelectorData = this.goalSelectorContainer.DataList;
+
+            if (goalSelectorData == null) {
+                throw new CantBeNullException(nameof(goalSelectorData));
+            }
+
+            this.selectors = new GoalSelector[goalSelectorData.Count];
 
             // Prepare the archetypes
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-            this.brainArchetype = entityManager.CreateArchetype(typeof(UtilityBrain), 
+            this.brainArchetype = entityManager.CreateArchetype(typeof(UtilityBrain),
                 typeof(UtilityValueWithOption), typeof(LinkedEntityGroup));
-            
+
             // Note here that GoalCondition is the custom data that will be need to set the main goal
             // unto its associated GoapAgent
             // We added LinkedEntityGroup here for the name
-            this.optionArchetype = entityManager.CreateArchetype(typeof(UtilityOption), 
-                typeof(NameReference), typeof(GoalCondition), typeof(UtilityValue), 
+            this.optionArchetype = entityManager.CreateArchetype(typeof(UtilityOption),
+                typeof(NameReference), typeof(GoalCondition), typeof(UtilityValue),
                 typeof(LinkedEntityGroup));
-            
+
             Parse(ref entityManager);
         }
 
         private void Parse(ref EntityManager entityManager) {
-            for (int i = 0; i < this.dataList.Length; ++i) {
-                this.selectors[i] = Parse(ref entityManager, this.dataList[i]);
+            if (this.goalSelectorContainer == null) {
+                throw new CantBeNullException(nameof(this.goalSelectorContainer));
+            }
+
+            if (this.selectors == null) {
+                throw new CantBeNullException(nameof(this.selectors));
+            }
+
+            List<GoalSelectorData>? goalSelectorData = this.goalSelectorContainer.DataList;
+
+            if (goalSelectorData == null) {
+                throw new CantBeNullException(nameof(goalSelectorData));
+            }
+
+            for (int i = 0; i < goalSelectorData.Count; ++i) {
+                this.selectors[i] = Parse(ref entityManager, goalSelectorData[i]);
             }
         }
 
         private static GoalSelector Parse(ref EntityManager entityManager, GoalSelectorData data) {
             GoalSelector goalSelector = new GoalSelector();
-            
+
             // Parse each goal
             for (int i = 0; i < data.Count; ++i) {
                 GoalData goalData = data.GetAt(i);
                 Assertion.NotEmpty(goalData.ConditionName); // Condition name must not be empty
                 Goal goal = new Goal(goalData.Id, goalData.ConditionName, goalData.ConditionValue);
                 ParseConsiderations(goalData, goal);
-                
+
                 goalSelector.Add(goal);
             }
-            
+
             // Initialize assemblers
             ReadOnlySimpleList<Goal> goals = goalSelector.Goals;
             for (int i = 0; i < goals.Count; ++i) {
@@ -73,12 +96,12 @@ namespace GoalSelector {
         private static void ParseConsiderations(GoalData data, Goal goal) {
             IReadOnlyList<ClassData> considerationsData = data.Considerations;
             for (int i = 0; i < considerationsData.Count; i++) {
-                Option<ConsiderationAssembler> assemblerInstance = 
+                Option<ConsiderationAssembler> assemblerInstance =
                     TypeUtils.Instantiate<ConsiderationAssembler>(considerationsData[i], null);
                 assemblerInstance.Match(new AddAssemblerToGoal(goal));
             }
         }
-        
+
         private readonly struct AddAssemblerToGoal : IOptionMatcher<ConsiderationAssembler> {
             private readonly Goal goal;
 
@@ -104,13 +127,17 @@ namespace GoalSelector {
         private readonly SimpleList<Entity> tempLinkedEntities = new SimpleList<Entity>();
 
         public Entity CreateUtilityBrainEntity(EntityManager entityManager, in Entity agent, int dataIndex) {
+            if (this.selectors == null) {
+                throw new CantBeNullException(nameof(this.selectors));
+            }
+
             this.tempLinkedEntities.Clear();
-            
+
             Entity brainEntity = CreateBrain(ref entityManager, agent, dataIndex);
-            
+
             // Add the brainEntity first as it is the owner of the subsequent entities
             this.tempLinkedEntities.Add(brainEntity);
-            
+
             // Create each option
             GoalSelector selector = this.selectors[dataIndex];
             ReadOnlySimpleList<Goal> goals = selector.Goals;
@@ -118,22 +145,26 @@ namespace GoalSelector {
                 Entity option = CreateOption(ref entityManager, goals[i], brainEntity, i, agent);
                 this.tempLinkedEntities.Add(option);
             }
-            
+
             // Commit the linked entities
             DynamicBuffer<LinkedEntityGroup> linkedEntities = entityManager.GetBuffer<LinkedEntityGroup>(brainEntity);
             for (int i = 0; i < this.tempLinkedEntities.Count; i++) {
                 linkedEntities.Add(this.tempLinkedEntities[i]);
             }
-            
+
             return brainEntity;
         }
 
         private Entity CreateBrain(ref EntityManager entityManager, in Entity agent, int dataIndex) {
+            if (this.selectors == null) {
+                throw new CantBeNullException(nameof(this.selectors));
+            }
+
             Entity brainEntity = entityManager.CreateEntity(this.brainArchetype);
-            
+
             // Note here that we pass true so that UtilityBrain will execute upon creation
             entityManager.SetComponentData(brainEntity, new UtilityBrain(agent, true));
-            
+
             // Prepare enough slots of UtilityValueWithOption
             DynamicBuffer<UtilityValueWithOption> brainValueList = entityManager.GetBuffer<UtilityValueWithOption>(brainEntity);
             GoalSelector selector = this.selectors[dataIndex];
@@ -151,13 +182,13 @@ namespace GoalSelector {
             Name.SetupName(ref entityManager, option, goal.Id);
 
             ReadOnlySimpleList<ConsiderationAssembler> assemblers = goal.Assemblers;
-            
+
             // Prepare enough UtilityValue slots for considerations 
             DynamicBuffer<UtilityValue> optionValueList = entityManager.GetBuffer<UtilityValue>(option);
             for (int i = 0; i < assemblers.Count; ++i) {
-                optionValueList.Add(default);    
+                optionValueList.Add(default);
             }
-            
+
             // Prepare consideration entity for each assembler
             // This is needed as ConsiderationAssembler.Prepare() needs this
             NativeList<Entity> optionLinkedEntities = new NativeList<Entity>(Allocator.Temp);
@@ -165,7 +196,7 @@ namespace GoalSelector {
                 ConsiderationAssembler assembler = assemblers[i];
                 assembler.Prepare(ref entityManager, agent, option, i, ref optionLinkedEntities);
             }
-            
+
             // Add entries from optionLinkedEntities to tempLinkedEntities
             for (int i = 0; i < optionLinkedEntities.Length; i++) {
                 this.tempLinkedEntities.Add(optionLinkedEntities[i]);

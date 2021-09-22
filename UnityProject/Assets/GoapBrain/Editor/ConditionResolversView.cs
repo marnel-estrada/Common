@@ -6,7 +6,7 @@ using UnityEditor;
 using Common;
 
 namespace GoapBrain {
-    class ConditionResolversView {
+    public class ConditionResolversView {
         private readonly EditorWindow parent;
 
         private Vector2 scrollPos = new Vector2();

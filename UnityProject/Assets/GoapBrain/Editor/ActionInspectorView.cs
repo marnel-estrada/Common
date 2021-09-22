@@ -1,7 +1,5 @@
 ﻿using Common;
-
 using UnityEditor;
-
 using UnityEngine;
 
 namespace GoapBrain {
@@ -62,7 +60,7 @@ namespace GoapBrain {
             GUILayout.Label("Name: ", GUILayout.Width(100));
             GUILayout.Label(action.Name, GUILayout.Width(300));
             GUILayout.EndHorizontal();
-            
+
             // Action Id
             GUILayout.BeginHorizontal();
             GUILayout.Label("Action ID: ", GUILayout.Width(100));

@@ -12,7 +12,7 @@ namespace GoapBrain {
 
         private readonly ActionSelectionView selectionView = new ActionSelectionView();
 
-        private Vector2 scrollPos = new Vector2();
+        private Vector2 scrollPos;
 
         private string newActionName = "";
 

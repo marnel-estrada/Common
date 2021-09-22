@@ -1,5 +1,4 @@
 ﻿using System;
-
 using UnityEngine;
 using UnityEditor;
 using Common;
@@ -11,8 +10,8 @@ namespace GoapBrain {
     class AtomActionsView {
         private readonly EditorWindow parent;
 
-        private GoapDomainData domain;
-        private GoapActionData action;
+        private GoapDomainData? domain;
+        private GoapActionData? action;
 
         private readonly ClassPropertiesRenderer propertiesRenderer;
 
@@ -35,9 +34,10 @@ namespace GoapBrain {
 
             // Add new atomic action
             GUI.backgroundColor = ColorUtils.GREEN;
-            if(GUILayout.Button("Add Atomic Action...", GUILayout.Width(140))) {
+            if (GUILayout.Button("Add Atomic Action...", GUILayout.Width(140))) {
                 OpenAtomActionsBrowser();
             }
+
             GUI.backgroundColor = ColorUtils.WHITE;
 
             GUILayout.Space(5);
@@ -51,14 +51,14 @@ namespace GoapBrain {
         }
 
         private void RenderAtomActions(GoapDomainData domain, GoapActionData action) {
-            for(int i = 0; i < action.AtomActions.Count; ++i) {
+            for (int i = 0; i < action.AtomActions.Count; ++i) {
                 RenderAtomAction(domain, action, action.AtomActions[i], i);
                 GUILayout.Space(5);
             }
         }
 
         private void RenderAtomAction(GoapDomainData domain, GoapActionData action, ClassData data, int index) {
-            if(data.ClassType == null) {
+            if (data.ClassType == null) {
                 // Cache
                 data.ClassType = TypeUtils.GetType(data.ClassName);
                 Assertion.NotNull(data.ClassType);
@@ -71,6 +71,7 @@ namespace GoapBrain {
             if (GUILayout.Button("X", GUILayout.Width(20), GUILayout.Height(20))) {
                 Remove(domain, action, data);
             }
+
             GUI.backgroundColor = ColorUtils.WHITE;
 
             // up button 
@@ -82,7 +83,7 @@ namespace GoapBrain {
             if (GUILayout.Button("Down", GUILayout.Width(45), GUILayout.Height(20))) {
                 MoveDown(domain, action, index);
             }
-            
+
             GUILayout.Box(data.ClassType.Name, GUILayout.Width(300));
 
             GUILayout.EndHorizontal();
@@ -109,16 +110,16 @@ namespace GoapBrain {
 
         private void OnAdd(Type type) {
             ClassData classData = new ClassData();
-            classData.ClassName = type.FullName;
+            classData.ClassName = type.FullName ?? string.Empty;
 
-            this.action.AtomActions.Add(classData);
+            this.action?.AtomActions.Add(classData);
 
             EditorUtility.SetDirty(this.domain);
             GoapEditorSignals.REPAINT.Dispatch();
         }
 
         private void Remove(GoapDomainData domain, GoapActionData action, ClassData data) {
-            if(EditorUtility.DisplayDialogComplex("Remove Atomic Action", "Are you sure you want to remove this atomic action?", "Yes", "No", "Cancel") != 0) {
+            if (EditorUtility.DisplayDialogComplex("Remove Atomic Action", "Are you sure you want to remove this atomic action?", "Yes", "No", "Cancel") != 0) {
                 // Cancelled or No
                 return;
             }
@@ -130,7 +131,7 @@ namespace GoapBrain {
         }
 
         private void MoveUp(GoapDomainData domain, GoapActionData action, int index) {
-            if(index <= 0) {
+            if (index <= 0) {
                 // Can no longer move up
                 return;
             }

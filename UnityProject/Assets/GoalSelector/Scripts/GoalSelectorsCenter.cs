@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Common;
 using CommonEcs;
 using CommonEcs.UtilityBrain;
-using Game;
 using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;

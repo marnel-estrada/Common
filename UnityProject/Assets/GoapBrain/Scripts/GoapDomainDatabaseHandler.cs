@@ -38,9 +38,14 @@ namespace GoapBrain {
             this.assemblerSets = new AssemblerSet[this.domains.Length];
 
             for (int i = 0; i < this.domains.Length; ++i) {
-                GoapDomainData domainData = this.domains[i];
-                domainsBuilder[i] = ParseDomain(domainData); // We use the index used here when creating the agent
-                this.assemblerSets[i] = ParseAssemblerSet(domainData, i);
+                try {
+                    GoapDomainData domainData = this.domains[i];
+                    domainsBuilder[i] = ParseDomain(domainData); // We use the index used here when creating the agent
+                    this.assemblerSets[i] = ParseAssemblerSet(domainData, i);
+                } catch (Exception e) {
+                    Debug.LogError($"Error while parsing domain at index {i}");
+                    throw;
+                }
             }
 
             this.domainDbReference = builder.CreateBlobAssetReference<GoapDomainDatabase>(Allocator.Persistent);

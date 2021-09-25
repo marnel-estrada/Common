@@ -103,18 +103,14 @@ namespace CommonEcs.Goap {
                     if (this.isActionFilterHasArray) {
                         TActionFilter actionFilter = filterActions[i];
                         ExecuteAction(ref atomAction, ref actionFilter, indexOfFirstEntityInQuery, i);
-
-                        // Modify
-                        atomActions[i] = atomAction;
-                        filterActions[i] = actionFilter;
+                        filterActions[i] = actionFilter; // Modify
                     } else {
                         // There's no array for the TActionFilter. It must be a tag component.
                         // Use a default filter component
                         ExecuteAction(ref atomAction, ref defaultActionFilter, indexOfFirstEntityInQuery, i);
-
-                        // Modify
-                        atomActions[i] = atomAction;
                     }
+                    
+                    atomActions[i] = atomAction; // Modify
                 }
             }
 

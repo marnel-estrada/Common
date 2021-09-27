@@ -53,6 +53,8 @@ namespace CommonEcs.Goap {
             ComponentDataFromEntity<TActionFilter> allFilterActions =
                 this.isActionFilterHasArray ? GetComponentDataFromEntity<TActionFilter>() : default;
 
+            BeforeActionsExecution();
+
             for (int i = 0; i < actionsThatCanExecuteList.Length; ++i) {
                 Entity actionEntity = actionsThatCanExecuteList[i];
                 AtomAction atomAction = allAtomActions[actionEntity];
@@ -84,6 +86,10 @@ namespace CommonEcs.Goap {
             }
 
             atomAction.result = Update(ref atomAction, ref actionFilter);
+        }
+
+        protected virtual void BeforeActionsExecution() {
+            // Caching of ComponentDataFromEntity or BufferFromEntity can be done here.
         }
 
         protected abstract GoapResult Start(ref AtomAction atomAction, ref TActionFilter actionComponent);

@@ -84,6 +84,8 @@ namespace CommonEcs.Goap {
                 NativeArray<TActionFilter> filterActions = this.isActionFilterHasArray ? batchInChunk.GetNativeArray(this.actionFilterType) : default;
                 TActionFilter defaultActionFilter = default; // This will be used if TActionFilter has no chunk (it's a tag component)
                 
+                this.processor.BeforeChunkIteration(batchInChunk, batchIndex);
+                
                 int count = batchInChunk.Count;
                 for (int i = 0; i < count; ++i) {
                     AtomAction atomAction = atomActions[i];

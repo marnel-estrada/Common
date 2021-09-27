@@ -38,7 +38,7 @@ namespace CommonEcs.Goap {
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
                 resultList = actionsThatCanExecuteList.AsParallelWriter()
             };
-            collectJob.Schedule(this.query, this.Dependency).Complete();
+            collectJob.ScheduleParallel(this.query, 1, this.Dependency).Complete();
 
             if (actionsThatCanExecuteList.IsEmpty) {
                 // There are no actions that can execute. We can skip executing the actions.

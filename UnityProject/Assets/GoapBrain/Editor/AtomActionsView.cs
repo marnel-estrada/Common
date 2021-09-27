@@ -90,7 +90,7 @@ namespace GoapBrain {
 
             // Variables
             Assertion.NotNull(data.ClassType);
-            this.propertiesRenderer.RenderVariables(domain.Variables, data.Variables, data.ClassType, data.ShowHints);
+            this.propertiesRenderer.RenderVariables(domain.Variables, data.Variables, data.ClassType, data.ShowHints, 250);
         }
 
         private void OpenAtomActionsBrowser() {

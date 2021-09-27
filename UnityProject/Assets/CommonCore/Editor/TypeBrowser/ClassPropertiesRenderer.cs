@@ -8,7 +8,7 @@ namespace Common {
     ///     A class that handles rendering of named properties of a certain class
     /// </summary>
     public class ClassPropertiesRenderer {
-        private const int LABEL_WIDTH = 150;
+        private const int DEFAULT_LABEL_WIDTH = 200;
 
         private readonly int fieldWidth;
 
@@ -33,8 +33,9 @@ namespace Common {
         /// <param name="localVariables"></param>
         /// <param name="classType"></param>
         /// <param name="showHints"></param>
+        /// <param name="labelWidth"></param>
         public void RenderVariables(NamedValueLibrary parentVariables, NamedValueLibrary localVariables, Type classType,
-                                    bool showHints) {
+                                    bool showHints, int labelWidth = DEFAULT_LABEL_WIDTH) {
             PropertyInfo[] properties = classType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (PropertyInfo property in properties) {
                 if (!TypeUtils.IsVariableProperty(property)) {
@@ -59,17 +60,17 @@ namespace Common {
                     Assertion.NotNull(holder, "holder");
                 }
 
-                RenderVariableField(parentVariables, property, holder, namedType, showHints);
+                RenderVariableField(parentVariables, property, holder, namedType, showHints, labelWidth);
 
                 GUILayout.Space(5);
             }
         }
 
         private void RenderVariableField(NamedValueLibrary parentVariables, PropertyInfo property, ValueHolder? holder,
-                                         NamedValueType namedType, bool showHint) {
+                                         NamedValueType namedType, bool showHint, int labelWidth) {
             EditorGUILayout.BeginHorizontal();
 
-            EditorGUILayout.LabelField(property.Name + ": ", GUILayout.Width(LABEL_WIDTH));
+            EditorGUILayout.LabelField(property.Name + ": ", GUILayout.Width(labelWidth));
 
             bool hasSelectionHint = HasEditorHint(property, EditorHint.SELECTION);
 

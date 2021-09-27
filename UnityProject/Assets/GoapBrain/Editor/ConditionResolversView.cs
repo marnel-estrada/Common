@@ -216,7 +216,7 @@ namespace GoapBrain {
             Assertion.NotNull(resolver.ResolverClass.ClassType);
             ClassData classData = resolver.ResolverClass;
 
-            this.propertiesRenderer.RenderVariables(domain.Variables, classData.Variables, classData.ClassType, classData.ShowHints);
+            this.propertiesRenderer.RenderVariables(domain.Variables, classData.Variables, classData.ClassType, classData.ShowHints, 250);
 
             GUILayout.Space(5);
         }

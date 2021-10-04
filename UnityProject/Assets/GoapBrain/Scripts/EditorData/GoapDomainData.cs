@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-
 using UnityEngine;
-
 using Common;
 
 namespace GoapBrain {
@@ -28,16 +26,14 @@ namespace GoapBrain {
         /// Adds a condition
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="value"></param>
         /// <returns></returns>
-        public ConditionName AddConditionName(string name) {
+        public void AddConditionName(string name) {
             Assertion.NotEmpty(name);
 
             ConditionName condition = new ConditionName();
             condition.Name = name;
 
             this.conditionNames.Add(condition);
-            return condition;
         }
 
         /// <summary>
@@ -46,8 +42,8 @@ namespace GoapBrain {
         /// <param name="name"></param>
         /// <returns></returns>
         public ConditionName? GetConditionName(string name) {
-            for(int i = 0; i < this.conditionNames.Count; ++i) {
-                if(this.conditionNames[i].Name.Equals(name)) {
+            for (int i = 0; i < this.conditionNames.Count; ++i) {
+                if (this.conditionNames[i].Name.Equals(name)) {
                     return this.conditionNames[i];
                 }
             }
@@ -74,7 +70,7 @@ namespace GoapBrain {
         /// <summary>
         /// Removes the specified condition name
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="conditionName"></param>
         public void RemoveConditionName(ConditionName conditionName) {
             this.conditionNames.Remove(conditionName);
         }
@@ -97,9 +93,9 @@ namespace GoapBrain {
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public GoapActionData GetAction(string name) {
-            for(int i = 0; i < this.actions.Count; ++i) {
-                if(this.actions[i].Name.Equals(name)) {
+        public GoapActionData? GetAction(string name) {
+            for (int i = 0; i < this.actions.Count; ++i) {
+                if (this.actions[i].Name.Equals(name)) {
                     return this.actions[i];
                 }
             }
@@ -155,9 +151,9 @@ namespace GoapBrain {
         /// <param name="conditionName"></param>
         /// <returns></returns>
         public ConditionResolverData? GetConditionResolver(string conditionName) {
-            for(int i = 0; i < this.conditionResolvers.Count; ++i) {
+            for (int i = 0; i < this.conditionResolvers.Count; ++i) {
                 ConditionResolverData data = this.conditionResolvers[i];
-                if(data.ConditionName.Equals(conditionName)) {
+                if (data.ConditionName.Equals(conditionName)) {
                     return data;
                 }
             }

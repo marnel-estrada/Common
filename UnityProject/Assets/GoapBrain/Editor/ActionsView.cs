@@ -39,8 +39,11 @@ namespace GoapBrain {
             GUILayout.Label("Inspector", EditorStyles.boldLabel);
             GUILayout.Space(10);
 
-            GoapActionData selectedAction = this.sidebar.GetSelectedAction();
-            this.inspector.Render(domainData, selectedAction);
+            GoapActionData? selectedAction = this.sidebar.GetSelectedAction();
+
+            if (selectedAction != null) {
+                this.inspector.Render(domainData, selectedAction);
+            }
 
             EditorGUILayout.EndVertical();
 

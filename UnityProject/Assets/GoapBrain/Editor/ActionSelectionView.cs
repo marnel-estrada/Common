@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using Common;
-
 using UnityEngine;
 
 namespace GoapBrain {
@@ -10,13 +8,13 @@ namespace GoapBrain {
     ///     Handles the filtering and showing of filtered actions
     /// </summary>
     internal class ActionSelectionView {
-        private string atomActionFilter = "";
-        private string effectFilter = "";
+        private string? atomActionFilter = "";
+        private string? effectFilter = "";
         private readonly SimpleList<GoapActionData> filteredList = new SimpleList<GoapActionData>();
         private readonly List<string> filteredNames = new List<string>(); // Used to render list of action buttons
 
-        private string nameFilter = "";
-        private string preconditionFilter = "";
+        private string? nameFilter = "";
+        private string? preconditionFilter = "";
 
         private int selection;
 
@@ -79,6 +77,7 @@ namespace GoapBrain {
         /// <summary>
         ///     Applies the filter
         /// </summary>
+        /// <param name="domainData"></param>
         /// <param name="nameFilter"></param>
         public void FilterByName(GoapDomainData domainData, string nameFilter) {
             this.nameFilter = nameFilter;
@@ -126,7 +125,7 @@ namespace GoapBrain {
 
             for (int i = 0; i < action.Preconditions.Count; ++i) {
                 ConditionData precondition = action.Preconditions[i];
-                if (precondition.Name.ToLower().Contains(loweredFilter)) {
+                if (precondition.Name != null && precondition.Name.ToLower().Contains(loweredFilter)) {
                     return true;
                 }
             }
@@ -148,10 +147,10 @@ namespace GoapBrain {
             if (action.Effect == null) {
                 return false;
             }
-            
+
             // We use upper here because it is faster
             string upperFilter = filter.ToUpperInvariant();
-            return action.Effect.Name.ToUpperInvariant().Contains(upperFilter);
+            return action.Effect.Name != null && action.Effect.Name.ToUpperInvariant().Contains(upperFilter);
         }
 
         private void Filter(GoapDomainData domainData, string filter, Func<GoapActionData, string, bool> predicate) {
@@ -196,6 +195,8 @@ namespace GoapBrain {
             this.selection = GUILayout.SelectionGrid(this.selection, this.filteredNames.ToArray(), 1);
         }
 
+        // Added Pragma warning here since the strings' null checks here are done inside the string.IsNullOrEmpty
+#pragma warning disable 8604
         /// <summary>
         ///     Reapplies the filters
         /// </summary>
@@ -211,15 +212,16 @@ namespace GoapBrain {
                 FilterByEffect(domain, this.effectFilter);
             } else {
                 // There are no filters. Show all
-                FilterByName(domain, null);
+                FilterByName(domain, string.Empty);
             }
         }
+#pragma warning restore 8604
 
         /// <summary>
         ///     Returns the currently selected action
         /// </summary>
         /// <returns></returns>
-        public GoapActionData GetSelectedAction() {
+        public GoapActionData? GetSelectedAction() {
             if (this.selection >= 0 && this.filteredList.Count > 0) {
                 if (this.selection < this.filteredList.Count) {
                     // Check for valid index

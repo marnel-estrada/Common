@@ -7,7 +7,7 @@ namespace GoapBrain {
     /// <summary>
     /// Handles rendering of atom actions UI
     /// </summary>
-    class AtomActionsView {
+    internal class AtomActionsView {
         private readonly EditorWindow parent;
 
         private GoapDomainData? domain;
@@ -100,11 +100,11 @@ namespace GoapBrain {
             position.width = 400;
             position.height = 600;
 
-            AtomActionBrowserWindow actionsBrowser = ScriptableObject.CreateInstance<AtomActionBrowserWindow>();
+            AtomActionBrowserWindow actionsBrowser = EditorWindow.GetWindow<AtomActionBrowserWindow>();
             actionsBrowser.titleContent = new GUIContent("Atom Actions Browser");
             actionsBrowser.Init(OnAdd);
             actionsBrowser.position = position;
-            actionsBrowser.ShowModalUtility();
+            actionsBrowser.Show(true);
             actionsBrowser.Focus();
         }
 

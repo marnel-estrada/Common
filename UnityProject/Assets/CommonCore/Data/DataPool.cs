@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Common {
@@ -13,6 +14,7 @@ namespace Common {
         private GUISkin guiSkin;
 
         [SerializeField]
+        [Searchable]
         private List<T> dataList = new List<T>();
 
         [SerializeField]

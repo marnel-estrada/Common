@@ -104,7 +104,7 @@ namespace GoapBrain {
             actionsBrowser.titleContent = new GUIContent("Atom Actions Browser");
             actionsBrowser.Init(OnAdd);
             actionsBrowser.position = position;
-            actionsBrowser.Show(true);
+            actionsBrowser.ShowUtility();
             actionsBrowser.Focus();
         }
 

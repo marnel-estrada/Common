@@ -85,8 +85,8 @@ namespace Common {
                     if(random < entry.RouletteFrom) {
                         // this means that item is to the left of the mid entry
                         maxIndex = midIndex - 1;
-                    } else if(entry.RouletteTo.TolerantGreaterThanOrEquals(random)) {
-                        // this means that the item is to the right of the mid entry
+                    } else {
+                        // If not to the left of mid entry, it can only be to the right
                         minIndex = midIndex + 1;
                     }
                 }

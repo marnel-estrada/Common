@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Common {
@@ -12,13 +12,14 @@ namespace Common {
         // This is used for the editor such that we don't need to resolve it by path
         [SerializeField]
         private GUISkin guiSkin;
-        
+
         [SerializeField]
+        [Searchable]
         private List<T> dataList = new List<T>();
 
         [SerializeField]
         private IdGenerator idGenerator = new IdGenerator();
-        
+
         private Dictionary<string, T> map;
 
         /// <summary>
@@ -31,7 +32,7 @@ namespace Common {
         }
 
         private void PopulateMap() {
-            if(this.map != null && this.map.Count > 0) {
+            if (this.map != null && this.map.Count > 0) {
                 // Already populated
                 return;
             }
@@ -42,7 +43,7 @@ namespace Common {
 
             for (int i = 0; i < this.dataList.Count; ++i) {
                 T data = this.dataList[i];
-                
+
                 // We trim here because data entry from designers might have spaces
                 this.map[data.Id.Trim()] = data;
             }
@@ -71,7 +72,7 @@ namespace Common {
                     return new Maybe<T>(item);
                 }
             }
-            
+
             return Maybe<T>.Nothing;
         }
 
@@ -109,6 +110,10 @@ namespace Common {
             return this.dataList[index];
         }
 
+        public void SetGuiSkin(GUISkin guiSkin) {
+            this.guiSkin = guiSkin;
+        }
+
         /// <summary>
         /// Returns all instances of items
         /// </summary>
@@ -125,7 +130,7 @@ namespace Common {
             T data = new T();
             data.IntId = this.idGenerator.Generate();
             data.Id = id;
-            
+
             this.dataList.Add(data);
             this.map[data.Id] = data;
 
@@ -139,7 +144,7 @@ namespace Common {
         /// <param name="item"></param>
         public void Add(T item) {
             Assertion.IsTrue(!this.map.ContainsKey(item.Id)); // Should not contain the same ID
-            
+
             item.IntId = this.idGenerator.Generate();
             this.dataList.Add(item);
             this.map[item.Id] = item;
@@ -155,14 +160,14 @@ namespace Common {
             this.removeList.Clear();
 
             // We search through list because IDs may repeat
-            for(int i = 0; i < this.dataList.Count; ++i) {
+            for (int i = 0; i < this.dataList.Count; ++i) {
                 T item = this.dataList[i];
-                if(item.Id.EqualsFast(id)) {
+                if (item.Id.EqualsFast(id)) {
                     this.removeList.Add(item);
                 }
             }
 
-            for(int i = 0; i < this.removeList.Count; ++i) {
+            for (int i = 0; i < this.removeList.Count; ++i) {
                 this.dataList.Remove(this.removeList[i]);
                 this.map.Remove(this.removeList[i].Id); // Remove from dictionary as well
             }

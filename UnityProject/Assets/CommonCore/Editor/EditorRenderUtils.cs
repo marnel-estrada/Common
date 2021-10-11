@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-
 using UnityEngine;
 using UnityEditor;
 
@@ -16,7 +15,7 @@ namespace Common {
             string finalValue = value ?? "";
 
             int index = valueSet.ResolveIndex(finalValue);
-            if(index < 0) {
+            if (index < 0) {
                 // current value is not found in the value set
                 // we use the first entry instead
                 index = 0;
@@ -36,7 +35,7 @@ namespace Common {
         /// <param name="stringList"></param>
         public static bool Render(string title, List<string> stringList) {
             bool changed = false;
-            
+
             // New entry
             GUILayout.BeginHorizontal();
             GUILayout.Label("New: ", GUILayout.Width(40));
@@ -47,14 +46,15 @@ namespace Common {
                     changed = true;
                 }
             }
+
             GUILayout.EndHorizontal();
-            
+
             GUILayout.Space(5);
-            
+
             // Existing entries
             for (int i = 0; i < stringList.Count; ++i) {
                 GUILayout.BeginHorizontal();
-                
+
                 // Close button
                 GUI.backgroundColor = Color.red;
                 if (GUILayout.Button("X", GUILayout.Width(20))) {
@@ -62,8 +62,9 @@ namespace Common {
                         REMOVAL_LIST.Add(stringList[i]);
                     }
                 }
+
                 GUI.backgroundColor = Color.white;
-                
+
                 string current = stringList[i];
                 string field = GUILayout.TextField(current, GUILayout.Width(200));
                 if (!current.EqualsFast(field)) {
@@ -71,18 +72,28 @@ namespace Common {
                     stringList[i] = field;
                     changed = true;
                 }
-                
+
                 GUILayout.EndHorizontal();
             }
-            
+
             // Apply removal list
-            changed = changed || REMOVAL_LIST.Count > 0; 
+            changed = changed || REMOVAL_LIST.Count > 0;
             for (int i = 0; i < REMOVAL_LIST.Count; ++i) {
                 stringList.Remove(REMOVAL_LIST[i]);
             }
+
             REMOVAL_LIST.Clear();
 
             return changed;
+        }
+
+        public static void DrawUILine(Color color, int thickness = 2, int padding = 10) {
+            Rect r = EditorGUILayout.GetControlRect(GUILayout.Height(padding + thickness));
+            r.height = thickness;
+            r.y += padding / 2f;
+            r.x -= 2;
+            r.width += 6;
+            EditorGUI.DrawRect(r, color);
         }
     }
 }

@@ -280,7 +280,7 @@ public class SwarmItemManager : MonoBehaviour {
 	/// </summary>
 	/// <param name="item">The SwarmItem to move</param>
 	/// <param name="parentTransform">The parent transform to move to</param>
-	private void SetItemParentTransform(SwarmItem item, Transform parentTransform) {
+	private static void SetItemParentTransform(SwarmItem item, Transform parentTransform) {
         if (item == null) {
             throw new Exception("item can't be null");
         }

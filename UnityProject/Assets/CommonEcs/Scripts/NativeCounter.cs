@@ -114,7 +114,7 @@ namespace CommonEcs {
         [NativeContainer]
         // This attribute is what makes it possible to use NativeCounter.Concurrent in a ParallelFor job
         [NativeContainerIsAtomicWriteOnly]
-        public struct Concurrent {
+        public struct ParallelWriter {
             // Copy of the pointer from the full NativeCounter
             [NativeDisableUnsafePtrRestriction]
             private int* m_Counter;
@@ -129,18 +129,18 @@ namespace CommonEcs {
             int m_ThreadIndex;
 
             // This is what makes it possible to assign to NativeCounter.Concurrent from NativeCounter
-            public static implicit operator Concurrent(NativeCounter cnt) {
-                Concurrent concurrent;
+            public static implicit operator ParallelWriter(NativeCounter cnt) {
+                ParallelWriter parallelWriter;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 AtomicSafetyHandle.CheckWriteAndThrow(cnt.m_Safety);
-                concurrent.m_Safety = cnt.m_Safety;
-                AtomicSafetyHandle.UseSecondaryVersion(ref concurrent.m_Safety);
+                parallelWriter.m_Safety = cnt.m_Safety;
+                AtomicSafetyHandle.UseSecondaryVersion(ref parallelWriter.m_Safety);
 #endif
 
-                concurrent.m_Counter = cnt.m_Counter;
-                concurrent.m_ThreadIndex = 0;
+                parallelWriter.m_Counter = cnt.m_Counter;
+                parallelWriter.m_ThreadIndex = 0;
 
-                return concurrent;
+                return parallelWriter;
             }
 
             public void Increment() {

@@ -29,7 +29,7 @@ public class SwarmItemManager : MonoBehaviour {
 	/// <summary>
 	///     internal member that stores the parent transform of all active items. This is used as a visual aid in the editor.
 	/// </summary>
-	private Transform _activeParentTransform;
+	private Transform? activeParentTransform;
 
 	/// <summary>
 	///     internal member to instantiate a SwarmItem
@@ -95,12 +95,7 @@ public class SwarmItemManager : MonoBehaviour {
         }
 
         // create the active objects parent transform
-        this._go = new GameObject("Active Items");
-        this._activeParentTransform = this._go.transform;
-        this._activeParentTransform.parent = this.transform;
-        this._activeParentTransform.localPosition = Vector3.zero;
-        this._activeParentTransform.localRotation = Quaternion.identity;
-        this._activeParentTransform.localScale = Vector3.one;
+        PrepareActiveItems();
 
         // create the inactive objects parent transform;
         this._go = new GameObject("Inactive Items");
@@ -110,6 +105,20 @@ public class SwarmItemManager : MonoBehaviour {
         this._inactiveParentTransform.localRotation = Quaternion.identity;
         this._inactiveParentTransform.localScale = Vector3.one;
     }
+
+	private void PrepareActiveItems() {
+		if (this.activeParentTransform != null) {
+			// Already prepared
+			return;
+		}
+		
+		this._go = new GameObject("Active Items");
+		this.activeParentTransform = this._go.transform;
+		this.activeParentTransform.parent = this.transform;
+		this.activeParentTransform.localPosition = Vector3.zero;
+		this.activeParentTransform.localRotation = Quaternion.identity;
+		this.activeParentTransform.localScale = Vector3.one;
+	}
 
 	/// <summary>
 	///     Overloaded form of ActivateItem that assumes you just want the first SwarmItem type (first prefab)
@@ -170,9 +179,13 @@ public class SwarmItemManager : MonoBehaviour {
             }
         }
 
+        if (this.activeParentTransform == null) {
+	        PrepareActiveItems();
+        }
+
         // move the item to active parent transform.
         // this is mainly just for visual reference in the editor
-        SetItemParentTransform(localItem, this._activeParentTransform);
+        SetItemParentTransform(localItem, this.activeParentTransform);
 
         // set the state to active
         localItem.State = SwarmItem.STATE.Active;

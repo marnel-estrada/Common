@@ -32,11 +32,6 @@ public class SwarmItemManager : MonoBehaviour {
 	private Transform? activeParentTransform;
 
 	/// <summary>
-	///     internal member to instantiate a SwarmItem
-	/// </summary>
-	private GameObject _go;
-
-	/// <summary>
 	///     internal member that stores the parent transform of all inactive items. This is used as a visual aid in the editor.
 	/// </summary>
 	private Transform _inactiveParentTransform;
@@ -98,13 +93,17 @@ public class SwarmItemManager : MonoBehaviour {
         PrepareActiveItems();
 
         // create the inactive objects parent transform;
-        this._go = new GameObject("Inactive Items");
-        this._inactiveParentTransform = this._go.transform;
-        this._inactiveParentTransform.parent = this.transform;
-        this._inactiveParentTransform.localPosition = Vector3.zero;
-        this._inactiveParentTransform.localRotation = Quaternion.identity;
-        this._inactiveParentTransform.localScale = Vector3.one;
-    }
+        PrepareInactiveItems();
+	}
+
+	private void PrepareInactiveItems() {
+		GameObject go = new GameObject("Inactive Items");
+		this._inactiveParentTransform = go.transform;
+		this._inactiveParentTransform.parent = this.transform;
+		this._inactiveParentTransform.localPosition = Vector3.zero;
+		this._inactiveParentTransform.localRotation = Quaternion.identity;
+		this._inactiveParentTransform.localScale = Vector3.one;
+	}
 
 	private void PrepareActiveItems() {
 		if (this.activeParentTransform != null) {
@@ -112,9 +111,9 @@ public class SwarmItemManager : MonoBehaviour {
 			return;
 		}
 		
-		this._go = new GameObject("Active Items");
-		this.activeParentTransform = this._go.transform;
-		this.activeParentTransform.parent = this.transform;
+		GameObject go = new GameObject("Active Items");
+		this.activeParentTransform = go.transform;
+		this.activeParentTransform.SetParent(this.transform);
 		this.activeParentTransform.localPosition = Vector3.zero;
 		this.activeParentTransform.localRotation = Quaternion.identity;
 		this.activeParentTransform.localScale = Vector3.one;
@@ -168,7 +167,7 @@ public class SwarmItemManager : MonoBehaviour {
             this._prefabItemLists[itemPrefabIndex].activeItems.AddLast(localItem);
 
             if (this.debugEvents) {
-                Debug.Log("Instantiated a new item " + this._go.name + " at frame: " + Time.frameCount);
+                Debug.Log("Instantiated a new item " + localItem.gameObject.name + " at frame: " + Time.frameCount);
             }
         } else {
             // there is an inactive item so we recycle it
@@ -270,12 +269,12 @@ public class SwarmItemManager : MonoBehaviour {
         SwarmItem item;
 
         // instantiate
-        this._go = Instantiate(this.itemPrefabs[itemPrefabIndex].prefab);
+        GameObject go = Instantiate(this.itemPrefabs[itemPrefabIndex].prefab);
         // change the name of the gameobject with an index and take off the 'Clone' postfix
-        this._go.name = "[" + this._itemCount.ToString("0000") + "] " + this._go.name.Replace("(Clone)", "");
+        go.name = "[" + this._itemCount.ToString("0000") + "] " + go.name.Replace("(Clone)", "");
 
         // get the SwarmItem component from the gameobject
-        item = (SwarmItem) this._go.GetComponent(typeof(SwarmItem));
+        item = (SwarmItem) go.GetComponent(typeof(SwarmItem));
         Assert.IsNotNull(item, "SwarmItem");
 
         // initialize the SwarmItem

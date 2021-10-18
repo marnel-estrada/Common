@@ -1,5 +1,4 @@
 using Unity.Mathematics;
-
 using UnityEngine;
 
 namespace Common {
@@ -19,15 +18,18 @@ namespace Common {
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="atlas"></param>
         /// <param name="uvRect"></param>
+        /// <param name="atlasWidth"></param>
+        /// <param name="atlasHeight"></param>
+        /// <param name="originalWidth"></param>
+        /// <param name="originalHeight"></param>
         public PackedTextureEntry(Rect uvRect, int atlasWidth, int atlasHeight, int originalWidth, int originalHeight) {
             this.uvRect = uvRect;
 
             this.atlasWidth = atlasWidth;
             this.atlasHeight = atlasHeight;
-            
-            this.spriteRect = new Rect(this.uvRect.x * this.atlasWidth, this.uvRect.y * this.atlasHeight, 
+
+            this.spriteRect = new Rect(this.uvRect.x * this.atlasWidth, this.uvRect.y * this.atlasHeight,
                 this.uvRect.width * this.atlasWidth, this.uvRect.height * this.atlasHeight);
 
             this.originalWidth = originalWidth;

@@ -8,7 +8,7 @@ namespace Common {
         // we need this to store activated SwarmItem temporarily
         // they will be killed right after
         // we can't Activate() then Kill() because it will only reuse the killed item
-        private SimpleList<SwarmItem> preloadList;
+        private readonly SimpleList<SwarmItem> preloadList = new SimpleList<SwarmItem>();
 
         private void Awake() {
             Initialize();
@@ -29,15 +29,12 @@ namespace Common {
                 // because there would be errors if the item was killed in its FrameUpdate method.
                 // instead we manually move to the next linkedlist nod/
 
-                LinkedListNode<SwarmItem> item = null;
-                LinkedListNode<SwarmItem> nextItem = null;
-
-                item = this._prefabItemLists[i].activeItems.First;
+                LinkedListNode<SwarmItem>? item = this._prefabItemLists[i].activeItems.First;
 
                 // while there are items left to process
                 while (item != null) {
                     // cache the next item because the current item will be killed
-                    nextItem = item.Next;
+                    LinkedListNode<SwarmItem>? nextItem = item.Next;
                     DeactiveItem(item.Value);
                     item = nextItem;
                 }
@@ -68,11 +65,6 @@ namespace Common {
                 // there are already enough inactive items
                 // no need to proceed
                 return;
-            }
-
-            // we lazy initialize because not all item managers needs preloading
-            if (this.preloadList == null) {
-                this.preloadList = new SimpleList<SwarmItem>();
             }
 
             this.preloadList.Clear();

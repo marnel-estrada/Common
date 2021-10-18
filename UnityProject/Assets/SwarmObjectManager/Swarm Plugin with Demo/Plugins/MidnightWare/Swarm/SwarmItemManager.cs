@@ -29,12 +29,7 @@ public class SwarmItemManager : MonoBehaviour {
 	/// <summary>
 	///     internal member that stores the parent transform of all active items. This is used as a visual aid in the editor.
 	/// </summary>
-	private Transform _activeParentTransform;
-
-	/// <summary>
-	///     internal member to instantiate a SwarmItem
-	/// </summary>
-	private GameObject _go;
+	private Transform? activeParentTransform;
 
 	/// <summary>
 	///     internal member that stores the parent transform of all inactive items. This is used as a visual aid in the editor.
@@ -95,21 +90,34 @@ public class SwarmItemManager : MonoBehaviour {
         }
 
         // create the active objects parent transform
-        this._go = new GameObject("Active Items");
-        this._activeParentTransform = this._go.transform;
-        this._activeParentTransform.parent = this.transform;
-        this._activeParentTransform.localPosition = Vector3.zero;
-        this._activeParentTransform.localRotation = Quaternion.identity;
-        this._activeParentTransform.localScale = Vector3.one;
+        PrepareActiveItems();
 
         // create the inactive objects parent transform;
-        this._go = new GameObject("Inactive Items");
-        this._inactiveParentTransform = this._go.transform;
-        this._inactiveParentTransform.parent = this.transform;
-        this._inactiveParentTransform.localPosition = Vector3.zero;
-        this._inactiveParentTransform.localRotation = Quaternion.identity;
-        this._inactiveParentTransform.localScale = Vector3.one;
-    }
+        PrepareInactiveItems();
+	}
+
+	private void PrepareInactiveItems() {
+		GameObject go = new GameObject("Inactive Items");
+		this._inactiveParentTransform = go.transform;
+		this._inactiveParentTransform.parent = this.transform;
+		this._inactiveParentTransform.localPosition = Vector3.zero;
+		this._inactiveParentTransform.localRotation = Quaternion.identity;
+		this._inactiveParentTransform.localScale = Vector3.one;
+	}
+
+	private void PrepareActiveItems() {
+		if (this.activeParentTransform != null) {
+			// Already prepared
+			return;
+		}
+		
+		GameObject go = new GameObject("Active Items");
+		this.activeParentTransform = go.transform;
+		this.activeParentTransform.SetParent(this.transform);
+		this.activeParentTransform.localPosition = Vector3.zero;
+		this.activeParentTransform.localRotation = Quaternion.identity;
+		this.activeParentTransform.localScale = Vector3.one;
+	}
 
 	/// <summary>
 	///     Overloaded form of ActivateItem that assumes you just want the first SwarmItem type (first prefab)
@@ -159,7 +167,7 @@ public class SwarmItemManager : MonoBehaviour {
             this._prefabItemLists[itemPrefabIndex].activeItems.AddLast(localItem);
 
             if (this.debugEvents) {
-                Debug.Log("Instantiated a new item " + this._go.name + " at frame: " + Time.frameCount);
+                Debug.Log("Instantiated a new item " + localItem.gameObject.name + " at frame: " + Time.frameCount);
             }
         } else {
             // there is an inactive item so we recycle it
@@ -170,9 +178,13 @@ public class SwarmItemManager : MonoBehaviour {
             }
         }
 
+        if (this.activeParentTransform == null) {
+	        PrepareActiveItems();
+        }
+
         // move the item to active parent transform.
         // this is mainly just for visual reference in the editor
-        SetItemParentTransform(localItem, this._activeParentTransform);
+        SetItemParentTransform(localItem, this.activeParentTransform);
 
         // set the state to active
         localItem.State = SwarmItem.STATE.Active;
@@ -257,12 +269,12 @@ public class SwarmItemManager : MonoBehaviour {
         SwarmItem item;
 
         // instantiate
-        this._go = Instantiate(this.itemPrefabs[itemPrefabIndex].prefab);
+        GameObject go = Instantiate(this.itemPrefabs[itemPrefabIndex].prefab);
         // change the name of the gameobject with an index and take off the 'Clone' postfix
-        this._go.name = "[" + this._itemCount.ToString("0000") + "] " + this._go.name.Replace("(Clone)", "");
+        go.name = "[" + this._itemCount.ToString("0000") + "] " + go.name.Replace("(Clone)", "");
 
         // get the SwarmItem component from the gameobject
-        item = (SwarmItem) this._go.GetComponent(typeof(SwarmItem));
+        item = (SwarmItem) go.GetComponent(typeof(SwarmItem));
         Assert.IsNotNull(item, "SwarmItem");
 
         // initialize the SwarmItem
@@ -280,7 +292,7 @@ public class SwarmItemManager : MonoBehaviour {
 	/// </summary>
 	/// <param name="item">The SwarmItem to move</param>
 	/// <param name="parentTransform">The parent transform to move to</param>
-	private void SetItemParentTransform(SwarmItem item, Transform parentTransform) {
+	private static void SetItemParentTransform(SwarmItem item, Transform? parentTransform) {
         if (item == null) {
             throw new Exception("item can't be null");
         }

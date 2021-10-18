@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.unity.collections": "0.9.0-preview.6",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.2d.tilemap": "1.0.0",
     "com.unity.ads": "3.5.2",
@@ -55,6 +56,5 @@
     "com.unity.entities",
     "com.unity.jobs",
     "com.unity.test-framework.performance"
-  ],
-  "registry": "https://packages.unity.com"
+  ]
 }

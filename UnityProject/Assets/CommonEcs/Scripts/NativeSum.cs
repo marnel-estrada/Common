@@ -50,11 +50,21 @@ namespace CommonEcs {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             DisposeSentinel.Create(out this.m_Safety, out this.m_DisposeSentinel, 0, label);
 #endif
-            
+
+            Clear();
+        }
+
+        public void Clear() {
             // Clear uninitialized data
-            for (int i = 1; i < JobsUtility.MaxJobThreadCount; ++i) {
+            // Verify that the caller has write permission on this data. 
+            // This is the race condition protection, without these checks the AtomicSafetyHandle is useless
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            AtomicSafetyHandle.CheckWriteAndThrow(this.m_Safety);
+#endif
+            
+            for (int i = 0; i < JobsUtility.MaxJobThreadCount; ++i) {
                 this.dataPointer[INTS_PER_CACHE_LINE * i] = 0;
-            }
+            }            
         }
 
         public void Add(int amount) {
@@ -104,7 +114,7 @@ namespace CommonEcs {
         public struct ParallelWriter {
             // Copy of the pointer from the main NativeSum
             [NativeDisableUnsafePtrRestriction]
-            private int* sumPointer;
+            private int* dataPointer;
 
             // Copy of the AtomicSafetyHandle from the full NativeCounter. The dispose sentinel is not copied since this inner struct does not own the memory and is not responsible for freeing it.
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -124,7 +134,7 @@ namespace CommonEcs {
                 AtomicSafetyHandle.UseSecondaryVersion(ref parallelWriter.m_Safety);
 #endif
 
-                parallelWriter.sumPointer = sum.dataPointer;
+                parallelWriter.dataPointer = sum.dataPointer;
                 parallelWriter.m_ThreadIndex = 0;
 
                 return parallelWriter;
@@ -137,7 +147,7 @@ namespace CommonEcs {
 #endif
                 
                 // No need for atomics any more since we are just incrementing the local count
-                this.sumPointer[INTS_PER_CACHE_LINE * this.m_ThreadIndex] += amount;
+                this.dataPointer[INTS_PER_CACHE_LINE * this.m_ThreadIndex] += amount;
             }
         }
     }

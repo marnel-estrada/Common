@@ -15,7 +15,7 @@ namespace CommonEcs {
     public unsafe struct NativeCounter {
         // The actual pointer to the allocated count needs to have restrictions relaxed so jobs can be schedled with this container
         [NativeDisableUnsafePtrRestriction]
-        private int* m_Counter;
+        private int* countIntegers;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
         private AtomicSafetyHandle m_Safety;
@@ -44,7 +44,7 @@ namespace CommonEcs {
             this.m_AllocatorLabel = label;
 
             // Allocate native memory for a single integer
-            this.m_Counter = (int*) UnsafeUtility.Malloc(
+            this.countIntegers = (int*) UnsafeUtility.Malloc(
                 UnsafeUtility.SizeOf<int>() * INTS_PER_CACHE_LINE * JobsUtility.MaxJobThreadCount, 4, label);
 
             // Create a dispose sentinel to track memory leaks. This also creates the AtomicSafetyHandle
@@ -61,7 +61,7 @@ namespace CommonEcs {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.CheckWriteAndThrow(this.m_Safety);
 #endif
-            (*this.m_Counter)++;
+            (*this.countIntegers)++;
         }
 
         public int Count {
@@ -73,7 +73,7 @@ namespace CommonEcs {
 #endif
                 int count = 0;
                 for (int i = 0; i < JobsUtility.MaxJobThreadCount; ++i) {
-                    count += this.m_Counter[INTS_PER_CACHE_LINE * i];
+                    count += this.countIntegers[INTS_PER_CACHE_LINE * i];
                 }
 
                 return count;
@@ -88,16 +88,16 @@ namespace CommonEcs {
                 // Clear all locally cached counts, 
                 // set the first one to the required value
                 for (int i = 1; i < JobsUtility.MaxJobThreadCount; ++i) {
-                    this.m_Counter[INTS_PER_CACHE_LINE * i] = 0;
+                    this.countIntegers[INTS_PER_CACHE_LINE * i] = 0;
                 }
 
-                *this.m_Counter = value;
+                *this.countIntegers = value;
             }
         }
 
         public bool IsCreated {
             get {
-                return this.m_Counter != null;
+                return this.countIntegers != null;
             }
         }
 
@@ -107,8 +107,8 @@ namespace CommonEcs {
             DisposeSentinel.Dispose(ref this.m_Safety, ref this.m_DisposeSentinel);
 #endif
 
-            UnsafeUtility.Free(this.m_Counter, this.m_AllocatorLabel);
-            this.m_Counter = null;
+            UnsafeUtility.Free(this.countIntegers, this.m_AllocatorLabel);
+            this.countIntegers = null;
         }
 
         [NativeContainer]
@@ -117,7 +117,7 @@ namespace CommonEcs {
         public struct ParallelWriter {
             // Copy of the pointer from the full NativeCounter
             [NativeDisableUnsafePtrRestriction]
-            private int* m_Counter;
+            private int* countIntegers;
 
             // Copy of the AtomicSafetyHandle from the full NativeCounter. The dispose sentinel is not copied since this inner struct does not own the memory and is not responsible for freeing it.
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -137,7 +137,7 @@ namespace CommonEcs {
                 AtomicSafetyHandle.UseSecondaryVersion(ref parallelWriter.m_Safety);
 #endif
 
-                parallelWriter.m_Counter = cnt.m_Counter;
+                parallelWriter.countIntegers = cnt.countIntegers;
                 parallelWriter.m_ThreadIndex = 0;
 
                 return parallelWriter;
@@ -150,7 +150,7 @@ namespace CommonEcs {
 #endif
                 
                 // No need for atomics any more since we are just incrementing the local count
-                ++this.m_Counter[INTS_PER_CACHE_LINE * this.m_ThreadIndex];
+                ++this.countIntegers[INTS_PER_CACHE_LINE * this.m_ThreadIndex];
             }
         }
     }

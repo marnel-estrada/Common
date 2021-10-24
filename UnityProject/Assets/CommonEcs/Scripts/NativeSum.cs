@@ -14,7 +14,7 @@ namespace CommonEcs {
     public unsafe struct NativeSum {
         // The actual pointer to the allocated sum needs to have restrictions relaxed so jobs can be scheduled with this utility
         [NativeDisableUnsafePtrRestriction]
-        private int* dataPointer;
+        private int* sumIntegers;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
         private AtomicSafetyHandle m_Safety;
@@ -43,7 +43,7 @@ namespace CommonEcs {
             this.m_AllocatorLabel = label;
 
             // Allocate native memory for a single integer
-            this.dataPointer = (int*) UnsafeUtility.Malloc(
+            this.sumIntegers = (int*) UnsafeUtility.Malloc(
                 UnsafeUtility.SizeOf<int>() * INTS_PER_CACHE_LINE * JobsUtility.MaxJobThreadCount, 4, label);
 
             // Create a dispose sentinel to track memory leaks. This also creates the AtomicSafetyHandle
@@ -63,7 +63,7 @@ namespace CommonEcs {
 #endif
             
             for (int i = 0; i < JobsUtility.MaxJobThreadCount; ++i) {
-                this.dataPointer[INTS_PER_CACHE_LINE * i] = 0;
+                this.sumIntegers[INTS_PER_CACHE_LINE * i] = 0;
             }            
         }
 
@@ -73,7 +73,7 @@ namespace CommonEcs {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.CheckWriteAndThrow(this.m_Safety);
 #endif
-            (*this.dataPointer) += amount;
+            (*this.sumIntegers) += amount;
         }
 
         public int Total {
@@ -85,7 +85,7 @@ namespace CommonEcs {
 #endif
                 int total = 0;
                 for (int i = 0; i < JobsUtility.MaxJobThreadCount; ++i) {
-                    total += this.dataPointer[INTS_PER_CACHE_LINE * i];
+                    total += this.sumIntegers[INTS_PER_CACHE_LINE * i];
                 }
 
                 return total;
@@ -94,7 +94,7 @@ namespace CommonEcs {
 
         public bool IsCreated {
             get {
-                return this.dataPointer != null;
+                return this.sumIntegers != null;
             }
         }
 
@@ -104,8 +104,8 @@ namespace CommonEcs {
             DisposeSentinel.Dispose(ref this.m_Safety, ref this.m_DisposeSentinel);
 #endif
 
-            UnsafeUtility.Free(this.dataPointer, this.m_AllocatorLabel);
-            this.dataPointer = null;
+            UnsafeUtility.Free(this.sumIntegers, this.m_AllocatorLabel);
+            this.sumIntegers = null;
         }
 
         [NativeContainer]
@@ -134,7 +134,7 @@ namespace CommonEcs {
                 AtomicSafetyHandle.UseSecondaryVersion(ref parallelWriter.m_Safety);
 #endif
 
-                parallelWriter.dataPointer = sum.dataPointer;
+                parallelWriter.dataPointer = sum.sumIntegers;
                 parallelWriter.m_ThreadIndex = 0;
 
                 return parallelWriter;

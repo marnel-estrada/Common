@@ -43,6 +43,10 @@ namespace Common {
         public static string AsSignedText(int value) {
             return value >= 0 ? ("+" + AsCommaSeparated(value)) : AsCommaSeparated(value); // note that negative values already have negative sign
         }
+        
+        public static string AsSignedText(float value) {
+            return value >= 0 ? ("+" + AsCommaSeparated(value)) : AsCommaSeparated(value); // note that negative values already have negative sign
+        }
 
         /// <summary>
         /// Proper trimming of a string

@@ -42,6 +42,10 @@ namespace Common {
 			IsTrue(pointer != null, DEFAULT_MESSAGE, context);
 		}
 		
+		public static unsafe void NotNull(void* address, UnityEngine.Object? context = null) {
+			IsTrue(address != null, DEFAULT_MESSAGE, context);
+		}
+		
 		public static void IsSome<T>(Option<T> option, UnityEngine.Object? context = null) {
 			IsTrue(option.IsSome, "Option should be Some. Got a None instead.", context);
 		}

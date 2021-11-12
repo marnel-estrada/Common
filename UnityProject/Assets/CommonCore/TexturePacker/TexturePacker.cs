@@ -83,7 +83,7 @@ namespace Common {
             }
             
             this.atlas.Compress(false);
-            this.atlas.Apply(false, true);
+            this.atlas.Apply(false, false);
         }
 
         /// <summary>

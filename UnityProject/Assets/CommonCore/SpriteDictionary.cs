@@ -15,12 +15,17 @@ namespace Common {
             public Sprite sprite;
         }
 
-        public Entry[] entries;
+        public Entry[]? entries;
         
-        private Dictionary<string, Sprite> map;
+        private Dictionary<string, Sprite>? map;
 
         public Sprite Get(string id) {
             Populate();
+
+            if (this.map == null) {
+                throw new CantBeNullException(nameof(this.map));
+            }
+            
             Assertion.IsTrue(this.map.TryGetValue(id, out Sprite sprite), id);
             return sprite;
         }
@@ -29,6 +34,10 @@ namespace Common {
             if (this.map != null) {
                 // Already populated
                 return;
+            }
+
+            if (this.entries == null) {
+                throw new CantBeNullException(nameof(this.entries));
             }
             
             this.map = new Dictionary<string, Sprite>();

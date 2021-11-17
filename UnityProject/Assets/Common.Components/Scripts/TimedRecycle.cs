@@ -5,7 +5,6 @@ namespace Common {
     /// A common behaviour that invokes SwarmItem.Kill() after some time
     /// </summary>
     public class TimedRecycle : MonoBehaviour {
-
         [SerializeField]
         private SwarmItem swarm;
 
@@ -23,7 +22,7 @@ namespace Common {
 
         private bool ticking;
 
-        void Awake() {
+        private void Awake() {
             Assertion.NotNull(this.swarm);
             Assertion.IsTrue(this.timeBeforeRecycle > 0);
 
@@ -54,17 +53,16 @@ namespace Common {
             this.ticking = false;
         }
 
-        void Update() {
+        private void Update() {
             if(!this.ticking) {
                 return;
             }
 
             this.timer.Update();
             if(this.timer.HasElapsed()) {
-                this.swarm.Kill();
+                this.swarm.Recycle();
                 this.ticking = false;
             }
         }
-
     }
 }

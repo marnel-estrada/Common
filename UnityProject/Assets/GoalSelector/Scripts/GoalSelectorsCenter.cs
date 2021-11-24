@@ -76,6 +76,12 @@ namespace GoalSelector {
             // Parse each goal
             for (int i = 0; i < data.Count; ++i) {
                 GoalData goalData = data.GetAt(i);
+
+                if (!goalData.Enabled) {
+                    // This goal is disabled by design, skip
+                    continue;
+                }
+
                 Assertion.NotEmpty(goalData.ConditionName); // Condition name must not be empty
                 Goal goal = new Goal(goalData.Id, goalData.ConditionName, goalData.ConditionValue);
                 ParseConsiderations(goalData, goal);

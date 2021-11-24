@@ -36,6 +36,7 @@ namespace CommonEcs.Goap {
             CollectActionsThatCanExecuteJob collectJob = new CollectActionsThatCanExecuteJob() {
                 entityType = GetEntityTypeHandle(),
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
+                allDebugEntities = GetComponentDataFromEntity<DebugEntity>(),
                 resultList = actionsThatCanExecuteList.AsParallelWriter()
             };
             collectJob.ScheduleParallel(this.query, 1, this.Dependency).Complete();

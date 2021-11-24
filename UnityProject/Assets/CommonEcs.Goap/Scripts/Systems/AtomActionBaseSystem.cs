@@ -77,6 +77,9 @@ namespace CommonEcs.Goap {
 
             [ReadOnly]
             public ComponentDataFromEntity<GoapAgent> allAgents;
+
+            [ReadOnly]
+            public ComponentDataFromEntity<DebugEntity> allDebugEntities;
             
             public void Execute(ArchetypeChunk batchInChunk, int batchIndex, int indexOfFirstEntityInQuery) {
                 NativeArray<AtomAction> atomActions = batchInChunk.GetNativeArray(this.atomActionType);
@@ -90,6 +93,13 @@ namespace CommonEcs.Goap {
                 for (int i = 0; i < count; ++i) {
                     AtomAction atomAction = atomActions[i];
                     GoapAgent agent = this.allAgents[atomAction.agentEntity];
+                    DebugEntity debug = this.allDebugEntities[atomAction.agentEntity];
+
+                    if (debug.enabled) {
+                        int breakpoint = 0;
+                        ++breakpoint;
+                    }
+                    
                     if (agent.state == AgentState.CLEANUP) {
                         // Time to cleanup
                         Cleanup(ref atomAction, ref atomActions, ref filterActions, indexOfFirstEntityInQuery, i);

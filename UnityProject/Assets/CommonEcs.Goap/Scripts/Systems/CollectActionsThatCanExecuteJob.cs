@@ -13,6 +13,9 @@ namespace CommonEcs.Goap {
 
         [ReadOnly]
         public ComponentTypeHandle<AtomAction> atomActionType;
+
+        [ReadOnly]
+        public ComponentDataFromEntity<DebugEntity> allDebugEntities;
             
         public NativeList<Entity>.ParallelWriter resultList;
             
@@ -23,6 +26,12 @@ namespace CommonEcs.Goap {
             for (int i = 0; i < batchInChunk.Count; ++i) {
                 AtomAction atomAction = atomActions[i];
                 if (atomAction.canExecute) {
+                    DebugEntity debug = this.allDebugEntities[atomAction.agentEntity];
+                    if (debug.enabled) {
+                        int breakpoint = 0;
+                        ++breakpoint;
+                    }
+                    
                     this.resultList.AddNoResize(entities[i]);
                 }
             }

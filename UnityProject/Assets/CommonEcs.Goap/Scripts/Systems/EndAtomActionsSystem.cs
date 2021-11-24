@@ -214,6 +214,12 @@ namespace CommonEcs.Goap {
                 }
                 
                 ++agent.currentAtomActionIndex;
+                
+                if (debugEntity.enabled) {
+                    // ReSharper disable once UseStringInterpolation (due to Burst)
+                    Debug.Log(string.Format("Moved atom action index: {0}", agent.currentAtomActionIndex));
+                }
+                
                 if (agent.currentAtomActionIndex < currentAction.atomActionCount) {
                     // This means that there are still more atoms to execute
                     // We can't move to the next action
@@ -223,6 +229,12 @@ namespace CommonEcs.Goap {
                 // At this point, it means that we've reached the end of the atom actions of the action
                 // We move to the next action
                 ++agent.currentActionIndex;
+                
+                if (debugEntity.enabled) {
+                    // ReSharper disable once UseStringInterpolation (due to Burst)
+                    Debug.Log(string.Format("Moved action index: {0}", agent.currentActionIndex));
+                }
+                
                 if (agent.currentActionIndex >= actionSet.Length) {
                     // This means that there are no more actions to execute
                     // Execution is done. We set state to Cleanup so that the agent will plan again.

@@ -11,10 +11,9 @@ namespace Common {
         private bool resolved;
         private T value;
 
-        public ResolveOnce(Func<T> resolver) {
+        public ResolveOnce(Func<T> resolver) : this() {
             this.resolver = resolver;
             this.resolved = false;
-            this.value = default(T);
         }
 
         public T Value {

@@ -66,9 +66,7 @@ namespace CommonEcs {
                 lastHandle = setTrianglesJob.Schedule(spriteManager.Count, 64, lastHandle);
                 
                 // Don't forget to deallocate the array
-                lastHandle = new DeallocateNativeArrayJob<SortedSpriteEntry>() {
-                    array = entries
-                }.Schedule(lastHandle);
+                lastHandle = entries.Dispose(lastHandle);
             }
 
             return lastHandle;

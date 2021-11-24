@@ -7,15 +7,14 @@ using Unity.Jobs.LowLevel.Unsafe;
 
 namespace CommonEcs {
     /// <summary>
-    ///     A counter that can be used in parallel jobs. This is derived from:
-    ///     https://docs.unity3d.com/Packages/com.unity.jobs@0.2/manual/custom_job_types.html?q=NativeCounter#custom-nativecontainers
+    /// A utility that can compute summation but allows to run in parallel
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     [NativeContainer]
-    public unsafe struct NativeCounter {
-        // The actual pointer to the allocated count needs to have restrictions relaxed so jobs can be schedled with this container
+    public unsafe struct NativeSum {
+        // The actual pointer to the allocated sum needs to have restrictions relaxed so jobs can be scheduled with this utility
         [NativeDisableUnsafePtrRestriction]
-        private int* countIntegers;
+        private int* sumIntegers;
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
         private AtomicSafetyHandle m_Safety;
@@ -32,7 +31,7 @@ namespace CommonEcs {
 
         public const int INTS_PER_CACHE_LINE = JobsUtility.CacheLineSize / sizeof(int);
 
-        public NativeCounter(Allocator label) {
+        public NativeSum(Allocator label) {
             // This check is redundant since we always use an int that is blittable.
             // It is here as an example of how to check for type correctness for generic types.
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -44,60 +43,58 @@ namespace CommonEcs {
             this.m_AllocatorLabel = label;
 
             // Allocate native memory for a single integer
-            this.countIntegers = (int*) UnsafeUtility.Malloc(
+            this.sumIntegers = (int*) UnsafeUtility.Malloc(
                 UnsafeUtility.SizeOf<int>() * INTS_PER_CACHE_LINE * JobsUtility.MaxJobThreadCount, 4, label);
 
             // Create a dispose sentinel to track memory leaks. This also creates the AtomicSafetyHandle
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             DisposeSentinel.Create(out this.m_Safety, out this.m_DisposeSentinel, 0, label);
 #endif
-            // Initialize the count to 0 to avoid uninitialized data
-            this.Count = 0;
+
+            Clear();
         }
 
-        public void Increment() {
+        public void Clear() {
+            // Clear uninitialized data
             // Verify that the caller has write permission on this data. 
             // This is the race condition protection, without these checks the AtomicSafetyHandle is useless
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.CheckWriteAndThrow(this.m_Safety);
 #endif
-            (*this.countIntegers)++;
+            
+            for (int i = 0; i < JobsUtility.MaxJobThreadCount; ++i) {
+                this.sumIntegers[INTS_PER_CACHE_LINE * i] = 0;
+            }            
         }
 
-        public int Count {
+        public void Add(int amount) {
+            // Verify that the caller has write permission on this data. 
+            // This is the race condition protection, without these checks the AtomicSafetyHandle is useless
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            AtomicSafetyHandle.CheckWriteAndThrow(this.m_Safety);
+#endif
+            (*this.sumIntegers) += amount;
+        }
+
+        public int Total {
             get {
                 // Verify that the caller has read permission on this data. 
                 // This is the race condition protection, without these checks the AtomicSafetyHandle is useless
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 AtomicSafetyHandle.CheckReadAndThrow(this.m_Safety);
 #endif
-                int count = 0;
+                int total = 0;
                 for (int i = 0; i < JobsUtility.MaxJobThreadCount; ++i) {
-                    count += this.countIntegers[INTS_PER_CACHE_LINE * i];
+                    total += this.sumIntegers[INTS_PER_CACHE_LINE * i];
                 }
 
-                return count;
-            }
-            
-            set {
-                // Verify that the caller has write permission on this data. 
-                // This is the race condition protection, without these checks the AtomicSafetyHandle is useless
-#if ENABLE_UNITY_COLLECTIONS_CHECKS
-                AtomicSafetyHandle.CheckWriteAndThrow(this.m_Safety);
-#endif
-                // Clear all locally cached counts, 
-                // set the first one to the required value
-                for (int i = 1; i < JobsUtility.MaxJobThreadCount; ++i) {
-                    this.countIntegers[INTS_PER_CACHE_LINE * i] = 0;
-                }
-
-                *this.countIntegers = value;
+                return total;
             }
         }
 
         public bool IsCreated {
             get {
-                return this.countIntegers != null;
+                return this.sumIntegers != null;
             }
         }
 
@@ -107,17 +104,17 @@ namespace CommonEcs {
             DisposeSentinel.Dispose(ref this.m_Safety, ref this.m_DisposeSentinel);
 #endif
 
-            UnsafeUtility.Free(this.countIntegers, this.m_AllocatorLabel);
-            this.countIntegers = null;
+            UnsafeUtility.Free(this.sumIntegers, this.m_AllocatorLabel);
+            this.sumIntegers = null;
         }
 
         [NativeContainer]
-        // This attribute is what makes it possible to use NativeCounter.Concurrent in a ParallelFor job
+        // This attribute is what makes it possible to use NativeSum.ParallelWriter in a ParallelFor job
         [NativeContainerIsAtomicWriteOnly]
         public struct ParallelWriter {
-            // Copy of the pointer from the full NativeCounter
+            // Copy of the pointer from the main NativeSum
             [NativeDisableUnsafePtrRestriction]
-            private int* countIntegers;
+            private int* dataPointer;
 
             // Copy of the AtomicSafetyHandle from the full NativeCounter. The dispose sentinel is not copied since this inner struct does not own the memory and is not responsible for freeing it.
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -129,28 +126,28 @@ namespace CommonEcs {
             int m_ThreadIndex;
 
             // This is what makes it possible to assign to NativeCounter.Concurrent from NativeCounter
-            public static implicit operator ParallelWriter(NativeCounter cnt) {
+            public static implicit operator ParallelWriter(NativeSum sum) {
                 ParallelWriter parallelWriter;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-                AtomicSafetyHandle.CheckWriteAndThrow(cnt.m_Safety);
-                parallelWriter.m_Safety = cnt.m_Safety;
+                AtomicSafetyHandle.CheckWriteAndThrow(sum.m_Safety);
+                parallelWriter.m_Safety = sum.m_Safety;
                 AtomicSafetyHandle.UseSecondaryVersion(ref parallelWriter.m_Safety);
 #endif
 
-                parallelWriter.countIntegers = cnt.countIntegers;
+                parallelWriter.dataPointer = sum.sumIntegers;
                 parallelWriter.m_ThreadIndex = 0;
 
                 return parallelWriter;
             }
 
-            public void Increment() {
+            public void Add(int amount) {
                 // Increment still needs to check for write permissions
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 AtomicSafetyHandle.CheckWriteAndThrow(this.m_Safety);
 #endif
                 
                 // No need for atomics any more since we are just incrementing the local count
-                ++this.countIntegers[INTS_PER_CACHE_LINE * this.m_ThreadIndex];
+                this.dataPointer[INTS_PER_CACHE_LINE * this.m_ThreadIndex] += amount;
             }
         }
     }

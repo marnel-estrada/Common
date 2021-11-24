@@ -2,6 +2,7 @@ using System;
 
 using Unity.Burst;
 using Unity.Collections;
+using Unity.Jobs;
 
 using UnityEngine;
 
@@ -43,7 +44,7 @@ namespace CommonEcs {
             DotsAssert.IsTrue(this.items.Length == this.itemToIndexMap.Count());
         }
 
-        public T Select(ref Unity.Mathematics.Random random) {
+        public readonly T Select(ref Unity.Mathematics.Random random) {
             DotsAssert.IsTrue(!this.entries.IsEmpty); // Should have entries
         
             uint lastItemEnd = this.entries[this.entries.Length - 1].end;
@@ -121,6 +122,14 @@ namespace CommonEcs {
             this.items.Dispose();
             this.entries.Dispose();
             this.itemToIndexMap.Dispose();
+        }
+
+        public JobHandle Dispose(JobHandle inputDeps) {
+            inputDeps = this.items.Dispose(inputDeps);
+            inputDeps = this.entries.Dispose(inputDeps);
+            inputDeps = this.itemToIndexMap.Dispose(inputDeps);
+
+            return inputDeps;
         }
 
         [BurstDiscard]

@@ -1,7 +1,9 @@
+using System;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using UnityEngine;
 
 namespace CommonEcs.Goap {
     /// <summary>
@@ -12,7 +14,7 @@ namespace CommonEcs.Goap {
     [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(IdentifyAtomActionsThatCanExecuteSystem))]
     [UpdateBefore(typeof(EndAtomActionsSystem))]
-    public abstract class AtomActionBaseSystem<TActionFilter, TProcessor> : JobSystemBase 
+    public abstract class AtomActionBaseSystem<TActionFilter, TProcessor> : JobSystemBase
         where TActionFilter : struct, IAtomActionComponent
         where TProcessor : struct, IAtomActionProcess<TActionFilter> {
         private EntityQuery query;
@@ -20,7 +22,7 @@ namespace CommonEcs.Goap {
 
         protected override void OnCreate() {
             this.query = PrepareQuery();
-            
+
             // Action has array if it's not zero sized
             this.isActionFilterHasArray = !TypeManager.GetTypeInfo(TypeManager.GetTypeIndex<TActionFilter>()).IsZeroSized;
         }
@@ -35,14 +37,19 @@ namespace CommonEcs.Goap {
                 actionFilterType = GetComponentTypeHandle<TActionFilter>(),
                 isActionFilterHasArray = this.isActionFilterHasArray, // Action filter has array if it's not zero sized
                 processor = PrepareProcessor(),
-                allAgents = GetComponentDataFromEntity<GoapAgent>()
+                allAgents = GetComponentDataFromEntity<GoapAgent>(),
+                allDebugEntities = GetComponentDataFromEntity<DebugEntity>()
             };
 
-            JobHandle handle = this.ShouldScheduleParallel ? 
-                job.ScheduleParallel(this.query, 1, inputDeps) : job.Schedule(this.query, inputDeps);
-            AfterJobScheduling(handle);
-
-            return handle;
+            try {
+                JobHandle handle = this.ShouldScheduleParallel ?
+                    job.ScheduleParallel(this.query, 1, inputDeps) : job.Schedule(this.query, inputDeps);
+                AfterJobScheduling(handle);
+                return handle;
+            } catch (InvalidOperationException) {
+                Debug.LogError(typeof(TActionFilter));
+                throw;
+            }
         }
 
         protected virtual void AfterJobScheduling(in JobHandle handle) {
@@ -58,7 +65,7 @@ namespace CommonEcs.Goap {
                 return true;
             }
         }
-        
+
         protected ref readonly EntityQuery Query {
             get {
                 return ref this.query;
@@ -66,7 +73,7 @@ namespace CommonEcs.Goap {
         }
 
         protected abstract TProcessor PrepareProcessor();
-        
+
         // We need this to be public so it can be referenced in AssemblyInfo
         [BurstCompile]
         public struct Job : IJobEntityBatchWithIndex {
@@ -80,15 +87,15 @@ namespace CommonEcs.Goap {
 
             [ReadOnly]
             public ComponentDataFromEntity<DebugEntity> allDebugEntities;
-            
+
             public void Execute(ArchetypeChunk batchInChunk, int batchIndex, int indexOfFirstEntityInQuery) {
                 NativeArray<AtomAction> atomActions = batchInChunk.GetNativeArray(this.atomActionType);
 
                 NativeArray<TActionFilter> filterActions = this.isActionFilterHasArray ? batchInChunk.GetNativeArray(this.actionFilterType) : default;
                 TActionFilter defaultActionFilter = default; // This will be used if TActionFilter has no chunk (it's a tag component)
-                
+
                 this.processor.BeforeChunkIteration(batchInChunk, batchIndex);
-                
+
                 int count = batchInChunk.Count;
                 for (int i = 0; i < count; ++i) {
                     AtomAction atomAction = atomActions[i];
@@ -99,13 +106,13 @@ namespace CommonEcs.Goap {
                         int breakpoint = 0;
                         ++breakpoint;
                     }
-                    
+
                     if (agent.state == AgentState.CLEANUP) {
                         // Time to cleanup
                         Cleanup(ref atomAction, ref atomActions, ref filterActions, indexOfFirstEntityInQuery, i);
                         continue;
                     }
-                    
+
                     if (!atomAction.canExecute) {
                         // The current atom action cannot execute yet
                         // Or not yet time to execute
@@ -121,7 +128,7 @@ namespace CommonEcs.Goap {
                         // Use a default filter component
                         ExecuteAction(ref atomAction, ref defaultActionFilter, indexOfFirstEntityInQuery, i);
                     }
-                    
+
                     atomActions[i] = atomAction; // Modify
                 }
             }
@@ -130,7 +137,7 @@ namespace CommonEcs.Goap {
                 if (this.isActionFilterHasArray) {
                     TActionFilter actionFilter = filterActions[index];
                     this.processor.Cleanup(ref atomAction, ref actionFilter, indexOfFirstEntityInQuery, index);
-                    
+
                     // Modify
                     filterActions[index] = actionFilter;
                 } else {
@@ -138,7 +145,7 @@ namespace CommonEcs.Goap {
                     TActionFilter actionFilter = default;
                     this.processor.Cleanup(ref atomAction, ref actionFilter, indexOfFirstEntityInQuery, index);
                 }
-                
+
                 // Modify
                 atomActions[index] = atomAction;
             }

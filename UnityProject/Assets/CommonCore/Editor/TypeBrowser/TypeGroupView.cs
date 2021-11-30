@@ -60,7 +60,7 @@ namespace Common {
             }
 
             if (this.expanded) {
-                RenderItems();
+                RenderItems(filter);
             }
 
             GUILayout.EndVertical();

@@ -32,7 +32,7 @@ namespace CommonEcs.Goap {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            Job job = new Job() {
+            ExecuteAtomActionJob job = new ExecuteAtomActionJob() {
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
                 actionFilterType = GetComponentTypeHandle<TActionFilter>(),
                 isActionFilterHasArray = this.isActionFilterHasArray, // Action filter has array if it's not zero sized
@@ -76,7 +76,7 @@ namespace CommonEcs.Goap {
 
         // We need this to be public so it can be referenced in AssemblyInfo
         [BurstCompile]
-        public struct Job : IJobEntityBatchWithIndex {
+        public struct ExecuteAtomActionJob : IJobEntityBatchWithIndex {
             public ComponentTypeHandle<AtomAction> atomActionType;
             public ComponentTypeHandle<TActionFilter> actionFilterType;
             public bool isActionFilterHasArray;

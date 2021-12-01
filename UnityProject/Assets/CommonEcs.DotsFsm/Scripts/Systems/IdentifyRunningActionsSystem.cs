@@ -38,6 +38,11 @@ namespace CommonEcs.DotsFsm {
                     // We no longer run the action if the FSM has a pending event
                     action.running = fsm.currentState.ValueOr(default) == action.stateOwner && fsm.pendingEvent.IsNone;
 
+                    if (action.running) {
+                        int breakpoint = 0;
+                        ++breakpoint;
+                    }
+
                     actions[i] = action; // Modify
                 }
             }

@@ -1,5 +1,4 @@
 using Unity.Mathematics;
-
 using UnityEngine;
 
 namespace Common {
@@ -19,15 +18,19 @@ namespace Common {
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="atlas"></param>
         /// <param name="uvRect"></param>
-        public PackedTextureEntry(Rect uvRect, int atlasWidth, int atlasHeight, int originalWidth, int originalHeight) {
+        /// <param name="atlasWidth"></param>
+        /// <param name="atlasHeight"></param>
+        /// <param name="originalWidth"></param>
+        /// <param name="originalHeight"></param>
+        public PackedTextureEntry(Rect uvRect, int atlasWidth, int atlasHeight,
+                                  int originalWidth, int originalHeight) {
             this.uvRect = uvRect;
 
             this.atlasWidth = atlasWidth;
             this.atlasHeight = atlasHeight;
-            
-            this.spriteRect = new Rect(this.uvRect.x * this.atlasWidth, this.uvRect.y * this.atlasHeight, 
+
+            this.spriteRect = new Rect(this.uvRect.x * this.atlasWidth, this.uvRect.y * this.atlasHeight,
                 this.uvRect.width * this.atlasWidth, this.uvRect.height * this.atlasHeight);
 
             this.originalWidth = originalWidth;
@@ -44,6 +47,39 @@ namespace Common {
             get {
                 return this.uvRect.size;
             }
+        }
+
+        public bool Equals(PackedTextureEntry other) {
+            return this.uvRect.Equals(other.uvRect) &&
+                   this.spriteRect.Equals(other.spriteRect) &&
+                   this.atlasWidth == other.atlasWidth &&
+                   this.atlasHeight == other.atlasHeight &&
+                   this.originalWidth == other.originalWidth &&
+                   this.originalHeight == other.originalHeight;
+        }
+
+        public override bool Equals(object? obj) {
+            return obj is PackedTextureEntry other && Equals(other);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                int hashCode = this.uvRect.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.spriteRect.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.atlasWidth;
+                hashCode = (hashCode * 397) ^ this.atlasHeight;
+                hashCode = (hashCode * 397) ^ this.originalWidth;
+                hashCode = (hashCode * 397) ^ this.originalHeight;
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(PackedTextureEntry left, PackedTextureEntry right) {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(PackedTextureEntry left, PackedTextureEntry right) {
+            return !left.Equals(right);
         }
     }
 }

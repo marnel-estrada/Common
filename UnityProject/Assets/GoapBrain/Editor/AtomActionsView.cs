@@ -12,6 +12,7 @@ namespace GoapBrain {
 
         private GoapDomainData? domain;
         private GoapActionData? action;
+        private GUISkin? skin;
 
         private readonly ClassPropertiesRenderer propertiesRenderer;
 
@@ -21,6 +22,18 @@ namespace GoapBrain {
         public AtomActionsView(EditorWindow parent) {
             this.parent = parent;
             this.propertiesRenderer = new ClassPropertiesRenderer(300);
+
+            // We did it this way so we can search for the skin even when the asset is in the package
+            string[] foundResults = AssetDatabase.FindAssets("GoapEditorSkin");
+            foreach (string guid in foundResults) {
+                this.skin = AssetDatabase.LoadAssetAtPath<GUISkin>(AssetDatabase.GUIDToAssetPath(guid));
+                if (this.skin != null) {
+                    // Found the skin
+                    break;
+                }
+            }
+
+            Assertion.NotNull(this.skin);
         }
 
         /// <summary>
@@ -58,6 +71,10 @@ namespace GoapBrain {
         }
 
         private void RenderAtomAction(GoapDomainData domain, GoapActionData action, ClassData data, int index) {
+            if (this.skin == null) {
+                throw new CantBeNullException(nameof(this.skin));
+            }
+
             if (data.ClassType == null) {
                 // Cache
                 data.ClassType = TypeUtils.GetType(data.ClassName);
@@ -84,7 +101,7 @@ namespace GoapBrain {
                 MoveDown(domain, action, index);
             }
 
-            GUILayout.Box(data.ClassType.Name, GUILayout.Width(300));
+            GUILayout.Box(data.ClassType.Name, this.skin.customStyles[1], GUILayout.Width(300));
 
             GUILayout.EndHorizontal();
 

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Common {
@@ -12,7 +11,6 @@ namespace Common {
             public Color color;
         }
 
-        [Searchable]
         public Entry[]? entries;
         
         private Dictionary<string, Color>? map;

@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 
 namespace GoapBrain {
-    class ActionsView {
-
+    public class ActionsView {
         private readonly ActionsSidebarView sidebar = new ActionsSidebarView();
         private readonly ActionInspectorView inspector;
 
@@ -45,10 +39,12 @@ namespace GoapBrain {
             GUILayout.Label("Inspector", EditorStyles.boldLabel);
             GUILayout.Space(10);
 
-            GoapActionData selectedAction = this.sidebar.GetSelectedAction();
-            if(selectedAction != null) {
+            GoapActionData? selectedAction = this.sidebar.GetSelectedAction();
+
+            if (selectedAction != null) {
                 this.inspector.Render(domainData, selectedAction);
             }
+
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.EndHorizontal();
@@ -61,6 +57,5 @@ namespace GoapBrain {
         public void OnRepaint(GoapDomainData domain) {
             this.sidebar.OnRepaint(domain);
         }
-
     }
 }

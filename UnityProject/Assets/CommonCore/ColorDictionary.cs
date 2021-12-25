@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-
 using UnityEngine;
 
 namespace Common {
@@ -12,20 +11,34 @@ namespace Common {
             public Color color;
         }
 
-        public Entry[] entries;
+        public Entry[]? entries;
         
-        private Dictionary<string, Color> map;
+        private Dictionary<string, Color>? map;
 
         public Color Get(string id) {
             Populate();
-            Assertion.IsTrue(this.map.TryGetValue(id, out Color color), id);
+            Assertion.IsTrue(this.Map.TryGetValue(id, out Color color), id);
             return color;
+        }
+
+        private Dictionary<string, Color> Map {
+            get {
+                if (this.map == null) {
+                    throw new CantBeNullException(nameof(this.map));
+                }
+
+                return this.map;
+            }
         }
 
         private void Populate() {
             if (this.map != null) {
                 // Already populated
                 return;
+            }
+
+            if (this.entries == null) {
+                throw new CantBeNullException(nameof(this.entries));
             }
             
             this.map = new Dictionary<string, Color>();

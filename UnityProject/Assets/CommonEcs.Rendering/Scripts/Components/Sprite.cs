@@ -70,7 +70,7 @@ namespace CommonEcs {
         // These two are used for sorting
         // Layer order has higher precedence than renderOrder
         // renderOrder is used for things like sorting by z position
-        private int layerOrder;
+        public int layerOrder;
 
         public ByteBool active;
 

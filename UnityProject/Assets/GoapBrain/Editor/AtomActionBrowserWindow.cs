@@ -1,19 +1,19 @@
 ﻿using System;
-
 using Common;
-
 using UnityEngine;
 using UnityEditor;
 
 namespace GoapBrain {
     internal class AtomActionBrowserWindow : EditorWindow {
-        private GUISkin skin;
+        private GUISkin? skin;
 
-        private TypeSelectionRenderer typeSelection;
+        private TypeSelectionRenderer? typeSelection;
 
-        private Type selectedType;
+        private Type? selectedType;
 
-        private Action<Type> onAdd;
+        private Action<Type>? onAdd;
+        private string? filterString;
+        private bool isOpen;
 
         /// <summary>
         /// Initializer
@@ -21,7 +21,8 @@ namespace GoapBrain {
         /// <param name="onAdd"></param>
         public void Init(Action<Type> onAdd) {
             this.onAdd = onAdd;
-            
+            this.isOpen = true;
+
             // We did it this way so we can search for the skin even when the asset is in the package
             string[] foundResults = AssetDatabase.FindAssets("GoapEditorSkin");
             foreach (string guid in foundResults) {
@@ -31,7 +32,12 @@ namespace GoapBrain {
                     break;
                 }
             }
+
             Assertion.NotNull(this.skin);
+
+            if (this.skin == null) {
+                return;
+            }
 
             this.typeSelection = new TypeSelectionRenderer(typeof(AtomActionAssembler), this.skin.customStyles[0], OnTypeSelectionChange);
         }
@@ -42,12 +48,17 @@ namespace GoapBrain {
         }
 
         private void OnGUI() {
-            EditorGUILayout.BeginVertical();
+            if (this.typeSelection == null) {
+                return;
+            }
 
-            GUILayout.Label("Atom Actions Browser", EditorStyles.boldLabel);
+            GUILayout.BeginVertical();
+
+            GUILayout.Label("Search", EditorStyles.boldLabel);
+            this.filterString = GUILayout.TextField(this.filterString);
             GUILayout.Space(10);
 
-            this.typeSelection.Render();
+            this.typeSelection.Render(this.filterString);
 
             GUILayout.FlexibleSpace();
 
@@ -58,17 +69,21 @@ namespace GoapBrain {
                 AddSelectedType();
             }
 
-            EditorGUILayout.EndVertical();
+            GUILayout.EndVertical();
         }
 
         private void AddSelectedType() {
+            if (this.onAdd == null) {
+                return;
+            }
+
             if (this.selectedType == null) {
                 EditorUtility.DisplayDialog("Add Atomic Action", "No selected atomic action", "OK");
                 return;
             }
 
             Close(); // close the window
-            
+
             this.onAdd(this.selectedType);
         }
 
@@ -80,6 +95,12 @@ namespace GoapBrain {
         }
 
         private void OnLostFocus() {
+            if (!this.isOpen) {
+                // Window is already closed. This can be called multiple times if this IMGUI was called inside UIElements.
+                return;
+            }
+
+            this.isOpen = false;
             Close();
         }
     }

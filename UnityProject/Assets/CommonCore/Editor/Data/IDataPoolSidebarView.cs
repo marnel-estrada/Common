@@ -1,6 +1,6 @@
 namespace Common {
     public interface IDataPoolSidebarView<T> where T : class, IDataPoolItem, IDuplicable<T>, new() {
-        void Render(DataPool<T> pool);
+        void Render(DataPool<T> pool, int width = 250);
 
         bool IsValidSelection(DataPool<T> pool);
 

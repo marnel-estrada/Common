@@ -16,23 +16,33 @@ namespace CommonEcs.Goap {
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             Job job = new Job() {
                 allAgents = GetComponentDataFromEntity<GoapAgent>(true),
+                allDebug = GetComponentDataFromEntity<DebugEntity>(),
                 plannerType = GetComponentTypeHandle<GoapPlanner>()
             };
-            
+
             return job.ScheduleParallel(this.query, 1, inputDeps);
         }
-        
+
         [BurstCompile]
         private struct Job : IJobEntityBatch {
             [ReadOnly]
             public ComponentDataFromEntity<GoapAgent> allAgents;
-            
+
+            [ReadOnly]
+            public ComponentDataFromEntity<DebugEntity> allDebug;
+
             public ComponentTypeHandle<GoapPlanner> plannerType;
-            
+
             public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
                 NativeArray<GoapPlanner> planners = batchInChunk.GetNativeArray(this.plannerType);
                 for (int i = 0; i < planners.Length; ++i) {
                     GoapPlanner planner = planners[i];
+
+                    if (this.allDebug[planner.agentEntity].enabled) {
+                        int breakpoint = 0;
+                        ++breakpoint;
+                    }
+
                     if (planner.state != PlanningState.FAILED) {
                         // Not failed
                         continue;
@@ -45,11 +55,11 @@ namespace CommonEcs.Goap {
                     if (agent.goals.Count == 0) {
                         continue;
                     }
-                    
+
                     // Move goalIndex to the next
                     planner.goalIndex = (planner.goalIndex + 1) % agent.goals.Count;
                     planner.StartPlanning(agent.goals[planner.goalIndex]);
-                    
+
                     // Modify
                     planners[i] = planner;
                 }

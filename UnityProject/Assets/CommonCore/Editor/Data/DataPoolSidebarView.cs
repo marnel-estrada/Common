@@ -16,13 +16,14 @@ namespace Common {
         private readonly SimpleList<DataPoolFilterStrategy<T>> filterStrategies = new SimpleList<DataPoolFilterStrategy<T>>();
 
         private bool shouldSortItems = true;
-        
+
         /// <summary>
         /// Renders the UI for the specified pool
         /// </summary>
         /// <param name="pool"></param>
-        public void Render(DataPool<T> pool) {
-            GUILayout.BeginVertical(GUILayout.Width(250));
+        /// <param name="width"></param>
+        public void Render(DataPool<T> pool, int width = 250) {
+            GUILayout.BeginVertical(GUILayout.Width(width));
 
             // Render existing
             GUILayout.Label("Items: ", EditorStyles.boldLabel);

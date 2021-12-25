@@ -21,6 +21,7 @@ namespace CommonEcs.Goap {
             Job job = new Job() {
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
                 allAgents = GetComponentDataFromEntity<GoapAgent>(),
+                allDebugEntities = GetComponentDataFromEntity<DebugEntity>(),
                 allActionSets = GetBufferFromEntity<ResolvedAction>()
             };
             
@@ -33,6 +34,9 @@ namespace CommonEcs.Goap {
 
             [ReadOnly]
             public ComponentDataFromEntity<GoapAgent> allAgents;
+
+            [ReadOnly]
+            public ComponentDataFromEntity<DebugEntity> allDebugEntities;
             
             [ReadOnly]
             public BufferFromEntity<ResolvedAction> allActionSets;
@@ -42,6 +46,8 @@ namespace CommonEcs.Goap {
                 for (int i = 0; i < atomActions.Length; ++i) {
                     AtomAction atomAction = atomActions[i];
                     GoapAgent agent = this.allAgents[atomAction.agentEntity];
+                    DebugEntity debugEntity = this.allDebugEntities[atomAction.agentEntity];
+                    
                     if (agent.state != AgentState.EXECUTING) {
                         // Agent owner is not executing
                         // We skip
@@ -49,6 +55,11 @@ namespace CommonEcs.Goap {
                     }
 
                     if (atomAction.executing) {
+                        if (debugEntity.enabled) {
+                            int breakpoint = 0;
+                            ++breakpoint;
+                        }
+                        
                         // The atom action is already currently executing. We should not continue
                         // because if we do, we will call AtomAction.MarkCanExecute() which will reset
                         // the started flag. If we do this, Start() routines will be invoked again
@@ -57,7 +68,12 @@ namespace CommonEcs.Goap {
                     }
 
                     if (CanExecute(atomAction, agent)) {
-                        atomAction.MarkCanExecute();    
+                        if (debugEntity.enabled) {
+                            int breakpoint = 0;
+                            ++breakpoint;
+                        }
+                        
+                        atomAction.MarkCanExecute();
                     } else {
                         // Reset this to false so that other systems that are using this will not
                         // mistake that the atom action is still running.
@@ -82,7 +98,7 @@ namespace CommonEcs.Goap {
 
                 // Returns true if the atom action's order is also the same as the agent's
                 // currentAtomActionIndex
-                return agent.currentAtomActionIndex == atomAction.order;
+                return agent.currentAtomActionIndex == atomAction.orderIndex;
             }
         }
     }

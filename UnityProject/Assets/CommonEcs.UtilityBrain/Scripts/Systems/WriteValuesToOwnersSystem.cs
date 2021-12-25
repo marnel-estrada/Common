@@ -83,6 +83,7 @@ namespace CommonEcs.UtilityBrain {
             public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
                 NativeArray<UtilityOption> options = batchInChunk.GetNativeArray(this.optionType);
                 BufferAccessor<UtilityValue> considerationValuesList = batchInChunk.GetBufferAccessor(this.utilityValueType);
+                
                 for (int i = 0; i < batchInChunk.Count; ++i) {
                     UtilityOption option = options[i];
                     if (!option.shouldExecute) {
@@ -102,8 +103,9 @@ namespace CommonEcs.UtilityBrain {
                 int maxRank = int.MinValue;
                 float totalBonus = 0;
                 float multiplier = 1;
-                
-                for (int i = 0; i < considerationValues.Length; ++i) {
+
+                int considerationsLength = considerationValues.Length;
+                for (int i = 0; i < considerationsLength; ++i) {
                     UtilityValue current = considerationValues[i];
                     if (current.multiplier.IsZero()) {
                         // This means that the consideration made the option invalid
@@ -116,8 +118,11 @@ namespace CommonEcs.UtilityBrain {
                     totalBonus += current.bonus;
                     multiplier *= current.multiplier;
                 }
+                
+                // We use geometric mean so that options with more considerations are scored fairly
+                float geometricMean = multiplier > 0 ? math.pow(multiplier, 1.0f / considerationsLength) : 0;
 
-                return new UtilityValue(maxRank, totalBonus, multiplier);
+                return new UtilityValue(maxRank, totalBonus, geometricMean);
             }
         }
 

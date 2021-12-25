@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-
 using Common;
-
 using UnityEngine;
 
 namespace GoalSelector {
@@ -32,6 +30,9 @@ namespace GoalSelector {
 
         [SerializeField]
         private bool editComment;
+
+        [SerializeField]
+        private bool enabled = true;
 
         [SerializeField]
         private List<ClassData> considerations = new List<ClassData>();
@@ -92,6 +93,15 @@ namespace GoalSelector {
             }
             set {
                 this.editComment = value;
+            }
+        }
+
+        public bool Enabled {
+            get {
+                return this.enabled;
+            }
+            set {
+                this.enabled = value;
             }
         }
 

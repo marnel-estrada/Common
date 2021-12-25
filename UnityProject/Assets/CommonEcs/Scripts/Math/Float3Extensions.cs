@@ -13,5 +13,9 @@ namespace CommonEcs.Scripts.Math {
         public static bool TolerantGreaterThanOrEquals(this float3 a, float3 b) {
             return a.x.TolerantGreaterThanOrEquals(b.x) && a.y.TolerantGreaterThanOrEquals(b.y) && a.z.TolerantGreaterThanOrEquals(b.z);
         }
+
+        public static bool IsZero(this float3 v) {
+            return Comparison.IsZero(v.x) && Comparison.IsZero(v.y) && Comparison.IsZero(v.z);
+        }
     }
 }

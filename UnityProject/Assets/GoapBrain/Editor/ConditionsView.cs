@@ -12,7 +12,7 @@ namespace GoapBrain {
     /// <summary>
     ///     Handles rendering of conditions part
     /// </summary>
-    internal class ConditionsView {
+    public class ConditionsView {
         private string newConditionName = "";
 
         private Vector2 scrollPos;

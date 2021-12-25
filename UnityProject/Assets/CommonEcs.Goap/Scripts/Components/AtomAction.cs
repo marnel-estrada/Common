@@ -7,8 +7,9 @@ namespace CommonEcs.Goap {
         // Denotes the action where this atom action belongs
         public readonly int actionId;
 
-        // The order number in which this atom action executes
-        public readonly int order;
+        // The order number in which this atom action executes 
+        // This is zero based (like an index)
+        public readonly int orderIndex;
         
         // An optional ID that we can set for easier debugging
         public readonly int debugId;
@@ -24,10 +25,10 @@ namespace CommonEcs.Goap {
         // reset the started flag which will run the Start() routine again.
         public bool executing;
 
-        public AtomAction(int actionId, Entity agentEntity, int order, int debugId = 0) : this() {
+        public AtomAction(int actionId, Entity agentEntity, int orderIndex, int debugId = 0) : this() {
             this.agentEntity = agentEntity;
             this.actionId = actionId;
-            this.order = order;
+            this.orderIndex = orderIndex;
             this.debugId = debugId;
         }
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-
 using UnityEngine;
 
 namespace Common {
@@ -9,7 +8,6 @@ namespace Common {
     /// An editor renderer that renders
     /// </summary>
     public class TypeSelectionRenderer {
-
         private readonly Dictionary<string, List<Type>> typeMap = new Dictionary<string, List<Type>>();
         private readonly List<TypeGroupView> groupViewList = new List<TypeGroupView>();
 
@@ -18,6 +16,7 @@ namespace Common {
         /// </summary>
         /// <param name="parentType"></param>
         /// <param name="style"></param>
+        /// <param name="onSelectionChange"></param>
         public TypeSelectionRenderer(Type parentType, GUIStyle style, Action<Type> onSelectionChange) {
             List<Type> allTypes = new List<Type>();
 
@@ -27,7 +26,7 @@ namespace Common {
                 // We did it this way because some assemblies causes error when GetTypes() is invoked
                 try {
                     allTypes.AddRange(assembly.GetTypes());
-                } catch(Exception e) {
+                } catch (Exception e) {
                     Debug.Log($"Assembly {assembly.FullName} caused an error.");
                     Debug.Log(e.Message);
                 }
@@ -61,7 +60,7 @@ namespace Common {
             }
 
             this.groupViewList.Sort(delegate(TypeGroupView a, TypeGroupView b) {
-                return a.Name.CompareTo(b.Name);
+                return string.Compare(a.Name, b.Name, StringComparison.Ordinal);
             });
         }
 
@@ -91,7 +90,7 @@ namespace Common {
             Attribute[] attributes = Attribute.GetCustomAttributes(type);
             foreach (Attribute attr in attributes) {
                 if (attr is Group) {
-                    return ((Group)attr).Name;
+                    return ((Group) attr).Name;
                 }
             }
 
@@ -99,18 +98,19 @@ namespace Common {
             return "Ungrouped";
         }
 
-        private Vector2 scrollPos = new Vector2();
+        private Vector2 scrollPos;
+        private const string EMPTY = "";
 
         /// <summary>
         /// Performs the rendering in editor
         /// </summary>
-        public void Render() {
+        public void Render(string filter = EMPTY) {
             this.scrollPos = GUILayout.BeginScrollView(this.scrollPos);
             foreach (TypeGroupView view in this.groupViewList) {
-                view.Render();
+                view.Render(filter);
             }
+
             GUILayout.EndScrollView();
         }
-
     }
 }

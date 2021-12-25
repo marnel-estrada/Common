@@ -81,14 +81,14 @@ namespace Common {
                 if (entry.IsWithinRoulette(random)) {
                     // item found
                     return entry.Item;
+                }
+                
+                if(random < entry.RouletteFrom) {
+	                // this means that item is to the left of the mid entry
+	                maxIndex = midIndex - 1;
                 } else {
-                    if(random < entry.RouletteFrom) {
-                        // this means that item is to the left of the mid entry
-                        maxIndex = midIndex - 1;
-                    } else if(entry.RouletteTo.TolerantGreaterThanOrEquals(random)) {
-                        // this means that the item is to the right of the mid entry
-                        minIndex = midIndex + 1;
-                    }
+	                // If not to the left of mid entry, it can only be to the right
+	                minIndex = midIndex + 1;
                 }
 
                 ++iterationCount;

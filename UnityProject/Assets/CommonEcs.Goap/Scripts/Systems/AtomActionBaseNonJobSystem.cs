@@ -36,9 +36,10 @@ namespace CommonEcs.Goap {
             CollectActionsThatCanExecuteJob collectJob = new CollectActionsThatCanExecuteJob() {
                 entityType = GetEntityTypeHandle(),
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
+                allDebugEntities = GetComponentDataFromEntity<DebugEntity>(),
                 resultList = actionsThatCanExecuteList.AsParallelWriter()
             };
-            collectJob.Schedule(this.query, this.Dependency).Complete();
+            collectJob.ScheduleParallel(this.query, 1, this.Dependency).Complete();
 
             if (actionsThatCanExecuteList.IsEmpty) {
                 // There are no actions that can execute. We can skip executing the actions.
@@ -52,6 +53,8 @@ namespace CommonEcs.Goap {
             ComponentDataFromEntity<AtomAction> allAtomActions = GetComponentDataFromEntity<AtomAction>();
             ComponentDataFromEntity<TActionFilter> allFilterActions =
                 this.isActionFilterHasArray ? GetComponentDataFromEntity<TActionFilter>() : default;
+
+            BeforeActionsExecution();
 
             for (int i = 0; i < actionsThatCanExecuteList.Length; ++i) {
                 Entity actionEntity = actionsThatCanExecuteList[i];
@@ -84,6 +87,10 @@ namespace CommonEcs.Goap {
             }
 
             atomAction.result = Update(ref atomAction, ref actionFilter);
+        }
+
+        protected virtual void BeforeActionsExecution() {
+            // Caching of ComponentDataFromEntity or BufferFromEntity can be done here.
         }
 
         protected abstract GoapResult Start(ref AtomAction atomAction, ref TActionFilter actionComponent);

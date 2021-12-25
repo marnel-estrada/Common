@@ -1,13 +1,9 @@
 using System;
 using System.Collections.Generic;
-
 using Common;
-
 using CommonEcs.Goap;
-
 using Unity.Collections;
 using Unity.Entities;
-
 using UnityEngine;
 
 namespace GoapBrain {
@@ -16,31 +12,45 @@ namespace GoapBrain {
     /// </summary>
     public class GoapDomainDatabaseHandler : MonoBehaviour {
         [SerializeField]
-        private GoapDomainData[]? domains;
+        private GoapDomainDataContainer? domains;
 
         private AssemblerSet[]? assemblerSets;
-        
+
         private BlobAssetReference<GoapDomainDatabase> domainDbReference;
+
+        public GoapDomainDataContainer? Domains => this.domains;
 
         private void Awake() {
             Assertion.NotNull(this.domains);
             if (this.domains == null) {
                 throw new Exception($"{nameof(this.domains)} can't be null");
             }
-            Assertion.IsTrue(this.domains.Length > 0);
-            
+
+            List<GoapDomainData>? domainsDataList = this.domains.DataList;
+
+            if (domainsDataList == null) {
+                throw new CantBeNullException(nameof(domainsDataList));
+            }
+
+            Assertion.IsTrue(domainsDataList.Count > 0);
+
             BlobBuilder builder = new BlobBuilder(Allocator.Temp);
 
             // Prepare DomainDatabase
             ref GoapDomainDatabase db = ref builder.ConstructRoot<GoapDomainDatabase>();
-            BlobBuilderArray<GoapDomain> domainsBuilder = builder.Allocate(ref db.domains, this.domains.Length);
+            BlobBuilderArray<GoapDomain> domainsBuilder = builder.Allocate(ref db.domains, domainsDataList.Count);
 
-            this.assemblerSets = new AssemblerSet[this.domains.Length];
+            this.assemblerSets = new AssemblerSet[domainsDataList.Count];
 
-            for (int i = 0; i < this.domains.Length; ++i) {
-                GoapDomainData domainData = this.domains[i];
-                domainsBuilder[i] = ParseDomain(domainData); // We use the index used here when creating the agent
-                this.assemblerSets[i] = ParseAssemblerSet(domainData, i);
+            for (int i = 0; i < domainsDataList.Count; ++i) {
+                try {
+                    GoapDomainData domainData = domainsDataList[i];
+                    domainsBuilder[i] = ParseDomain(domainData); // We use the index used here when creating the agent
+                    this.assemblerSets[i] = ParseAssemblerSet(domainData, i);
+                } catch (Exception e) {
+                    Debug.LogError($"Error while parsing domain at index {i}");
+                    throw;
+                }
             }
 
             this.domainDbReference = builder.CreateBlobAssetReference<GoapDomainDatabase>(Allocator.Persistent);
@@ -51,10 +61,10 @@ namespace GoapBrain {
 
         private GoapDomain ParseDomain(GoapDomainData data) {
             this.addedActions.Clear();
-            
+
             GoapDomain domain = new GoapDomain(data.name);
             AddActions(ref domain, data, this.addedActions);
-            
+
             // Parse each extension domain
             // Note here that we're just adding the actions in the extensions to the main GoapDomain
             List<GoapExtensionData> extensions = data.Extensions;
@@ -76,10 +86,10 @@ namespace GoapBrain {
                     // Not enabled. Skip adding the action.
                     continue;
                 }
-                
+
                 // Check that the action is unique (not been added before)
                 Assertion.IsTrue(!addedActions.Contains(actionData.Name), actionData.Name);
-                
+
                 ConditionData? effectData = actionData.Effect;
                 Assertion.NotNull(effectData);
 
@@ -88,19 +98,19 @@ namespace GoapBrain {
                 }
 
                 Condition effect = new Condition(effectData.Name, effectData.Value);
-                GoapAction action = new GoapAction(actionData.Name, actionData.Cost, actionData.AtomActions.Count, 
+                GoapAction action = new GoapAction(actionData.Name, actionData.Cost, actionData.AtomActions.Count,
                     effect);
-                    
+
                 AddPreconditions(ref action, actionData);
                 Assertion.IsTrue(action.preconditions.Count == actionData.Preconditions.Count);
-                    
+
                 domain.AddAction(action);
-                
+
                 // Add to unique set
                 addedActions.Add(actionData.Name);
             }
         }
-        
+
         public ref BlobAssetReference<GoapDomainDatabase> DbReference {
             get {
                 return ref this.domainDbReference;
@@ -116,16 +126,16 @@ namespace GoapBrain {
         }
 
         // We need this so that we can check that each condition only has one resolver
-        private readonly HashSet<string> conditionsWithResolvers = new HashSet<string>(); 
+        private readonly HashSet<string> conditionsWithResolvers = new HashSet<string>();
 
         private AssemblerSet ParseAssemblerSet(GoapDomainData data, int index) {
             AssemblerSet set = new AssemblerSet(index);
-            
+
             this.conditionsWithResolvers.Clear();
-            
+
             PrepareActions(data, set);
             PrepareConditionResolvers(data, set, this.conditionsWithResolvers);
-            
+
             // Add atom actions and condition resolvers from extensions as well
             IReadOnlyList<GoapExtensionData> extensions = data.Extensions;
             for (int i = 0; i < extensions.Count; ++i) {
@@ -157,7 +167,7 @@ namespace GoapBrain {
                 assemblerInstance.Match(new AddAtomActionToSet(set, actionName.GetHashCode(), i));
             }
         }
-        
+
         private readonly struct AddAtomActionToSet : IOptionMatcher<AtomActionAssembler> {
             private readonly AssemblerSet set;
             private readonly int actionId;
@@ -173,7 +183,7 @@ namespace GoapBrain {
                 // We Init() so that the archetypes would be created prior to adding
                 EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
                 actionAssembler.Init(ref entityManager, this.actionId, this.order);
-                
+
                 this.set.Add(actionAssembler);
             }
 
@@ -185,10 +195,10 @@ namespace GoapBrain {
             IReadOnlyList<ConditionResolverData> conditionResolvers = domainData.ConditionResolvers;
             for (int i = 0; i < conditionResolvers.Count; ++i) {
                 ConditionResolverData data = conditionResolvers[i];
-                
+
                 // A condition can only have one resolver
                 Assertion.IsTrue(!conditionsWithResolvers.Contains(data.ConditionName), data.ConditionName);
-                
+
                 Option<ConditionResolverAssembler> assemblerInstance =
                     TypeUtils.Instantiate<ConditionResolverAssembler>(data.ResolverClass, domainData.Variables);
                 assemblerInstance.Match(new AddConditionResolverPairToSet(set, data.ConditionName));
@@ -223,6 +233,7 @@ namespace GoapBrain {
             if (this.assemblerSets == null) {
                 throw new Exception($"{nameof(this.assemblerSets)} can't be null");
             }
+
             return this.assemblerSets[id];
         }
     }

@@ -129,6 +129,15 @@ namespace Common.Xml {
 
             return float.Parse(GetAttribute(attributeKey), NumberFormatInfo.InvariantInfo);
         }
+        
+        public Option<float> GetFloatAttributeAsOption(string attributeKey) {
+            if (!ContainsAttribute(attributeKey)) {
+                return Option<float>.NONE;
+            }
+            
+            float value = float.Parse(GetAttribute(attributeKey), NumberFormatInfo.InvariantInfo);
+            return Option<float>.Some(value);
+        }
 
         /**
          * Retrieves an attribute as a boolean value.

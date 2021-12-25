@@ -7,7 +7,7 @@ using UnityEditor;
 using UnityEngine;
 
 namespace GoapBrain {
-    internal class ExtensionsView {
+    public class ExtensionsView {
         private GoapDomainData? newExtensionDomainData;
 
         private readonly EditorWindow parent;

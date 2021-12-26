@@ -13,16 +13,16 @@ namespace CommonEcs {
 
             if (!this.bucket[bucketIndex].hasValue) {
                 // This means that it's an empty slot. We can place the value here.
-                this.bucket[bucketIndex] = new LinearHashMapEntry<K, V>(key, hashCode, value);
+                this.bucket[bucketIndex] = new LinearHashMapEntry<K, V>(key, value);
                 ++this.count;
             }
             
             // At this point, there's an existing value at the slot
             // Let's check if they have the same hashcode
-            if (this.bucket[bucketIndex].hashCode == hashCode) {
+            if (this.bucket[bucketIndex].HashCode == hashCode) {
                 // It's the same item. We can replace the value.
                 // Note here that we don't update the count since we're just replacing a value.
-                this.bucket[bucketIndex] = new LinearHashMapEntry<K, V>(key, hashCode, value);
+                this.bucket[bucketIndex] = new LinearHashMapEntry<K, V>(key, value);
                 return;
             }
             
@@ -33,7 +33,7 @@ namespace CommonEcs {
             
             // Note here that we don't add to count if it was a replacement
             this.count += this.bucket[probedIndex].hasValue ? 0 : 1;
-            this.bucket[probedIndex] = new LinearHashMapEntry<K, V>(key, hashCode, value);
+            this.bucket[probedIndex] = new LinearHashMapEntry<K, V>(key, value);
         }
 
         private readonly int LinearProbeForAdding(int hashCode, int startingIndex) {
@@ -46,7 +46,7 @@ namespace CommonEcs {
                 // Using bitwise operator is faster instead of using modulo
                 int checkIndex = (startingIndex + i) & maxCountMinusOne;
                 LinearHashMapEntry<K, V> entry = this.bucket[checkIndex];
-                if (!entry.hasValue || entry.hashCode == hashCode) {
+                if (!entry.hasValue || entry.HashCode == hashCode) {
                     return checkIndex;
                 }
             }
@@ -61,7 +61,7 @@ namespace CommonEcs {
             
             // Check if the slot at the resolved index is already the item
             LinearHashMapEntry<K, V> entry = this.bucket[bucketIndex];
-            if (entry.hasValue && entry.hashCode == hashCode) {
+            if (entry.hasValue && entry.HashCode == hashCode) {
                 // This is the item. We remove it.
                 this.bucket[bucketIndex] = LinearHashMapEntry<K, V>.Nothing;
                 --this.count;
@@ -97,7 +97,7 @@ namespace CommonEcs {
                 int checkIndex = (startingIndex + i) & maxCountMinusOne;
                 
                 LinearHashMapEntry<K, V> entry = this.bucket[checkIndex];
-                if (entry.hasValue && entry.hashCode == hashCode) {
+                if (entry.hasValue && entry.HashCode == hashCode) {
                     return checkIndex;
                 }
             }
@@ -113,7 +113,7 @@ namespace CommonEcs {
             
             // Check if key is already at the resolved index
             LinearHashMapEntry<K, V> entry = this.bucket[bucketIndex];
-            if (entry.hasValue && entry.hashCode == hashCode) {
+            if (entry.hasValue && entry.HashCode == hashCode) {
                 // Found the item
                 return ValueTypeOption<V>.Some(entry.value);
             }
@@ -135,7 +135,7 @@ namespace CommonEcs {
             
             // Check if key is already at the resolved index
             LinearHashMapEntry<K, V> entry = this.bucket[bucketIndex];
-            if (entry.hasValue && entry.hashCode == hashCode) {
+            if (entry.hasValue && entry.HashCode == hashCode) {
                 // Found the item
                 return true;
             }

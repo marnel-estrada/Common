@@ -6,14 +6,19 @@ namespace CommonEcs {
         where V : unmanaged {
         public readonly V value;
         public readonly K key;
-        public readonly int hashCode;
+        
         public readonly bool hasValue; // This is to discriminate entries with no value
 
-        public LinearHashMapEntry(K key, int keyHashCode, V value) {
+        public LinearHashMapEntry(K key, V value) {
             this.key = key;
-            this.hashCode = keyHashCode;
             this.value = value;
             this.hasValue = true;
+        }
+
+        public int HashCode {
+            get {
+                return this.key.GetHashCode();
+            }
         }
 
         public static LinearHashMapEntry<K, V> Nothing {

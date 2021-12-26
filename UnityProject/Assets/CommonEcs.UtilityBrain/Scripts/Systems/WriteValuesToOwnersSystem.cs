@@ -120,9 +120,18 @@ namespace CommonEcs.UtilityBrain {
                 }
                 
                 // We use geometric mean so that options with more considerations are scored fairly
-                float geometricMean = multiplier > 0 ? math.pow(multiplier, 1.0f / considerationsLength) : 0;
-
+                float geometricMean = ComputeGeometricMean(multiplier, considerationsLength);
                 return new UtilityValue(maxRank, totalBonus, geometricMean);
+            }
+
+            private static float ComputeGeometricMean(float multiplier, int considerationsLength) {
+                if (considerationsLength == 0) {
+                    // There are no considerations.
+                    // This also fixes divide by zero
+                    return 0;
+                }
+                
+                return multiplier > 0 ? math.pow(multiplier, 1.0f / considerationsLength) : 0;
             }
         }
 

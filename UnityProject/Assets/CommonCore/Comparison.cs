@@ -4,7 +4,6 @@ using UnityEngine;
  * Class for comparing floating point values 
  */
 public static class Comparison {
-
 	/**
 	 * Returns whether or not a == b
 	 */
@@ -34,5 +33,4 @@ public static class Comparison {
     public static bool IsZero(float value) {
         return TolerantEquals(value, 0.0f);
     }
-
 }

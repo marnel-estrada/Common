@@ -16,7 +16,7 @@ namespace CommonEcs {
             }
 
             set {
-                if (index < 0 || index >= 32) {
+                if (index < 0 || index >= MAX) {
                     throw new Exception("Invalid index");
                 }
                 

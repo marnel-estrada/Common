@@ -86,7 +86,7 @@ namespace Common {
                 Type type = this.typeList[i];
                 string typeName = type.Name;
 
-                if (!typeName.ToLower().Contains(filter.ToLower())) {
+                if (!(string.IsNullOrEmpty(filter) || typeName.ToLower().Contains(filter.ToLower()))) {
                     continue;
                 }
 

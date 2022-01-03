@@ -152,7 +152,7 @@ namespace CommonEcs.Goap {
                     return true;
                 }
 
-                ValueTypeOption<FixedList32<int>> foundActionIndices = domain.GetActionIndices(goal);
+                ValueTypeOption<FixedList64<int>> foundActionIndices = domain.GetActionIndices(goal);
                 if (foundActionIndices.IsNone) {
                     // There are no actions to satisfy the goal
                     return false;

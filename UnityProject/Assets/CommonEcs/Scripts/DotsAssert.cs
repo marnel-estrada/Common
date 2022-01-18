@@ -19,7 +19,7 @@ namespace CommonEcs {
             }
         }
         
-        public static void IsTrue(bool condition, FixedString128 message) {
+        public static void IsTrue(bool condition, in FixedString128 message) {
             if (!condition) {
 #if UNITY_EDITOR
                 throw new Exception(message.ToString());
@@ -53,8 +53,8 @@ namespace CommonEcs {
             IsTrue(entity != Entity.Null);
         }
 
-        public static void IsSome<T>(in ValueTypeOption<T> option) where T : struct, IEquatable<T> {
-            IsTrue(option.IsSome);
+        public static void IsSome<T>(in ValueTypeOption<T> option, FixedString128 message = new FixedString128()) where T : struct, IEquatable<T> {
+            IsTrue(option.IsSome, message);
         }
     }
 }

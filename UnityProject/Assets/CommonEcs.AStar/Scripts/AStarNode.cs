@@ -1,5 +1,7 @@
+using System;
+
 namespace CommonEcs {
-    public readonly struct AStarNode<T> where T : unmanaged {
+    public readonly struct AStarNode<T> where T : unmanaged, IEquatable<T> {
         public readonly int index;
         public readonly T position;
         public readonly int parent;

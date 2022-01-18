@@ -43,8 +43,8 @@ namespace CommonEcs {
         }
         
         public int ToIndex(int x, int y, int z) {
-            int countPerLayer = this.columns * this.rows;
-            return (z * countPerLayer) + (y * this.columns + x);
+            int countPerFloor = this.columns * this.rows;
+            return (z * countPerFloor) + (y * this.columns + x);
         }
         
         public int GetX(int index) {

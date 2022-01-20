@@ -18,9 +18,9 @@ namespace CommonEcs {
         private readonly int id;
         private static readonly IdGenerator GENERATOR = new IdGenerator(1);
 
-        public MeshRendererVessel(Entity spriteLayerEntity, Material material, int layer, int sortingLayerId) {
+        public MeshRendererVessel(Entity spriteLayerEntity, Material material, int layer, int sortingLayerId, int sortingOrder) {
             this.internalInstance = new Internal();
-            this.internalInstance.Init(spriteLayerEntity, material, layer, sortingLayerId);
+            this.internalInstance.Init(spriteLayerEntity, material, layer, sortingLayerId, sortingOrder);
             this.id = GENERATOR.Generate();
         }
         
@@ -67,7 +67,7 @@ namespace CommonEcs {
             private MeshRenderer meshRenderer;
 
             // Initializer
-            public void Init(Entity spriteLayerEntity, Material material, int layer, int sortingLayerId) {
+            public void Init(Entity spriteLayerEntity, Material material, int layer, int sortingLayerId, int sortingOrder) {
                 this.spriteLayerEntity = spriteLayerEntity;
                 
                 if (this.gameObject != null) {
@@ -82,6 +82,7 @@ namespace CommonEcs {
                 this.meshRenderer = this.gameObject.AddComponent<MeshRenderer>();
                 this.meshRenderer.material = material;
                 this.meshRenderer.sortingLayerID = sortingLayerId;
+                this.meshRenderer.sortingOrder = sortingOrder;
             }
 
             private void Clear() {

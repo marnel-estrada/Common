@@ -24,6 +24,10 @@ namespace CommonEcs {
         private int sortingLayerId; // This is the ID
         private int sortingLayer; // Note that this is the value, not the ID
 
+        // We need the sorting order because there may be multiple meshes in a layer but have
+        // different sortingOrder
+        private int sortingOrder;
+
         public readonly SimpleList<Entity> spriteManagerEntities;
         
         private readonly int id;
@@ -46,6 +50,7 @@ namespace CommonEcs {
             this.layer = 0;
             this.sortingLayer = 0;
             this.sortingLayerId = 0;
+            this.sortingOrder = 0;
             this.alwaysUpdateMesh = false;
             this.useMeshRenderer = false;
             this.id = ID_GENERATOR.Generate();
@@ -70,6 +75,15 @@ namespace CommonEcs {
             }
             set {
                 this.name = value;
+            }
+        }
+
+        public int SortingOrder {
+            get {
+                return this.sortingOrder;
+            }
+            set {
+                this.sortingOrder = value;
             }
         }
 

@@ -63,7 +63,9 @@ namespace CommonEcs {
         }
 
         /// <summary>
-        /// Transform from world position to grid coordinate
+        /// Transform from world position to grid coordinate.
+        /// Note that the z coordinate of the world position matters now as it denotes which floor level
+        /// it is.
         /// </summary>
         /// <param name="worldPosition"></param>
         /// <returns></returns>
@@ -93,9 +95,11 @@ namespace CommonEcs {
             
             float yDiff = worldPosition.y - this.worldBoundingBox.Min.y;
             int yCoord = (int)(yDiff / this.grid.cellHeight);
+
+            int zCoord = (int)math.round(worldPosition.z);
             
             // Note that we don't determine the z here (the level)
-            return ValueTypeOption<GridCoord3>.Some(new GridCoord3(xCoord, yCoord, 0));
+            return ValueTypeOption<GridCoord3>.Some(new GridCoord3(xCoord, yCoord, zCoord));
         }
     }
 }

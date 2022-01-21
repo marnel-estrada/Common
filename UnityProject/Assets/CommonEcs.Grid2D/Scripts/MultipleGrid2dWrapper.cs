@@ -96,10 +96,20 @@ namespace CommonEcs {
             float yDiff = worldPosition.y - this.worldBoundingBox.Min.y;
             int yCoord = (int)(yDiff / this.grid.cellHeight);
 
-            int zCoord = (int)math.round(worldPosition.z);
+            // Note here that positive z means negative z in world space so that the sprite would be closer 
+            // to the camera.
+            int zCoord = (int)math.round(worldPosition.z / -this.grid.cellHeight);
             
             // Note that we don't determine the z here (the level)
             return ValueTypeOption<GridCoord3>.Some(new GridCoord3(xCoord, yCoord, zCoord));
+        }
+
+        // Note here that the z position is just multiplied with cell height
+        // It's basically the same distance when moving from cell to cell in XY.
+        // We multiply by negative here so that the sprite will move closer to the camera instead
+        // of going farther.
+        public float ToWorldZPosition(int zCoordinate) {
+            return zCoordinate * -this.grid.cellHeight;
         }
     }
 }

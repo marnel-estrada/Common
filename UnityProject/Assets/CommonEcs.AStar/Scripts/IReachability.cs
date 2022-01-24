@@ -9,7 +9,7 @@ namespace CommonEcs {
      * The index is used to locate to a NativeArray of entities or components that the Reachability
      * algorithm may need
 	 */
-    public interface IReachability<T> where T : unmanaged, IEquatable<T> {
+    public interface IReachability<TNode> where TNode : unmanaged, IEquatable<TNode> {
         /// <summary>
         /// A reachability check on a single position
         /// This is used to check if a goal is reachable at all
@@ -18,7 +18,7 @@ namespace CommonEcs {
         /// </summary>
         /// <param name="position"></param>
         /// <returns></returns>
-        bool IsReachable(T position);
+        bool IsReachable(TNode position);
 
         /// <summary>
         /// Returns whether or not the specified movement is reachable.
@@ -26,7 +26,7 @@ namespace CommonEcs {
         /// <param name="start"></param>
         /// <param name="destination"></param>
         /// <returns></returns>
-        bool IsReachable(T start, T destination);
+        bool IsReachable(TNode start, TNode destination);
 
         /// <summary>
         /// Computes the weight for the specified movement
@@ -34,6 +34,6 @@ namespace CommonEcs {
         /// <param name="start"></param>
         /// <param name="destination"></param>
         /// <returns></returns>
-        float GetWeight(T start, T destination);
+        float GetWeight(TNode start, TNode destination);
     }
 }

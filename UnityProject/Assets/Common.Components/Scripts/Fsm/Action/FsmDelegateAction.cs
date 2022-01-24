@@ -28,21 +28,15 @@ namespace Common.Fsm {
 		}
 		
 		public override void OnEnter() {
-			if(this.onEnterRoutine != null) {
-				this.onEnterRoutine(GetOwner());
-			}
+			this.onEnterRoutine?.Invoke(GetOwner());
 		}
 		
 		public override void OnUpdate() {
-			if(this.onUpdateRoutine != null) {
-				this.onUpdateRoutine(GetOwner());
-			}
+			this.onUpdateRoutine?.Invoke(GetOwner());
 		}
 		
 		public override void OnExit() {
-			if(this.onExitRoutine != null) {
-				this.onExitRoutine(GetOwner());
-			}
+			this.onExitRoutine?.Invoke(GetOwner());
 		}
 
 	}

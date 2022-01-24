@@ -1,6 +1,7 @@
 ﻿using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 
 using UnityEngine;
 
@@ -23,6 +24,8 @@ namespace CommonEcs {
         public NativeArray<Color> colors;
         
         public uint lastSystemVersion;
+        
+        private static readonly float3 OFF_SCREEN = new float3(1000, 1000, 1000);
 
         public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {
             if (!chunk.DidChange(this.spriteType, this.lastSystemVersion)) {
@@ -36,10 +39,19 @@ namespace CommonEcs {
                 Sprite sprite = sprites[i];
 
                 if (sprite.VerticesChanged) {
-                    this.vertices[sprite.index1] = sprite.transformedV1;
-                    this.vertices[sprite.index2] = sprite.transformedV2;
-                    this.vertices[sprite.index3] = sprite.transformedV3;
-                    this.vertices[sprite.index4] = sprite.transformedV4;
+                    if (sprite.Hidden) {
+                        // We add off screen position if the sprite was set to not visible
+                        this.vertices[sprite.index1] = sprite.transformedV1 + OFF_SCREEN;
+                        this.vertices[sprite.index2] = sprite.transformedV2 + OFF_SCREEN;
+                        this.vertices[sprite.index3] = sprite.transformedV3 + OFF_SCREEN;
+                        this.vertices[sprite.index4] = sprite.transformedV4 + OFF_SCREEN;
+                    } else {
+                        // Sprite is visible. No need to add off screen offset.
+                        this.vertices[sprite.index1] = sprite.transformedV1;
+                        this.vertices[sprite.index2] = sprite.transformedV2;
+                        this.vertices[sprite.index3] = sprite.transformedV3;
+                        this.vertices[sprite.index4] = sprite.transformedV4;
+                    }
                 }
 
                 if (sprite.UvChanged) {

@@ -8,10 +8,10 @@ namespace CommonEcs {
     public class ResetSpriteChangedFlagsSystem : SystemBase {
         protected override void OnUpdate() {
             this.Entities.WithChangeFilter<Sprite>().ForEach(delegate(ref Sprite sprite) {
-                sprite.verticesChanged = false;
-                sprite.uvChanged = false;
-                sprite.colorChanged = false;
-                sprite.renderOrderChanged = false;
+                sprite.VerticesChanged = false;
+                sprite.UvChanged = false;
+                sprite.ColorChanged = false;
+                sprite.RenderOrderChanged = false;
             }).WithBurst().ScheduleParallel();
         }
     }

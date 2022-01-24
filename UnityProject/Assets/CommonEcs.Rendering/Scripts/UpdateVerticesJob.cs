@@ -35,14 +35,14 @@ namespace CommonEcs {
             for (int i = 0; i < sprites.Length; ++i) {
                 Sprite sprite = sprites[i];
 
-                if (sprite.verticesChanged.Value) {
+                if (sprite.VerticesChanged) {
                     this.vertices[sprite.index1] = sprite.transformedV1;
                     this.vertices[sprite.index2] = sprite.transformedV2;
                     this.vertices[sprite.index3] = sprite.transformedV3;
                     this.vertices[sprite.index4] = sprite.transformedV4;
                 }
 
-                if (sprite.uvChanged.Value) {
+                if (sprite.UvChanged) {
                     this.uv[sprite.index1] = sprite.uv_1;
                     this.uv[sprite.index2] = sprite.uv_2;
                     this.uv[sprite.index3] = sprite.uv_3;
@@ -54,7 +54,7 @@ namespace CommonEcs {
                     this.uv2[sprite.index4] = sprite.uv2_4;
                 }
 
-                if (sprite.colorChanged.Value) {
+                if (sprite.ColorChanged) {
                     this.colors[sprite.index1] = sprite.color;
                     this.colors[sprite.index2] = sprite.color;
                     this.colors[sprite.index3] = sprite.color;

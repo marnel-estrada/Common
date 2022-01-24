@@ -570,7 +570,7 @@ namespace CommonEcs {
                 this.nativeUv2[index3] = sprite.uv2_3;
                 this.nativeUv2[index4] = sprite.uv2_4;
 
-                // Set the triangle indeces
+                // Set the triangle indices
                 int triangle1 = sprite.managerIndex * 6;
                 int triangle2 = triangle1 + 1;
                 int triangle3 = triangle2 + 1;
@@ -588,12 +588,12 @@ namespace CommonEcs {
                 this.nativeTriangles[triangle5] = index4;
                 this.nativeTriangles[triangle6] = index2;
 
-                sprite.active.Value = true;
+                sprite.Active = true;
 
-                sprite.verticesChanged.Value = true;
-                sprite.renderOrderChanged.Value = true;
-                sprite.uvChanged.Value = true;
-                sprite.colorChanged.Value = true;
+                sprite.VerticesChanged = true;
+                sprite.RenderOrderChanged = true;
+                sprite.UvChanged = true;
+                sprite.ColorChanged = true;
 
                 ++this.spriteCount;
 
@@ -614,7 +614,7 @@ namespace CommonEcs {
 
                 // We don't really remove. We just keep it in a temporary list of inactive sprite
                 // When a sprite is added, we check if there are sprites in inactive list and we use that instead
-                sprite.active.Value = false;
+                sprite.Active = false;
                 Remove(sprite.managerIndex);
             }
 

@@ -108,19 +108,19 @@ namespace CommonEcs {
                     Sprite sprite = sprites[i];
                     Entity spriteManagerEntity = sprite.spriteManagerEntity;
                     
-                    if (sprite.verticesChanged.Value) {
+                    if (sprite.VerticesChanged) {
                         this.verticesChangedMap.Add(spriteManagerEntity);
                     }
 
-                    if (sprite.renderOrderChanged.Value) {
+                    if (sprite.RenderOrderChanged) {
                         this.trianglesChangedMap.Add(spriteManagerEntity);
                     }
     
-                    if (sprite.uvChanged.Value) {
+                    if (sprite.UvChanged) {
                         this.uvChangedMap.Add(spriteManagerEntity);
                     }
 
-                    if (sprite.colorChanged.Value) {
+                    if (sprite.ColorChanged) {
                         this.colorChangedMap.Add(spriteManagerEntity);
                     }
                 }

@@ -72,19 +72,23 @@ namespace CommonEcs {
         // renderOrder is used for things like sorting by z position
         public int layerOrder;
 
-        public ByteBool active;
+        // We used BitArrayX here so we can save on bytes when using booleans
+        public BitArray8 flags;
 
-        public ByteBool verticesChanged;
-        public ByteBool uvChanged;
-        public ByteBool colorChanged;
-        public ByteBool renderOrderChanged;
+        // Flag indices
+        private const int ACTIVE = 0;
+        
+        private const int VERTICES_CHANGED = 1;
+        private const int UV_CHANGED = 2;
+        private const int COLOR_CHANGED = 3;
+        private const int RENDER_ORDER_CHANGED = 4;
 
         public int LayerOrder {
             get {
                 return this.layerOrder;
             }
             set {
-                this.renderOrderChanged.Value = this.layerOrder != value;
+                this.RenderOrderChanged = this.layerOrder != value;
                 this.layerOrder = value;
             }
         }
@@ -96,7 +100,7 @@ namespace CommonEcs {
             
             set {
                 // Render order changed if the new render order is not the same as the previous one
-                this.renderOrderChanged.Value = !this.renderOrder.TolerantEquals(value);                
+                this.RenderOrderChanged = !this.renderOrder.TolerantEquals(value);                
                 this.renderOrder = value;
             }
         }
@@ -108,7 +112,7 @@ namespace CommonEcs {
 
             set {
                 // Render order changed if the new render order is not the same as the previous one
-                this.renderOrderChanged.Value = !this.renderOrderDueToPosition.TolerantEquals(value);
+                this.RenderOrderChanged = !this.renderOrderDueToPosition.TolerantEquals(value);
                 this.renderOrderDueToPosition = value;
             }
         }
@@ -158,7 +162,7 @@ namespace CommonEcs {
             this.v3 = new float3(-halfWidth + (offset.x * width), halfHeight + (offset.y * height), 0); // Upper left
             this.v4 = new float3(halfWidth + (offset.x * width), halfHeight + (offset.y * height), 0); // Upper right
 
-            this.verticesChanged.Value = true;
+            this.VerticesChanged = true;
         }
 
         /// <summary>
@@ -172,7 +176,7 @@ namespace CommonEcs {
             this.uv_3 = lowerLeftUv + new float2(0, uvDimension.y); // Upper left
             this.uv_4 = lowerLeftUv + uvDimension; // Upper right
 
-            this.uvChanged.Value = true;
+            this.UvChanged = true;
         }
 
         /// <summary>
@@ -186,7 +190,7 @@ namespace CommonEcs {
             this.uv2_3 = lowerLeftUv2 + new float2(0, uvDimension2.y); // Upper left
             this.uv2_4 = lowerLeftUv2 + uvDimension2; // Upper right
             
-            this.uvChanged.Value = true;
+            this.UvChanged = true;
         }
 
         /// <summary>
@@ -195,7 +199,7 @@ namespace CommonEcs {
         /// <param name="color"></param>
         public void SetColor(Color color) {
             this.color = color;
-            this.colorChanged.Value = true;
+            this.ColorChanged = true;
         }
 
         /// <summary>
@@ -208,7 +212,57 @@ namespace CommonEcs {
             this.transformedV3 = math.mul(matrix, new float4(this.v3, 1)).xyz;
             this.transformedV4 = math.mul(matrix, new float4(this.v4, 1)).xyz;
 
-            this.verticesChanged.Value = true;
+            this.VerticesChanged = true;
+        }
+
+        public bool Active {
+            get {
+                return this.flags[ACTIVE];
+            }
+
+            set {
+                this.flags[ACTIVE] = value;
+            }
+        }
+
+        public bool VerticesChanged {
+            get {
+                return this.flags[VERTICES_CHANGED];
+            }
+
+            set {
+                this.flags[VERTICES_CHANGED] = value;
+            }
+        }
+
+        public bool UvChanged {
+            get {
+                return this.flags[UV_CHANGED];
+            }
+
+            set {
+                this.flags[UV_CHANGED] = value;
+            }
+        }
+
+        public bool ColorChanged {
+            get {
+                return this.flags[COLOR_CHANGED];
+            }
+
+            set {
+                this.flags[COLOR_CHANGED] = value;
+            }
+        }
+
+        public bool RenderOrderChanged {
+            get {
+                return this.flags[RENDER_ORDER_CHANGED];
+            }
+
+            set {
+                this.flags[RENDER_ORDER_CHANGED] = value;
+            }
         }
     }
 }

@@ -100,7 +100,6 @@ namespace CommonEcs {
             // to the camera.
             int zCoord = (int)math.round(worldPosition.z / -this.grid.cellHeight);
             
-            // Note that we don't determine the z here (the level)
             return ValueTypeOption<GridCoord3>.Some(new GridCoord3(xCoord, yCoord, zCoord));
         }
 

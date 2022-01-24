@@ -76,12 +76,18 @@ namespace CommonEcs {
         public BitArray8 flags;
 
         // Flag indices
+        
+        // Active here means whether or not it is active in SpriteManager or is a recycled instance
         private const int ACTIVE = 0;
         
         private const int VERTICES_CHANGED = 1;
         private const int UV_CHANGED = 2;
         private const int COLOR_CHANGED = 3;
         private const int RENDER_ORDER_CHANGED = 4;
+
+        // We used "Hidden" here instead of "Visible" so we don't have to set the value to true by default
+        // which is hard to do for structs
+        private const int HIDDEN = 5;
 
         public int LayerOrder {
             get {
@@ -262,6 +268,20 @@ namespace CommonEcs {
 
             set {
                 this.flags[RENDER_ORDER_CHANGED] = value;
+            }
+        }
+
+        public bool Hidden {
+            get {
+                return this.flags[HIDDEN];
+            }
+
+            set {
+                this.flags[HIDDEN] = value;
+
+                // We set vertices changed here so that the transform vertices would be updated
+                // Note that we add an offset to the transformed vertex positions to hide the sprite
+                this.VerticesChanged = true;
             }
         }
     }

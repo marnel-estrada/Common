@@ -61,7 +61,6 @@ namespace CommonEcs {
                 if (this.goalIdentifier.IsGoal(current.position)) {
                     // Goal has been found
                     this.allPaths[this.owner] = new AStarPath(true);
-
                     return;
                 }
 

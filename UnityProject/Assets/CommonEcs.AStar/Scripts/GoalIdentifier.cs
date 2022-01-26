@@ -1,7 +1,5 @@
 using System;
 
-using Unity.Mathematics;
-
 namespace CommonEcs {
     public interface GoalIdentifier<T> where T : unmanaged, IEquatable<T> {
         /// <summary>

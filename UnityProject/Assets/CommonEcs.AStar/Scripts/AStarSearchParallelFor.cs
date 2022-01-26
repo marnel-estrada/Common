@@ -92,7 +92,7 @@ namespace CommonEcs {
                 this.closeSet = new NativeHashMap<int3, byte>(10, Allocator.Temp);
 
                 AStarSearchParameters parameters = this.allParameters[this.entity];
-                this.goalPosition = parameters.goal;
+                this.goalPosition = parameters.goal.ValueOrError();
 
                 float startNodeH = this.heuristicCalculator.ComputeCost(parameters.start, this.goalPosition);
                 AStarNode<GridCoord3> startNode = CreateNode(parameters.start, -1, 0, startNodeH);

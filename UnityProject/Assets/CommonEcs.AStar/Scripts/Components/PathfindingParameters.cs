@@ -1,7 +1,7 @@
 using Unity.Entities;
 
 namespace CommonEcs {
-    public readonly struct AStarSearchParameters : IComponentData {
+    public readonly struct PathfindingParameters : IComponentData {
         public readonly GridCoord3 start;
         public readonly ValueTypeOption<GridCoord3> goal;
 
@@ -10,12 +10,12 @@ namespace CommonEcs {
         /// by a goal identifier.
         /// </summary>
         /// <param name="start"></param>
-        public AStarSearchParameters(GridCoord3 start) {
+        public PathfindingParameters(GridCoord3 start) {
             this.start = start;
             this.goal = ValueTypeOption<GridCoord3>.None;
         }
 
-        public AStarSearchParameters(GridCoord3 start, GridCoord3 goal) {
+        public PathfindingParameters(GridCoord3 start, GridCoord3 goal) {
             this.start = start;
             this.goal = ValueTypeOption<GridCoord3>.Some(goal);
         }

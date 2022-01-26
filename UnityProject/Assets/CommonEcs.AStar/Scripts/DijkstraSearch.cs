@@ -23,7 +23,7 @@ namespace CommonEcs {
 
         public MultipleGrid2dWrapper gridWrapper;
         
-        public ComponentDataFromEntity<AStarPath> allPaths;
+        public ComponentDataFromEntity<Path> allPaths;
         
         [ReadOnly]
         public BufferFromEntity<Int3BufferElement> allPathLists;
@@ -60,7 +60,7 @@ namespace CommonEcs {
                 AStarNode<int3> current = this.openSet.Pop();
                 if (this.goalIdentifier.IsGoal(current.position)) {
                     // Goal has been found
-                    this.allPaths[this.owner] = new AStarPath(true);
+                    this.allPaths[this.owner] = new Path(true);
                     return;
                 }
 
@@ -74,7 +74,7 @@ namespace CommonEcs {
         }
 
         private void MarkUnreachable() {
-            AStarPath path = this.allPaths[this.owner];
+            Path path = this.allPaths[this.owner];
             path.Clear();
             path.reachable = false;
             this.allPaths[this.owner] = path;

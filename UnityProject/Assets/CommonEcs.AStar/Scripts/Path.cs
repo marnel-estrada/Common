@@ -1,11 +1,11 @@
 using Unity.Entities;
 
 namespace CommonEcs {
-    public struct AStarPath : IComponentData {
+    public struct Path : IComponentData {
         private int currentIndex;
         public bool reachable;
 
-        public AStarPath(bool reachable) {
+        public Path(bool reachable) {
             this.currentIndex = -1;
             this.reachable = reachable;
         }

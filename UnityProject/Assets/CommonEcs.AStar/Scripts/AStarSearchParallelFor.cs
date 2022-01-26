@@ -13,10 +13,10 @@ namespace CommonEcs {
         public NativeArray<Entity> entities; // The request entities
 
         [NativeDisableParallelForRestriction, ReadOnly]
-        public ComponentDataFromEntity<AStarSearchParameters> allParameters;
+        public ComponentDataFromEntity<PathfindingParameters> allParameters;
 
         [NativeDisableParallelForRestriction, WriteOnly]
-        public ComponentDataFromEntity<AStarPath> allPaths;
+        public ComponentDataFromEntity<Path> allPaths;
 
         [NativeDisableParallelForRestriction, WriteOnly]
         public ComponentDataFromEntity<Waiting> allWaiting;
@@ -58,8 +58,8 @@ namespace CommonEcs {
         private struct Search {
             public Entity entity;
 
-            public ComponentDataFromEntity<AStarSearchParameters> allParameters;
-            public ComponentDataFromEntity<AStarPath> allPaths;
+            public ComponentDataFromEntity<PathfindingParameters> allParameters;
+            public ComponentDataFromEntity<Path> allPaths;
             public BufferFromEntity<Int3BufferElement> allPathLists;
 
             public TReachability reachability;
@@ -91,7 +91,7 @@ namespace CommonEcs {
                 
                 this.closeSet = new NativeHashMap<int3, byte>(10, Allocator.Temp);
 
-                AStarSearchParameters parameters = this.allParameters[this.entity];
+                PathfindingParameters parameters = this.allParameters[this.entity];
                 this.goalPosition = parameters.goal.ValueOrError();
 
                 float startNodeH = this.heuristicCalculator.ComputeCost(parameters.start, this.goalPosition);
@@ -107,7 +107,7 @@ namespace CommonEcs {
                     if (current.position.Equals(this.goalPosition)) {
                         // Goal has been found
                         ConstructPath(current);
-                        this.allPaths[this.entity] = new AStarPath(true);
+                        this.allPaths[this.entity] = new Path(true);
 
                         return;
                     }
@@ -127,9 +127,9 @@ namespace CommonEcs {
                 // Open set has been exhausted. Path is unreachable.
                 if (minHPosition.HasValue) {
                     ConstructPath(minHPosition.Value);
-                    this.allPaths[this.entity] = new AStarPath(false); // false for unreachable
+                    this.allPaths[this.entity] = new Path(false); // false for unreachable
                 } else {
-                    this.allPaths[this.entity] = new AStarPath(false);
+                    this.allPaths[this.entity] = new Path(false);
                 }
 
                 // Unity says to Dispose() Temp collections:

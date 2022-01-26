@@ -21,7 +21,6 @@ namespace CommonEcs.DotsFsm {
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             ConsumeJob consumeJob = new ConsumeJob() {
                 fsmType = GetComponentTypeHandle<DotsFsm>(),
-                nameReferenceType = GetComponentTypeHandle<NameReference>(),
                 transitionType = GetBufferTypeHandle<Transition>(),
                 debugType = GetComponentTypeHandle<DebugFsm>(true),
                 allNameReferences = GetComponentDataFromEntity<NameReference>(true),
@@ -34,9 +33,6 @@ namespace CommonEcs.DotsFsm {
         [BurstCompile]
         private struct ConsumeJob : IJobEntityBatch {
             public ComponentTypeHandle<DotsFsm> fsmType;
-            
-            [ReadOnly]
-            public ComponentTypeHandle<NameReference> nameReferenceType;
 
             [ReadOnly]
             public BufferTypeHandle<Transition> transitionType;
@@ -52,13 +48,11 @@ namespace CommonEcs.DotsFsm {
             
             public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
                 NativeArray<DotsFsm> fsms = batchInChunk.GetNativeArray(this.fsmType);
-                NativeArray<NameReference> nameReferences = batchInChunk.GetNativeArray(this.nameReferenceType);
                 BufferAccessor<Transition> transitionLists = batchInChunk.GetBufferAccessor(this.transitionType);
                 NativeArray<DebugFsm> debugList = batchInChunk.GetNativeArray(this.debugType);
 
                 for (int i = 0; i < batchInChunk.Count; ++i) {
                     DotsFsm fsm = fsms[i];
-                    NameReference nameReference = nameReferences[i];
                     DynamicBuffer<Transition> transitions = transitionLists[i];
                     
                     if (fsm.pendingEvent.IsNone) {
@@ -69,7 +63,6 @@ namespace CommonEcs.DotsFsm {
                     // The current state will be updated in the matcher
                     fsm = fsm.currentState.Match<TryChangeState, DotsFsm>(new TryChangeState() {
                         fsm = fsm,
-                        fsmName = this.allNames[nameReference.nameEntity].value,
                         fsmEvent = fsm.pendingEvent.ValueOr(default),
                         transitions = transitions,
                         allNameReferences = this.allNameReferences,
@@ -85,7 +78,6 @@ namespace CommonEcs.DotsFsm {
 
         private struct TryChangeState : IFuncOptionMatcher<Entity, DotsFsm> {
             public DotsFsm fsm;
-            public FixedString64 fsmName;
             public FsmEvent fsmEvent;
             
             [ReadOnly]

@@ -103,6 +103,16 @@ namespace CommonEcs {
             return ValueTypeOption<GridCoord3>.Some(new GridCoord3(xCoord, yCoord, zCoord));
         }
 
+        public ValueTypeOption<Entity> GetCellEntityFromWorld(in float3 worldPosition) {
+            ValueTypeOption<GridCoord3> gridCoordinate = ToGridCoordinate(worldPosition);
+            if (gridCoordinate.IsNone) {
+                // Must be outside map
+                return ValueTypeOption<Entity>.None;
+            }
+
+            return GetCellEntity(gridCoordinate.ValueOrError());
+        }
+
         // Note here that the z position is just multiplied with cell height
         // It's basically the same distance when moving from cell to cell in XY.
         // We multiply by negative here so that the sprite will move closer to the camera instead

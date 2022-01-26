@@ -1,3 +1,5 @@
+using System;
+
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -29,11 +31,16 @@ namespace CommonEcs.Goap {
                 processor = PrepareProcessor()
             };
 
-            JobHandle handle = this.ShouldScheduleParallel ? job.ScheduleParallel(this.query, 1, inputDeps) :
-                job.Schedule(this.query, inputDeps);
-            AfterJobScheduling(handle);
-
-            return handle;
+            try {
+                JobHandle handle = this.ShouldScheduleParallel ? job.ScheduleParallel(this.query, 1, inputDeps) :
+                    job.Schedule(this.query, inputDeps);
+                AfterJobScheduling(handle);
+                
+                return handle;
+            } catch (InvalidOperationException) {
+                Debug.LogError(typeof(TResolverFilter));
+                throw;
+            }
         }
         
         protected virtual void AfterJobScheduling(in JobHandle handle) {

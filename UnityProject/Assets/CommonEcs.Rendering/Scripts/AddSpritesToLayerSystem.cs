@@ -109,8 +109,8 @@ namespace CommonEcs {
 
             if (spriteLayer.useMeshRenderer) {
                 // This means that the layer will use MeshRenderers in GameObjects to render the mesh
-                MeshRendererVessel vessel = new MeshRendererVessel(spriteLayerEntity, spriteLayer.material, spriteLayer.layer,
-                    spriteLayer.SortingLayerId, spriteLayer.SortingOrder);
+                MeshRendererVessel vessel = new MeshRendererVessel(spriteLayerEntity, spriteLayer.Name, spriteLayer.material, 
+                    spriteLayer.layer, spriteLayer.SortingLayerId, spriteLayer.SortingOrder);
                 this.PostUpdateCommands.AddSharedComponent(entity, vessel);
             }
         }

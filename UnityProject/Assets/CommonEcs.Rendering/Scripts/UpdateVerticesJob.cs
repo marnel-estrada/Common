@@ -1,6 +1,7 @@
 ﻿using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 
 using UnityEngine;
 
@@ -23,6 +24,8 @@ namespace CommonEcs {
         public NativeArray<Color> colors;
         
         public uint lastSystemVersion;
+        
+        private static readonly float3 OFF_SCREEN = new float3(1000, 1000, 1000);
 
         public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {
             if (!chunk.DidChange(this.spriteType, this.lastSystemVersion)) {
@@ -35,14 +38,23 @@ namespace CommonEcs {
             for (int i = 0; i < sprites.Length; ++i) {
                 Sprite sprite = sprites[i];
 
-                if (sprite.verticesChanged.Value) {
-                    this.vertices[sprite.index1] = sprite.transformedV1;
-                    this.vertices[sprite.index2] = sprite.transformedV2;
-                    this.vertices[sprite.index3] = sprite.transformedV3;
-                    this.vertices[sprite.index4] = sprite.transformedV4;
+                if (sprite.VerticesChanged) {
+                    if (sprite.Hidden) {
+                        // We add off screen position if the sprite was set to not visible
+                        this.vertices[sprite.index1] = sprite.transformedV1 + OFF_SCREEN;
+                        this.vertices[sprite.index2] = sprite.transformedV2 + OFF_SCREEN;
+                        this.vertices[sprite.index3] = sprite.transformedV3 + OFF_SCREEN;
+                        this.vertices[sprite.index4] = sprite.transformedV4 + OFF_SCREEN;
+                    } else {
+                        // Sprite is visible. No need to add off screen offset.
+                        this.vertices[sprite.index1] = sprite.transformedV1;
+                        this.vertices[sprite.index2] = sprite.transformedV2;
+                        this.vertices[sprite.index3] = sprite.transformedV3;
+                        this.vertices[sprite.index4] = sprite.transformedV4;
+                    }
                 }
 
-                if (sprite.uvChanged.Value) {
+                if (sprite.UvChanged) {
                     this.uv[sprite.index1] = sprite.uv_1;
                     this.uv[sprite.index2] = sprite.uv_2;
                     this.uv[sprite.index3] = sprite.uv_3;
@@ -54,7 +66,7 @@ namespace CommonEcs {
                     this.uv2[sprite.index4] = sprite.uv2_4;
                 }
 
-                if (sprite.colorChanged.Value) {
+                if (sprite.ColorChanged) {
                     this.colors[sprite.index1] = sprite.color;
                     this.colors[sprite.index2] = sprite.color;
                     this.colors[sprite.index3] = sprite.color;

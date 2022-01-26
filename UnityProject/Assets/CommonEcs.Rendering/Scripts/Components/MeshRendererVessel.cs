@@ -18,10 +18,10 @@ namespace CommonEcs {
         private readonly int id;
         private static readonly IdGenerator GENERATOR = new IdGenerator(1);
 
-        public MeshRendererVessel(Entity spriteLayerEntity, Material material, int layer, int sortingLayerId, int sortingOrder) {
-            this.internalInstance = new Internal();
-            this.internalInstance.Init(spriteLayerEntity, material, layer, sortingLayerId, sortingOrder);
+        public MeshRendererVessel(Entity spriteLayerEntity, string name, Material material, int layer, int sortingLayerId, int sortingOrder) {
             this.id = GENERATOR.Generate();
+            this.internalInstance = new Internal();
+            this.internalInstance.Init(spriteLayerEntity, name, this.id, material, layer, sortingLayerId, sortingOrder);
         }
         
         public Mesh Mesh {
@@ -67,7 +67,8 @@ namespace CommonEcs {
             private MeshRenderer meshRenderer;
 
             // Initializer
-            public void Init(Entity spriteLayerEntity, Material material, int layer, int sortingLayerId, int sortingOrder) {
+            public void Init(Entity spriteLayerEntity, string name, int id, Material material, int layer,
+                int sortingLayerId, int sortingOrder) {
                 this.spriteLayerEntity = spriteLayerEntity;
                 
                 if (this.gameObject != null) {
@@ -75,7 +76,7 @@ namespace CommonEcs {
                     Clear();
                 }
                 
-                this.gameObject = new GameObject("MeshRendererVessel." + material.name);
+                this.gameObject = new GameObject($"MeshRendererVessel.{name}.{id}");
                 this.gameObject.layer = layer;
                 this.meshFilter = this.gameObject.AddComponent<MeshFilter>();
                 

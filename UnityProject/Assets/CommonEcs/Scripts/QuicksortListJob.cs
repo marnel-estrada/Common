@@ -24,41 +24,46 @@ namespace CommonEcs {
                 Quicksort(0, this.list.Length - 1);
             }
         }
-        
+
         private void Quicksort(int left, int right) {
-            int i = left;
-            int j = right;
-            T pivot = this.list[(left + right) / 2];
+            while (true) {
+                int i = left;
+                int j = right;
+                T pivot = this.list[(left + right) / 2];
 
-            while (i <= j) {
-                // Lesser
-                while (this.list[i].CompareTo(pivot) < 0) {
-                    ++i;
-                }
+                while (i <= j) {
+                    // Lesser
+                    while (this.list[i].CompareTo(pivot) < 0) {
+                        ++i;
+                    }
 
-                // Greater
-                while (this.list[j].CompareTo(pivot) > 0) {
-                    --j;
-                }
+                    // Greater
+                    while (this.list[j].CompareTo(pivot) > 0) {
+                        --j;
+                    }
 
-                if (i <= j) {
+                    if (i > j) {
+                        continue;
+                    }
+
                     // Swap
-                    T temp = this.list[i];
-                    this.list[i] = this.list[j];
-                    this.list[j] = temp;
+                    (this.list[i], this.list[j]) = (this.list[j], this.list[i]);
 
                     ++i;
                     --j;
                 }
-            }
 
-            // Recurse
-            if (left < j) {
-                Quicksort(left, j);
-            }
+                // Recurse
+                if (left < j) {
+                    Quicksort(left, j);
+                }
 
-            if (i < right) {
-                Quicksort(i, right);
+                if (i < right) {
+                    left = i;
+                    continue;
+                }
+
+                break;
             }
         }
     }

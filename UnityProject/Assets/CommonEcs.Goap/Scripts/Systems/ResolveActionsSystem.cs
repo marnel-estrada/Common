@@ -67,10 +67,12 @@ namespace CommonEcs.Goap {
 
                     // Used for debugging
                     DebugEntity debug = this.allDebug[planner.agentEntity];
+#if UNITY_EDITOR
                     if (debug.enabled) {
                         int breakpoint = 0;
                         ++breakpoint;
                     }
+#endif
 
                     // Prepare conditions map. We convert it from the bucket.
                     // The algorithm needs to use BoolHashMap so it can pass the hashmap around. 
@@ -89,9 +91,11 @@ namespace CommonEcs.Goap {
                     if (planner.state == PlanningState.SUCCESS) {
                         AddActions(ref resolvedActions, ref actionList);
 
+#if UNITY_EDITOR
                         if (debug.enabled) {
                             PrintActions(planner, resolvedActions);
                         }
+#endif
                     }
 
                     if (planner.state == PlanningState.FAILED && debug.enabled) {
@@ -138,9 +142,11 @@ namespace CommonEcs.Goap {
 
             private bool SearchActions(in Condition goal, in GoapDomain domain, ref BoolHashMap conditionsMap,
                 ref NativeList<ResolvedAction> actionList, ref NativeHashSet<int> actionsBeingEvaluated, bool isDebug) {
+#if UNITY_EDITOR
                 if (isDebug) {
                     Debug.Log(string.Format("Evaluation goal {0}:{1}", goal.id.hashCode, goal.value));
                 }
+#endif
                 
                 // Check if goal was already specified in the current conditionsMap
                 ValueTypeOption<bool> foundGoalValue = conditionsMap.Find(goal.id.hashCode);
@@ -171,9 +177,11 @@ namespace CommonEcs.Goap {
                         continue;
                     }
                     
+#if UNITY_EDITOR
                     if (isDebug) {
                         Debug.Log(string.Format("Evaluating action {0}", action.id));
                     }
+#endif
 
                     actionsBeingEvaluated.TryAdd(action.id);
 
@@ -186,9 +194,11 @@ namespace CommonEcs.Goap {
                     actionsBeingEvaluated.Remove(action.id);
 
                     if (!searchSuccess) {
+#if UNITY_EDITOR
                         if (isDebug) {
                             Debug.Log(string.Format("Searching for actions for preconditions for {0} failed!", action.id));
                         }
+#endif
                         
                         continue;
                     }

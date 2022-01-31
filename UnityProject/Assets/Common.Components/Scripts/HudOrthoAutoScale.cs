@@ -4,6 +4,7 @@ namespace Common {
 	public class HudOrthoAutoScale : MonoBehaviour, OrthographicCameraObserver {
 		[SerializeField]
 		private Camera selfCamera;
+		
 		private OrthographicCamera orthoCamera;
 		
 		private Transform selfTransform;

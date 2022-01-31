@@ -38,9 +38,7 @@ namespace CommonEcs.Goap {
                 // At this point, this means that the action at i has lesser cost than the action
                 // at i - 1
                 // We swap action indices
-                int temp = indexList[i];
-                indexList[i] = indexList[i - 1];
-                indexList[i - 1] = temp;
+                (indexList[i], indexList[i - 1]) = (indexList[i - 1], indexList[i]);
             }
 
             // Update map (because we are using structs)

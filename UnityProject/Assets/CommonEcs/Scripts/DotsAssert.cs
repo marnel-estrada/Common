@@ -50,11 +50,15 @@ namespace CommonEcs {
         }
 
         public static void NotNullEntity(in Entity entity) {
+#if UNITY_EDITOR
             IsTrue(entity != Entity.Null);
+#endif
         }
 
         public static void IsSome<T>(in ValueTypeOption<T> option, FixedString128 message = new FixedString128()) where T : struct, IEquatable<T> {
+#if UNITY_EDITOR
             IsTrue(option.IsSome, message);
+#endif
         }
     }
 }

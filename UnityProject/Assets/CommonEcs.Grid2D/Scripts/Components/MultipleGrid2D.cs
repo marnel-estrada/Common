@@ -19,15 +19,21 @@ namespace CommonEcs {
         // This is the number of floors/layers
         public readonly int levels;
 
+        // The game may have floors below the ground floor which is represented by negative integers
+        // However, the cells are still arranged starting at zero z position.
+        // We need this minZCoordinate so we can compute the z position in the perspective of the grid.
+        public readonly int minZCoordinate;
+
         public readonly float cellWidth;
         public readonly float cellHeight;
 
-        public MultipleGrid2D(int columns, int rows, float cellWidth, float cellHeight, int levels) {
+        public MultipleGrid2D(int columns, int rows, float cellWidth, float cellHeight, int levels, int minZCoordinate) {
             this.columns = columns;
             this.rows = rows;
             this.cellWidth = cellWidth;
             this.cellHeight = cellHeight;
             this.levels = levels;
+            this.minZCoordinate = minZCoordinate;
 
             this.minGridCoordinate = new GridCoord3(new int3(0, 0, 0));
             this.maxGridCoordinate = new GridCoord3(new int3(this.columns - 1, this.rows - 1, this.levels - 1));
@@ -44,7 +50,9 @@ namespace CommonEcs {
         
         public int ToIndex(int x, int y, int z) {
             int countPerFloor = this.columns * this.rows;
-            return (z * countPerFloor) + (y * this.columns + x);
+            int zeroBasedZ = z - this.minZCoordinate;
+            DotsAssert.IsTrue(zeroBasedZ >= 0);
+            return (zeroBasedZ * countPerFloor) + (y * this.columns + x);
         }
         
         public int GetX(int index) {
@@ -60,7 +68,7 @@ namespace CommonEcs {
         }
 
         public int GetZ(int index) {
-            return index / (this.columns * this.rows);
+            return (index / (this.columns * this.rows)) + this.minZCoordinate;
         }
 
         public bool IsInsideAsWorld(int x, int y, int z) {

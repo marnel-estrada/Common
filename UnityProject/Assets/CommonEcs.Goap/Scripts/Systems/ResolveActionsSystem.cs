@@ -67,10 +67,12 @@ namespace CommonEcs.Goap {
 
                     // Used for debugging
                     DebugEntity debug = this.allDebug[planner.agentEntity];
+#if UNITY_EDITOR
                     if (debug.enabled) {
                         int breakpoint = 0;
                         ++breakpoint;
                     }
+#endif
 
                     // Prepare conditions map. We convert it from the bucket.
                     // The algorithm needs to use BoolHashMap so it can pass the hashmap around. 
@@ -80,7 +82,7 @@ namespace CommonEcs.Goap {
                     NativeList<ResolvedAction> actionList = new NativeList<ResolvedAction>(Allocator.Temp);
                     NativeHashSet<int> actionsBeingEvaluated = new NativeHashSet<int>(4, Allocator.Temp);
                     Condition currentGoal = planner.currentGoal.ValueOrError();
-                    bool result = SearchActions(currentGoal, domain, ref boolHashMap, ref actionList, ref actionsBeingEvaluated);
+                    bool result = SearchActions(currentGoal, domain, ref boolHashMap, ref actionList, ref actionsBeingEvaluated, debug.enabled);
 
                     // Note here that we only set PlanningState to Success if there were actions added to actionList
                     planner.state = result && actionList.Length > 0 ? PlanningState.SUCCESS : PlanningState.FAILED;
@@ -89,9 +91,11 @@ namespace CommonEcs.Goap {
                     if (planner.state == PlanningState.SUCCESS) {
                         AddActions(ref resolvedActions, ref actionList);
 
+#if UNITY_EDITOR
                         if (debug.enabled) {
                             PrintActions(planner, resolvedActions);
                         }
+#endif
                     }
 
                     if (planner.state == PlanningState.FAILED && debug.enabled) {
@@ -137,7 +141,13 @@ namespace CommonEcs.Goap {
             }
 
             private bool SearchActions(in Condition goal, in GoapDomain domain, ref BoolHashMap conditionsMap,
-                                       ref NativeList<ResolvedAction> actionList, ref NativeHashSet<int> actionsBeingEvaluated) {
+                ref NativeList<ResolvedAction> actionList, ref NativeHashSet<int> actionsBeingEvaluated, bool isDebug) {
+#if UNITY_EDITOR
+                if (isDebug) {
+                    Debug.Log(string.Format("Evaluation goal {0}:{1}", goal.id.hashCode, goal.value));
+                }
+#endif
+                
                 // Check if goal was already specified in the current conditionsMap
                 ValueTypeOption<bool> foundGoalValue = conditionsMap.Find(goal.id.hashCode);
                 if (foundGoalValue.IsSome && foundGoalValue.ValueOrError() == goal.value) {
@@ -158,7 +168,7 @@ namespace CommonEcs.Goap {
                     return false;
                 }
 
-                FixedList32<int> actionIndices = foundActionIndices.ValueOrError();
+                FixedList64<int> actionIndices = foundActionIndices.ValueOrError();
                 for (int i = 0; i < actionIndices.Length; ++i) {
                     GoapAction action = domain.GetAction(actionIndices[i]);
                     if (actionsBeingEvaluated.Contains(action.id)) {
@@ -166,17 +176,30 @@ namespace CommonEcs.Goap {
                         // resolved. We skip it as this will cause infinite loop.
                         continue;
                     }
+                    
+#if UNITY_EDITOR
+                    if (isDebug) {
+                        Debug.Log(string.Format("Evaluating action {0}", action.id));
+                    }
+#endif
 
                     actionsBeingEvaluated.TryAdd(action.id);
 
                     BoolHashMap conditionsMapCopy = conditionsMap;
                     NativeList<ResolvedAction> tempActionList = new NativeList<ResolvedAction>(Allocator.Temp);
-                    bool searchSuccess = SearchActionsToSatisfyPreconditions(action, domain, ref conditionsMapCopy, ref tempActionList, ref actionsBeingEvaluated);
+                    bool searchSuccess = SearchActionsToSatisfyPreconditions(action, domain, ref conditionsMapCopy, 
+                        ref tempActionList, ref actionsBeingEvaluated, isDebug);
 
                     // We remove here because the action was already searched
                     actionsBeingEvaluated.Remove(action.id);
 
                     if (!searchSuccess) {
+#if UNITY_EDITOR
+                        if (isDebug) {
+                            Debug.Log(string.Format("Searching for actions for preconditions for {0} failed!", action.id));
+                        }
+#endif
+                        
                         continue;
                     }
 
@@ -191,6 +214,10 @@ namespace CommonEcs.Goap {
 
                     // Add all the actions that were resolved so far
                     actionList.AddRange(tempActionList);
+                    
+                    if (isDebug) {
+                        Debug.Log(string.Format("Searching for actions for preconditions for {0} succeeded.", action.id));
+                    }
 
                     return true;
                 }
@@ -199,10 +226,10 @@ namespace CommonEcs.Goap {
             }
 
             private bool SearchActionsToSatisfyPreconditions(in GoapAction action, in GoapDomain domain,
-                                                             ref BoolHashMap conditionsMap, ref NativeList<ResolvedAction> actionList, ref NativeHashSet<int> actionsBeingEvaluated) {
+                ref BoolHashMap conditionsMap, ref NativeList<ResolvedAction> actionList, ref NativeHashSet<int> actionsBeingEvaluated, bool isDebug) {
                 for (int i = 0; i < action.preconditions.Count; ++i) {
                     Condition precondition = action.preconditions[i];
-                    if (!SearchActions(precondition, domain, ref conditionsMap, ref actionList, ref actionsBeingEvaluated)) {
+                    if (!SearchActions(precondition, domain, ref conditionsMap, ref actionList, ref actionsBeingEvaluated, isDebug)) {
                         // This means that one of the preconditions can't be met by actions
                         return false;
                     }

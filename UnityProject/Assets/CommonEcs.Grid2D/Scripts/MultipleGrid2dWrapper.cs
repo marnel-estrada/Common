@@ -43,7 +43,7 @@ namespace CommonEcs {
         }
 
         public ValueTypeOption<Entity> GetCellEntity(in GridCoord3 gridCoordinate) {
-            return GetCellEntity(gridCoordinate.value.x, gridCoordinate.value.y, gridCoordinate.value.z);
+            return GetCellEntity(gridCoordinate.value);
         }
         
         public ValueTypeOption<Entity> GetCellEntity(in int3 gridCoordinate) {

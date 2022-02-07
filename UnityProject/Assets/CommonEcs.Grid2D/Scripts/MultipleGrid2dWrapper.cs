@@ -22,12 +22,12 @@ namespace CommonEcs {
         }
 
         public ValueTypeOption<Entity> GetCellEntity(int x, int y, int z) {
-            if (x < 0 || y < 0 || z < 0) {
+            if (x < 0 || y < 0 || z < this.grid.minGridCoordinate.value.z) {
                 // Outside of map
                 return ValueTypeOption<Entity>.None;
             }
 
-            if (x >= this.grid.columns || y >= this.grid.rows) {
+            if (x >= this.grid.columns || y >= this.grid.rows || z > this.grid.maxGridCoordinate.value.z) {
                 // Outside of map
                 return ValueTypeOption<Entity>.None;
             }
@@ -43,7 +43,7 @@ namespace CommonEcs {
         }
 
         public ValueTypeOption<Entity> GetCellEntity(in GridCoord3 gridCoordinate) {
-            return GetCellEntity(gridCoordinate.value.x, gridCoordinate.value.y, gridCoordinate.value.z);
+            return GetCellEntity(gridCoordinate.value);
         }
         
         public ValueTypeOption<Entity> GetCellEntity(in int3 gridCoordinate) {

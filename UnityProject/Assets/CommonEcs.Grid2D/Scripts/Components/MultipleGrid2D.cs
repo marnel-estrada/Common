@@ -35,13 +35,13 @@ namespace CommonEcs {
             this.levels = levels;
             this.minZCoordinate = minZCoordinate;
 
-            this.minGridCoordinate = new GridCoord3(new int3(0, 0, 0));
-            this.maxGridCoordinate = new GridCoord3(new int3(this.columns - 1, this.rows - 1, this.levels - 1));
+            this.minGridCoordinate = new GridCoord3(new int3(0, 0, minZCoordinate));
+            this.maxGridCoordinate = new GridCoord3(new int3(this.columns - 1, this.rows - 1, minZCoordinate + levels - 1));
 
             int columnHalf = columns >> 1;
             int rowHalf = rows >> 1;
-            this.minWorldCoordinate = new WorldCoord3(new int3(-columnHalf, -rowHalf, 0));
-            this.maxWorldCoordinate = new WorldCoord3(new int3(columnHalf - 1, rowHalf - 1, levels - 1));
+            this.minWorldCoordinate = new WorldCoord3(new int3(-columnHalf, -rowHalf, minZCoordinate));
+            this.maxWorldCoordinate = new WorldCoord3(new int3(columnHalf - 1, rowHalf - 1, minZCoordinate + levels - 1));
         }
 
         public int ToIndex(GridCoord3 gridCoordinate) {

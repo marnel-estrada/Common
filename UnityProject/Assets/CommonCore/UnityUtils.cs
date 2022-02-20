@@ -171,10 +171,7 @@ namespace Common {
             GameObject gameObject = GameObject.Find(objectName);
             Assertion.NotNull(gameObject, objectName);
 
-            TComponentType component = gameObject.GetComponent<TComponentType>();
-            Assertion.NotNull(component);
-
-            return component;
+            return gameObject.GetRequiredComponent<TComponentType>();;
         }
 
         /**

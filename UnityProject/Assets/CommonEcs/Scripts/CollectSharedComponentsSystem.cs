@@ -6,7 +6,7 @@ using Unity.Entities;
 namespace CommonEcs {    
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public abstract class CollectSharedComponentsSystem<T> : ComponentSystem where T : struct, ISharedComponentData {
-        public struct Collected : ISystemStateComponentData {
+        public struct Collected : IComponentData {
         } 
 
         private EntityQuery query;

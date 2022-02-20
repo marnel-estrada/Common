@@ -12,7 +12,7 @@
     public class CreateAddToSpriteLayerFromWrapperSystem : ComponentSystem {
         private EntityQuery query;
         
-        private struct Created : ISystemStateComponentData {
+        private struct Created : IComponentData {
         }
 
         protected override void OnCreate() {

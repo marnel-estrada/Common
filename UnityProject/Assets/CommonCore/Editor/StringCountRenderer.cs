@@ -16,7 +16,8 @@ namespace Common {
         /// </summary>
         /// <param name="title"></param>
         /// <param name="entryList"></param>
-        public bool Render(string title, List<StringCountData> entryList) {
+        /// <param name="countLabel"></param>
+        public bool Render(string title, List<StringCountData> entryList, string countLabel = "Min Count:") {
             bool changed = false;
 
             // New entry
@@ -31,7 +32,7 @@ namespace Common {
 
             GUILayout.Space(5);
 
-            GUILayout.Label("Min Count:", GUILayout.Width(70));
+            GUILayout.Label(countLabel, GUILayout.Width(70));
             this.newEntryCount = EditorGUILayout.IntField(this.newEntryCount, GUILayout.Width(50));
 
             if (GUILayout.Button("Add", GUILayout.Width(40), GUILayout.Height(15))) {

@@ -19,7 +19,7 @@ namespace CommonEcs {
 
         private SharedComponentQuery<SpriteManager> spriteManagerQuery;
         
-        private struct OwnerSet : ISystemStateComponentData {
+        private struct OwnerSet : IComponentData {
         }
 
         protected override void OnCreate() {

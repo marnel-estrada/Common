@@ -8,7 +8,7 @@ namespace CommonEcs {
     public class CreateSpriteFromWrapperSystem : ComponentSystem {
         private EntityQuery query;
         
-        private struct Created : IComponentData {
+        private struct Created : ISystemStateComponentData {
         }
 
         protected override void OnCreate() {

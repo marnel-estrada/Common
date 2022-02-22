@@ -160,5 +160,9 @@ namespace Common {
 
             return this.IsSome ? this.value : valueWhenNone;
         }
+
+        public T ValueOrError() {
+            return this.IsSome ? this.value : throw new Exception("Option has no value");
+        }
     }
 }

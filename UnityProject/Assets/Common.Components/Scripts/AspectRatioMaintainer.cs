@@ -26,5 +26,9 @@ namespace Common {
             cameraRect.y = (1.0f - rectHeight) / 2.0f;
             this.camera.rect = cameraRect;
         }
+
+        private void OnPreRender() {
+            GL.Clear(true, true, ColorUtils.BLACK); 
+        }
     }
 }

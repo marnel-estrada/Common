@@ -7,7 +7,7 @@ namespace CommonEcs {
     [UpdateBefore(typeof(AddSpritesToLayerSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class AddSpriteManagerToLayerSystem : ComponentSystem {
-        private struct Processed : ISystemStateComponentData {
+        private struct Processed : IComponentData {
         }
 
         private EntityQuery query;

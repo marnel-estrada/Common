@@ -12,9 +12,7 @@ namespace Common {
         /// <param name="width"></param>
         /// <returns></returns>
         public static string Dropdown(string value, PopupValueSet valueSet, int width) {
-            string finalValue = value ?? "";
-
-            int index = valueSet.ResolveIndex(finalValue);
+            int index = valueSet.ResolveIndex(value);
             if (index < 0) {
                 // current value is not found in the value set
                 // we use the first entry instead
@@ -32,6 +30,7 @@ namespace Common {
         /// Generic renderer for a string list
         /// Returns whether or not there changes on the list
         /// </summary>
+        /// <param name="title"></param>
         /// <param name="stringList"></param>
         public static bool Render(string title, List<string> stringList) {
             bool changed = false;
@@ -44,6 +43,7 @@ namespace Common {
                 if (!string.IsNullOrEmpty(NEW_ENTRY)) {
                     stringList.Add(NEW_ENTRY);
                     changed = true;
+                    NEW_ENTRY = string.Empty;
                 }
             }
 

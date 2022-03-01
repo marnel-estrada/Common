@@ -5,8 +5,8 @@ using UnityEngine;
 namespace Common {
     [Serializable]
     public class RangeDataWithStringList {
-        public int min;
-        public int max;
+        public float min;
+        public float max;
 
         [SerializeField]
         public List<string>? stringList;

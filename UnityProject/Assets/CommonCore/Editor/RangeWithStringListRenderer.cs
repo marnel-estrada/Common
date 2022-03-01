@@ -88,10 +88,10 @@ namespace Common {
             GUI.backgroundColor = ColorUtils.WHITE;
 
             GUILayout.Label("Min Count:", GUILayout.Width(70));
-            entry.min = EditorGUILayout.IntField(entry.min, GUILayout.Width(50));
+            entry.min = EditorGUILayout.FloatField(entry.min, GUILayout.Width(50));
 
             GUILayout.Label("Max Count:", GUILayout.Width(70));
-            entry.max = EditorGUILayout.IntField(entry.max, GUILayout.Width(50));
+            entry.max = EditorGUILayout.FloatField(entry.max, GUILayout.Width(50));
 
             GUILayout.BeginVertical();
             if (entry.stringList != null && EditorRenderUtils.Render("String Ids:", entry.stringList)) {

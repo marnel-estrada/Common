@@ -34,10 +34,24 @@ namespace CommonEcs {
                 }
             }
         }
+        
+        /// <summary>
+        /// Adds the values of another BitArray32
+        /// </summary>
+        /// <param name="other"></param>
+        public void Add(in BitArray32 other) {
+            this.internalValue |= other.internalValue;
+        }
 
         public int InternalValue {
             get {
                 return this.internalValue;
+            }
+        }
+        
+        public bool IsEmpty {
+            get {
+                return this.internalValue == 0;
             }
         }
 

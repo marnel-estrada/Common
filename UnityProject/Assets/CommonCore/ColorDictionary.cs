@@ -17,8 +17,12 @@ namespace Common {
 
         public Color Get(string id) {
             Populate();
-            Assertion.IsTrue(this.Map.TryGetValue(id, out Color color), id);
-            return color;
+
+            if (this.Map.TryGetValue(id, out Color color)) {
+                return color;
+            }
+
+            throw new Exception($"Can't find color for '{id}'");
         }
 
         private Dictionary<string, Color> Map {

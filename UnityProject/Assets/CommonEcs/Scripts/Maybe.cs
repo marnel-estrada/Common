@@ -26,7 +26,7 @@ namespace CommonEcs {
     /// <license>
     /// MIT
     /// </license>
-    public struct Maybe<T> {
+    public struct Maybe<T> where T : struct {
         /// <summary>
         /// If the value is set. True when the constructor is called. False
         /// otherwise, such as when `default(T)` is called.
@@ -133,9 +133,9 @@ namespace CommonEcs {
         /// <returns>
         /// The value if set or `default(T)` if not set
         /// </returns>
-        public T ValueOrDefault {
+        public T ValueOrError {
             get {
-                return this.hasValue ? this.value : default(T);
+                return this.hasValue ? this.value : throw new Exception("Trying to access value when there's no value.");
             }
         }
 

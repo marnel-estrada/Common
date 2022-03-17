@@ -12,7 +12,7 @@ namespace CommonEcs {
     [UpdateBefore(typeof(TransformGameObjectSpriteVerticesSystem))]
     [UpdateBefore(typeof(SortRenderOrderSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class UseYAsSortOrderGameObjectSystem : JobComponentSystem {
+    public class UseYAsSortOrderGameObjectSystem : JobSystemBase {
         private EntityQuery query;
 
         protected override void OnCreate() {

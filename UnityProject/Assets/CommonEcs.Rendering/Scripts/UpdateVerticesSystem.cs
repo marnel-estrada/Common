@@ -13,7 +13,7 @@ namespace CommonEcs {
     [UpdateBefore(typeof(SpriteManagerRendererSystem))]
     [UpdateBefore(typeof(SpriteManagerJobsFinisher))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public abstract class UpdateVerticesSystem : JobComponentSystem {        
+    public abstract class UpdateVerticesSystem : JobSystemBase {        
         private SharedComponentQuery<SpriteManager> spriteManagerQuery;
 
         private EntityQuery query;

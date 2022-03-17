@@ -8,7 +8,7 @@ namespace CommonEcs {
     [UpdateBefore(typeof(TransformVerticesSystem))]
     [UpdateBefore(typeof(SortRenderOrderSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class UseYAsSortOrderSystem : JobComponentSystem {
+    public class UseYAsSortOrderSystem : JobSystemBase {
         private EntityQuery query;
 
         protected override void OnCreate() {

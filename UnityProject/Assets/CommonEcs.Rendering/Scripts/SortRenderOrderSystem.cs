@@ -10,7 +10,7 @@ namespace CommonEcs {
     [UpdateBefore(typeof(SpriteManagerRendererSystem))]
     [UpdateBefore(typeof(SpriteManagerJobsFinisher))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class SortRenderOrderSystem : JobComponentSystem {
+    public class SortRenderOrderSystem : JobSystemBase {
         private EntityQuery query;
 
         private SharedComponentQuery<SpriteManager> managerQuery;

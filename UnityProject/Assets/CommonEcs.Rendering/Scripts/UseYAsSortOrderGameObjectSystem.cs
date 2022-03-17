@@ -36,22 +36,42 @@ namespace CommonEcs {
             
             // Job for applying to sprites
             UpdateSpritesJob updateSpritesJob = new UpdateSpritesJob() {
+                spriteType = GetComponentTypeHandle<Sprite>(),
+                useYAsSortOrderType = GetComponentTypeHandle<UseYAsSortOrder>(),
                 stashes = stashes
             };
 
-            return updateSpritesJob.Schedule(this.query, stashHandle);
+            return updateSpritesJob.ScheduleParallel(this.query, 1, stashHandle);
         }
         
         [BurstCompile]
-        private struct UpdateSpritesJob : IJobForEachWithEntity<Sprite, UseYAsSortOrder> {
+        private struct UpdateSpritesJob : IJobEntityBatchWithIndex {
+            public ComponentTypeHandle<Sprite> spriteType;
+
+            [ReadOnly]
+            public ComponentTypeHandle<UseYAsSortOrder> useYAsSortOrderType;
+            
+            [ReadOnly]
             [DeallocateOnJobCompletion]
             public NativeArray<TransformStash> stashes;
 
-            public void Execute(Entity entity, int index, ref Sprite sprite, [ReadOnly] ref UseYAsSortOrder sortOrder) {
-                float3 position = this.stashes[index].position;
+            public void Execute(ArchetypeChunk batchInChunk, int batchIndex, int indexOfFirstEntityInQuery) {
+                NativeArray<Sprite> sprites = batchInChunk.GetNativeArray(this.spriteType);
+                NativeArray<UseYAsSortOrder> sortOrders = batchInChunk.GetNativeArray(this.useYAsSortOrderType);
+
+                for (int i = 0; i < batchInChunk.Count; ++i) {
+                    Sprite sprite = sprites[i];
+                    UseYAsSortOrder sortOrder = sortOrders[i];
+                    int index = indexOfFirstEntityInQuery + i;
+                    
+                    float3 position = this.stashes[index].position;
                 
-                // We use negative of z here because the higher z should be ordered first
-                sprite.RenderOrder = -(position.y + sortOrder.offset);
+                    // We use negative of z here because the higher z should be ordered first
+                    sprite.RenderOrder = -(position.y + sortOrder.offset);
+                    
+                    // Modify Sprite
+                    sprites[i] = sprite;
+                }
             }
         }
     }

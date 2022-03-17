@@ -32,24 +32,38 @@ namespace CommonEcs {
             JobHandle stashHandle = stashTransforms.Schedule(transforms, inputDeps);
             
             // Job for applying to sprites
-            ApplyTransforms applyTransforms = new ApplyTransforms() {
+            ApplyTransformsJob job = new ApplyTransformsJob() {
+                spriteType = GetComponentTypeHandle<Sprite>(),
                 stashes = stashes
             };
 
-            return applyTransforms.Schedule(this.query, stashHandle);
+            return job.ScheduleParallel(this.query, 1, stashHandle);
         }
-
+        
         [BurstCompile]
-        private struct ApplyTransforms : IJobForEachWithEntity<Sprite> {
+        private struct ApplyTransformsJob : IJobEntityBatchWithIndex {
+            public ComponentTypeHandle<Sprite> spriteType;
+            
+            [ReadOnly]
             [DeallocateOnJobCompletion]
             public NativeArray<TransformStash> stashes;
 
-            public void Execute(Entity entity, int index, ref Sprite sprite) {
-                TransformStash stash = this.stashes[index];
-                float4x4 rotationTranslationMatrix = new float4x4(stash.rotation, stash.position);
-                float4x4 scaleMatrix = float4x4.Scale(stash.localScale);
-                float4x4 finalMatrix = math.mul(rotationTranslationMatrix, scaleMatrix);
-                sprite.Transform(ref finalMatrix);
+            public void Execute(ArchetypeChunk batchInChunk, int batchIndex, int indexOfFirstEntityInQuery) {
+                NativeArray<Sprite> sprites = batchInChunk.GetNativeArray(this.spriteType);
+
+                for (int i = 0; i < batchInChunk.Count; ++i) {
+                    int index = indexOfFirstEntityInQuery + i;
+                    Sprite sprite = sprites[i];
+                    
+                    TransformStash stash = this.stashes[index];
+                    float4x4 rotationTranslationMatrix = new float4x4(stash.rotation, stash.position);
+                    float4x4 scaleMatrix = float4x4.Scale(stash.localScale);
+                    float4x4 finalMatrix = math.mul(rotationTranslationMatrix, scaleMatrix);
+                    sprite.Transform(ref finalMatrix);
+                    
+                    // Modify
+                    sprites[i] = sprite;
+                }
             }
         }
     }

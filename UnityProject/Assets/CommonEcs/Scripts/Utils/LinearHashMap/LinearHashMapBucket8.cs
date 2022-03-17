@@ -25,9 +25,12 @@ namespace CommonEcs {
             }
 
             public bool MoveNext() {
-                this.m_Index++;
+                // Note that we check for hasValue here so that slots with no value are skipped
+                do {
+                    ++this.m_Index;
+                } while (!this.m_Elements[this.m_Index].hasValue && this.m_Index < Length);
 
-                return this.m_Index < 8;
+                return this.m_Index < Length;
             }
 
             public ref LinearHashMapEntry<K, V> Current {

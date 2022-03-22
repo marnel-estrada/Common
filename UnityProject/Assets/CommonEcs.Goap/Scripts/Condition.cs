@@ -7,7 +7,7 @@ namespace CommonEcs.Goap {
         public readonly ConditionId id;
         public readonly bool value;
         
-        public Condition(FixedString64 stringId, bool value) : this(new ConditionId(stringId.GetHashCode()), value) {
+        public Condition(FixedString64Bytes stringId, bool value) : this(new ConditionId(stringId.GetHashCode()), value) {
         }
 
         public Condition(ConditionId id, bool value) {

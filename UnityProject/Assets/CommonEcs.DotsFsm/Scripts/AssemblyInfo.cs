@@ -1,5 +1,5 @@
 using CommonEcs.DotsFsm;
 
-using Unity.Entities;
+using Unity.Jobs;
 
 [assembly:RegisterGenericJobType(typeof(DotsFsmActionSystem<MoveTo, MoveToSystem.Execution>.ExecuteActionJob))]

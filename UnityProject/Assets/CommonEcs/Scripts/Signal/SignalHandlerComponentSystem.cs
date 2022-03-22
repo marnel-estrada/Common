@@ -21,7 +21,7 @@ namespace CommonEcs {
 
         protected override void OnUpdate() {
             this.signalHandler.Update();
-            this.PostUpdateCommands.AddComponent(this.signalQuery, typeof(ProcessedBySystem));
+            this.PostUpdateCommands.AddComponentForEntityQuery(this.signalQuery, typeof(ProcessedBySystem));
         }
     }
 }

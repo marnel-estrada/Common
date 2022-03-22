@@ -4,7 +4,7 @@ namespace CommonEcs {
     /// <summary>
     /// A stack implementation that uses NativeList internally
     /// </summary>
-    public struct NativeStack<T> where T : struct {
+    public struct NativeStack<T> where T : unmanaged {
         private NativeList<T> internalList;
 
         public NativeStack(int initialCapacity, Allocator allocator) {

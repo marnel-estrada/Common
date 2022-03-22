@@ -6,9 +6,9 @@ namespace CommonEcs {
     /// A common component for named entities
     /// </summary>
     public readonly struct Name : IComponentData {
-        public readonly FixedString64 value;
+        public readonly FixedString64Bytes value;
 
-        public Name(FixedString64 value) {
+        public Name(FixedString64Bytes value) {
             this.value = value;
         }
 
@@ -26,7 +26,7 @@ namespace CommonEcs {
         /// <param name="entityManager"></param>
         /// <param name="owner"></param>
         /// <param name="name"></param>
-        public static void SetupName(ref EntityManager entityManager, Entity owner, FixedString64 name) {
+        public static void SetupName(ref EntityManager entityManager, Entity owner, FixedString64Bytes name) {
 #if UNITY_EDITOR
             // We use compiler directive because SetName() is only available on editor
             entityManager.SetName(owner, name.ToString());
@@ -60,7 +60,7 @@ namespace CommonEcs {
         /// <param name="commandBuffer"></param>
         /// <param name="owner"></param>
         /// <param name="name"></param>
-        public static void SetupName(ref EntityCommandBuffer commandBuffer, Entity owner, FixedString64 name) {
+        public static void SetupName(ref EntityCommandBuffer commandBuffer, Entity owner, FixedString64Bytes name) {
             Entity nameEntity = commandBuffer.CreateEntity();
             commandBuffer.AddComponent(nameEntity, new Name(name));
 
@@ -81,7 +81,7 @@ namespace CommonEcs {
         /// <param name="entityManager"></param>
         /// <param name="owner"></param>
         /// <param name="name"></param>
-        public static void SetName(ref EntityManager entityManager, Entity owner, FixedString64 name) {
+        public static void SetName(ref EntityManager entityManager, Entity owner, FixedString64Bytes name) {
 #if UNITY_EDITOR
             // We use compiler directive because SetName() is only available on editor
             entityManager.SetName(owner, name.ToString());
@@ -98,7 +98,7 @@ namespace CommonEcs {
         /// <param name="nameReference"></param>
         /// <param name="name"></param>
         public static void SetName(ref EntityCommandBuffer commandBuffer,
-                                   NameReference nameReference, FixedString64 name) {
+                                   NameReference nameReference, FixedString64Bytes name) {
             // We just set the component here since at this point, the client code should've already set up
             // the NameReference and the owner Entity for this Name
             commandBuffer.SetComponent(nameReference.nameEntity, new Name(name));

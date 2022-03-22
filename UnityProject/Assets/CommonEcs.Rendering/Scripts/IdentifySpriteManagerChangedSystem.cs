@@ -13,7 +13,7 @@ namespace CommonEcs {
     [UpdateBefore(typeof(SortRenderOrderSystem))]
     [UpdateBefore(typeof(UpdateChangedVerticesSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class IdentifySpriteManagerChangedSystem : SystemBase {
+    public partial class IdentifySpriteManagerChangedSystem : SystemBase {
         private EntityQuery query;
         private ComponentTypeHandle<Sprite> spriteType;
 

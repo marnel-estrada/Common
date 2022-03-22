@@ -109,7 +109,7 @@ namespace CommonEcs.DotsFsm {
 
                     if (this.isDebug) {
                         // Log transition state if it's for debugging
-                        FixedString64 stateName = this.allNames[this.allNameReferences[transition.toState].nameEntity].value;
+                        FixedString64Bytes stateName = this.allNames[this.allNameReferences[transition.toState].nameEntity].value;
 
                         if (this.isDebug) {
                             // ReSharper disable once UseStringInterpolation (due to Burst)

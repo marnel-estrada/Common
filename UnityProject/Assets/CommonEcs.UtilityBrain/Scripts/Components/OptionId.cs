@@ -10,10 +10,10 @@ namespace CommonEcs.UtilityBrain {
             this.value = value;
         }
 
-        public OptionId(in FixedString32 textId) : this(textId.GetHashCode()) {
+        public OptionId(in FixedString32Bytes textId) : this(textId.GetHashCode()) {
         }
         
-        public OptionId(in FixedString64 textId) : this(textId.GetHashCode()) {
+        public OptionId(in FixedString64Bytes textId) : this(textId.GetHashCode()) {
         }
 
         public bool Equals(OptionId other) {

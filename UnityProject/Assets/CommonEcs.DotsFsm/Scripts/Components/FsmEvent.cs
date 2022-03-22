@@ -10,10 +10,10 @@ namespace CommonEcs.DotsFsm {
             this.id = id;
         }
 
-        public FsmEvent(in FixedString32 stringId) : this(stringId.GetHashCode()) {
+        public FsmEvent(in FixedString32Bytes stringId) : this(stringId.GetHashCode()) {
         }
         
-        public FsmEvent(in FixedString64 stringId) : this(stringId.GetHashCode()) {
+        public FsmEvent(in FixedString64Bytes stringId) : this(stringId.GetHashCode()) {
         }
 
         public bool Equals(FsmEvent other) {

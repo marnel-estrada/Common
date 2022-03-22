@@ -19,6 +19,6 @@ namespace GoapBrain {
         /// <param name="entityManager"></param>
         /// <param name="agentEntity"></param>
         /// <param name="linkedEntities"></param>
-        public abstract Entity Prepare(ref EntityManager entityManager, in FixedString64 conditionName, in Entity agentEntity, in Entity plannerEntity);
+        public abstract Entity Prepare(ref EntityManager entityManager, in FixedString64Bytes conditionName, in Entity agentEntity, in Entity plannerEntity);
     }
 }

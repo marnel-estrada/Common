@@ -162,13 +162,13 @@ namespace CommonEcs.Goap {
                     return true;
                 }
 
-                ValueTypeOption<FixedList64<int>> foundActionIndices = domain.GetActionIndices(goal);
+                ValueTypeOption<FixedList64Bytes<int>> foundActionIndices = domain.GetActionIndices(goal);
                 if (foundActionIndices.IsNone) {
                     // There are no actions to satisfy the goal
                     return false;
                 }
 
-                FixedList64<int> actionIndices = foundActionIndices.ValueOrError();
+                FixedList64Bytes<int> actionIndices = foundActionIndices.ValueOrError();
                 for (int i = 0; i < actionIndices.Length; ++i) {
                     GoapAction action = domain.GetAction(actionIndices[i]);
                     if (actionsBeingEvaluated.Contains(action.id)) {

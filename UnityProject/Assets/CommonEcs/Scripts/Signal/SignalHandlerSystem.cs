@@ -25,7 +25,7 @@ namespace CommonEcs {
 
         protected override void OnUpdate() {
             this.signalHandler.Update();
-            this.PostUpdateCommands.AddComponent(this.signalQuery, typeof(ProcessedBySystem));
+            this.PostUpdateCommands.AddComponentForEntityQuery(this.signalQuery, typeof(ProcessedBySystem));
         }
 
         // Tag that identifies a signal entity that it has been already processed

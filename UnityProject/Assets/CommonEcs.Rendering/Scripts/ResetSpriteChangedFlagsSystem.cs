@@ -5,9 +5,9 @@ namespace CommonEcs {
     [UpdateAfter(typeof(UpdateChangedVerticesSystem))]
     [UpdateAfter(typeof(SortRenderOrderSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class ResetSpriteChangedFlagsSystem : SystemBase {
+    public partial class ResetSpriteChangedFlagsSystem : SystemBase {
         protected override void OnUpdate() {
-            this.Entities.WithChangeFilter<Sprite>().ForEach(delegate(ref Sprite sprite) {
+            this.Entities.WithChangeFilter<Sprite>().ForEach((ref Sprite sprite) => {
                 sprite.VerticesChanged = false;
                 sprite.UvChanged = false;
                 sprite.ColorChanged = false;

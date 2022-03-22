@@ -10,18 +10,18 @@ namespace CommonEcs {
         /// <returns></returns>
         public static int ToIntId(string stringId) {
             Assertion.NotEmpty(stringId);
-            return new FixedString64(stringId.Trim()).AsIntId();
+            return new FixedString64Bytes(stringId.Trim()).AsIntId();
         }
 
         public static int AsIntId(this string self) {
             return ToIntId(self);
         }
 
-        public static int AsIntId(this FixedString64 self) {
+        public static int AsIntId(this FixedString64Bytes self) {
             return self.GetHashCode();
         }
 
-        public static int AsIntId(this FixedString32 self) {
+        public static int AsIntId(this FixedString32Bytes self) {
             return self.GetHashCode();
         }
     }

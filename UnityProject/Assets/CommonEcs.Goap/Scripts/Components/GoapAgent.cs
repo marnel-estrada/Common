@@ -7,15 +7,15 @@ namespace CommonEcs.Goap {
         // actions, it will try to resolve the next goals.
         public ConditionList5 goals;
 
-        public readonly BlobAssetReference<GoapDomainDatabase> domainDbReference;
+        public BlobAssetReference<GoapDomainDatabase> domainDbReference;
 
         // We use a separate entity here because we don't want the agent entity to get
         // bigger and thus will have less entities per archetype.
         // Note that the planner entity contains a BoolHashMap which is a big object.
-        public readonly Entity plannerEntity;
+        public Entity plannerEntity;
 
         // Maps to a GoapDomain
-        public readonly int domainId; 
+        public int domainId; 
 
         public AgentState state;
         

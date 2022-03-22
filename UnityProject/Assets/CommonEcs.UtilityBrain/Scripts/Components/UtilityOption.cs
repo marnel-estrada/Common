@@ -31,7 +31,7 @@ namespace CommonEcs.UtilityBrain {
             this(new OptionId(id), utilityBrainEntity, brainIndex) {
         }
 
-        public UtilityOption(in FixedString64 textId, in Entity utilityBrainEntity, int brainIndex) : this(
+        public UtilityOption(in FixedString64Bytes textId, in Entity utilityBrainEntity, int brainIndex) : this(
             textId.GetHashCode(), utilityBrainEntity, brainIndex) {
         }
     }

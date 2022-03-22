@@ -37,11 +37,11 @@ namespace CommonEcs.Goap {
             return this.map.AddOrSet(ref this.bucket, id, value);
         }
         
-        public int AddOrSet(in FixedString32 id, bool value) {
+        public int AddOrSet(in FixedString32Bytes id, bool value) {
             return AddOrSet(new ConditionId(id), value);
         }
         
-        public int AddOrSet(in FixedString64 id, bool value) {
+        public int AddOrSet(in FixedString64Bytes id, bool value) {
             return AddOrSet(new ConditionId(id), value);
         }
 
@@ -54,11 +54,11 @@ namespace CommonEcs.Goap {
             return this.map.Find(this.bucket, id);
         }
 
-        public ValueTypeOption<bool> Find(in FixedString32 id) {
+        public ValueTypeOption<bool> Find(in FixedString32Bytes id) {
             return Find(new ConditionId(id));
         }
         
-        public ValueTypeOption<bool> Find(in FixedString64 id) {
+        public ValueTypeOption<bool> Find(in FixedString64Bytes id) {
             return Find(new ConditionId(id));
         }
 

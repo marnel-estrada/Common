@@ -11,7 +11,7 @@ namespace CommonEcs {
         }
 
         protected override void OnUpdate() {
-            this.PostUpdateCommands.AddComponent(this.query, typeof(SignalFramePassed));
+            this.PostUpdateCommands.AddComponentForEntityQuery(this.query, typeof(SignalFramePassed));
         }
     }
 }

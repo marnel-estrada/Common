@@ -3,17 +3,17 @@ using Unity.Collections;
 
 namespace CommonEcs.Goap {
     public struct GoapDomain {
-        public readonly FixedString64 name;
+        public readonly FixedString64Bytes name;
 
         // This is the list of actions
         public GoapActionList64 actions;
 
         // The list of integers mapped to the condition are indices to actions
-        public FixedHashMap<Condition, FixedList64<int>> actionMap;
+        public FixedHashMap<Condition, FixedList64Bytes<int>> actionMap;
 
         public int actionsCount;
 
-        public GoapDomain(FixedString64 name) : this() {
+        public GoapDomain(FixedString64Bytes name) : this() {
             this.name = name;
         }
 
@@ -21,7 +21,7 @@ namespace CommonEcs.Goap {
             this.actions[this.actionsCount] = action;
 
             // Add to action map
-            FixedList32<int> indexList = ResolveFixedList(action.effect);
+            FixedList32Bytes<int> indexList = ResolveFixedList(action.effect);
             indexList.Add(this.actionsCount);
 
             // We need to do insertion sort here because we need to sort the actions by cost
@@ -46,14 +46,14 @@ namespace CommonEcs.Goap {
             ++this.actionsCount;
         }
 
-        private FixedList32<int> ResolveFixedList(in Condition effect) {
-            ValueTypeOption<FixedList64<int>> found = this.actionMap.Find(effect);
+        private FixedList32Bytes<int> ResolveFixedList(in Condition effect) {
+            ValueTypeOption<FixedList64Bytes<int>> found = this.actionMap.Find(effect);
             if (found.IsSome) {
                 return found.ValueOr(default);
             }
 
             // Not found yet. We create a new list.
-            FixedList64<int> newList = new FixedList64<int>();
+            FixedList64Bytes<int> newList = new FixedList64Bytes<int>();
             this.actionMap.AddOrSet(effect, newList);
             return newList;
         }
@@ -72,7 +72,7 @@ namespace CommonEcs.Goap {
         /// </summary>
         /// <param name="effect"></param>
         /// <returns></returns>
-        public readonly ValueTypeOption<FixedList64<int>> GetActionIndices(in Condition effect) {
+        public readonly ValueTypeOption<FixedList64Bytes<int>> GetActionIndices(in Condition effect) {
             return this.actionMap.Find(effect);
         }
     }

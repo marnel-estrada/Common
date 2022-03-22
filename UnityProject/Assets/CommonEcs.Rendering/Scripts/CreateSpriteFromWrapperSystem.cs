@@ -16,7 +16,7 @@ namespace CommonEcs {
         }
 
         protected override void OnUpdate() {
-            this.Entities.With(this.query).ForEach(delegate(Entity entity, SpriteWrapper wrapper) {
+            this.Entities.With(this.query).ForEach((Entity entity, SpriteWrapper wrapper) => {
                 Sprite sprite = wrapper.Sprite;
                 sprite.Init(wrapper.SpriteManagerEntity, sprite.width, sprite.height,
                     wrapper.pivot);

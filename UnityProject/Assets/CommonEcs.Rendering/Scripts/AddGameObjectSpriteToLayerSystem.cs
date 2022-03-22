@@ -12,7 +12,7 @@ namespace CommonEcs {
     [UpdateAfter(typeof(SpriteLayerInstancesSystem))]
     [UpdateBefore(typeof(AddGameObjectSpriteToManagerSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class AddGameObjectSpriteToLayerSystem : SystemBase {
+    public partial class AddGameObjectSpriteToLayerSystem : SystemBase {
         public struct Added : ISystemStateComponentData {
             // The entity of the sprite manager to where the sprite is added
             public readonly Entity spriteManagerEntity;
@@ -41,7 +41,7 @@ namespace CommonEcs {
             EntityCommandBuffer commandBuffer = this.barrier.CreateCommandBuffer();
             bool hasManager = true;
             
-            this.Entities.WithNone<Added>().ForEach(delegate(Entity entity, Transform transform, ref Sprite sprite, ref AddToSpriteLayer addToLayer) {
+            this.Entities.WithNone<Added>().ForEach((Entity entity, Transform transform, ref Sprite sprite, ref AddToSpriteLayer addToLayer) => {
                 if (!hasManager) {
                     // Do not process anymore if it already returned false in a previous entity
                     return;

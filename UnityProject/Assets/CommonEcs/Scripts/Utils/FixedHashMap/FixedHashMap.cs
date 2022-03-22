@@ -12,7 +12,7 @@ namespace CommonEcs {
         public void AddOrSet(in K key, in V value) {
             int hashCode = key.GetHashCode();
             int bucketIndex = FibonacciHash(hashCode);
-            ref FixedList512<FixedHashMapEntry<K, V>> bucket = ref this.buckets[bucketIndex];
+            ref FixedList512Bytes<FixedHashMapEntry<K, V>> bucket = ref this.buckets[bucketIndex];
             
             // Search for similar key. Replace the value if we find an entry with similar key.
             for (int i = 0; i < bucket.Length; ++i) {
@@ -33,7 +33,7 @@ namespace CommonEcs {
         public void Remove(in K key) {
             int hashCode = key.GetHashCode();
             int bucketIndex = FibonacciHash(hashCode);
-            ref FixedList512<FixedHashMapEntry<K, V>> bucket = ref this.buckets[bucketIndex];
+            ref FixedList512Bytes<FixedHashMapEntry<K, V>> bucket = ref this.buckets[bucketIndex];
 
             // Search for the key in the value list and remove that
             for (int i = 0; i < bucket.Length; ++i) {
@@ -53,7 +53,7 @@ namespace CommonEcs {
         public readonly ValueTypeOption<V> Find(in K key) {
             int hashCode = key.GetHashCode();
             int bucketIndex = FibonacciHash(hashCode);
-            ref FixedList512<FixedHashMapEntry<K, V>> bucket = ref this.buckets[bucketIndex];
+            ref FixedList512Bytes<FixedHashMapEntry<K, V>> bucket = ref this.buckets[bucketIndex];
 
             // Search for the value with the same key
             for (int i = 0; i < bucket.Length; ++i) {
@@ -71,7 +71,7 @@ namespace CommonEcs {
         public bool ContainsKey(in K key) {
             int hashCode = key.GetHashCode();
             int bucketIndex = FibonacciHash(hashCode);
-            ref FixedList512<FixedHashMapEntry<K, V>> bucket = ref this.buckets[bucketIndex];
+            ref FixedList512Bytes<FixedHashMapEntry<K, V>> bucket = ref this.buckets[bucketIndex];
 
             // Search for the value with the same key
             for (int i = 0; i < bucket.Length; ++i) {

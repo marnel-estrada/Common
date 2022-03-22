@@ -15,7 +15,7 @@ namespace Common {
             this.entriesMap = entriesMap;
         }
 
-        public PackedTextureEntry GetEntry(in FixedString64 entryId) {
+        public PackedTextureEntry GetEntry(in FixedString64Bytes entryId) {
             if (this.entriesMap.TryGetValue(entryId.GetHashCode(), out PackedTextureEntry entry)) {
                 return entry;
             }

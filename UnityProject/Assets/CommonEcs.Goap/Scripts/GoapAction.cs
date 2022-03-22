@@ -19,7 +19,7 @@ namespace CommonEcs.Goap {
         // This is used to identify if execution of atom actions is already done
         public readonly int atomActionsCount;
 
-        public readonly FixedString64 name;
+        public readonly FixedString64Bytes name;
 
         public GoapAction(int id, float cost, int atomActionsCount, in Condition effect) : this() {
             this.id = id;
@@ -38,7 +38,7 @@ namespace CommonEcs.Goap {
         public GoapAction(int id, float cost, in Condition effect) : this(id, cost, 1, effect) {
         }
         
-        public GoapAction(FixedString64 name, float cost, int atomActionsCount, in Condition effect) :
+        public GoapAction(FixedString64Bytes name, float cost, int atomActionsCount, in Condition effect) :
             this(name.GetHashCode(), cost, atomActionsCount, effect) {
             this.name = name;
         }

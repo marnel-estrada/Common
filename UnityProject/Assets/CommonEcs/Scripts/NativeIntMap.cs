@@ -9,7 +9,7 @@ namespace CommonEcs {
     /// HashMap implementation
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public struct NativeIntMap<T> : IDisposable where T : struct {
+    public struct NativeIntMap<T> : IDisposable where T : unmanaged {
         private NativeList<T> itemList;
         private NativeStack<int> unusedKeys;
 

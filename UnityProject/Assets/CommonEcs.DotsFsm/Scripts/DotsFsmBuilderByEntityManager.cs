@@ -21,7 +21,7 @@ namespace CommonEcs.DotsFsm {
                 typeof(NameReference), typeof(LinkedEntityGroup), typeof(EntityBufferElement));
         }
         
-        public Entity CreateFsm(in FixedString64 name, bool isDebug = false) {
+        public Entity CreateFsm(in FixedString64Bytes name, bool isDebug = false) {
             Entity fsmEntity = this.entityManager.CreateEntity(this.fsmArchetype);
             this.entityManager.SetComponentData(fsmEntity, new DebugFsm(isDebug));
             
@@ -35,7 +35,7 @@ namespace CommonEcs.DotsFsm {
             return fsmEntity;
         }
         
-        public Entity AddState(Entity fsmOwnerEntity, in FixedString64 name) {
+        public Entity AddState(Entity fsmOwnerEntity, in FixedString64Bytes name) {
             Entity stateEntity = this.entityManager.CreateEntity(this.stateArchetype);
             this.entityManager.SetComponentData(stateEntity, new DotsFsmState(fsmOwnerEntity));
             
@@ -75,7 +75,7 @@ namespace CommonEcs.DotsFsm {
             transitions.Add(new Transition(fromState, fsmEvent, toState));
         }
         
-        public void AddTransition(in Entity fsmEntity, in Entity fromState, in FixedString64 eventAsString, in Entity toState) {
+        public void AddTransition(in Entity fsmEntity, in Entity fromState, in FixedString64Bytes eventAsString, in Entity toState) {
             AddTransition(fsmEntity, fromState, new FsmEvent(eventAsString), toState);
         }
         

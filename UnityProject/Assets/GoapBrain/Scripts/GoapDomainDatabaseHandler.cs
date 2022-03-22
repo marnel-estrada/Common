@@ -161,7 +161,7 @@ namespace GoapBrain {
             }
         }
 
-        private static void PrepareActions(GoapDomainData domainData, FixedString64 actionName, IReadOnlyList<ClassData> atomActionsData, AssemblerSet set) {
+        private static void PrepareActions(GoapDomainData domainData, FixedString64Bytes actionName, IReadOnlyList<ClassData> atomActionsData, AssemblerSet set) {
             for (int i = 0; i < atomActionsData.Count; ++i) {
                 Option<AtomActionAssembler> assemblerInstance = TypeUtils.Instantiate<AtomActionAssembler>(atomActionsData[i], domainData.Variables);
                 assemblerInstance.Match(new AddAtomActionToSet(set, actionName.GetHashCode(), i));

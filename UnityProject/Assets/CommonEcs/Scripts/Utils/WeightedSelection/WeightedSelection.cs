@@ -11,7 +11,7 @@ namespace CommonEcs {
     /// A random but weighted selection amongst items.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public struct WeightedSelection<T> where T : struct, IEquatable<T> {
+    public struct WeightedSelection<T> where T : unmanaged, IEquatable<T> {
         private NativeList<T> items;
         private NativeList<WeightEntry> entries;
 

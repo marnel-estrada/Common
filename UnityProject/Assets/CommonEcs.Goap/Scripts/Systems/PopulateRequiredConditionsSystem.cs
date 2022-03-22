@@ -83,13 +83,13 @@ namespace CommonEcs.Goap {
             private void AddPreconditions(ref DynamicBuffer<RequiredCondition> requiredConditions, ref NativeHashSet<int> addedActions, 
                 in GoapDomain domain, in Condition effect) {
                 // We don't use match here because this needs to fast as much as possible
-                ValueTypeOption<FixedList64<int>> foundActionIndices = domain.GetActionIndices(effect);
+                ValueTypeOption<FixedList64Bytes<int>> foundActionIndices = domain.GetActionIndices(effect);
                 if (foundActionIndices.IsNone) {
                     // No more actions for specified effect
                     return;
                 }
 
-                FixedList32<int> actionIndices = foundActionIndices.ValueOr(default);
+                FixedList32Bytes<int> actionIndices = foundActionIndices.ValueOr(default);
                 for (int i = 0; i < actionIndices.Length; ++i) {
                     GoapAction action = domain.GetAction(actionIndices[i]);
 

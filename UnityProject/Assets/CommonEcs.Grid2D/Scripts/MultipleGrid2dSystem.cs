@@ -5,7 +5,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 
 namespace CommonEcs {
-    public class MultipleGrid2dSystem : SystemBase {
+    public partial class MultipleGrid2dSystem : SystemBase {
         private bool resolved;
         private MultipleGrid2D grid;
         private Maybe<NativeArray<EntityBufferElement>> cellEntities;
@@ -14,9 +14,8 @@ namespace CommonEcs {
         
         protected override void OnUpdate() {
             ComponentDataFromEntity<Cell2D> allCells = GetComponentDataFromEntity<Cell2D>();
-            
-            this.Entities.ForEach(
-                delegate(in MultipleGrid2D multipleGrid, in DynamicBuffer<EntityBufferElement> entityBuffer) {
+
+            this.Entities.ForEach((in MultipleGrid2D multipleGrid, in DynamicBuffer<EntityBufferElement> entityBuffer) => {
                     if (this.resolved) {
                         // Resolve only once
                         return;

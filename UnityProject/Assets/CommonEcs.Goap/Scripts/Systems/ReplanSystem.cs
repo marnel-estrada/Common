@@ -8,10 +8,12 @@ namespace CommonEcs.Goap {
     public class ReplanSystem : JobSystemBase {
         private EntityQuery atomActionsQuery;
         private EntityQuery plannersQuery;
+        private EntityQuery agentsQuery;
 
         protected override void OnCreate() {
             this.atomActionsQuery = GetEntityQuery(typeof(AtomAction));
             this.plannersQuery = GetEntityQuery(typeof(GoapPlanner));
+            this.agentsQuery = GetEntityQuery(typeof(GoapAgent));
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
@@ -21,27 +23,18 @@ namespace CommonEcs.Goap {
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
                 allAgents = allAgents
             };
-            JobHandle handle = resetAtomActionsJob.ScheduleParallel(this.atomActionsQuery, 1, inputDeps);
+            JobHandle handle = resetAtomActionsJob.ScheduleParallel(this.atomActionsQuery, inputDeps);
 
             ResetGoalIndexJob resetGoalIndexJob = new ResetGoalIndexJob() {
                 plannerType = GetComponentTypeHandle<GoapPlanner>(), 
                 allAgents = allAgents
             };
-            handle = resetGoalIndexJob.ScheduleParallel(this.plannersQuery, 1, handle);
-            
-            // Reset the replanRequested flag
-            handle = this.Entities.ForEach(delegate(ref GoapAgent agent) {
-                if (!agent.replanRequested) {
-                    return;
-                }
+            handle = resetGoalIndexJob.ScheduleParallel(this.plannersQuery, handle);
 
-                // We also reset other values here to ensure that they are in correct values
-                // such they would replan again
-                agent.lastResult = GoapResult.FAILED;
-                agent.state = AgentState.CLEANUP;
-                
-                agent.replanRequested = false;
-            }).ScheduleParallel(handle);
+            SetCleanupStateJob setCleanupStateJob = new SetCleanupStateJob() {
+                agentType = GetComponentTypeHandle<GoapAgent>()
+            };
+            handle = setCleanupStateJob.ScheduleParallel(this.agentsQuery, handle);
             
             return handle;
         }
@@ -97,6 +90,32 @@ namespace CommonEcs.Goap {
                     
                     // Modify
                     planners[i] = planner;
+                }
+            }
+        }
+        
+        [BurstCompile]
+        private struct SetCleanupStateJob : IJobEntityBatch {
+            public ComponentTypeHandle<GoapAgent> agentType;
+
+            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
+                NativeArray<GoapAgent> agents = batchInChunk.GetNativeArray(this.agentType);
+
+                for (int i = 0; i < batchInChunk.Count; ++i) {
+                    GoapAgent agent = agents[i];
+                    if (!agent.replanRequested) {
+                        continue;
+                    }
+
+                    // We also reset other values here to ensure that they are in correct values
+                    // such they would replan again
+                    agent.lastResult = GoapResult.FAILED;
+                    agent.state = AgentState.CLEANUP;
+                
+                    agent.replanRequested = false;
+                    
+                    // Modify
+                    agents[i] = agent;
                 }
             }
         }

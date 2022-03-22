@@ -7,29 +7,28 @@ namespace CommonEcs.Goap {
     [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(ReplanSystem))]
     public class StartPlanningSystem : JobSystemBase {
-        private EntityQuery query;
+        private EntityQuery plannerQuery;
+        private EntityQuery agentsQuery;
 
         protected override void OnCreate() {
-            this.query = GetEntityQuery(typeof(GoapPlanner),
+            this.plannerQuery = GetEntityQuery(typeof(GoapPlanner),
                 typeof(DynamicBufferHashMap<ConditionId, bool>.Entry<bool>));
+
+            this.agentsQuery = GetEntityQuery(typeof(GoapAgent));
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            StartPlanningJob job = new StartPlanningJob() {
+            StartPlanningJob startPlanningJob = new StartPlanningJob() {
                 plannerType = GetComponentTypeHandle<GoapPlanner>(),
                 bucketType = GetBufferTypeHandle<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>>(),
                 allAgents = GetComponentDataFromEntity<GoapAgent>()
             };
+            JobHandle handle = startPlanningJob.ScheduleParallel(this.plannerQuery, inputDeps);
 
-            JobHandle handle = job.ScheduleParallel(this.query, 1, inputDeps);
-            
-            // Update state of agent
-            handle = this.Entities.ForEach(delegate(ref GoapAgent agent) {
-                if (agent.state == AgentState.IDLE && agent.goals.Count > 0) {
-                    // Agent must have started planning
-                    agent.state = AgentState.PLANNING;
-                } 
-            }).ScheduleParallel(handle);
+            SetIdleAgentsWithGoalsToPlanningJob setToPlanningJob = new SetIdleAgentsWithGoalsToPlanningJob() {
+                agentType = GetComponentTypeHandle<GoapAgent>()
+            };
+            handle = setToPlanningJob.ScheduleParallel(this.agentsQuery, handle);
 
             return handle;
         }
@@ -69,6 +68,27 @@ namespace CommonEcs.Goap {
                     
                     // Modify
                     planners[i] = planner;
+                }
+            }
+        }
+        
+        [BurstCompile]
+        private struct SetIdleAgentsWithGoalsToPlanningJob : IJobEntityBatch {
+            public ComponentTypeHandle<GoapAgent> agentType;
+
+            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
+                NativeArray<GoapAgent> agents = batchInChunk.GetNativeArray(this.agentType);
+
+                for (int i = 0; i < batchInChunk.Count; ++i) {
+                    GoapAgent agent = agents[i];
+                    
+                    if (agent.state == AgentState.IDLE && agent.goals.Count > 0) {
+                        // Agent must have started planning
+                        agent.state = AgentState.PLANNING;
+                        
+                        // Modify
+                        agents[i] = agent;
+                    }
                 }
             }
         }

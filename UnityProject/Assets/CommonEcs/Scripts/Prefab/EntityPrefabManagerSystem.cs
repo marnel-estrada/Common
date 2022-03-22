@@ -7,11 +7,11 @@ namespace CommonEcs {
     /// <summary>
     /// Holds the mapping from integer ID to the Entity prefab
     /// </summary>
-    public class EntityPrefabManagerSystem : SystemBase {
-        private NativeHashMap<FixedString64, Entity> map;
+    public partial class EntityPrefabManagerSystem : SystemBase {
+        private NativeHashMap<FixedString64Bytes, Entity> map;
         
         protected override void OnCreate() {
-            this.map = new NativeHashMap<FixedString64, Entity>(10, Allocator.Persistent);
+            this.map = new NativeHashMap<FixedString64Bytes, Entity>(10, Allocator.Persistent);
         }
 
         protected override void OnDestroy() {
@@ -24,7 +24,7 @@ namespace CommonEcs {
         /// Adds a prefab to maintain
         /// </summary>
         /// <param name="item"></param>
-        public void Add(FixedString64 id, Entity entityPrefab) {
+        public void Add(FixedString64Bytes id, Entity entityPrefab) {
             if (this.map.ContainsKey(id)) {
                 throw new Exception($"The prefab pool already contains an entry for {id}");
             }
@@ -41,7 +41,7 @@ namespace CommonEcs {
             }
         }
 
-        public Entity GetEntityPrefab(FixedString64 id) {
+        public Entity GetEntityPrefab(FixedString64Bytes id) {
             if (this.map.TryGetValue(id, out Entity prefabEntity)) {
                 return prefabEntity;
             }

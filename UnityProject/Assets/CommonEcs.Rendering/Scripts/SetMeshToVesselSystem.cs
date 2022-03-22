@@ -5,7 +5,7 @@ namespace CommonEcs {
     [UpdateAfter(typeof(SpriteManagerRendererSystem))]
     [UpdateBefore(typeof(ResetSpriteManagerFlagsSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class SetMeshToVesselSystem : SystemBase {
+    public partial class SetMeshToVesselSystem : SystemBase {
         private EntityQuery query;
         private SharedComponentQuery<SpriteManager> spriteManagerQuery;
         private SharedComponentQuery<MeshRendererVessel> vesselQuery;

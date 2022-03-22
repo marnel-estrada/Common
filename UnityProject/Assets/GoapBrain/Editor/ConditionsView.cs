@@ -84,7 +84,7 @@ namespace GoapBrain {
                         name.RenameMode = true;
                     }
 
-                    GUILayout.Label($"{name.Name} ({new FixedString64(name.Name).GetHashCode()})");
+                    GUILayout.Label($"{name.Name} ({new FixedString64Bytes(name.Name).GetHashCode()})");
                 }
 
                 GUILayout.EndHorizontal();

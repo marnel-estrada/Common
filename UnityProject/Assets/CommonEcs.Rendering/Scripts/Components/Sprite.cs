@@ -75,20 +75,6 @@ namespace CommonEcs {
         // We used BitArrayX here so we can save on bytes when using booleans
         public BitArray8 flags;
 
-        // Flag indices
-        
-        // Active here means whether or not it is active in SpriteManager or is a recycled instance
-        private const int ACTIVE = 0;
-        
-        private const int VERTICES_CHANGED = 1;
-        private const int UV_CHANGED = 2;
-        private const int COLOR_CHANGED = 3;
-        private const int RENDER_ORDER_CHANGED = 4;
-
-        // We used "Hidden" here instead of "Visible" so we don't have to set the value to true by default
-        // which is hard to do for structs
-        private const int HIDDEN = 5;
-
         public int LayerOrder {
             get {
                 return this.layerOrder;
@@ -223,61 +209,61 @@ namespace CommonEcs {
 
         public bool Active {
             get {
-                return this.flags[ACTIVE];
+                return this.flags[SpriteFlags.ACTIVE];
             }
 
             set {
-                this.flags[ACTIVE] = value;
+                this.flags[SpriteFlags.ACTIVE] = value;
             }
         }
 
         public bool VerticesChanged {
             get {
-                return this.flags[VERTICES_CHANGED];
+                return this.flags[SpriteFlags.VERTICES_CHANGED];
             }
 
             set {
-                this.flags[VERTICES_CHANGED] = value;
+                this.flags[SpriteFlags.VERTICES_CHANGED] = value;
             }
         }
 
         public bool UvChanged {
             get {
-                return this.flags[UV_CHANGED];
+                return this.flags[SpriteFlags.UV_CHANGED];
             }
 
             set {
-                this.flags[UV_CHANGED] = value;
+                this.flags[SpriteFlags.UV_CHANGED] = value;
             }
         }
 
         public bool ColorChanged {
             get {
-                return this.flags[COLOR_CHANGED];
+                return this.flags[SpriteFlags.COLOR_CHANGED];
             }
 
             set {
-                this.flags[COLOR_CHANGED] = value;
+                this.flags[SpriteFlags.COLOR_CHANGED] = value;
             }
         }
 
         public bool RenderOrderChanged {
             get {
-                return this.flags[RENDER_ORDER_CHANGED];
+                return this.flags[SpriteFlags.RENDER_ORDER_CHANGED];
             }
 
             set {
-                this.flags[RENDER_ORDER_CHANGED] = value;
+                this.flags[SpriteFlags.RENDER_ORDER_CHANGED] = value;
             }
         }
 
         public bool Hidden {
             get {
-                return this.flags[HIDDEN];
+                return this.flags[SpriteFlags.HIDDEN];
             }
 
             set {
-                this.flags[HIDDEN] = value;
+                this.flags[SpriteFlags.HIDDEN] = value;
 
                 // We set vertices changed here so that the transform vertices would be updated
                 // Note that we add an offset to the transformed vertex positions to hide the sprite

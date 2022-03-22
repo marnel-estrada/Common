@@ -21,7 +21,7 @@ namespace GoapBrain {
         /// <param name="plannerEntity"></param>
         /// <param name="linkedEntities"></param>
         /// <returns></returns>
-        public override Entity Prepare(ref EntityManager entityManager, in FixedString64 conditionName, in Entity agentEntity, in Entity plannerEntity) {
+        public override Entity Prepare(ref EntityManager entityManager, in FixedString64Bytes conditionName, in Entity agentEntity, in Entity plannerEntity) {
             Entity resolverEntity = entityManager.CreateEntity(this.archetype);
             
             ConditionsMap conditionsMap = new ConditionsMap(ref entityManager, plannerEntity);

@@ -52,7 +52,7 @@ namespace GoapBrain {
 
         public int ActionId {
             get {
-                return new FixedString64(this.name).GetHashCode();
+                return new FixedString64Bytes(this.name).GetHashCode();
             }
         }
 

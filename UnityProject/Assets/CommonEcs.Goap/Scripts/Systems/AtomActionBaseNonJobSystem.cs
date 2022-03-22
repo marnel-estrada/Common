@@ -10,7 +10,7 @@ namespace CommonEcs.Goap {
     [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(IdentifyAtomActionsThatCanExecuteSystem))]
     [UpdateBefore(typeof(EndAtomActionsSystem))]
-    public abstract class AtomActionBaseNonJobSystem<TActionFilter> : SystemBase where TActionFilter : struct, IAtomActionComponent {
+    public abstract partial class AtomActionBaseNonJobSystem<TActionFilter> : SystemBase where TActionFilter : struct, IAtomActionComponent {
         private EntityQuery query;
         private bool isActionFilterHasArray;
 

@@ -8,7 +8,9 @@
         "Unity.Burst",
         "Unity.Collections",
         "Unity.Mathematics",
-        "Unity.Transforms"
+        "Unity.Transforms",
+        "Unity.Entities.Hybrid",
+        "Unity.Jobs"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

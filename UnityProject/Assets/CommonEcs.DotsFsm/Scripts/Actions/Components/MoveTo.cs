@@ -21,7 +21,7 @@ namespace CommonEcs.DotsFsm {
             this.targetEntity = targetEntity;
         }
         
-        public MoveTo(Entity targetEntity, FixedString64 finishEvent) : this() {
+        public MoveTo(Entity targetEntity, FixedString64Bytes finishEvent) : this() {
             this.targetEntity = targetEntity;
             this.finishEvent = finishEvent.Length > 0 ? ValueTypeOption<FsmEvent>.Some(new FsmEvent(finishEvent)) : 
                 ValueTypeOption<FsmEvent>.None;

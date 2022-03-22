@@ -14,7 +14,7 @@ namespace CommonEcs.DotsFsm {
             this.commandBuffer = commandBuffer;
         }
 
-        public Entity CreateFsm(in FixedString64 name, bool isDebug = false) {
+        public Entity CreateFsm(in FixedString64Bytes name, bool isDebug = false) {
             Entity fsmEntity = this.commandBuffer.CreateEntity();
             this.commandBuffer.AddComponent(fsmEntity, new DotsFsm());
             this.commandBuffer.AddComponent(fsmEntity, new DebugFsm(isDebug));
@@ -31,7 +31,7 @@ namespace CommonEcs.DotsFsm {
             return fsmEntity;
         }
 
-        public Entity AddState(Entity fsmEntityOwner, in FixedString64 name) {
+        public Entity AddState(Entity fsmEntityOwner, in FixedString64Bytes name) {
             Entity stateEntity = this.commandBuffer.CreateEntity();
             this.commandBuffer.AddComponent(stateEntity, new DotsFsmState(fsmEntityOwner));
             this.commandBuffer.AddComponent<NameReference>(stateEntity);
@@ -84,7 +84,7 @@ namespace CommonEcs.DotsFsm {
             this.commandBuffer.AppendToBuffer(fsmEntity, new Transition(fromState, fsmEvent, toState));
         }
         
-        public void AddTransition(in Entity fsmEntity, in Entity fromState, in FixedString64 eventAsString, in Entity toState) {
+        public void AddTransition(in Entity fsmEntity, in Entity fromState, in FixedString64Bytes eventAsString, in Entity toState) {
             AddTransition(fsmEntity, fromState, new FsmEvent(eventAsString), toState);
         }
 

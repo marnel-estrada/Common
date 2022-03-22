@@ -64,7 +64,7 @@ namespace Common {
             for (int i = 0; i < this.names.Count; ++i) {
                 int originalWidth = this.originalDimensions[i].x;
                 int originalHeight = this.originalDimensions[i].y;
-                int hashcode = new FixedString64(this.names[i]).GetHashCode();
+                int hashcode = new FixedString64Bytes(this.names[i]).GetHashCode();
                 this.entriesMap[hashcode] =
                     new PackedTextureEntry(rects[i], this.atlas.width, this.atlas.height, originalWidth, originalHeight);
             }
@@ -93,7 +93,7 @@ namespace Common {
         /// <param name="key"></param>
         /// <returns></returns>
         public PackedTextureEntry GetEntry(string key) {
-            if (this.entriesMap.TryGetValue(new FixedString64(key).GetHashCode(), out PackedTextureEntry entry)) {
+            if (this.entriesMap.TryGetValue(new FixedString64Bytes(key).GetHashCode(), out PackedTextureEntry entry)) {
                 return entry;
             }
 

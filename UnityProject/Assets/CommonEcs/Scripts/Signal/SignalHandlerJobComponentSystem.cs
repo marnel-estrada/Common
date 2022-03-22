@@ -1,3 +1,5 @@
+using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 
@@ -31,7 +33,7 @@ namespace CommonEcs {
             JobHandle handle = this.signalHandler.Update(inputDeps);
             
             // We added this component so that they will not be processed again 
-            this.barrier.CreateCommandBuffer().AddComponent(this.signalQuery, typeof(ProcessedBySystem));
+            this.barrier.CreateCommandBuffer().AddComponentForEntityQuery(this.signalQuery, typeof(ProcessedBySystem));
 
             return handle;
         }

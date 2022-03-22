@@ -5,8 +5,8 @@ namespace CommonEcs.DotsFsm {
     /// A utility component that stores a reference to an FSM entity
     /// </summary>
     [GenerateAuthoringComponent]
-    public readonly struct DotsFsmReference : IComponentData {
-        public readonly Entity fsmEntity;
+    public struct DotsFsmReference : IComponentData {
+        public Entity fsmEntity;
 
         public DotsFsmReference(Entity fsmEntity) {
             this.fsmEntity = fsmEntity;

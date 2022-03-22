@@ -20,7 +20,7 @@
         }
 
         protected override void OnUpdate() {
-            this.Entities.With(this.query).ForEach(delegate(Entity entity, AddToSpriteLayerWrapper wrapper) {
+            this.Entities.With(this.query).ForEach((Entity entity, AddToSpriteLayerWrapper wrapper) => {
                 this.PostUpdateCommands.AddComponent(entity, wrapper.componentData);
             
                 // We add this component so it will no longer be processed by this system

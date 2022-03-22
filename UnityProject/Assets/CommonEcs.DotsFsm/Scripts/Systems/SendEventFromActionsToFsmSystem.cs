@@ -10,7 +10,7 @@ namespace CommonEcs.DotsFsm {
     /// </summary>
     [UpdateInGroup(typeof(DotsFsmSystemGroup))]
     [UpdateAfter(typeof(StartFsmSystem))]
-    public class SendEventFromActionsToFsmSystem : SystemBase {
+    public partial class SendEventFromActionsToFsmSystem : SystemBase {
         private EntityQuery actionsQuery;
         
         protected override void OnCreate() {

@@ -5,7 +5,7 @@
     using Unity.Jobs;
 
     [BurstCompile]
-    public struct DeallocateArchtypeChunksJob : IJob {
+    public struct DeallocateArchetypeChunksJob : IJob {
         [ReadOnly]
         [DeallocateOnJobCompletion]
         public NativeArray<ArchetypeChunk> chunks;

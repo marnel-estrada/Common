@@ -5,7 +5,6 @@
         "Unity.Entities.Hybrid",
         "Unity.Transforms",
         "Unity.Burst",
-        "Unity.Entities.Properties",
         "Unity.Transforms.Hybrid",
         "Unity.Mathematics",
         "Unity.Collections",

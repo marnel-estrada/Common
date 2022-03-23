@@ -6,7 +6,7 @@ namespace CommonEcs.DotsFsm {
     /// </summary>
     [GenerateAuthoringComponent]
     public struct DotsFsmReference : IComponentData {
-        public Entity fsmEntity;
+        public NonNullEntity fsmEntity;
 
         public DotsFsmReference(Entity fsmEntity) {
             this.fsmEntity = fsmEntity;

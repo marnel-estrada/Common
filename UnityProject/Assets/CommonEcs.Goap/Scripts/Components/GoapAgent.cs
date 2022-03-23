@@ -12,7 +12,7 @@ namespace CommonEcs.Goap {
         // We use a separate entity here because we don't want the agent entity to get
         // bigger and thus will have less entities per archetype.
         // Note that the planner entity contains a BoolHashMap which is a big object.
-        public Entity plannerEntity;
+        public NonNullEntity plannerEntity;
 
         // Maps to a GoapDomain
         public int domainId; 

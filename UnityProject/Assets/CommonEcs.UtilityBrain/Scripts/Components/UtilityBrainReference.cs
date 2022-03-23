@@ -6,7 +6,7 @@ namespace CommonEcs.UtilityBrain {
     /// </summary>
     [GenerateAuthoringComponent]
     public struct UtilityBrainReference : IComponentData {
-        public Entity utilityBrainEntity;
+        public NonNullEntity utilityBrainEntity;
 
         public UtilityBrainReference(Entity utilityBrainEntity) {
             this.utilityBrainEntity = utilityBrainEntity;

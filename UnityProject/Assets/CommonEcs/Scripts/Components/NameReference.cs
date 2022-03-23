@@ -12,7 +12,7 @@ namespace CommonEcs {
     /// </summary>
     [GenerateAuthoringComponent]
     public struct NameReference : IComponentData {
-        public Entity nameEntity;
+        public NonNullEntity nameEntity;
 
         public NameReference(Entity nameEntity) {
             this.nameEntity = nameEntity;

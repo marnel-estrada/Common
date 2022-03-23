@@ -11,7 +11,7 @@ namespace CommonEcs.Goap {
     [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(IdentifyConditionsToResolveSystem))]
     [UpdateBefore(typeof(EndConditionResolversSystem))]
-    public abstract class ConditionResolverBaseSystem<TResolverFilter, TResolverProcessor> : JobSystemBase
+    public abstract partial class ConditionResolverBaseSystem<TResolverFilter, TResolverProcessor> : JobSystemBase
         where TResolverFilter : unmanaged, IConditionResolverComponent
         where TResolverProcessor : struct, IConditionResolverProcess<TResolverFilter> {
         private EntityQuery query;

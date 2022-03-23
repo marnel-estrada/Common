@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class TransformVerticesSystem : JobSystemBase {
+    public partial class TransformVerticesSystem : JobSystemBase {
         private EntityQuery query;
 
         private ComponentTypeHandle<Sprite> spriteType;

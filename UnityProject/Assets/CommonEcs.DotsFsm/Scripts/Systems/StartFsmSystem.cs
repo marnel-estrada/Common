@@ -5,7 +5,7 @@ using Unity.Jobs;
 
 namespace CommonEcs.DotsFsm {
     [UpdateInGroup(typeof(DotsFsmSystemGroup))]
-    public class StartFsmSystem : JobSystemBase {
+    public partial class StartFsmSystem : JobSystemBase {
         private EntityQuery query;
 
         protected override void OnCreate() {

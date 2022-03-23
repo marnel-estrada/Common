@@ -6,7 +6,7 @@ using Unity.Jobs;
 namespace CommonEcs.Goap {
     [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(ReplanSystem))]
-    public class StartPlanningSystem : JobSystemBase {
+    public partial class StartPlanningSystem : JobSystemBase {
         private EntityQuery plannerQuery;
         private EntityQuery agentsQuery;
 

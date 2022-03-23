@@ -13,7 +13,7 @@ namespace CommonEcs {
     /// This is the same as SpriteManagerTransformSystem but for sprite made in GameObject world
     /// </summary>
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class TransformGameObjectSpriteVerticesSystem : JobSystemBase {
+    public partial class TransformGameObjectSpriteVerticesSystem : JobSystemBase {
         private EntityQuery query;
 
         protected override void OnCreate() {

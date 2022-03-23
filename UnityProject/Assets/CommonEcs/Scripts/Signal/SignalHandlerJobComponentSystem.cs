@@ -1,5 +1,3 @@
-using Unity.Burst;
-using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 
@@ -9,7 +7,7 @@ namespace CommonEcs {
     /// </summary>
     [UpdateBefore(typeof(DestroySignalsSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public abstract class SignalHandlerJobComponentSystem<T> : JobSystemBase where T : struct, IComponentData {
+    public abstract partial class SignalHandlerJobComponentSystem<T> : JobSystemBase where T : struct, IComponentData {
         private EntityQuery signalQuery;
         private JobSignalHandler<T> signalHandler;
 

@@ -11,7 +11,7 @@ namespace CommonEcs.Goap {
     /// </summary>
     [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(IdentifyConditionsToResolveSystem))]
-    public class EndConditionResolversSystem : JobSystemBase {
+    public partial class EndConditionResolversSystem : JobSystemBase {
         private EntityQuery resolversQuery;
         private EntityQuery plannersQuery;
 

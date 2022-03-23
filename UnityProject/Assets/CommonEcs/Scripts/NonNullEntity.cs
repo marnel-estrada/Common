@@ -19,11 +19,11 @@ namespace CommonEcs {
             this.value = entity;
         }
 
-        public static implicit operator NonNullEntity(in Entity entity) {
+        public static implicit operator NonNullEntity(Entity entity) {
             return new NonNullEntity(entity);
         }
 
-        public static implicit operator Entity(in NonNullEntity nonNullEntity) {
+        public static implicit operator Entity(NonNullEntity nonNullEntity) {
             return nonNullEntity.value;
         }
 

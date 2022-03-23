@@ -14,7 +14,7 @@ namespace CommonEcs.Goap {
     [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(IdentifyAtomActionsThatCanExecuteSystem))]
     [UpdateBefore(typeof(EndAtomActionsSystem))]
-    public abstract class AtomActionBaseSystem<TActionFilter, TProcessor> : JobSystemBase
+    public abstract partial class AtomActionBaseSystem<TActionFilter, TProcessor> : JobSystemBase
         where TActionFilter : struct, IAtomActionComponent
         where TProcessor : struct, IAtomActionProcess<TActionFilter> {
         private EntityQuery query;

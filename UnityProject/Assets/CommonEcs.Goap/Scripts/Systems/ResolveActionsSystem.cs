@@ -8,7 +8,7 @@ using UnityEngine;
 namespace CommonEcs.Goap {
     [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(EndConditionResolversSystem))]
-    public class ResolveActionsSystem : JobSystemBase {
+    public partial class ResolveActionsSystem : JobSystemBase {
         private EntityQuery query;
 
         protected override void OnCreate() {

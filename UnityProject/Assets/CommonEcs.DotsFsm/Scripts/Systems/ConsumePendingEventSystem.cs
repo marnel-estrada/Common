@@ -10,7 +10,7 @@ using UnityEngine;
 namespace CommonEcs.DotsFsm {
     [UpdateInGroup(typeof(DotsFsmSystemGroup))]
     [UpdateAfter(typeof(SendEventFromActionsToFsmSystem))]
-    public class ConsumePendingEventSystem : JobSystemBase {
+    public partial class ConsumePendingEventSystem : JobSystemBase {
         private EntityQuery query;
 
         protected override void OnCreate() {

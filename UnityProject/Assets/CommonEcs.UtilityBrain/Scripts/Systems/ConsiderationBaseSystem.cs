@@ -7,7 +7,7 @@ namespace CommonEcs.UtilityBrain {
     [UpdateInGroup(typeof(UtilityBrainSystemGroup))]
     [UpdateAfter(typeof(IdentifyOptionsAndConsiderationsToExecuteSystem))]
     [UpdateBefore(typeof(WriteValuesToOwnersSystem))]
-    public abstract class ConsiderationBaseSystem<TFilter, TProcessor> : JobSystemBase
+    public abstract partial class ConsiderationBaseSystem<TFilter, TProcessor> : JobSystemBase
         where TFilter : struct, IConsiderationComponent
         where TProcessor : struct, IConsiderationProcess<TFilter> {
         private EntityQuery query;

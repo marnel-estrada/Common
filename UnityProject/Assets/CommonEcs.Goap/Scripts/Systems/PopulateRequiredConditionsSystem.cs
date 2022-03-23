@@ -12,7 +12,7 @@ namespace CommonEcs.Goap {
     /// </summary>
     [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(StartPlanningSystem))]
-    public class PopulateRequiredConditionsSystem : JobSystemBase {
+    public partial class PopulateRequiredConditionsSystem : JobSystemBase {
         private EntityQuery query;
 
         protected override void OnCreate() {

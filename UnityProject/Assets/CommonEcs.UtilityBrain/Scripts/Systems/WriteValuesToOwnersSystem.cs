@@ -11,7 +11,7 @@ namespace CommonEcs.UtilityBrain {
     /// </summary>
     [UpdateInGroup(typeof(UtilityBrainSystemGroup))]
     [UpdateBefore(typeof(ResolveBestOptionSystem))]
-    public class WriteValuesToOwnersSystem : JobSystemBase {
+    public partial class WriteValuesToOwnersSystem : JobSystemBase {
         private EntityQuery considerationsQuery;
         private EntityQuery optionsQuery;
 

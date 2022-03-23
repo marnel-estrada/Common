@@ -14,7 +14,7 @@ namespace CommonEcs.Goap {
     /// </summary>
     [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(IdentifyAtomActionsThatCanExecuteSystem))]
-    public class EndAtomActionsSystem : JobSystemBase {
+    public partial class EndAtomActionsSystem : JobSystemBase {
         private EntityQuery atomActionsQuery;
         private EntityQuery agentsQuery;
         private EntityQuery plannersQuery;

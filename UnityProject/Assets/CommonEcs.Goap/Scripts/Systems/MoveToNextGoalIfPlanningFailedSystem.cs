@@ -6,7 +6,7 @@ using Unity.Jobs;
 namespace CommonEcs.Goap {
     [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(ResolveActionsSystem))]
-    public class MoveToNextGoalIfPlanningFailedSystem : JobSystemBase {
+    public partial class MoveToNextGoalIfPlanningFailedSystem : JobSystemBase {
         private EntityQuery query;
 
         protected override void OnCreate() {

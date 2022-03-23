@@ -10,7 +10,7 @@ namespace CommonEcs {
     /// </summary>
     /// <typeparam name="ParameterType"></typeparam>
     /// <typeparam name="ProcessorType"></typeparam>
-    public abstract class SignalHandlerBatchJobSystem<ParameterType, ProcessorType> : JobSystemBase 
+    public abstract partial class SignalHandlerBatchJobSystem<ParameterType, ProcessorType> : JobSystemBase 
         where ParameterType : struct, IComponentData
         where ProcessorType : struct, ISignalProcessor<ParameterType> {
         private EntityQuery query;

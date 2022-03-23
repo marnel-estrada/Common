@@ -10,7 +10,7 @@ namespace CommonEcs.Goap {
     /// </summary>
     [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(ChangeAgentStateToExecutingSystem))]
-    public class IdentifyAtomActionsThatCanExecuteSystem : JobSystemBase {
+    public partial class IdentifyAtomActionsThatCanExecuteSystem : JobSystemBase {
         private EntityQuery query;
 
         protected override void OnCreate() {

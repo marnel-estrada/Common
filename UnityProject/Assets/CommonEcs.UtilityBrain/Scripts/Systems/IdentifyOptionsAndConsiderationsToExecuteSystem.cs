@@ -9,7 +9,7 @@ namespace CommonEcs.UtilityBrain {
     /// The value is whatever their parent UtilityBrain value is (when its shouldExecute is true).
     /// </summary>
     [UpdateInGroup(typeof(UtilityBrainSystemGroup))]
-    public class IdentifyOptionsAndConsiderationsToExecuteSystem : JobSystemBase {
+    public partial class IdentifyOptionsAndConsiderationsToExecuteSystem : JobSystemBase {
         private EntityQuery optionsQuery;
         private EntityQuery considerationsQuery;
 

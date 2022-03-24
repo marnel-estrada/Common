@@ -16,26 +16,26 @@ namespace CommonEcs {
             ComponentDataFromEntity<Cell2D> allCells = GetComponentDataFromEntity<Cell2D>();
 
             this.Entities.ForEach((in MultipleGrid2D multipleGrid, in DynamicBuffer<EntityBufferElement> entityBuffer) => {
-                    if (this.resolved) {
-                        // Resolve only once
-                        return;
-                    }
-                    
-                    this.grid = multipleGrid;
-                    PopulateCellEntities(in entityBuffer);
-                    
-                    // Prepare the bounding box
-                    float2 min = allCells[this.cellEntities.Value[0].entity].BottomLeft; // first cell
+                if (this.resolved) {
+                    // Resolve only once
+                    return;
+                }
+                
+                this.grid = multipleGrid;
+                PopulateCellEntities(in entityBuffer);
+                
+                // Prepare the bounding box
+                float2 min = allCells[this.cellEntities.Value[0].entity].BottomLeft; // first cell
 
-                    int cellCount = this.cellEntities.Value.Length;
-                    float2 max = allCells[this.cellEntities.Value[cellCount - 1].entity].TopRight;
-                    Aabb2 worldBoundingBox = new Aabb2(min, max);
-                    
-                    this.gridWrapper = new MultipleGrid2dWrapper(this.grid, this.cellEntities.Value, worldBoundingBox);
+                int cellCount = this.cellEntities.Value.Length;
+                float2 max = allCells[this.cellEntities.Value[cellCount - 1].entity].TopRight;
+                Aabb2 worldBoundingBox = new Aabb2(min, max);
+                
+                this.gridWrapper = new MultipleGrid2dWrapper(this.grid, this.cellEntities.Value, worldBoundingBox);
 
-                    this.resolved = true;
-                    this.Enabled = false; // So update will not be called again
-                }).WithoutBurst().Run();
+                this.resolved = true;
+                this.Enabled = false; // So update will not be called again
+            }).WithoutBurst().Run();
         }
         
         private void PopulateCellEntities(in DynamicBuffer<EntityBufferElement> entityBuffer) {

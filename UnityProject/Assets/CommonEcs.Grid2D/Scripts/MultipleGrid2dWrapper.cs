@@ -53,6 +53,10 @@ namespace CommonEcs {
         public int ToIndex(GridCoord3 gridCoordinate) {
             return this.grid.ToIndex(gridCoordinate);
         }
+
+        public int ToIndex(int x, int y, int z) {
+            return this.grid.ToIndex(x, y, z);
+        }
         
         public bool IsInside(in WorldCoord3 coordinate) {
             return this.grid.IsInsideAsWorld(coordinate.value.x, coordinate.value.y, coordinate.value.z);

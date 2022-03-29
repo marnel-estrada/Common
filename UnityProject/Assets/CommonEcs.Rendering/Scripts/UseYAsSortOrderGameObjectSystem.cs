@@ -41,7 +41,7 @@ namespace CommonEcs {
                 stashes = stashes
             };
 
-            return updateSpritesJob.ScheduleParallel(this.query, 1, stashHandle);
+            return updateSpritesJob.ScheduleParallel(this.query, stashHandle);
         }
         
         [BurstCompile]

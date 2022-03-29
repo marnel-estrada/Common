@@ -52,7 +52,7 @@ namespace CommonEcs {
                 colorChangedMap = colorChangedMap.AsParallelWriter(),
                 lastSystemVersion = this.LastSystemVersion
             };
-            job.ScheduleParallel(this.query, 1, inputDeps).Complete();
+            job.ScheduleParallel(this.query, inputDeps).Complete();
 
             // Process the result
             for (int i = 1; i < this.managers.Count; ++i) {

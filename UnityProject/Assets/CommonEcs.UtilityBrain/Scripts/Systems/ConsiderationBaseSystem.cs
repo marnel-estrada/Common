@@ -26,7 +26,7 @@ namespace CommonEcs.UtilityBrain {
                 processor = PrepareProcessor()
             };
             
-            return this.ShouldScheduleParallel ? job.ScheduleParallel(this.query, 1, inputDeps) : 
+            return this.ShouldScheduleParallel ? job.ScheduleParallel(this.query, inputDeps) : 
                 job.Schedule(this.query, inputDeps);
         }
         

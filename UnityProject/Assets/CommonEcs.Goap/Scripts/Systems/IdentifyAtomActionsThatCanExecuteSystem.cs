@@ -25,7 +25,7 @@ namespace CommonEcs.Goap {
                 allActionSets = GetBufferFromEntity<ResolvedAction>()
             };
             
-            return job.ScheduleParallel(this.query, 1, inputDeps);
+            return job.ScheduleParallel(this.query, inputDeps);
         }
         
         [BurstCompile]

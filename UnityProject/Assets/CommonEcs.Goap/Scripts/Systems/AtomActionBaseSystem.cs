@@ -43,7 +43,7 @@ namespace CommonEcs.Goap {
 
             try {
                 JobHandle handle = this.ShouldScheduleParallel ?
-                    job.ScheduleParallel(this.query, 1, inputDeps) : job.Schedule(this.query, inputDeps);
+                    job.ScheduleParallel(this.query, inputDeps) : job.Schedule(this.query, inputDeps);
                 AfterJobScheduling(handle);
                 return handle;
             } catch (InvalidOperationException) {

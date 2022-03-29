@@ -26,7 +26,7 @@ namespace CommonEcs.Goap {
                 allDebug = GetComponentDataFromEntity<DebugEntity>(true)
             };
 
-            return job.ScheduleParallel(this.query, 2, inputDeps);
+            return job.ScheduleParallel(this.query, ScheduleGranularity.Entity, default, inputDeps);
         }
 
         [BurstCompile]

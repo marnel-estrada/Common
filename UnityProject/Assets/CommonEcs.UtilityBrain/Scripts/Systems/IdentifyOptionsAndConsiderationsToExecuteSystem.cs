@@ -23,13 +23,13 @@ namespace CommonEcs.UtilityBrain {
                 optionType = GetComponentTypeHandle<UtilityOption>(), 
                 allBrains = GetComponentDataFromEntity<UtilityBrain>()
             };
-            JobHandle handle = identifyOptionsJob.ScheduleParallel(this.optionsQuery, 1, inputDeps);
+            JobHandle handle = identifyOptionsJob.ScheduleParallel(this.optionsQuery, inputDeps);
 
             IdentifyConsiderationsJob identifyConsiderationsJob = new IdentifyConsiderationsJob() {
                 considerationType = GetComponentTypeHandle<Consideration>(),
                 allOptions = GetComponentDataFromEntity<UtilityOption>()
             };
-            handle = identifyConsiderationsJob.ScheduleParallel(this.considerationsQuery, 1, handle);
+            handle = identifyConsiderationsJob.ScheduleParallel(this.considerationsQuery, handle);
             
             return handle;
         }

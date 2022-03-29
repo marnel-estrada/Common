@@ -27,7 +27,7 @@ namespace CommonEcs.DotsFsm {
                 allNames = GetComponentDataFromEntity<Name>(true)
             };
             
-            return consumeJob.ScheduleParallel(this.query, 1, inputDeps);
+            return consumeJob.ScheduleParallel(this.query, inputDeps);
         }
         
         [BurstCompile]

@@ -24,7 +24,7 @@ namespace CommonEcs.DotsFsm {
                 actionType = GetComponentTypeHandle<DotsFsmAction>(),
                 allFsms = GetComponentDataFromEntity<DotsFsm>()
             };
-            this.Dependency = job.ScheduleParallel(this.actionsQuery, 1, this.Dependency);
+            this.Dependency = job.ScheduleParallel(this.actionsQuery, this.Dependency);
         } 
 
         [BurstCompile]

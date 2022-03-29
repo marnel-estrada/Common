@@ -26,7 +26,7 @@ namespace CommonEcs.Goap {
                 allAgents = GetComponentDataFromEntity<GoapAgent>()
             };
             
-            return job.ScheduleParallel(this.query, 1, inputDeps);
+            return job.ScheduleParallel(this.query, inputDeps);
         }
         
         [BurstCompile]

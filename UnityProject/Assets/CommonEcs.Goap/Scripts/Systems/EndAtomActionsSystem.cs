@@ -31,7 +31,7 @@ namespace CommonEcs.Goap {
             ChangeStateFromCleanupToIdleJob changeFromCleanupToIdleJob = new ChangeStateFromCleanupToIdleJob() {
                 agentType = agentType
             };
-            JobHandle handle = changeFromCleanupToIdleJob.ScheduleParallel(this.agentsQuery, 1, inputDeps);
+            JobHandle handle = changeFromCleanupToIdleJob.ScheduleParallel(this.agentsQuery, inputDeps);
 
             ComponentDataFromEntity<GoapAgent> allAgents = GetComponentDataFromEntity<GoapAgent>();
             
@@ -39,7 +39,7 @@ namespace CommonEcs.Goap {
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
                 allAgents = allAgents
             };
-            handle = processAtomActionsJob.ScheduleParallel(this.atomActionsQuery, 1, handle);
+            handle = processAtomActionsJob.ScheduleParallel(this.atomActionsQuery, handle);
             
             // We try to reset the goal index first so that GoapAgent.state remains Executing.
             // Note that it is set to Idle in MoveToNextActionJob when last action failed or ended
@@ -47,14 +47,14 @@ namespace CommonEcs.Goap {
                 plannerType = GetComponentTypeHandle<GoapPlanner>(), 
                 allAgents = allAgents
             };
-            handle = resetGoalIndexJob.ScheduleParallel(this.plannersQuery, 1, handle);
+            handle = resetGoalIndexJob.ScheduleParallel(this.plannersQuery, handle);
 
             MoveToNextActionJob moveToNextActionJob = new MoveToNextActionJob() {
                 agentType = agentType, 
                 debugEntityType = GetComponentTypeHandle<DebugEntity>(),
                 allActionSets = GetBufferFromEntity<ResolvedAction>()
             };
-            handle = moveToNextActionJob.ScheduleParallel(this.agentsQuery, 1, handle);
+            handle = moveToNextActionJob.ScheduleParallel(this.agentsQuery, handle);
 
             return handle;
         }

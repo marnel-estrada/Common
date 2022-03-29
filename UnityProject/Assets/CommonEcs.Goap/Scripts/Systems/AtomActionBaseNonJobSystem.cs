@@ -39,7 +39,7 @@ namespace CommonEcs.Goap {
                 allDebugEntities = GetComponentDataFromEntity<DebugEntity>(),
                 resultList = actionsThatCanExecuteList.AsParallelWriter()
             };
-            collectJob.ScheduleParallel(this.query, 1, this.Dependency).Complete();
+            collectJob.ScheduleParallel(this.query, this.Dependency).Complete();
 
             if (actionsThatCanExecuteList.IsEmpty) {
                 // There are no actions that can execute. We can skip executing the actions.

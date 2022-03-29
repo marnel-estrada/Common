@@ -26,12 +26,12 @@ namespace CommonEcs.Goap {
                 resolverType = GetComponentTypeHandle<ConditionResolver>(),
                 allBuckets = GetBufferFromEntity<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>>()
             };
-            JobHandle handle = setResultsJob.ScheduleParallel(this.resolversQuery, 1, inputDeps);
+            JobHandle handle = setResultsJob.ScheduleParallel(this.resolversQuery, inputDeps);
 
             SetPlannerToResolvingActionsJob setToResolvingActionsJob = new SetPlannerToResolvingActionsJob() {
                 plannerType = GetComponentTypeHandle<GoapPlanner>()
             };
-            handle = setToResolvingActionsJob.ScheduleParallel(this.plannersQuery, 1, handle);
+            handle = setToResolvingActionsJob.ScheduleParallel(this.plannersQuery, handle);
 
             return handle;
         }

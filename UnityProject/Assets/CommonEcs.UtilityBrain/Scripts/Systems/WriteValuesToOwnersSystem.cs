@@ -25,7 +25,7 @@ namespace CommonEcs.UtilityBrain {
                 considerationType = GetComponentTypeHandle<Consideration>(true),
                 allValueLists = GetBufferFromEntity<UtilityValue>()
             };
-            JobHandle handle = writeConsiderationsToOptions.ScheduleParallel(this.considerationsQuery, 1, inputDeps);
+            JobHandle handle = writeConsiderationsToOptions.ScheduleParallel(this.considerationsQuery, inputDeps);
 
             ComponentTypeHandle<UtilityOption> optionType = GetComponentTypeHandle<UtilityOption>();
             
@@ -33,14 +33,14 @@ namespace CommonEcs.UtilityBrain {
                 optionType = optionType,
                 utilityValueType = GetBufferTypeHandle<UtilityValue>()
             };
-            handle = computeOptionValues.ScheduleParallel(this.optionsQuery, 1, handle);
+            handle = computeOptionValues.ScheduleParallel(this.optionsQuery, handle);
 
             WriteOptionsToBrainJob writeOptionsToBrain = new WriteOptionsToBrainJob() {
                 entityType = GetEntityTypeHandle(),
                 optionType = optionType,
                 allBrainValueBuffers = GetBufferFromEntity<UtilityValueWithOption>()
             };
-            handle = writeOptionsToBrain.ScheduleParallel(this.optionsQuery, 1, handle);
+            handle = writeOptionsToBrain.ScheduleParallel(this.optionsQuery, handle);
             
             return handle;
         }

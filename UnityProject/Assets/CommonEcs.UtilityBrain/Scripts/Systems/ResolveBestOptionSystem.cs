@@ -18,7 +18,7 @@ namespace CommonEcs.UtilityBrain {
                 valueBufferType = GetBufferTypeHandle<UtilityValueWithOption>(),
                 allDebug = GetComponentDataFromEntity<DebugEntity>()
             };
-            return resolveBestOptionJob.ScheduleParallel(this.query, 1, inputDeps);
+            return resolveBestOptionJob.ScheduleParallel(this.query, inputDeps);
         }
         
         [BurstCompile]

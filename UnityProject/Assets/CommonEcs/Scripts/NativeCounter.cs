@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Jobs;
 using Unity.Jobs.LowLevel.Unsafe;
 
 namespace CommonEcs {
@@ -85,6 +86,7 @@ namespace CommonEcs {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
                 AtomicSafetyHandle.CheckWriteAndThrow(this.m_Safety);
 #endif
+                
                 // Clear all locally cached counts, 
                 // set the first one to the required value
                 for (int i = 1; i < JobsUtility.MaxJobThreadCount; ++i) {

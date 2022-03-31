@@ -6,12 +6,16 @@ namespace CommonEcs {
 
         private const int MAX = 8;
 
+        public BitArray8(byte value) {
+            this.internalValue = value;
+        }
+
         public bool this[int index] {
             get {
                 if (index < 0 || index >= MAX) {
                     throw new Exception("Invalid index");
                 }
-                
+
                 return (this.internalValue & (1 << index)) != 0;
             }
 
@@ -19,7 +23,7 @@ namespace CommonEcs {
                 if (index < 0 || index >= MAX) {
                     throw new Exception("Invalid index");
                 }
-                
+
                 if (value) {
                     // Turn on bit
                     this.internalValue |= (byte)(1 << index);

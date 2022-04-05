@@ -26,6 +26,10 @@ namespace CommonEcs.DotsFsm {
         }
 
         public void Start(Entity stateEntity) {
+            // We clear the pending event so no event would be processed
+            // Start state should have high precedence than event transition
+            ClearPendingEvent();
+            
             this.startState = ValueTypeOption<Entity>.Some(stateEntity);
             
             // We set the currentState to None when we start an FSM to remove the retained value

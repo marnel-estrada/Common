@@ -7,7 +7,7 @@ namespace CommonEcs {
         public readonly bool isDebug;
 
         /// <summary>
-        /// Constructor with start only. This will be used by Dijsktra search where the goal is identfied
+        /// Constructor with start only. This will be used by Dijsktra search where the goal is identified
         /// by a goal identifier.
         /// </summary>
         /// <param name="start"></param>

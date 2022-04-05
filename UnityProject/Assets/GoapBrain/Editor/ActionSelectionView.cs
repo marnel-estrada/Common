@@ -8,13 +8,14 @@ namespace GoapBrain {
     ///     Handles the filtering and showing of filtered actions
     /// </summary>
     internal class ActionSelectionView {
-        private string? atomActionFilter = "";
-        private string? effectFilter = "";
         private readonly SimpleList<GoapActionData> filteredList = new SimpleList<GoapActionData>();
         private readonly List<string> filteredNames = new List<string>(); // Used to render list of action buttons
 
+        private string? atomActionFilter = "";
+        private string? effectFilter = "";
         private string? nameFilter = "";
         private string? preconditionFilter = "";
+        private string? hashCodeFilter = "";
 
         private int selection;
 
@@ -71,6 +72,20 @@ namespace GoapBrain {
 
             set {
                 this.effectFilter = value;
+            }
+        }
+
+        public string HashCodeFilter {
+            get {
+                if (this.hashCodeFilter == null) {
+                    return "";
+                }
+
+                return this.hashCodeFilter;
+            }
+
+            set {
+                this.hashCodeFilter = value;
             }
         }
 
@@ -143,6 +158,11 @@ namespace GoapBrain {
             Filter(domainData, effectFilter, ContainsEffect);
         }
 
+        public void FilterByHashCode(GoapDomainData domainData, string hashCodeFilter) {
+            this.hashCodeFilter = hashCodeFilter;
+            Filter(domainData, hashCodeFilter, ContainsHashCode);
+        }
+
         private static bool ContainsEffect(GoapActionData action, string filter) {
             if (action.Effect == null) {
                 return false;
@@ -151,6 +171,10 @@ namespace GoapBrain {
             // We use upper here because it is faster
             string upperFilter = filter.ToUpperInvariant();
             return action.Effect.Name != null && action.Effect.Name.ToUpperInvariant().Contains(upperFilter);
+        }
+
+        private static bool ContainsHashCode(GoapActionData action, string filter) {
+            return action.ActionId.ToString().Contains(filter);
         }
 
         private void Filter(GoapDomainData domainData, string filter, Func<GoapActionData, string, bool> predicate) {

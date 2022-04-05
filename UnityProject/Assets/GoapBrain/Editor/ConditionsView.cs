@@ -1,11 +1,7 @@
 ﻿using System.Collections.Generic;
-
 using Common;
-
 using Unity.Collections;
-
 using UnityEditor;
-
 using UnityEngine;
 
 namespace GoapBrain {
@@ -13,7 +9,8 @@ namespace GoapBrain {
     ///     Handles rendering of conditions part
     /// </summary>
     public class ConditionsView {
-        private string newConditionName = "";
+        private string newConditionName = string.Empty;
+        private string filterHashCode = string.Empty;
 
         private Vector2 scrollPos;
 
@@ -22,31 +19,36 @@ namespace GoapBrain {
         /// </summary>
         /// <param name="domain"></param>
         public void Render(GoapDomainData domain) {
-            EditorGUILayout.BeginVertical();
+            using (new GUILayout.VerticalScope()) {
+                this.scrollPos = EditorGUILayout.BeginScrollView(this.scrollPos);
 
-            this.scrollPos = EditorGUILayout.BeginScrollView(this.scrollPos);
 
-            GUILayout.Label("Conditions", EditorStyles.boldLabel);
-            GUILayout.Space(10);
+                GUILayout.Label("Conditions", EditorStyles.boldLabel);
+                GUILayout.Space(10);
 
-            // Add section
-            GUILayout.Label("New condition:");
-            GUILayout.BeginHorizontal();
-            this.newConditionName = EditorGUILayout.TextField(this.newConditionName, GUILayout.Width(200));
-            if (GUILayout.Button("Add", GUILayout.Width(50), GUILayout.Height(15))) {
-                AddConditionName(domain, this.newConditionName);
+                using (new GUILayout.HorizontalScope()) {
+                    // Add section
+                    GUILayout.Label("New condition:", GUILayout.Width(100));
+                    GUILayout.Space(5);
+                    this.newConditionName = EditorGUILayout.TextField(this.newConditionName, GUILayout.Width(200));
+                    if (GUILayout.Button("Add", GUILayout.Width(50), GUILayout.Height(15))) {
+                        AddConditionName(domain, this.newConditionName);
+                    }
+
+                    GUILayout.Space(5);
+
+                    GUILayout.Label("Filter Hashcode:", GUILayout.Width(100));
+                    GUILayout.Space(5);
+                    this.filterHashCode = EditorGUILayout.TextField(this.filterHashCode, GUILayout.Width(100));
+                }
+
+                GUILayout.Space(10);
+
+                // Condition names
+                RenderConditionNames(domain);
+
+                EditorGUILayout.EndScrollView();
             }
-
-            GUILayout.EndHorizontal();
-
-            GUILayout.Space(10);
-
-            // Condition names
-            RenderConditionNames(domain);
-
-            EditorGUILayout.EndScrollView();
-
-            EditorGUILayout.EndVertical();
         }
 
         private void RenderConditionNames(GoapDomainData domain) {
@@ -84,7 +86,14 @@ namespace GoapBrain {
                         name.RenameMode = true;
                     }
 
-                    GUILayout.Label($"{name.Name} ({new FixedString64Bytes(name.Name).GetHashCode()})");
+                    string hashcode = new FixedString64Bytes(name.Name).GetHashCode().ToString();
+                    if (!string.IsNullOrEmpty(this.filterHashCode) && hashcode.Contains(this.filterHashCode)) {
+                        GUI.contentColor = ColorUtils.YELLOW;
+                        GUILayout.Label($"{name.Name} ({hashcode})");
+                        GUI.contentColor = ColorUtils.WHITE;
+                    } else {
+                        GUILayout.Label($"{name.Name} ({hashcode})");
+                    }
                 }
 
                 GUILayout.EndHorizontal();

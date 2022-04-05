@@ -8,7 +8,14 @@ namespace GoapBrain {
 
         private Vector2 scrollPos;
 
-        private string newActionName = "";
+        private bool filtersFoldOutOpened;
+
+        private string newActionName = string.Empty;
+        private string newNameFilter = string.Empty;
+        private string newAtomActionFilter = string.Empty;
+        private string newPreconditionFilter = string.Empty;
+        private string newEffectFilter = string.Empty;
+        private string hashCodeFilter = string.Empty;
 
         /// <summary>
         /// Start routines
@@ -44,50 +51,76 @@ namespace GoapBrain {
 
             GUILayout.Space(5);
 
-            // Filter section
-            GUILayout.Label("Filter By Name:");
-            string newNameFilter = EditorGUILayout.TextField(this.selectionView.NameFilter);
-            if (!this.selectionView.NameFilter.Equals(newNameFilter)) {
-                // There's a new filter text
-                // Apply the filter
-                this.selectionView.FilterByName(domainData, newNameFilter);
+            this.filtersFoldOutOpened = EditorGUILayout.Foldout(this.filtersFoldOutOpened, "Filters");
+
+            if (this.filtersFoldOutOpened) {
+                GUILayout.Space(5);
+
+                // Filter section
+                GUILayout.Label("Filter By Name:");
+                this.newNameFilter = EditorGUILayout.TextField(this.selectionView.NameFilter);
+
+                GUILayout.Space(5);
+
+                // Filter by atom action
+                GUILayout.Label("Filter By Atom Action:");
+                this.newAtomActionFilter = EditorGUILayout.TextField(this.selectionView.AtomActionFilter);
+
+                GUILayout.Space(5);
+
+                // Filter by precondition
+                GUILayout.Label("Filter By Precondition:");
+                this.newPreconditionFilter = EditorGUILayout.TextField(this.selectionView.PreconditionFilter);
+
+                GUILayout.Space(5);
+
+                // Filter by effect
+                GUILayout.Label("Filter By Effect:");
+                this.newEffectFilter = EditorGUILayout.TextField(this.selectionView.EffectFilter);
+
+                GUILayout.Space(5);
+
+                // Filter by effect
+                GUILayout.Label("Filter By Action Id (Hashcode):");
+                this.hashCodeFilter = EditorGUILayout.TextField(this.selectionView.HashCodeFilter);
+
+                GUILayout.Space(5);
             }
+
+            ApplyFilters(domainData);
 
             GUILayout.Space(5);
-
-            // Filter by atom action
-            GUILayout.Label("Filter By Atom Action:");
-            string newAtomActionFilter = EditorGUILayout.TextField(this.selectionView.AtomActionFilter);
-            if (!this.selectionView.AtomActionFilter.EqualsFast(newAtomActionFilter)) {
-                // New filter text by atom action name
-                this.selectionView.FilterByAtomAction(domainData, newAtomActionFilter);
-            }
-
-            GUILayout.Space(5);
-
-            // Filter by precondition
-            GUILayout.Label("Filter By Precondition:");
-            string newPreconditionFilter = EditorGUILayout.TextField(this.selectionView.PreconditionFilter);
-            if (!this.selectionView.PreconditionFilter.EqualsFast(newPreconditionFilter)) {
-                this.selectionView.FilterByPrecondition(domainData, newPreconditionFilter);
-            }
-
-            GUILayout.Space(5);
-
-            // Filter by effect
-            GUILayout.Label("Filter By Effect:");
-            string newEffectFilter = EditorGUILayout.TextField(this.selectionView.EffectFilter);
-            if (!this.selectionView.EffectFilter.EqualsFast(newEffectFilter)) {
-                this.selectionView.FilterByEffect(domainData, newEffectFilter);
-            }
-
-            GUILayout.Space(10);
 
             this.selectionView.Render(domainData);
 
             EditorGUILayout.EndScrollView();
 
             EditorGUILayout.EndVertical();
+        }
+
+        private void ApplyFilters(GoapDomainData domainData) {
+            if (!this.selectionView.NameFilter.Equals(this.newNameFilter)) {
+                // There's a new filter text
+                // Apply the filter
+                this.selectionView.FilterByName(domainData, this.newNameFilter);
+            }
+
+            if (!this.selectionView.AtomActionFilter.EqualsFast(this.newAtomActionFilter)) {
+                // New filter text by atom action name
+                this.selectionView.FilterByAtomAction(domainData, this.newAtomActionFilter);
+            }
+
+            if (!this.selectionView.PreconditionFilter.EqualsFast(this.newPreconditionFilter)) {
+                this.selectionView.FilterByPrecondition(domainData, this.newPreconditionFilter);
+            }
+
+            if (!this.selectionView.EffectFilter.EqualsFast(this.newEffectFilter)) {
+                this.selectionView.FilterByEffect(domainData, this.newEffectFilter);
+            }
+
+            if (!this.selectionView.HashCodeFilter.EqualsFast(this.hashCodeFilter)) {
+                this.selectionView.FilterByHashCode(domainData, this.hashCodeFilter);
+            }
         }
 
         private void AddNewAction(GoapDomainData data, string actionName) {

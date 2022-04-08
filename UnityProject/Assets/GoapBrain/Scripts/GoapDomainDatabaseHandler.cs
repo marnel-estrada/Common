@@ -18,6 +18,9 @@ namespace GoapBrain {
 
         private BlobAssetReference<GoapDomainDatabase> domainDbReference;
 
+        // We temporarily keep the conditions names and action names here 
+        private readonly Dictionary<int, FixedString64Bytes> textMap = new Dictionary<int, FixedString64Bytes>(500);
+        
         public GoapDomainDataContainer? Domains => this.domains;
 
         private void Awake() {
@@ -54,6 +57,12 @@ namespace GoapBrain {
             }
 
             this.domainDbReference = builder.CreateBlobAssetReference<GoapDomainDatabase>(Allocator.Persistent);
+            
+            // Don't forget to create the text DB after all domains are parsed
+            GoapTextDbSystem textDbSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<GoapTextDbSystem>();
+            Assertion.NotNull(textDbSystem);
+            textDbSystem.CreateTextDb(this.textMap);
+            this.textMap.Clear(); // We clear to conserve memory
         }
 
         // We need this to have unique action names
@@ -79,7 +88,7 @@ namespace GoapBrain {
             return domain;
         }
 
-        private static void AddActions(ref GoapDomain domain, GoapDomainData data, HashSet<string> addedActions) {
+        private void AddActions(ref GoapDomain domain, GoapDomainData data, HashSet<string> addedActions) {
             for (int i = 0; i < data.ActionCount; ++i) {
                 GoapActionData actionData = data.GetActionAt(i);
                 if (!actionData.Enabled) {
@@ -98,8 +107,11 @@ namespace GoapBrain {
                 }
 
                 Condition effect = new Condition(effectData.Name, effectData.Value);
+                AddToTextMap(effectData.Name);
+                
                 GoapAction action = new GoapAction(actionData.Name, actionData.Cost, actionData.AtomActions.Count,
                     effect);
+                AddToTextMap(actionData.Name);
 
                 AddPreconditions(ref action, actionData);
                 Assertion.IsTrue(action.preconditions.Count == actionData.Preconditions.Count);
@@ -117,12 +129,35 @@ namespace GoapBrain {
             }
         }
 
-        private static void AddPreconditions(ref GoapAction action, GoapActionData data) {
+        private void AddPreconditions(ref GoapAction action, GoapActionData data) {
             for (int i = 0; i < data.Preconditions.Count; ++i) {
                 ConditionData preconditionData = data.Preconditions[i];
                 Condition condition = new Condition(preconditionData.Name, preconditionData.Value);
                 action.AddPrecondition(condition);
+                
+                AddToTextMap(preconditionData.Name);
             }
+        }
+        
+        private void AddToTextMap(string? s) {
+            Assertion.NotNull(s);
+
+            if (s == null) {
+                return;
+            }
+
+            FixedString64Bytes fixedString = s;
+            int hashCode = fixedString.GetHashCode();
+
+            if (this.textMap.TryGetValue(hashCode, out FixedString64Bytes existingString)) {
+                // They should be the same because if not, then we have a problem. This is a collision.
+                Assertion.IsTrue(existingString == fixedString);
+                    
+                // Already contains such text
+                return;
+            }
+                
+            this.textMap[hashCode] = fixedString;
         }
 
         // We need this so that we can check that each condition only has one resolver

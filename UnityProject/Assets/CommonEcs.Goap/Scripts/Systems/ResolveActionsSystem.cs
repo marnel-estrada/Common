@@ -144,7 +144,7 @@ namespace CommonEcs.Goap {
                 ref NativeList<ResolvedAction> actionList, ref NativeHashSet<int> actionsBeingEvaluated, bool isDebug) {
 #if UNITY_EDITOR
                 if (isDebug) {
-                    Debug.Log(string.Format("Evaluation goal {0}:{1}", goal.id.hashCode, goal.value));
+                    Debug.Log(string.Format("Evaluating goal {0}.{1}", goal.id.hashCode, goal.value));
                 }
 #endif
                 
@@ -152,6 +152,11 @@ namespace CommonEcs.Goap {
                 ValueTypeOption<bool> foundGoalValue = conditionsMap.Find(goal.id.hashCode);
                 if (foundGoalValue.IsSome && foundGoalValue.ValueOrError() == goal.value) {
                     // Goal is already satisfied. No need for further search.
+#if UNITY_EDITOR
+                    if (isDebug) {
+                        Debug.Log(string.Format("Goal {0}.{1} is already satisfied.", goal.id.hashCode, goal.value));
+                    }
+#endif
                     return true;
                 }
 
@@ -159,12 +164,31 @@ namespace CommonEcs.Goap {
                     // This means that the goal is false and is not found in the conditionsMap.
                     // Since conditions default to false, then there's no need to look for actions.
                     // The false goal is already satisfied.
+#if UNITY_EDITOR
+                    if (isDebug) {
+                        Debug.Log(string.Format("Goal {0}.{1} is not found in conditionsMap but is false so it's already satisfied.", 
+                            goal.id.hashCode, goal.value));
+                    }
+#endif
                     return true;
                 }
+                
+#if UNITY_EDITOR
+                if (isDebug) {
+                    Debug.Log(string.Format("Goal {0}.{1} is not yet satisfied. Proceeding to look for actions.", 
+                        goal.id.hashCode, goal.value));
+                }
+#endif
 
                 ValueTypeOption<FixedList64Bytes<int>> foundActionIndices = domain.GetActionIndices(goal);
                 if (foundActionIndices.IsNone) {
                     // There are no actions to satisfy the goal
+#if UNITY_EDITOR
+                    if (isDebug) {
+                        Debug.Log(string.Format("There are no actions to satisfy goal {0}.{1}", goal.id.hashCode, goal.value));
+                    }
+#endif
+                    
                     return false;
                 }
 
@@ -215,9 +239,11 @@ namespace CommonEcs.Goap {
                     // Add all the actions that were resolved so far
                     actionList.AddRange(tempActionList);
                     
+#if UNITY_EDITOR
                     if (isDebug) {
                         Debug.Log(string.Format("Searching for actions for preconditions for {0} succeeded.", action.id));
                     }
+#endif
 
                     return true;
                 }
@@ -229,14 +255,30 @@ namespace CommonEcs.Goap {
                 ref BoolHashMap conditionsMap, ref NativeList<ResolvedAction> actionList, ref NativeHashSet<int> actionsBeingEvaluated, bool isDebug) {
                 for (int i = 0; i < action.preconditions.Count; ++i) {
                     Condition precondition = action.preconditions[i];
-                    if (!SearchActions(precondition, domain, ref conditionsMap, ref actionList, ref actionsBeingEvaluated, isDebug)) {
-                        // This means that one of the preconditions can't be met by actions
-                        return false;
+                    if (SearchActions(precondition, domain, ref conditionsMap, ref actionList,
+                            ref actionsBeingEvaluated, isDebug)) {
+                        continue;
                     }
+                    
+                    // This means that one of the preconditions can't be met by actions
+#if UNITY_EDITOR
+                    if (isDebug) {
+                        Debug.Log(string.Format("SearchActionsToSatisfyPreconditions: Searching for actions for precondition {0}.{1} failed!", 
+                            precondition.id.hashCode, precondition.value));
+                    }
+#endif
+                        
+                    return false;
                 }
 
                 // At this point, it means that there are actions to satisfy all preconditions
                 actionList.Add(new ResolvedAction(action.id, action.atomActionsCount)); // Add the action being searched itself
+                
+#if UNITY_EDITOR
+                if (isDebug) {
+                    Debug.Log(string.Format("SearchActionsToSatisfyPreconditions: Found actions to satisfy preconditions of action {0}.", action.id));
+                }
+#endif
 
                 return true;
             }

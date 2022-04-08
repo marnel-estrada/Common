@@ -51,7 +51,7 @@ namespace CommonEcs.Goap {
                     
                     // Set the value
                     DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> bucket = this.allBuckets[resolver.plannerEntity];
-                    bucket[resolver.resultIndex] = DynamicBufferHashMap<ConditionId, bool>.Entry<bool>.Something(resolver.id.hashCode, resolver.result);
+                    bucket[resolver.resultIndex] = DynamicBufferHashMap<ConditionId, bool>.Entry<bool>.Something(resolver.conditionId.hashCode, resolver.result);
                 }
             }
         }

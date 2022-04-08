@@ -145,18 +145,16 @@ namespace CommonEcs.Goap {
             }
 
             // Utility method. Do not remove.
-            [BurstDiscard]
             private void PrintActions(in GoapPlanner planner, in DynamicBuffer<ResolvedAction> resolvedActions) {
-                Debug.Log($"Resolved actions for agent {planner.agentEntity}");
+                Debug.Log(string.Format("Resolved actions for agent {0}", planner.agentEntity));
                 for (int a = 0; a < resolvedActions.Length; ++a) {
                     Debug.Log(this.textResolver.GetText(resolvedActions[a].actionId));
                 }
             }
 
-            [BurstDiscard]
             private void PrintFailedCondition(in Condition currentGoal, in GoapDomain domain, in GoapPlanner planner) {
                 FixedString64Bytes goalName = this.textResolver.GetText(currentGoal.id.hashCode);
-                Debug.Log($"Failed goal for agent {planner.agentEntity} ({domain.name}): {goalName}.{currentGoal.value}");
+                Debug.Log(string.Format("Failed goal for agent {0} ({1}): {2}.{3}", planner.agentEntity, domain.name, goalName, currentGoal.value));
             }
 
             private bool SearchActions(in Condition goal, in GoapDomain domain, ref BoolHashMap conditionsMap,

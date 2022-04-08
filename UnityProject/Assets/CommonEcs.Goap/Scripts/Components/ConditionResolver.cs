@@ -8,7 +8,7 @@ namespace CommonEcs.Goap {
     /// the condition can filter which entities.
     /// </summary>
     public struct ConditionResolver : IComponentData {
-        public readonly ConditionId id;
+        public readonly ConditionId conditionId;
         public readonly Entity agentEntity;
         
         // We denormalize here for faster access
@@ -22,8 +22,8 @@ namespace CommonEcs.Goap {
         public bool resolved;
         public bool result;
 
-        public ConditionResolver(ConditionId id, Entity agentEntity, Entity plannerEntity, int resultIndex) : this() {
-            this.id = id;
+        public ConditionResolver(ConditionId conditionId, Entity agentEntity, Entity plannerEntity, int resultIndex) : this() {
+            this.conditionId = conditionId;
             this.agentEntity = agentEntity;
             this.plannerEntity = plannerEntity;
             this.resultIndex = resultIndex;

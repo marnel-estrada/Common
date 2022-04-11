@@ -46,7 +46,7 @@ namespace CommonEcs.Goap {
             ++this.actionsCount;
         }
 
-        private FixedList32Bytes<int> ResolveFixedList(in Condition effect) {
+        private FixedList64Bytes<int> ResolveFixedList(in Condition effect) {
             ValueTypeOption<FixedList64Bytes<int>> found = this.actionMap.Find(effect);
             if (found.IsSome) {
                 return found.ValueOr(default);

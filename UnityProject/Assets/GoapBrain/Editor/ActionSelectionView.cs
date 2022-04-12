@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Common;
+using Unity.Collections;
 using UnityEngine;
 
 namespace GoapBrain {
@@ -184,16 +185,18 @@ namespace GoapBrain {
             for (int i = 0; i < domainData.ActionCount; ++i) {
                 GoapActionData action = domainData.GetActionAt(i);
 
+                string actionName = action.Name;
+                string hashCode = new FixedString64Bytes(actionName).GetHashCode().ToString();
                 if (string.IsNullOrEmpty(filter)) {
                     // Filter text is empty
                     // Add every action data
                     this.filteredList.Add(action);
-                    this.filteredNames.Add(action.Name);
+                    this.filteredNames.Add($"{actionName}  ({hashCode})");
                 } else {
                     // Invoke the predicate
                     if (predicate(action, filter)) {
                         this.filteredList.Add(action);
-                        this.filteredNames.Add(action.Name);
+                        this.filteredNames.Add($"{actionName}  ({hashCode})");
                     }
                 }
             }

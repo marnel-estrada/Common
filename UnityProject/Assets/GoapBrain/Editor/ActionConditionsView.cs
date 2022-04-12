@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
-
 using UnityEngine;
 using UnityEditor;
-
 using Common;
+using Unity.Collections;
 
 namespace GoapBrain {
     class ActionConditionsView {
-
         private readonly EditorWindow parent;
         private readonly string itemName;
         private readonly Color backgroundColor;
@@ -46,7 +44,7 @@ namespace GoapBrain {
                 }
             }
         }
-        
+
         private readonly GUIContent chooseGuiContent = new GUIContent("Choose...");
 
         private void RenderAddNewCondition(GoapDomainData domain, List<ConditionData> conditionList) {
@@ -64,7 +62,7 @@ namespace GoapBrain {
             }
 
             GUILayout.Space(5);
-            
+
             this.newConditionValue = GUILayout.Toggle(this.newConditionValue, this.newConditionValue ? "true" : "false", EditorStyles.miniButton, GUILayout.Width(50), GUILayout.Height(20));
 
             GUILayout.Space(5);
@@ -73,6 +71,7 @@ namespace GoapBrain {
             if (GUILayout.Button("Add", GUILayout.Width(40), GUILayout.Height(20))) {
                 AddNewCondition(domain, conditionList);
             }
+
             GUI.backgroundColor = ColorUtils.WHITE;
             GUILayout.EndHorizontal();
         }
@@ -82,12 +81,13 @@ namespace GoapBrain {
 
             // Remove button
             GUI.backgroundColor = ColorUtils.RED;
-            if(GUILayout.Button("X", GUILayout.Width(20), GUILayout.Height(20))) {
+            if (GUILayout.Button("X", GUILayout.Width(20), GUILayout.Height(20))) {
                 RemoveCondition(domain, conditionList, condition);
             }
+
             GUI.backgroundColor = ColorUtils.WHITE;
 
-            if(GUILayout.Button("Up", GUILayout.Width(35), GUILayout.Height(20))) {
+            if (GUILayout.Button("Up", GUILayout.Width(35), GUILayout.Height(20))) {
                 MoveUp(domain, conditionList, index);
             }
 
@@ -97,7 +97,8 @@ namespace GoapBrain {
 
             // Name
             GUI.backgroundColor = this.backgroundColor;
-            GUILayout.Box(condition.Name, GUILayout.Width(400), GUILayout.Height(20));
+            string? conditionName = condition.Name;
+            GUILayout.Box($"{conditionName}  ({new FixedString64Bytes(conditionName).GetHashCode().ToString()})", GUILayout.Width(400), GUILayout.Height(20));
             GUI.backgroundColor = ColorUtils.WHITE;
 
             // Value
@@ -111,7 +112,7 @@ namespace GoapBrain {
         }
 
         private void AddNewCondition(GoapDomainData domain, List<ConditionData> conditionList) {
-            if(string.IsNullOrEmpty(this.newConditionName)) {
+            if (string.IsNullOrEmpty(this.newConditionName)) {
                 // No condition currently chosen
                 return;
             }
@@ -128,7 +129,7 @@ namespace GoapBrain {
         }
 
         private void RemoveCondition(GoapDomainData domain, List<ConditionData> conditionList, ConditionData condition) {
-            if(EditorUtility.DisplayDialogComplex(string.Format("Remove {0}", this.itemName), string.Format("Are you sure you want to remove {0} \"{1}\"", this.itemName, condition.Name), 
+            if (EditorUtility.DisplayDialogComplex(string.Format("Remove {0}", this.itemName), string.Format("Are you sure you want to remove {0} \"{1}\"", this.itemName, condition.Name),
                 "Yes", "No", "Cancel") != 0) {
                 // Cancelled or selected No
                 return;
@@ -141,7 +142,7 @@ namespace GoapBrain {
         }
 
         private static void MoveUp(GoapDomainData domain, List<ConditionData> conditionList, int index) {
-            if(index <= 0) {
+            if (index <= 0) {
                 // Can no longer move up
                 return;
             }
@@ -179,9 +180,10 @@ namespace GoapBrain {
             RenderSelectCondition(domain, action);
 
             GUILayout.Space(5);
-            
+
             // Render the effect
-            if (action.Effect == null || string.IsNullOrEmpty(action.Effect.Name)) {
+            string? effectName = action.Effect?.Name;
+            if (action.Effect == null || string.IsNullOrEmpty(effectName)) {
                 // Empty
                 GUILayout.Label("(Empty)");
             } else {
@@ -190,7 +192,7 @@ namespace GoapBrain {
 
                 // Name
                 GUI.backgroundColor = this.backgroundColor;
-                GUILayout.Box(action.Effect.Name, GUILayout.Width(400), GUILayout.Height(20));
+                GUILayout.Box($"{effectName} ({new FixedString64Bytes(effectName).GetHashCode().ToString()})", GUILayout.Width(400), GUILayout.Height(20));
                 GUI.backgroundColor = ColorUtils.WHITE;
 
                 // Value
@@ -199,7 +201,7 @@ namespace GoapBrain {
                 GUILayout.EndHorizontal();
             }
         }
-        
+
         private void RenderSelectCondition(GoapDomainData domain, GoapActionData action) {
             GUILayout.BeginHorizontal();
             GUILayout.Label("Effect Name:", GUILayout.Width(80), GUILayout.Height(20));
@@ -215,7 +217,7 @@ namespace GoapBrain {
             }
 
             GUILayout.Space(5);
-            
+
             this.newConditionValue = GUILayout.Toggle(this.newConditionValue, this.newConditionValue ? "true" : "false", EditorStyles.miniButton, GUILayout.Width(50), GUILayout.Height(20));
 
             GUILayout.Space(5);
@@ -224,12 +226,13 @@ namespace GoapBrain {
             if (GUILayout.Button("Set", GUILayout.Width(40), GUILayout.Height(20))) {
                 SetNewEffect(domain, action);
             }
+
             GUI.backgroundColor = ColorUtils.WHITE;
             GUILayout.EndHorizontal();
         }
-        
+
         private void SetNewEffect(GoapDomainData domain, GoapActionData action) {
-            if(string.IsNullOrEmpty(this.newConditionName)) {
+            if (string.IsNullOrEmpty(this.newConditionName)) {
                 // No condition currently chosen
                 return;
             }

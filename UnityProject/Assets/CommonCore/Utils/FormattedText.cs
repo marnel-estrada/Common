@@ -19,5 +19,15 @@ namespace Common {
         public override string ToString() {
             return this.baseText.FormatWith(this.parameters);
         }
+
+        /// <summary>
+        /// Short hand for setting a single parameter
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public string ToString(object parameter) {
+            SetParameter(0, parameter);
+            return ToString();
+        }
     }
 }

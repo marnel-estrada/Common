@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Common;
+using Unity.Collections;
 using UnityEngine;
 
 namespace GoalSelector {
@@ -36,6 +37,8 @@ namespace GoalSelector {
 
         [SerializeField]
         private List<ClassData> considerations = new List<ClassData>();
+
+        private int hashcode;
 
         public string? Id {
             get {
@@ -120,6 +123,17 @@ namespace GoalSelector {
 
             set {
                 this.intId = value;
+            }
+        }
+
+        [ReadOnlyField]
+        [PropertyGroup("ID")]
+        public int Hashcode {
+            get {
+                return this.hashcode;
+            }
+            set {
+                this.hashcode = value;
             }
         }
 

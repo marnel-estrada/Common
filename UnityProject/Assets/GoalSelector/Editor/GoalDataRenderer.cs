@@ -1,4 +1,5 @@
 using Common;
+using Unity.Collections;
 using UnityEditor;
 using UnityEngine;
 
@@ -25,6 +26,8 @@ namespace GoalSelector.Editor {
             GUI.backgroundColor = ColorUtils.WHITE;
 
             GUILayout.Space(5);
+
+            item.Hashcode = new FixedString64Bytes(item.Id).GetHashCode();
 
             this.renderer.Render(item);
 

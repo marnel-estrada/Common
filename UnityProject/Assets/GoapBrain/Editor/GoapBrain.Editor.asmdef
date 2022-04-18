@@ -1,14 +1,13 @@
 {
     "name": "GoapBrain.Editor",
+    "rootNamespace": "",
     "references": [
-        "CommonCode",
         "GoapBrain",
         "Common.Editor",
         "CommonCore",
         "CommonCore.Editor",
         "Unity.Collections"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
@@ -18,5 +17,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }

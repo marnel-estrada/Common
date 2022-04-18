@@ -5,7 +5,8 @@
         "CommonCore",
         "CommonCore.Editor",
         "GoalSelector",
-        "CommonEcs.UtilityBrain"
+        "CommonEcs.UtilityBrain",
+        "Unity.Collections"
     ],
     "includePlatforms": [
         "Editor"

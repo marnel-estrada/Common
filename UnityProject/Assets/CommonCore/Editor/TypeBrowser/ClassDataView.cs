@@ -159,9 +159,7 @@ namespace Common {
         }
 
         private void Swap(int a, int b) {
-            ClassData temp = this.dataList[a];
-            this.dataList[a] = this.dataList[b];
-            this.dataList[b] = temp;
+            (this.dataList[a], this.dataList[b]) = (this.dataList[b], this.dataList[a]);
         }
     }
 }

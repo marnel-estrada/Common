@@ -43,7 +43,7 @@ namespace CommonEcs.Goap {
                     // We set resolved to false so that the resolver systems
                     // will try to resolve the values
                     resolver.resolved = !(planner.state == PlanningState.RESOLVING_CONDITIONS 
-                        && ContainsConditionId(requiredConditions, resolver.id));
+                        && ContainsConditionId(requiredConditions, resolver.conditionId));
                     
                     // Modify
                     resolvers[i] = resolver;

@@ -131,7 +131,7 @@ namespace Common {
         /// <param name="parentVariables"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static Option<T> Instantiate<T>(ClassData data, NamedValueLibrary? parentVariables) where T : class {
+        public static Option<T> Instantiate<T>(ClassData data, NamedValueLibrary? parentVariables = null) where T : class {
             Option<Type> type = TypeIdentifier.GetType(data.ClassName);
             Assertion.IsSome(type, data.ClassName);
 

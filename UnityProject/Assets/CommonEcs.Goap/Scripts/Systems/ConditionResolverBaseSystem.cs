@@ -1,5 +1,7 @@
 using System;
 
+using Common;
+
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -14,19 +16,28 @@ namespace CommonEcs.Goap {
     public abstract partial class ConditionResolverBaseSystem<TResolverFilter, TResolverProcessor> : JobSystemBase
         where TResolverFilter : unmanaged, IConditionResolverComponent
         where TResolverProcessor : struct, IConditionResolverProcess<TResolverFilter> {
+        private GoapTextDbSystem? textDbSystem;
+        
         private EntityQuery query;
         protected bool isFilterZeroSized;
 
         protected override void OnCreate() {
+            this.textDbSystem = GetOrCreateSystem<GoapTextDbSystem>();
+            
             this.query = GetEntityQuery(typeof(ConditionResolver), typeof(TResolverFilter));
             this.isFilterZeroSized = TypeManager.GetTypeInfo(TypeManager.GetTypeIndex<TResolverFilter>()).IsZeroSized;
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            Job job = new Job() {
+            if (this.textDbSystem == null) {
+                throw new CantBeNullException(nameof(this.textDbSystem));
+            }
+            
+            ExecuteResolversJob job = new ExecuteResolversJob() {
                 resolverType = GetComponentTypeHandle<ConditionResolver>(),
                 filterType = GetComponentTypeHandle<TResolverFilter>(),
                 allDebugEntity = GetComponentDataFromEntity<DebugEntity>(),
+                textResolver = this.textDbSystem.TextResolver,
                 filterHasArray = !this.isFilterZeroSized, // Filter has array if it's not zero sized
                 processor = PrepareProcessor()
             };
@@ -42,6 +53,16 @@ namespace CommonEcs.Goap {
                 throw;
             }
         }
+
+        protected ref readonly GoapTextResolver TextResolver {
+            get {
+                if (this.textDbSystem == null) {
+                    throw new CantBeNullException(nameof(this.textDbSystem));
+                }
+                
+                return ref this.textDbSystem.TextResolver;
+            }
+        } 
         
         protected virtual void AfterJobScheduling(in JobHandle handle) {
             // Routines like calling AddJobHandleForProducer() may be placed here
@@ -66,12 +87,15 @@ namespace CommonEcs.Goap {
         protected abstract TResolverProcessor PrepareProcessor();
         
         [BurstCompile]
-        public struct Job : IJobEntityBatchWithIndex {
+        public struct ExecuteResolversJob : IJobEntityBatchWithIndex {
             public ComponentTypeHandle<ConditionResolver> resolverType;
             public ComponentTypeHandle<TResolverFilter> filterType;
 
             [ReadOnly]
             public ComponentDataFromEntity<DebugEntity> allDebugEntity;
+
+            [ReadOnly]
+            public GoapTextResolver textResolver;
             
             public bool filterHasArray;
             public TResolverProcessor processor;
@@ -117,8 +141,8 @@ namespace CommonEcs.Goap {
 #if UNITY_EDITOR
                 if (this.allDebugEntity[resolver.agentEntity].enabled) {
                     // Debugging is enabled
-                    // ReSharper disable once UseStringInterpolation (due to Burst)
-                    Debug.Log(string.Format("Condition {0}: {1}", resolver.id.hashCode, resolver.result));
+                    FixedString64Bytes conditionName = this.textResolver.GetText(resolver.conditionId.hashCode);
+                    Debug.Log(string.Format("Condition {0}: {1}", conditionName, resolver.result));
                 }
 #endif
             }

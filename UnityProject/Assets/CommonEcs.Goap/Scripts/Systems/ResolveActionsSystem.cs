@@ -1,4 +1,7 @@
 using System;
+
+using Common;
+
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -9,28 +12,37 @@ namespace CommonEcs.Goap {
     [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(EndConditionResolversSystem))]
     public partial class ResolveActionsSystem : JobSystemBase {
+        private GoapTextDbSystem? textDbSystem;
+    
         private EntityQuery query;
 
         protected override void OnCreate() {
+            this.textDbSystem = GetOrCreateSystem<GoapTextDbSystem>();
+            
             this.query = GetEntityQuery(typeof(GoapPlanner), typeof(ResolvedAction),
                 typeof(DynamicBufferHashMap<ConditionId, bool>),
                 typeof(DynamicBufferHashMap<ConditionId, bool>.Entry<bool>));
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            Job job = new Job() {
+            if (this.textDbSystem == null) {
+                throw new CantBeNullException(nameof(this.textDbSystem));
+            }
+            
+            ResolveActionsJob job = new ResolveActionsJob() {
                 plannerType = GetComponentTypeHandle<GoapPlanner>(),
                 resolvedActionType = GetBufferTypeHandle<ResolvedAction>(),
                 bucketType = GetBufferTypeHandle<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>>(),
                 allAgents = GetComponentDataFromEntity<GoapAgent>(true),
-                allDebug = GetComponentDataFromEntity<DebugEntity>(true)
+                allDebug = GetComponentDataFromEntity<DebugEntity>(true),
+                textResolver = this.textDbSystem.TextResolver
             };
 
             return job.ScheduleParallel(this.query, ScheduleGranularity.Entity, default, inputDeps);
         }
 
         [BurstCompile]
-        private struct Job : IJobEntityBatch {
+        private struct ResolveActionsJob : IJobEntityBatch {
             public ComponentTypeHandle<GoapPlanner> plannerType;
             public BufferTypeHandle<ResolvedAction> resolvedActionType;
 
@@ -42,6 +54,10 @@ namespace CommonEcs.Goap {
 
             [ReadOnly]
             public ComponentDataFromEntity<DebugEntity> allDebug;
+
+            // We need this to resolve condition and action names.
+            [ReadOnly]
+            public GoapTextResolver textResolver;
 
             public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
                 NativeArray<GoapPlanner> planners = batchInChunk.GetNativeArray(this.plannerType);
@@ -98,10 +114,12 @@ namespace CommonEcs.Goap {
 #endif
                     }
 
+#if UNITY_EDITOR
                     if (planner.state == PlanningState.FAILED && debug.enabled) {
                         // Print the failed condition
                         PrintFailedCondition(currentGoal, domain, planner);
                     }
+#endif
 
                     // Modify
                     planners[i] = planner;
@@ -127,24 +145,24 @@ namespace CommonEcs.Goap {
             }
 
             // Utility method. Do not remove.
-            [BurstDiscard]
-            private static void PrintActions(in GoapPlanner planner, in DynamicBuffer<ResolvedAction> resolvedActions) {
-                Debug.Log($"Resolved actions for agent {planner.agentEntity}");
+            private void PrintActions(in GoapPlanner planner, in DynamicBuffer<ResolvedAction> resolvedActions) {
+                Debug.Log(string.Format("Resolved actions for agent {0}", planner.agentEntity));
                 for (int a = 0; a < resolvedActions.Length; ++a) {
-                    Debug.Log(resolvedActions[a].actionId);
+                    Debug.Log(this.textResolver.GetText(resolvedActions[a].actionId));
                 }
             }
 
-            [BurstDiscard]
-            private static void PrintFailedCondition(in Condition currentGoal, in GoapDomain domain, in GoapPlanner planner) {
-                Debug.Log($"Failed goal for agent {planner.agentEntity} ({domain.name}): {currentGoal.id.hashCode}");
+            private void PrintFailedCondition(in Condition currentGoal, in GoapDomain domain, in GoapPlanner planner) {
+                FixedString64Bytes goalName = this.textResolver.GetText(currentGoal.id.hashCode);
+                Debug.Log(string.Format("Failed goal for agent {0} ({1}): {2}.{3}", planner.agentEntity, domain.name, goalName, currentGoal.value));
             }
 
             private bool SearchActions(in Condition goal, in GoapDomain domain, ref BoolHashMap conditionsMap,
                 ref NativeList<ResolvedAction> actionList, ref NativeHashSet<int> actionsBeingEvaluated, bool isDebug) {
 #if UNITY_EDITOR
+                FixedString64Bytes goalName = this.textResolver.GetText(goal.id.hashCode);
                 if (isDebug) {
-                    Debug.Log(string.Format("Evaluation goal {0}:{1}", goal.id.hashCode, goal.value));
+                    Debug.Log(string.Format("Evaluating goal {0}.{1}", goalName, goal.value));
                 }
 #endif
                 
@@ -152,6 +170,11 @@ namespace CommonEcs.Goap {
                 ValueTypeOption<bool> foundGoalValue = conditionsMap.Find(goal.id.hashCode);
                 if (foundGoalValue.IsSome && foundGoalValue.ValueOrError() == goal.value) {
                     // Goal is already satisfied. No need for further search.
+#if UNITY_EDITOR
+                    if (isDebug) {
+                        Debug.Log(string.Format("Goal {0}.{1} is already satisfied.", goalName, goal.value));
+                    }
+#endif
                     return true;
                 }
 
@@ -159,12 +182,31 @@ namespace CommonEcs.Goap {
                     // This means that the goal is false and is not found in the conditionsMap.
                     // Since conditions default to false, then there's no need to look for actions.
                     // The false goal is already satisfied.
+#if UNITY_EDITOR
+                    if (isDebug) {
+                        Debug.Log(string.Format("Goal {0}.{1} is not found in conditionsMap but is false so it's already satisfied.", 
+                            goalName, goal.value));
+                    }
+#endif
                     return true;
                 }
+                
+#if UNITY_EDITOR
+                if (isDebug) {
+                    Debug.Log(string.Format("Goal {0}.{1} is not yet satisfied. Proceeding to look for actions.", 
+                        goalName, goal.value));
+                }
+#endif
 
                 ValueTypeOption<FixedList64Bytes<int>> foundActionIndices = domain.GetActionIndices(goal);
                 if (foundActionIndices.IsNone) {
                     // There are no actions to satisfy the goal
+#if UNITY_EDITOR
+                    if (isDebug) {
+                        Debug.Log(string.Format("There are no actions to satisfy goal {0}.{1}", goalName, goal.value));
+                    }
+#endif
+                    
                     return false;
                 }
 
@@ -176,10 +218,11 @@ namespace CommonEcs.Goap {
                         // resolved. We skip it as this will cause infinite loop.
                         continue;
                     }
-                    
+
 #if UNITY_EDITOR
+                    FixedString64Bytes actionName = this.textResolver.GetText(action.id);
                     if (isDebug) {
-                        Debug.Log(string.Format("Evaluating action {0}", action.id));
+                        Debug.Log(string.Format("Evaluating action {0}", actionName));
                     }
 #endif
 
@@ -196,7 +239,7 @@ namespace CommonEcs.Goap {
                     if (!searchSuccess) {
 #if UNITY_EDITOR
                         if (isDebug) {
-                            Debug.Log(string.Format("Searching for actions for preconditions for {0} failed!", action.id));
+                            Debug.Log(string.Format("Searching for actions for preconditions for {0} failed!", actionName));
                         }
 #endif
                         
@@ -215,9 +258,11 @@ namespace CommonEcs.Goap {
                     // Add all the actions that were resolved so far
                     actionList.AddRange(tempActionList);
                     
+#if UNITY_EDITOR
                     if (isDebug) {
-                        Debug.Log(string.Format("Searching for actions for preconditions for {0} succeeded.", action.id));
+                        Debug.Log(string.Format("Searching for actions for preconditions for {0} succeeded.", actionName));
                     }
+#endif
 
                     return true;
                 }
@@ -229,14 +274,32 @@ namespace CommonEcs.Goap {
                 ref BoolHashMap conditionsMap, ref NativeList<ResolvedAction> actionList, ref NativeHashSet<int> actionsBeingEvaluated, bool isDebug) {
                 for (int i = 0; i < action.preconditions.Count; ++i) {
                     Condition precondition = action.preconditions[i];
-                    if (!SearchActions(precondition, domain, ref conditionsMap, ref actionList, ref actionsBeingEvaluated, isDebug)) {
-                        // This means that one of the preconditions can't be met by actions
-                        return false;
+                    if (SearchActions(precondition, domain, ref conditionsMap, ref actionList,
+                            ref actionsBeingEvaluated, isDebug)) {
+                        continue;
                     }
+                    
+                    // This means that one of the preconditions can't be met by actions
+#if UNITY_EDITOR
+                    if (isDebug) {
+                        FixedString64Bytes preconditionName = this.textResolver.GetText(precondition.id.hashCode);
+                        Debug.Log(string.Format("SearchActionsToSatisfyPreconditions: Searching for actions for precondition {0}.{1} failed!", 
+                            preconditionName, precondition.value));
+                    }
+#endif
+                        
+                    return false;
                 }
 
                 // At this point, it means that there are actions to satisfy all preconditions
                 actionList.Add(new ResolvedAction(action.id, action.atomActionsCount)); // Add the action being searched itself
+                
+#if UNITY_EDITOR
+                if (isDebug) {
+                    FixedString64Bytes actionName = this.textResolver.GetText(action.id);
+                    Debug.Log(string.Format("SearchActionsToSatisfyPreconditions: Found actions to satisfy preconditions of action {0}.", actionName));
+                }
+#endif
 
                 return true;
             }

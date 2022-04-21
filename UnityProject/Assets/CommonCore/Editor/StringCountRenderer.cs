@@ -88,7 +88,7 @@ namespace Common {
             entry.stringId = EditorGUILayout.TextField(entry.stringId, GUILayout.Width(150));
             GUILayout.Space(5);
 
-            GUILayout.Label("Min Count:", GUILayout.Width(70));
+            GUILayout.Label("Count:", GUILayout.Width(47));
             entry.count = EditorGUILayout.IntField(entry.count, GUILayout.Width(50));
 
             GUILayout.EndHorizontal();

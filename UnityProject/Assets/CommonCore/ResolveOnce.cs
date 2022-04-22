@@ -6,31 +6,29 @@ namespace Common {
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public struct ResolveOnce<T> {
+        private Option<T> valueOption;
         private readonly Func<T> resolver;
-
-        private bool resolved;
-        private T value;
 
         public ResolveOnce(Func<T> resolver) : this() {
             this.resolver = resolver;
-            this.resolved = false;
         }
 
         public T Value {
             get {
-                if (!this.resolved) {
-                    // Not resolved yet
-                    this.value = this.resolver(); // Invoke the functor
-                    this.resolved = true;
+                if (this.valueOption.IsSome) {
+                    return this.valueOption.ValueOrError();
                 }
 
-                return this.value;
+                // Not resolved yet
+                this.valueOption = Option<T>.AsOption(this.resolver()); // Invoke the functor
+                Assertion.IsSome(this.valueOption);
+                return this.valueOption.ValueOrError();
             }
         }
 
         public bool Resolved {
             get {
-                return this.resolved;
+                return this.valueOption.IsSome;
             }
         }
     }

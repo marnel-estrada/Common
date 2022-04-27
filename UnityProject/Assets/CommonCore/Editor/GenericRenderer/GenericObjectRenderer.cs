@@ -18,6 +18,7 @@ namespace Common {
         private delegate void PropertyRenderer(PropertyInfo property, object instance);
         private static readonly Dictionary<Type, PropertyRenderer> RENDERER_MAP = new Dictionary<Type, PropertyRenderer>() {
             { typeof(string), RenderString },
+            { typeof(byte), RenderByte },
             { typeof(int), RenderInt },
             { typeof(float), RenderFloat },
             { typeof(bool), RenderBool },
@@ -244,6 +245,18 @@ namespace Common {
             GUILayout.BeginHorizontal();
             GUILayout.Label(property.Name + ":", GUILayout.Width(150));
             value = EditorGUILayout.TextField(value, GUILayout.Width(300)).Trim();
+            GUILayout.EndHorizontal();
+
+            // Set the value back
+            property.GetSetMethod().Invoke(instance, new object[] { value });
+        }
+
+        private static void RenderByte(PropertyInfo property, object instance) {
+            byte value = (byte)property.GetGetMethod().Invoke(instance, null);
+            
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(property.Name + ":", GUILayout.Width(150));
+            value = (byte)EditorGUILayout.IntField(value, GUILayout.Width(150));
             GUILayout.EndHorizontal();
 
             // Set the value back

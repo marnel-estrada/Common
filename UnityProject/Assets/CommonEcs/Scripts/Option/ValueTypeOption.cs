@@ -1,7 +1,5 @@
 using System;
-
 using Common;
-
 using Unity.Burst;
 
 namespace CommonEcs {
@@ -13,20 +11,28 @@ namespace CommonEcs {
     /// Match(), ValueOr() or ValueOrError().
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    #if UNITY_EDITOR
+    public struct ValueTypeOption<T> : IEquatable<ValueTypeOption<T>> where T : struct, IEquatable<T> {
+        // Set these values to non-readonly public variables so that we can see and select them in 
+        // Unity's Component Inspector
+        public T value;
+        public byte hasValue;
+        #else
     public readonly struct ValueTypeOption<T> : IEquatable<ValueTypeOption<T>> where T : struct, IEquatable<T> {
+        public readonly T value;
+        public readonly byte hasValue;
+        #endif
+
         // We use property here as static member variable doesn't work for Burst
         public static ValueTypeOption<T> None {
             get {
                 return new ValueTypeOption<T>();
             }
         }
-        
+
         public static ValueTypeOption<T> Some(in T value) {
             return new ValueTypeOption<T>(value);
         }
-        
-        private readonly T value;
-        private readonly byte hasValue;
 
         private ValueTypeOption(in T value) {
             this.value = value;

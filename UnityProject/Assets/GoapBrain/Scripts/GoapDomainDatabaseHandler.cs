@@ -123,7 +123,7 @@ namespace GoapBrain {
             }
         }
 
-        public ref BlobAssetReference<GoapDomainDatabase> DbReference {
+        public ref readonly BlobAssetReference<GoapDomainDatabase> DbReference {
             get {
                 return ref this.domainDbReference;
             }

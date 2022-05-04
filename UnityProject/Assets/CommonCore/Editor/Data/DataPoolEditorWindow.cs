@@ -8,14 +8,16 @@ using UnityEngine;
 
 namespace Common {
     public class DataPoolEditorWindow<T> : EditorWindow where T : class, IDataPoolItem, IDuplicable<T>, new() {
-        private DataPool<T> target;
+        private DataPool<T>? target;
 
         public static readonly Signal.Signal REPAINT = new Signal.Signal("Repaint");
 
         private readonly DataPoolSidebarView<T> sidebar = new DataPoolSidebarView<T>();
-        private DataPoolInspectorView<T> inspector;
+        private DataPoolInspectorView<T>? inspector;
 
-        private Action<DataPool<T>> runAction;
+        private Action<DataPool<T>>? runAction;
+        private string? runActionButtonLabel; // This is the text to show on the run button
+        private int runActionButtonWidth;
 
         /// <summary>
         /// Initializer
@@ -36,6 +38,10 @@ namespace Common {
         }
 
         private void Repaint(ISignalParameters parameters) {
+            if (this.target == null) {
+                throw new CantBeNullException(nameof(this.target));
+            }
+        
             this.sidebar.OnRepaint(this.target);
             Repaint();
         }
@@ -65,7 +71,7 @@ namespace Common {
             }
 
             if (this.runAction != null) {
-                if (GUILayout.Button("Run", GUILayout.Width(40))) {
+                if (GUILayout.Button(this.runActionButtonLabel, GUILayout.Width(this.runActionButtonWidth))) {
                     this.runAction(this.target);
                     EditorUtility.DisplayDialog("Run", "Run Executed", "OK");
                 }
@@ -84,6 +90,10 @@ namespace Common {
 
             // Inspector
             if (this.sidebar.IsValidSelection(this.target)) {
+                if (this.inspector == null) {
+                    throw new CantBeNullException(nameof(this.inspector));
+                }
+                
                 this.inspector.Render(this.target, this.sidebar.GetSelectedItem(this.target));
             }
 
@@ -92,14 +102,10 @@ namespace Common {
             GUILayout.EndVertical();
         }
 
-        public Action<DataPool<T>> RunAction {
-            get {
-                return this.runAction;
-            }
-
-            set {
-                this.runAction = value;
-            }
+        public void SetRunAction(Action<DataPool<T>> action, string buttonLabel, int buttonWidth) {
+            this.runAction = action;
+            this.runActionButtonLabel = buttonLabel;
+            this.runActionButtonWidth = buttonWidth;
         }
 
         /// <summary>

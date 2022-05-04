@@ -21,15 +21,15 @@ namespace Common {
 
         private void Update() {
             if (this.pointerData != null && this.button != null) {
-                if (Time.realtimeSinceStartup - this.lastTrigger >= this.repeatDelay) {
-                    this.lastTrigger = Time.realtimeSinceStartup - (this.repeatDelay - this.repeatClickInterval);
+                if (UnityEngine.Time.realtimeSinceStartup - this.lastTrigger >= this.repeatDelay) {
+                    this.lastTrigger = UnityEngine.Time.realtimeSinceStartup - (this.repeatDelay - this.repeatClickInterval);
                     this.button.OnSubmit(this.pointerData);
                 }
             }
         }
 
         public void OnPointerDown(PointerEventData eventData) {
-            this.lastTrigger = Time.realtimeSinceStartup;
+            this.lastTrigger = UnityEngine.Time.realtimeSinceStartup;
             this.pointerData = eventData;
         }
 

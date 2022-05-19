@@ -19,8 +19,8 @@ namespace CommonEcs {
         public byte hasValue;
         #else
     public readonly struct ValueTypeOption<T> : IEquatable<ValueTypeOption<T>> where T : struct, IEquatable<T> {
-        public readonly T value;
-        public readonly byte hasValue;
+        private readonly T value;
+        private readonly byte hasValue;
         #endif
 
         // We use property here as static member variable doesn't work for Burst

@@ -58,14 +58,12 @@ namespace Common {
         /// </summary>
         /// <param name="xmlPath"></param>
         private void Parse(string xmlPath) {
-            string path = xmlPath;
-
-            Debug.Log("Parsed " + path);
+            Debug.Log("Parsed " + xmlPath);
 
             if (this.currentTranslation == null) {
-                this.currentTranslation = TranslationContainer.Load(path);
+                this.currentTranslation = TranslationContainer.Load(xmlPath);
             } else {
-                this.currentTranslation.CompareTranslation(TranslationContainer.Load(path));
+                this.currentTranslation.CompareTranslation(TranslationContainer.Load(xmlPath));
             }
 
             Assertion.NotNull(this.currentTranslation);

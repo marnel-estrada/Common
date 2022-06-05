@@ -110,6 +110,14 @@ namespace Common.Xml {
 
             return uint.Parse(GetAttribute(attributeKey), NumberFormatInfo.InvariantInfo);
         }
+
+        public long GetAttributeAsLong(string attributeKey) {
+            if (!ContainsAttribute(attributeKey)) {
+                return 0;
+            }
+
+            return long.Parse(GetAttribute(attributeKey), NumberFormatInfo.InvariantInfo);
+        }
         
         public byte GetAttributeAsByte(string attributeKey) {
             if (!ContainsAttribute(attributeKey)) {

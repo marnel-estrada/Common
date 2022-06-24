@@ -19,7 +19,7 @@ namespace Common {
         private readonly SimpleList<Vector2Int> originalDimensions = new SimpleList<Vector2Int>(BUFFER_SIZE);
 
         // Keeps track of the packed entries
-        private NativeHashMap<int, PackedTextureEntry> entriesMap;
+        private NativeParallelHashMap<int, PackedTextureEntry> entriesMap;
 
         private Texture2D? atlas;
 
@@ -27,7 +27,7 @@ namespace Common {
         /// Constructor
         /// </summary>
         public TexturePacker() {
-            this.entriesMap = new NativeHashMap<int, PackedTextureEntry>(BUFFER_SIZE, Allocator.Persistent);
+            this.entriesMap = new NativeParallelHashMap<int, PackedTextureEntry>(BUFFER_SIZE, Allocator.Persistent);
         }
 
         public void Dispose() {

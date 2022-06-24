@@ -8,9 +8,9 @@ namespace CommonEcs {
     /// Used to wrap NativeHashMap so we don't pass it around when used in jobs
     /// </summary>
     public struct EntityPrefabResolver {
-        private NativeHashMap<FixedString64Bytes, Entity> map;
+        private NativeParallelHashMap<FixedString64Bytes, Entity> map;
 
-        public EntityPrefabResolver(NativeHashMap<FixedString64Bytes, Entity> map) {
+        public EntityPrefabResolver(NativeParallelHashMap<FixedString64Bytes, Entity> map) {
             this.map = map;
         }
 

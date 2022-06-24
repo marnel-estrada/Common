@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace CommonEcs.Goap {
     public partial class GoapTextDbSystem : SystemBase {
-        private NativeHashMap<int, FixedString64Bytes> textMap;
+        private NativeParallelHashMap<int, FixedString64Bytes> textMap;
         private GoapTextResolver textResolver;
 
         protected override void OnCreate() {
@@ -29,7 +29,7 @@ namespace CommonEcs.Goap {
         }
 
         public void CreateTextDb(IReadOnlyDictionary<int, FixedString64Bytes> rawTextMap) {
-            this.textMap = new NativeHashMap<int, FixedString64Bytes>(rawTextMap.Count, Allocator.Persistent);
+            this.textMap = new NativeParallelHashMap<int, FixedString64Bytes>(rawTextMap.Count, Allocator.Persistent);
             
             foreach (KeyValuePair<int,FixedString64Bytes> entry in rawTextMap) {
                 this.textMap.Add(entry.Key, entry.Value);                

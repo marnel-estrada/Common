@@ -8,9 +8,9 @@ namespace CommonEcs {
     /// </summary>
     public struct OpenSet<T> where T : unmanaged, IEquatable<T> {
         private GrowingHeap<T> heap;
-        private NativeHashMap<T, AStarNode<T>> map;
+        private NativeParallelHashMap<T, AStarNode<T>> map;
 
-        public OpenSet(GrowingHeap<T> heap, NativeHashMap<T, AStarNode<T>> map) {
+        public OpenSet(GrowingHeap<T> heap, NativeParallelHashMap<T, AStarNode<T>> map) {
             this.heap = heap;
             this.map = map;
         }

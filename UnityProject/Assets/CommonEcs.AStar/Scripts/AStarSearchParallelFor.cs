@@ -75,7 +75,7 @@ namespace CommonEcs {
             private OpenSet<GridCoord3> openSet;
 
             // Only used for existence of position in closed set
-            private NativeHashMap<int3, byte> closeSet;
+            private NativeParallelHashMap<int3, byte> closeSet;
 
             private GridCoord3 goalPosition;
 
@@ -86,10 +86,10 @@ namespace CommonEcs {
                 NativeList<HeapNode<GridCoord3>> heapList = new NativeList<HeapNode<GridCoord3>>(10, Allocator.Temp);
                 GrowingHeap<GridCoord3> heap = new GrowingHeap<GridCoord3>(heapList);
 
-                NativeHashMap<GridCoord3, AStarNode<GridCoord3>> openSetMap = new NativeHashMap<GridCoord3, AStarNode<GridCoord3>>(10, Allocator.Temp);
+                NativeParallelHashMap<GridCoord3, AStarNode<GridCoord3>> openSetMap = new NativeParallelHashMap<GridCoord3, AStarNode<GridCoord3>>(10, Allocator.Temp);
                 this.openSet = new OpenSet<GridCoord3>(heap, openSetMap);
                 
-                this.closeSet = new NativeHashMap<int3, byte>(10, Allocator.Temp);
+                this.closeSet = new NativeParallelHashMap<int3, byte>(10, Allocator.Temp);
 
                 PathfindingParameters parameters = this.allParameters[this.entity];
                 this.goalPosition = parameters.goal.ValueOrError();

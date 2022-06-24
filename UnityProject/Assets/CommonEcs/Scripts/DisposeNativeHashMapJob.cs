@@ -7,7 +7,7 @@ namespace CommonEcs {
     public struct DisposeNativeHashMapJob<K, V> : IJob 
         where K : struct, IEquatable<K>
         where V : struct {
-        public NativeHashMap<K, V> map;
+        public NativeParallelHashMap<K, V> map;
         
         public void Execute() {
             this.map.Dispose();

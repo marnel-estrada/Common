@@ -12,7 +12,7 @@ namespace CommonEcs {
         /// <param name="value"></param>
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TValue"></typeparam>
-        public static void AddOrReplace<TKey, TValue>(this NativeHashMap<TKey, TValue> hashMap, TKey key, TValue value)
+        public static void AddOrReplace<TKey, TValue>(this NativeParallelHashMap<TKey, TValue> hashMap, TKey key, TValue value)
             where TKey : struct, IEquatable<TKey> where TValue : struct {
             hashMap.Remove(key);
             hashMap.TryAdd(key, value);

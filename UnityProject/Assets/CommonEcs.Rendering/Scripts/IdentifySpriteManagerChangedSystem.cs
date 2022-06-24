@@ -39,10 +39,10 @@ namespace CommonEcs {
             // Note here that we used NativeHashSet and pass it as parallel writer to the job
             // so that we can run the job in parallel. This is the safest way to do it.
             int entityCount = this.query.CalculateEntityCount();
-            Unity.Collections.NativeHashSet<Entity> verticesChangedMap = new Unity.Collections.NativeHashSet<Entity>(entityCount, Allocator.TempJob);
-            Unity.Collections.NativeHashSet<Entity> trianglesChangedMap = new Unity.Collections.NativeHashSet<Entity>(entityCount, Allocator.TempJob);
-            Unity.Collections.NativeHashSet<Entity> uvChangedMap = new Unity.Collections.NativeHashSet<Entity>(entityCount, Allocator.TempJob);
-            Unity.Collections.NativeHashSet<Entity> colorChangedMap = new Unity.Collections.NativeHashSet<Entity>(entityCount, Allocator.TempJob);
+            NativeParallelHashSet<Entity> verticesChangedMap = new NativeParallelHashSet<Entity>(entityCount, Allocator.TempJob);
+            NativeParallelHashSet<Entity> trianglesChangedMap = new NativeParallelHashSet<Entity>(entityCount, Allocator.TempJob);
+            NativeParallelHashSet<Entity> uvChangedMap = new NativeParallelHashSet<Entity>(entityCount, Allocator.TempJob);
+            NativeParallelHashSet<Entity> colorChangedMap = new NativeParallelHashSet<Entity>(entityCount, Allocator.TempJob);
 
             Job job = new Job() {
                 spriteType = this.spriteType,
@@ -88,10 +88,10 @@ namespace CommonEcs {
             [ReadOnly]
             public ComponentTypeHandle<Sprite> spriteType;
 
-            public Unity.Collections.NativeHashSet<Entity>.ParallelWriter verticesChangedMap;
-            public Unity.Collections.NativeHashSet<Entity>.ParallelWriter trianglesChangedMap;
-            public Unity.Collections.NativeHashSet<Entity>.ParallelWriter uvChangedMap;
-            public Unity.Collections.NativeHashSet<Entity>.ParallelWriter colorChangedMap;
+            public NativeParallelHashSet<Entity>.ParallelWriter verticesChangedMap;
+            public NativeParallelHashSet<Entity>.ParallelWriter trianglesChangedMap;
+            public NativeParallelHashSet<Entity>.ParallelWriter uvChangedMap;
+            public NativeParallelHashSet<Entity>.ParallelWriter colorChangedMap;
 
             public uint lastSystemVersion;
 

@@ -14,10 +14,10 @@ namespace CommonEcs {
         /// <typeparam name="K"></typeparam>
         /// <typeparam name="V"></typeparam>
         /// <returns></returns>
-        public static NativeArray<V> GetValuesAsArray<K, V>(this ref NativeMultiHashMap<K, V> self, in K key, Allocator allocator)
+        public static NativeArray<V> GetValuesAsArray<K, V>(this ref NativeParallelMultiHashMap<K, V> self, in K key, Allocator allocator)
             where K : struct, IEquatable<K> 
             where V : struct {
-            NativeMultiHashMap<K, V>.Enumerator values = self.GetValuesForKey(key);
+            NativeParallelMultiHashMap<K, V>.Enumerator values = self.GetValuesForKey(key);
             NativeArray<V> array = new NativeArray<V>(self.CountValuesForKey(key), allocator);
             
             // Copy to array

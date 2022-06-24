@@ -20,7 +20,7 @@ namespace CommonEcs {
             NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
             
             // Collection of referenced entities
-            NativeHashMap<Entity, byte> referencedEntities = new NativeHashMap<Entity, byte>(10, Allocator.TempJob);
+            NativeParallelHashMap<Entity, byte> referencedEntities = new NativeParallelHashMap<Entity, byte>(10, Allocator.TempJob);
     
             // Note here that we store the referenced entities here so that we can check if they
             // are still referenced by another entities before destroying them
@@ -31,14 +31,14 @@ namespace CommonEcs {
             chunks.Dispose();
         }
     
-        private void StoreReferencedEntities(ref NativeArray<ArchetypeChunk> chunks, ref NativeHashMap<Entity, byte> referencedEntities) {
+        private void StoreReferencedEntities(ref NativeArray<ArchetypeChunk> chunks, ref NativeParallelHashMap<Entity, byte> referencedEntities) {
             for (int i = 0; i < chunks.Length; ++i) {
                 StoreReferencedEntities(chunks[i], ref referencedEntities);
             }
         }
     
         private void StoreReferencedEntities(ArchetypeChunk chunk,
-            ref NativeHashMap<Entity, byte> referencedEntities) {
+            ref NativeParallelHashMap<Entity, byte> referencedEntities) {
             NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
             NativeArray<EntityReference> references = chunk.GetNativeArray(this.referenceType);
             for (int i = 0; i < references.Length; ++i) {
@@ -51,13 +51,13 @@ namespace CommonEcs {
         }
     
         private void DestroyUnownedReferences(ref NativeArray<ArchetypeChunk> chunks,
-            ref NativeHashMap<Entity, byte> referencedEntities) {
+            ref NativeParallelHashMap<Entity, byte> referencedEntities) {
             for (int i = 0; i < chunks.Length; ++i) {
                 DestroyUnownedReferences(chunks[i], ref referencedEntities);
             }
         }
     
-        private void DestroyUnownedReferences(ArchetypeChunk chunk, ref NativeHashMap<Entity, byte> referencedEntities) {
+        private void DestroyUnownedReferences(ArchetypeChunk chunk, ref NativeParallelHashMap<Entity, byte> referencedEntities) {
             NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
             NativeArray<EntityReference> references = chunk.GetNativeArray(this.referenceType);
             for (int i = 0; i < references.Length; ++i) {

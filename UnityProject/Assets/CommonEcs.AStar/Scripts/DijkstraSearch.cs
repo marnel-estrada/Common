@@ -36,7 +36,7 @@ namespace CommonEcs {
 
         // Only used for existence of position in closed set
         // This will be specified by client code
-        public NativeHashMap<int3, byte> closeSet;
+        public NativeParallelHashMap<int3, byte> closeSet;
 
         public OpenSet<int3> openSet;
 

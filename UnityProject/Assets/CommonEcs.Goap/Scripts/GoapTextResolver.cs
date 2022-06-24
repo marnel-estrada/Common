@@ -6,9 +6,9 @@ namespace CommonEcs.Goap {
     /// when we only want to resolve the text from IDs.
     /// </summary>
     public struct GoapTextResolver {
-        private NativeHashMap<int, FixedString64Bytes> textMap;
+        private NativeParallelHashMap<int, FixedString64Bytes> textMap;
 
-        public GoapTextResolver(in NativeHashMap<int, FixedString64Bytes> textMap) {
+        public GoapTextResolver(in NativeParallelHashMap<int, FixedString64Bytes> textMap) {
             this.textMap = textMap;
         }
 

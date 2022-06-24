@@ -15,12 +15,12 @@ namespace CommonEcs {
         private NativeList<T> items;
         private NativeList<WeightEntry> entries;
 
-        private NativeHashMap<T, int> itemToIndexMap;
+        private NativeParallelHashMap<T, int> itemToIndexMap;
         
         public WeightedSelection(int initialCapacity, Allocator allocator) {
             this.items = new NativeList<T>(initialCapacity, allocator);
             this.entries = new NativeList<WeightEntry>(initialCapacity, allocator);
-            this.itemToIndexMap = new NativeHashMap<T, int>(initialCapacity, allocator);
+            this.itemToIndexMap = new NativeParallelHashMap<T, int>(initialCapacity, allocator);
         }
 
         public void Add(in T item, uint weight) {

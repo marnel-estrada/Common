@@ -8,10 +8,10 @@ namespace CommonEcs {
     /// Holds the mapping from integer ID to the Entity prefab
     /// </summary>
     public partial class EntityPrefabManagerSystem : SystemBase {
-        private NativeHashMap<FixedString64Bytes, Entity> map;
+        private NativeParallelHashMap<FixedString64Bytes, Entity> map;
         
         protected override void OnCreate() {
-            this.map = new NativeHashMap<FixedString64Bytes, Entity>(10, Allocator.Persistent);
+            this.map = new NativeParallelHashMap<FixedString64Bytes, Entity>(10, Allocator.Persistent);
         }
 
         protected override void OnDestroy() {

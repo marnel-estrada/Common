@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEditor;
 using Common.Signal;
-using UnityEditor.Experimental.SceneManagement;
+
 
 namespace Common {
     /// <summary>
@@ -28,7 +28,7 @@ namespace Common {
         public void Init(DataClassPool<T> target, DataClassItemRenderer<T> itemRenderer) {
             this.target = target;
             this.inspector = new DataClassInspectorView<T>(itemRenderer);
-            this.prefabPath = PrefabStageUtility.GetPrefabStage(this.target.gameObject)?.prefabAssetPath;
+            this.prefabPath = UnityEditor.SceneManagement.PrefabStageUtility.GetPrefabStage(this.target.gameObject)?.prefabAssetPath;
             REPAINT.Dispatch(); // Force a repaint
         }
 

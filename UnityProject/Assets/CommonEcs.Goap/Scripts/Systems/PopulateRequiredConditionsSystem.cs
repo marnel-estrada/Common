@@ -14,15 +14,25 @@ namespace CommonEcs.Goap {
     [UpdateAfter(typeof(StartPlanningSystem))]
     public partial class PopulateRequiredConditionsSystem : JobSystemBase {
         private EntityQuery query;
+        
+        // Type handles
+        private ComponentTypeHandle<GoapPlanner> plannerType;
+        private BufferTypeHandle<RequiredCondition> requiredConditionType;
 
         protected override void OnCreate() {
             this.query = GetEntityQuery(typeof(GoapPlanner), typeof(RequiredCondition));
+
+            this.plannerType = GetComponentTypeHandle<GoapPlanner>();
+            this.requiredConditionType = GetBufferTypeHandle<RequiredCondition>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
+            this.plannerType.Update(this);
+            this.requiredConditionType.Update(this);
+            
             Job job = new Job() {
-                plannerType = GetComponentTypeHandle<GoapPlanner>(),
-                requiredConditionType = GetBufferTypeHandle<RequiredCondition>(),
+                plannerType = this.plannerType,
+                requiredConditionType = this.requiredConditionType,
                 allAgents = GetComponentDataFromEntity<GoapAgent>()
             };
             

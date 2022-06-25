@@ -12,17 +12,30 @@ namespace CommonEcs.DotsFsm {
     [UpdateAfter(typeof(SendEventFromActionsToFsmSystem))]
     public partial class ConsumePendingEventSystem : JobSystemBase {
         private EntityQuery query;
+        
+        // Type handles
+        private ComponentTypeHandle<DotsFsm> fsmType;
+        private BufferTypeHandle<Transition> transitionType;
+        private ComponentTypeHandle<DebugFsm> debugType;
 
         protected override void OnCreate() {
             this.query = GetEntityQuery(typeof(DotsFsm), ComponentType.ReadOnly<NameReference>(), 
                 ComponentType.ReadOnly<Transition>(), ComponentType.ReadOnly<DebugFsm>());
+
+            this.fsmType = GetComponentTypeHandle<DotsFsm>();
+            this.transitionType = GetBufferTypeHandle<Transition>();
+            this.debugType = GetComponentTypeHandle<DebugFsm>(true);
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
+            this.fsmType.Update(this);
+            this.transitionType.Update(this);
+            this.debugType.Update(this);
+        
             ConsumeJob consumeJob = new ConsumeJob() {
-                fsmType = GetComponentTypeHandle<DotsFsm>(),
-                transitionType = GetBufferTypeHandle<Transition>(),
-                debugType = GetComponentTypeHandle<DebugFsm>(true),
+                fsmType = this.fsmType,
+                transitionType = this.transitionType,
+                debugType = this.debugType,
                 allNameReferences = GetComponentDataFromEntity<NameReference>(true),
                 allNames = GetComponentDataFromEntity<Name>(true)
             };

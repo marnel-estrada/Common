@@ -15,6 +15,11 @@ namespace CommonEcs.Goap {
         private GoapTextDbSystem? textDbSystem;
     
         private EntityQuery query;
+        
+        // Type handles
+        private ComponentTypeHandle<GoapPlanner> plannerType;
+        private BufferTypeHandle<ResolvedAction> resolvedActionType;
+        private BufferTypeHandle<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> bucketType;
 
         protected override void OnCreate() {
             this.textDbSystem = GetOrCreateSystem<GoapTextDbSystem>();
@@ -22,6 +27,10 @@ namespace CommonEcs.Goap {
             this.query = GetEntityQuery(typeof(GoapPlanner), typeof(ResolvedAction),
                 typeof(DynamicBufferHashMap<ConditionId, bool>),
                 typeof(DynamicBufferHashMap<ConditionId, bool>.Entry<bool>));
+
+            this.plannerType = GetComponentTypeHandle<GoapPlanner>();
+            this.resolvedActionType = GetBufferTypeHandle<ResolvedAction>();
+            this.bucketType = GetBufferTypeHandle<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
@@ -29,10 +38,14 @@ namespace CommonEcs.Goap {
                 throw new CantBeNullException(nameof(this.textDbSystem));
             }
             
+            this.plannerType.Update(this);
+            this.resolvedActionType.Update(this);
+            this.bucketType.Update(this);
+            
             ResolveActionsJob job = new ResolveActionsJob() {
-                plannerType = GetComponentTypeHandle<GoapPlanner>(),
-                resolvedActionType = GetBufferTypeHandle<ResolvedAction>(),
-                bucketType = GetBufferTypeHandle<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>>(),
+                plannerType = this.plannerType,
+                resolvedActionType = this.resolvedActionType,
+                bucketType = this.bucketType,
                 allAgents = GetComponentDataFromEntity<GoapAgent>(true),
                 allDebug = GetComponentDataFromEntity<DebugEntity>(true),
                 textResolver = this.textDbSystem.TextResolver

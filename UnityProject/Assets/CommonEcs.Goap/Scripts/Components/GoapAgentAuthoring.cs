@@ -1,7 +1,9 @@
 using Unity.Entities;
 
+using UnityEngine;
+
 namespace CommonEcs.Goap {
-    [GenerateAuthoringComponent]
+    // [GenerateAuthoringComponent]
     public struct GoapAgent : IComponentData {
         // Note here that the first goal is the main goal. Then if it can't resolve
         // actions, it will try to resolve the next goals.
@@ -79,5 +81,9 @@ namespace CommonEcs.Goap {
             // We set to Cleanup so actions have a chance to cleanup before planning again
             this.state = AgentState.CLEANUP;
         }
+    }
+
+    public class GoapAgentAuthoring : MonoBehaviour {
+        public int domainId;
     }
 }

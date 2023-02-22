@@ -8,8 +8,7 @@ using Unity.Mathematics;
 using UnityEngine;
 
 namespace CommonEcs {
-    [Serializable]
-    [GenerateAuthoringComponent]
+    //[GenerateAuthoringComponent]
     public struct Sprite : IComponentData {
         // Note here that we rearrange the variables from high number of bytes to low
         // This is so that memory is properly compacted
@@ -270,5 +269,12 @@ namespace CommonEcs {
                 this.VerticesChanged = true;
             }
         }
+    }
+
+    public class SpriteAuthoring : MonoBehaviour {
+        public Color color;
+        
+        public float renderOrder;
+        public int layerOrder;
     }
 }

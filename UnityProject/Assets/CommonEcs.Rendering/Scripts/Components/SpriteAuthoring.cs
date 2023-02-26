@@ -272,7 +272,7 @@ namespace CommonEcs {
     }
 
     public class SpriteAuthoring : MonoBehaviour {
-        public Color color;
+        public Color color = Color.white;
         
         public float renderOrder;
         public int layerOrder;

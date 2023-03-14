@@ -28,7 +28,7 @@ namespace CommonEcs {
             this.entityType = this.system.GetEntityTypeHandle();
             this.componentType = this.system.GetComponentTypeHandle<T>();
 
-            NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
             try {
                 for (int i = 0; i < chunks.Length; ++i) {
                     Process(chunks[i]);

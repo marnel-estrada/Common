@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace CommonEcs {
     public struct TimeReference : ISharedComponentData, IEquatable<TimeReference> {
-        private readonly Internal instance;
+        private Internal instance;
 
         public TimeReference(byte id) {
             this.instance = new Internal(id);
@@ -60,7 +60,7 @@ namespace CommonEcs {
         }
 
         // We use a class internally so we don't have to access it through a chunk if we want to modify it.
-        private class Internal : IEquatable<Internal> {
+        private struct Internal : IEquatable<Internal> {
             public readonly byte id;
             public float timeScale;
 
@@ -72,26 +72,10 @@ namespace CommonEcs {
             }
 
             public bool Equals(Internal other) {
-                if (ReferenceEquals(null, other)) {
-                    return false;
-                }
-
-                if (ReferenceEquals(this, other)) {
-                    return true;
-                }
-
                 return this.id == other.id;
             }
 
             public override bool Equals(object obj) {
-                if (ReferenceEquals(null, obj)) {
-                    return false;
-                }
-
-                if (ReferenceEquals(this, obj)) {
-                    return true;
-                }
-
                 if (obj.GetType() != GetType()) {
                     return false;
                 }

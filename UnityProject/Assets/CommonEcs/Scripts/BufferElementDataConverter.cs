@@ -9,10 +9,13 @@ namespace CommonEcs {
     /// not work for IBufferElementData.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class BufferElementDataConverter<T> : MonoBehaviour, IConvertGameObjectToEntity 
-        where T : struct, IBufferElementData {
-        public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem) {
-            dstManager.AddBuffer<T>(entity);
+    public abstract class BufferElementDataConverter<T> : MonoBehaviour
+        where T : unmanaged, IBufferElementData {
+        // Provide the baker
+        internal class InternalBaker<T> : Baker<BufferElementDataConverter<T>> where T : unmanaged, IBufferElementData {
+            public override void Bake(BufferElementDataConverter<T> authoring) {
+                AddBuffer<T>();
+            }
         }
     }
 }

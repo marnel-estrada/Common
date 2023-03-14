@@ -22,37 +22,37 @@ namespace CommonEcs {
         // The entity that points to the buckets
         private readonly Entity hashMapEntity;
 
-        private ComponentDataFromEntity<EcsHashMap<K, V>> allHashMaps;
+        private ComponentLookup<EcsHashMap<K, V>> allHashMaps;
 
         // The contents of each bucket is an entity that points to the array of elements.
-        private readonly Maybe<BufferFromEntity<EntityBufferElement>> allBuckets;
+        private readonly Maybe<BufferLookup<EntityBufferElement>> allBuckets;
 
         // The entities here have DynamicBuffer that contains the HashMap values
-        private readonly Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists;
+        private readonly Maybe<BufferLookup<EcsHashMapEntry<K, V>>> allEntryLists;
 
         private readonly ValueTypeOption<EntityManager> entityManager;
 
-        public EcsHashMapWrapper(Entity hashMapEntity, ComponentDataFromEntity<EcsHashMap<K, V>> allHashMaps,
-            BufferFromEntity<EntityBufferElement> allBuckets,
-            BufferFromEntity<EcsHashMapEntry<K, V>> allEntryLists) {
+        public EcsHashMapWrapper(Entity hashMapEntity, ComponentLookup<EcsHashMap<K, V>> allHashMaps,
+            BufferLookup<EntityBufferElement> allBuckets,
+            BufferLookup<EcsHashMapEntry<K, V>> allEntryLists) {
             this.hashMapEntity = hashMapEntity;
             this.allHashMaps = allHashMaps;
 
-            this.allBuckets = new Maybe<BufferFromEntity<EntityBufferElement>>(allBuckets);
-            this.allEntryLists = new Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>>(allEntryLists);
+            this.allBuckets = new Maybe<BufferLookup<EntityBufferElement>>(allBuckets);
+            this.allEntryLists = new Maybe<BufferLookup<EcsHashMapEntry<K, V>>>(allEntryLists);
 
             // Note here that this is None. We can't use static NONE as it is not allowed in Burst.
             this.entityManager = new ValueTypeOption<EntityManager>();
         }
 
         // This is another version that uses EntityManager instead of BufferFromEntity
-        public EcsHashMapWrapper(Entity hashMapEntity, ComponentDataFromEntity<EcsHashMap<K, V>> allHashMaps,
+        public EcsHashMapWrapper(Entity hashMapEntity, ComponentLookup<EcsHashMap<K, V>> allHashMaps,
             EntityManager entityManager) {
             this.hashMapEntity = hashMapEntity;
             this.allHashMaps = allHashMaps;
 
-            this.allBuckets = Maybe<BufferFromEntity<EntityBufferElement>>.Nothing;
-            this.allEntryLists = Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>>.Nothing;
+            this.allBuckets = Maybe<BufferLookup<EntityBufferElement>>.Nothing;
+            this.allEntryLists = Maybe<BufferLookup<EcsHashMapEntry<K, V>>>.Nothing;
 
             // Note here that this is Some. We can't use static NONE as it is not allowed in Burst.
             this.entityManager = ValueTypeOption<EntityManager>.Some(entityManager);
@@ -137,12 +137,12 @@ namespace CommonEcs {
             IFuncOptionMatcher<EntityManager, DynamicBuffer<EcsHashMapEntry<K, V>>> {
             private readonly Entity hashMapEntity;
             private readonly int bucketIndex;
-            private readonly Maybe<BufferFromEntity<EntityBufferElement>> allBuckets;
-            private readonly Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists;
+            private readonly Maybe<BufferLookup<EntityBufferElement>> allBuckets;
+            private readonly Maybe<BufferLookup<EcsHashMapEntry<K, V>>> allEntryLists;
 
             public ResolveEntryListMatcher(Entity hashMapEntity, int bucketIndex, 
-                Maybe<BufferFromEntity<EntityBufferElement>> allBuckets, 
-                Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists) {
+                Maybe<BufferLookup<EntityBufferElement>> allBuckets, 
+                Maybe<BufferLookup<EcsHashMapEntry<K, V>>> allEntryLists) {
                 this.hashMapEntity = hashMapEntity;
                 this.bucketIndex = bucketIndex;
                 this.allBuckets = allBuckets;
@@ -180,10 +180,10 @@ namespace CommonEcs {
 
         private readonly struct GetEnumeratorMatcher : IFuncOptionMatcher<EntityManager, EcsHashMapEnumerator<K, V>> {
             private readonly Entity hashMapEntity;
-            private readonly Maybe<BufferFromEntity<EntityBufferElement>> allBuckets;
-            private readonly Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists;
+            private readonly Maybe<BufferLookup<EntityBufferElement>> allBuckets;
+            private readonly Maybe<BufferLookup<EcsHashMapEntry<K, V>>> allEntryLists;
 
-            public GetEnumeratorMatcher(Entity hashMapEntity, Maybe<BufferFromEntity<EntityBufferElement>> allBuckets, Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists) {
+            public GetEnumeratorMatcher(Entity hashMapEntity, Maybe<BufferLookup<EntityBufferElement>> allBuckets, Maybe<BufferLookup<EcsHashMapEntry<K, V>>> allEntryLists) {
                 this.hashMapEntity = hashMapEntity;
                 this.allBuckets = allBuckets;
                 this.allEntryLists = allEntryLists;
@@ -212,10 +212,10 @@ namespace CommonEcs {
 
         private readonly struct ClearMatcher : IOptionMatcher<EntityManager> {
             private readonly Entity hashMapEntity;
-            private readonly Maybe<BufferFromEntity<EntityBufferElement>> allBuckets;
-            private readonly Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists;
+            private readonly Maybe<BufferLookup<EntityBufferElement>> allBuckets;
+            private readonly Maybe<BufferLookup<EcsHashMapEntry<K, V>>> allEntryLists;
 
-            public ClearMatcher(Entity hashMapEntity, Maybe<BufferFromEntity<EntityBufferElement>> allBuckets, Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists) {
+            public ClearMatcher(Entity hashMapEntity, Maybe<BufferLookup<EntityBufferElement>> allBuckets, Maybe<BufferLookup<EcsHashMapEntry<K, V>>> allEntryLists) {
                 this.hashMapEntity = hashMapEntity;
                 this.allBuckets = allBuckets;
                 this.allEntryLists = allEntryLists;

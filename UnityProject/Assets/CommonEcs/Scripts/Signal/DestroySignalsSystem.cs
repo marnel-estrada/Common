@@ -2,7 +2,7 @@
 
 namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class DestroySignalsSystem : ComponentSystem {
+    public class DestroySignalsSystem : SystemBase {
         private EntityQuery query;
 
         protected override void OnCreate() {

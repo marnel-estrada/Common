@@ -1,4 +1,5 @@
-﻿using Unity.Entities;
+﻿using Unity.Collections;
+using Unity.Entities;
 
 namespace CommonEcs {
     /// <summary>
@@ -10,12 +11,10 @@ namespace CommonEcs {
         protected override EntityQuery ResolveQuery() {
             // We added sprite as subtractive here because we don't want to count those sprites
             // where the SpriteManager is just added
-            return GetEntityQuery(this.ConstructQuery(null, new ComponentType[] {
-                typeof(Collected),
-                typeof(Sprite)
-            }, new ComponentType[] {
-                typeof(SpriteManager)
-            }));
+            return new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<Collected>()
+                .WithAll<Sprite>()
+                .WithNone<SpriteManager>().Build(this);
         }
     }
 }

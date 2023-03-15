@@ -5,7 +5,7 @@ using Unity.Entities;
 
 namespace CommonEcs {    
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public abstract class CollectSharedComponentsSystem<T> : ComponentSystem where T : struct, ISharedComponentData {
+    public abstract partial class CollectSharedComponentsSystem<T> : SystemBase where T : struct, ISharedComponentData {
         public struct Collected : IComponentData {
         } 
 
@@ -13,12 +13,16 @@ namespace CommonEcs {
         private EntityTypeHandle entityType;
         private SharedComponentQuery<T> sharedQuery;
         
-        private readonly Dictionary<Entity, T> map = new Dictionary<Entity, T>(1);
+        private readonly Dictionary<Entity, T> map = new(1);
+
+        private EntityCommandBufferSystem commandBufferSystem;
 
         protected override void OnCreate() {
             this.query = ResolveQuery();
             
             this.sharedQuery = new SharedComponentQuery<T>(this, this.EntityManager);
+
+            this.commandBufferSystem = this.World.GetOrCreateSystemManaged<EndSimulationEntityCommandBufferSystem>();
         }
 
         /// <summary>
@@ -37,15 +41,18 @@ namespace CommonEcs {
             this.entityType = GetEntityTypeHandle();
             this.sharedQuery.Update();
             NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
+            EntityCommandBuffer commandBuffer = this.commandBufferSystem.CreateCommandBuffer();
             
             for(int i = 0; i < chunks.Length; ++i) {
-                Process(chunks[i]);
+                Process(chunks[i], ref commandBuffer);
             }
             
             chunks.Dispose();
+            
+            this.commandBufferSystem.AddJobHandleForProducer(this.Dependency);
         }
 
-        private void Process(ArchetypeChunk chunk) {
+        private void Process(ArchetypeChunk chunk, ref EntityCommandBuffer commandBuffer) {
             NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
             T sharedComponent = this.sharedQuery.GetSharedComponent(ref chunk);
 
@@ -54,7 +61,7 @@ namespace CommonEcs {
                 this.map[entity] = sharedComponent;
                 
                 // Add this component so it will no longer be processed by this system
-                this.PostUpdateCommands.AddComponent(entity, new Collected());
+                commandBuffer.AddComponent(entity, new Collected());
             }
         }
         

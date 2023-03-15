@@ -2,9 +2,8 @@
 
 namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class EntityDestructionSystem : ComponentSystem {
+    public class EntityDestructionSystem : SystemBase {
         private EntityQuery query;
-        private EntityTypeHandle entityType;
 
         protected override void OnCreate() {
             this.query = GetEntityQuery(typeof(ForDestruction));

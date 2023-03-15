@@ -13,10 +13,10 @@ namespace CommonEcs {
     [UpdateAfter(typeof(SpriteManagerInstancesSystem))]
     [UpdateAfter(typeof(AddGameObjectSpriteToLayerSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class AddGameObjectSpriteToManagerSystem : ComponentSystem {
+    public class AddGameObjectSpriteToManagerSystem : SystemBase {
         // Note here that we're not using a common Added component so that each manager knows what 
         // sprite to remove
-        public struct Added : ISystemStateComponentData {
+        public struct Added : ICleanupComponentData {
             // The entity of the sprite manager to where the sprite is added
             public readonly Entity spriteManagerEntity;
         
@@ -51,7 +51,7 @@ namespace CommonEcs {
                 typeof(Transform), typeof(Sprite)
             }));
 
-            this.spriteManagers = this.World.GetOrCreateSystem<SpriteManagerInstancesSystem>();
+            this.spriteManagers = this.World.GetOrCreateSystemManaged<SpriteManagerInstancesSystem>();
 
             this.addedForEach = delegate(Entity entity, Transform transform, ref Sprite sprite) {
                 if (sprite.spriteManagerEntity == Entity.Null) {

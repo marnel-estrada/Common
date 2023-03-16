@@ -8,8 +8,8 @@ namespace CommonEcs {
     /// <summary>
     /// It's the same as SignalHandler but for jobs.
     /// </summary>
-    public class JobSignalHandler<T> where T : struct, IComponentData {
-        private readonly EntityQuery query;
+    public class JobSignalHandler<T> where T : unmanaged, IComponentData {
+        private EntityQuery query;
         private EntityTypeHandle entityType;
         private ComponentTypeHandle<T> componentType;
 
@@ -45,7 +45,7 @@ namespace CommonEcs {
         
         private JobHandle Process(ArchetypeChunk chunk, JobHandle inputDeps) {
             NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
-            NativeArray<T> components = chunk.GetNativeArray(this.componentType);
+            NativeArray<T> components = chunk.GetNativeArray(ref this.componentType);
 
             JobHandle lastHandle = inputDeps;
 

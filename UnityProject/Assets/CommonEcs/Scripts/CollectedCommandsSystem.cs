@@ -7,7 +7,7 @@ namespace CommonEcs {
     /// transform system after playback of the buffer
     /// </summary>
     [UpdateInGroup(typeof(SimulationSystemGroup))]
-    public class CollectedCommandsSystem : ComponentSystem {
+    public class CollectedCommandsSystem : SystemBase {
         private EntityCommandBuffer? pendingBuffer;
     
         protected override void OnUpdate() {

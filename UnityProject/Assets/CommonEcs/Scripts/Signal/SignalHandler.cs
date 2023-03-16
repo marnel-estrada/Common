@@ -4,8 +4,8 @@ using Unity.Entities;
 using Common;
 
 namespace CommonEcs {
-    public class SignalHandler<T> where T : struct, IComponentData {
-        private readonly EntityQuery query;
+    public class SignalHandler<T> where T : unmanaged, IComponentData {
+        private EntityQuery query;
         private EntityTypeHandle entityType;
         private ComponentTypeHandle<T> componentType;
 
@@ -40,7 +40,7 @@ namespace CommonEcs {
 
         private void Process(ArchetypeChunk chunk) {
             NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
-            NativeArray<T> components = chunk.GetNativeArray(this.componentType);
+            NativeArray<T> components = chunk.GetNativeArray(ref this.componentType);
 
             int count = chunk.Count;
             for (int i = 0; i < count; ++i) {

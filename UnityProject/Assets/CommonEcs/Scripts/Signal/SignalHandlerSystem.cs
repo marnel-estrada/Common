@@ -10,22 +10,31 @@ namespace CommonEcs {
     /// <typeparam name="S"></typeparam>
     [UpdateBefore(typeof(DestroySignalsSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public abstract class SignalHandlerSystem<T, S> : ComponentSystem where T : struct, IComponentData
+    public abstract class SignalHandlerSystem<T, S> : SystemBase where T : unmanaged, IComponentData
         where S : SignalHandlerSystem<T, S> {
         private SignalHandler<T> signalHandler;
         private EntityQuery signalQuery;
 
+        private EntityCommandBufferSystem commandBufferSystem;
+
         protected override void OnCreate() {
-            this.signalQuery = GetEntityQuery(typeof(Signal), typeof(T), ComponentType.Exclude<ProcessedBySystem>());
+            this.signalQuery = GetEntityQuery(typeof(Signal), 
+                typeof(T), 
+                ComponentType.Exclude<ProcessedBySystem>());
+            
             this.signalHandler = new SignalHandler<T>(this, this.signalQuery);
             this.signalHandler.AddListener(OnDispatch);
+
+            this.commandBufferSystem = this.World.GetOrCreateSystemManaged<EndSimulationEntityCommandBufferSystem>();
         }
 
         protected abstract void OnDispatch(Entity entity, T parameter);
 
         protected override void OnUpdate() {
             this.signalHandler.Update();
-            this.PostUpdateCommands.AddComponentForEntityQuery(this.signalQuery, typeof(ProcessedBySystem));
+            
+            EntityCommandBuffer commandBuffer = this.commandBufferSystem.CreateCommandBuffer();
+            commandBuffer.AddComponent<ProcessedBySystem>(this.signalQuery);
         }
 
         // Tag that identifies a signal entity that it has been already processed

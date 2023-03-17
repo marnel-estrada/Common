@@ -13,16 +13,16 @@ namespace CommonEcs {
         public NativeArray<Entity> entities; // The request entities
 
         [NativeDisableParallelForRestriction, ReadOnly]
-        public ComponentDataFromEntity<PathfindingParameters> allParameters;
+        public ComponentLookup<PathfindingParameters> allParameters;
 
         [NativeDisableParallelForRestriction, WriteOnly]
-        public ComponentDataFromEntity<Path> allPaths;
+        public ComponentLookup<Path> allPaths;
 
         [NativeDisableParallelForRestriction, WriteOnly]
-        public ComponentDataFromEntity<Waiting> allWaiting;
+        public ComponentLookup<Waiting> allWaiting;
 
         [NativeDisableParallelForRestriction, WriteOnly]
-        public BufferFromEntity<Int3BufferElement> allPathLists;
+        public BufferLookup<Int3BufferElement> allPathLists;
 
         [ReadOnly]
         public TReachability reachability;
@@ -58,9 +58,9 @@ namespace CommonEcs {
         private struct Search {
             public Entity entity;
 
-            public ComponentDataFromEntity<PathfindingParameters> allParameters;
-            public ComponentDataFromEntity<Path> allPaths;
-            public BufferFromEntity<Int3BufferElement> allPathLists;
+            public ComponentLookup<PathfindingParameters> allParameters;
+            public ComponentLookup<Path> allPaths;
+            public BufferLookup<Int3BufferElement> allPathLists;
 
             public TReachability reachability;
             public THeuristicCalculator heuristicCalculator;

@@ -8,22 +8,24 @@ namespace CommonEcs.DotsFsm {
         /// </summary>
         /// <param name="batchInChunk"></param>
         /// <param name="batchIndex"></param>
-        void BeforeChunkIteration(ArchetypeChunk batchInChunk, int batchIndex);
-        
+        void BeforeChunkIteration(ArchetypeChunk batchInChunk);
+
         /// <summary>
         /// DotsFsm is passed here so that the action can send events
         /// </summary>
         /// <param name="actionEntity"></param>
         /// <param name="action"></param>
         /// <param name="actionComponent"></param>
+        /// <param name="indexOfFirstEntityInQuery"></param>
         void OnEnter(Entity actionEntity, ref DotsFsmAction action, ref T actionComponent, int indexOfFirstEntityInQuery, int iterIndex);
-        
+
         /// <summary>
         /// DotsFsm is passed here so that the action can send events
         /// </summary>
         /// <param name="actionEntity"></param>
         /// <param name="action"></param>
         /// <param name="actionComponent"></param>
+        /// <param name="indexOfFirstEntityInQuery"></param>
         void OnUpdate(Entity actionEntity, ref DotsFsmAction action, ref T actionComponent, int indexOfFirstEntityInQuery, int iterIndex);
         
         void OnExit(Entity actionEntity, DotsFsmAction action, ref T actionComponent, int indexOfFirstEntityInQuery, int iterIndex);

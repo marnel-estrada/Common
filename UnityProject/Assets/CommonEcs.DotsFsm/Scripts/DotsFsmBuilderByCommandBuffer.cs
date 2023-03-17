@@ -67,7 +67,7 @@ namespace CommonEcs.DotsFsm {
         /// <param name="actionComponent"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public Entity AddAction<T>(Entity fsmEntity, Entity stateEntity, T actionComponent) where T : struct, IComponentData {
+        public Entity AddAction<T>(Entity fsmEntity, Entity stateEntity, T actionComponent) where T : unmanaged, IComponentData {
             Entity actionEntity = this.commandBuffer.CreateEntity();
             this.commandBuffer.AddComponent(actionEntity, new DotsFsmAction(fsmEntity, stateEntity));
             this.commandBuffer.AddComponent(actionEntity, actionComponent);

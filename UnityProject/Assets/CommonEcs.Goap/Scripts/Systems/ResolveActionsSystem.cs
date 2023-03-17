@@ -22,7 +22,7 @@ namespace CommonEcs.Goap {
         private BufferTypeHandle<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> bucketType;
 
         protected override void OnCreate() {
-            this.textDbSystem = GetOrCreateSystem<GoapTextDbSystem>();
+            this.textDbSystem = GetOrCreateSystemManaged<GoapTextDbSystem>();
             
             this.query = GetEntityQuery(typeof(GoapPlanner), typeof(ResolvedAction),
                 typeof(DynamicBufferHashMap<ConditionId, bool>),

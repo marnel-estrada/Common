@@ -22,7 +22,7 @@ namespace CommonEcs.Goap {
         protected bool isFilterZeroSized;
 
         protected override void OnCreate() {
-            this.textDbSystem = GetOrCreateSystem<GoapTextDbSystem>();
+            this.textDbSystem = GetOrCreateSystemManaged<GoapTextDbSystem>();
             
             this.query = GetEntityQuery(typeof(ConditionResolver), typeof(TResolverFilter));
             this.isFilterZeroSized = TypeManager.GetTypeInfo(TypeManager.GetTypeIndex<TResolverFilter>()).IsZeroSized;

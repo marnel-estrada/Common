@@ -15,8 +15,8 @@ namespace CommonEcs {
         /// <typeparam name="V"></typeparam>
         /// <returns></returns>
         public static NativeArray<V> GetValuesAsArray<K, V>(this ref NativeParallelMultiHashMap<K, V> self, in K key, Allocator allocator)
-            where K : struct, IEquatable<K> 
-            where V : struct {
+            where K : unmanaged, IEquatable<K> 
+            where V : unmanaged {
             NativeParallelMultiHashMap<K, V>.Enumerator values = self.GetValuesForKey(key);
             NativeArray<V> array = new NativeArray<V>(self.CountValuesForKey(key), allocator);
             

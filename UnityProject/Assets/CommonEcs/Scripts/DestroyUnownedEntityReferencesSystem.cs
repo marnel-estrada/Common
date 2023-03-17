@@ -3,13 +3,17 @@ using Unity.Entities;
 
 namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class DestroyUnownedEntityReferencesSystem : ComponentSystem {
+    public class DestroyUnownedEntityReferencesSystem : SystemBase {
+        private EntityCommandBufferSystem commandBufferSystem;
+        
         private EntityQuery query;
         
         private EntityTypeHandle entityType;
         private ComponentTypeHandle<EntityReference> referenceType;
     
         protected override void OnCreate() {
+            this.commandBufferSystem = this.GetOrCreateSystemManaged<EndSimulationEntityCommandBufferSystem>();
+            
             this.query = GetEntityQuery(typeof(EntityReference));
         }
     
@@ -20,12 +24,14 @@ namespace CommonEcs {
             NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
             
             // Collection of referenced entities
-            NativeParallelHashMap<Entity, byte> referencedEntities = new NativeParallelHashMap<Entity, byte>(10, Allocator.TempJob);
+            NativeParallelHashMap<Entity, byte> referencedEntities = new(10, Allocator.TempJob);
     
             // Note here that we store the referenced entities here so that we can check if they
             // are still referenced by another entities before destroying them
             StoreReferencedEntities(ref chunks, ref referencedEntities);
-            DestroyUnownedReferences(ref chunks, ref referencedEntities);
+
+            EntityCommandBuffer commandBuffer = this.commandBufferSystem.CreateCommandBuffer();
+            DestroyUnownedReferences(ref chunks, ref referencedEntities, ref commandBuffer);
             
             referencedEntities.Dispose();
             chunks.Dispose();
@@ -51,13 +57,14 @@ namespace CommonEcs {
         }
     
         private void DestroyUnownedReferences(ref NativeArray<ArchetypeChunk> chunks,
-            ref NativeParallelHashMap<Entity, byte> referencedEntities) {
+            ref NativeParallelHashMap<Entity, byte> referencedEntities, ref EntityCommandBuffer commandBuffer) {
             for (int i = 0; i < chunks.Length; ++i) {
-                DestroyUnownedReferences(chunks[i], ref referencedEntities);
+                DestroyUnownedReferences(chunks[i], ref referencedEntities, ref commandBuffer);
             }
         }
     
-        private void DestroyUnownedReferences(ArchetypeChunk chunk, ref NativeParallelHashMap<Entity, byte> referencedEntities) {
+        private void DestroyUnownedReferences(ArchetypeChunk chunk, ref NativeParallelHashMap<Entity, byte> referencedEntities,
+            ref EntityCommandBuffer commandBuffer) {
             NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
             NativeArray<EntityReference> references = chunk.GetNativeArray(this.referenceType);
             for (int i = 0; i < references.Length; ++i) {
@@ -66,7 +73,7 @@ namespace CommonEcs {
                 if (!this.EntityManager.Exists(entityReference.owner) && !referencedEntities.TryGetValue(entities[i], out _)) {
                     // Owner no longer exists and the referenced Entity is not referenced by anyone.
                     // We destroy the reference as it is no longer being pointed to
-                    this.PostUpdateCommands.DestroyEntity(entities[i]);
+                    commandBuffer.DestroyEntity(entities[i]);
                 }
             }
         }

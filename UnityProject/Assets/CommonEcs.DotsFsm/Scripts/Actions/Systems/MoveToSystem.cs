@@ -21,10 +21,10 @@ namespace CommonEcs.DotsFsm {
             
             public float deltaTime;
             
-            public void BeforeChunkIteration(ArchetypeChunk batchInChunk, int batchIndex) {
+            public void BeforeChunkIteration(ArchetypeChunk chunk) {
             }
             
-            public void OnEnter(Entity actionEntity, ref DotsFsmAction action, ref MoveTo move, int indexOfFirstEntityInQuery, int iterIndex) {
+            public void OnEnter(Entity actionEntity, ref DotsFsmAction action, ref MoveTo move, int indexInQuery) {
                 LocalTransform transform = this.allTransform[move.targetEntity];
                 
                 // Set to start position
@@ -38,7 +38,7 @@ namespace CommonEcs.DotsFsm {
                 }
             }
 
-            public void OnUpdate(Entity actionEntity, ref DotsFsmAction action, ref MoveTo move, int indexOfFirstEntityInQuery, int iterIndex) {
+            public void OnUpdate(Entity actionEntity, ref DotsFsmAction action, ref MoveTo move, int indexInQuery) {
                 move.timer.Update(this.deltaTime);
                 
                 if (move.timer.HasElapsed) {
@@ -54,7 +54,7 @@ namespace CommonEcs.DotsFsm {
                 this.allTransform[move.targetEntity] = transform.WithPosition(newPosition);
             }
 
-            public void OnExit(Entity actionEntity, DotsFsmAction action, ref MoveTo move, int indexOfFirstEntityInQuery, int iterIndex) {
+            public void OnExit(Entity actionEntity, DotsFsmAction action, ref MoveTo move, int indexInQuery) {
             }
             
             private void Finish(ref DotsFsmAction action, ref MoveTo moveTo) {

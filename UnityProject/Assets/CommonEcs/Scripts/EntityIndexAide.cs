@@ -10,7 +10,7 @@ namespace CommonEcs {
         private readonly int baseEntityIndex;
         private int validEntitiesInChunk;
 
-        public EntityIndexAide(NativeArray<int> chunkBaseEntityIndices, int unfilteredChunkIndex) : this() {
+        public EntityIndexAide(ref NativeArray<int> chunkBaseEntityIndices, int unfilteredChunkIndex) : this() {
             this.baseEntityIndex = chunkBaseEntityIndices[unfilteredChunkIndex];
         }
 

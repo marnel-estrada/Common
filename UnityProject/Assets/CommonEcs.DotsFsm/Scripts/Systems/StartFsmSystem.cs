@@ -14,15 +14,15 @@ namespace CommonEcs.DotsFsm {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            Job job = new Job() {
+            StartFsmJob startFsmJob = new StartFsmJob() {
                 fsmType = GetComponentTypeHandle<DotsFsm>()
             };
 
-            return job.ScheduleParallel(this.query, inputDeps);
+            return startFsmJob.ScheduleParallel(this.query, inputDeps);
         }
         
         [BurstCompile]
-        private struct Job : IJobChunk {
+        private struct StartFsmJob : IJobChunk {
             public ComponentTypeHandle<DotsFsm> fsmType;
 
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {

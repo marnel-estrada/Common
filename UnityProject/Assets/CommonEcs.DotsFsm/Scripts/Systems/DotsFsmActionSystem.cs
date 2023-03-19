@@ -22,7 +22,7 @@ namespace CommonEcs.DotsFsm {
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(Allocator.TempJob);
-            ExecuteActionJob job = new ExecuteActionJob() {
+            ExecuteActionJob job = new() {
                 entityHandle = GetEntityTypeHandle(),
                 fsmActionHandle = GetComponentTypeHandle<DotsFsmAction>(),
                 customActionHandle = GetComponentTypeHandle<TActionType>(),
@@ -71,7 +71,7 @@ namespace CommonEcs.DotsFsm {
                 
                 this.execution.BeforeChunkIteration(chunk);
 
-                EntityIndexAide indexAide = new EntityIndexAide(ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
+                EntityIndexAide indexAide = new(ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
 
                 ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
                 while (enumerator.NextEntityIndex(out int i)) {

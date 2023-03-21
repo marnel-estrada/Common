@@ -108,7 +108,6 @@ namespace CommonEcs.Goap {
                 
                 EntityIndexAide indexAide = new(ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
                 ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
-
                 while (enumerator.NextEntityIndex(out int i)) {
                     AtomAction atomAction = atomActions[i];
                     GoapAgent agent = this.allAgents[atomAction.agentEntity];

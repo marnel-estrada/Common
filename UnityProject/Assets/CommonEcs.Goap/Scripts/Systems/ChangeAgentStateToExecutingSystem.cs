@@ -1,4 +1,5 @@
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -14,23 +15,23 @@ namespace CommonEcs.Goap {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            Job job = new Job() {
+            ChangeStateJob changeStateJob = new ChangeStateJob() {
                 agentType = GetComponentTypeHandle<GoapAgent>(), 
-                allPlanners = GetComponentDataFromEntity<GoapPlanner>()
+                allPlanners = GetComponentLookup<GoapPlanner>()
             };
             
-            return job.ScheduleParallel(this.query, inputDeps);
+            return changeStateJob.ScheduleParallel(this.query, inputDeps);
         }
         
         [BurstCompile]
-        private struct Job : IJobEntityBatch {
+        private struct ChangeStateJob : IJobChunk {
             public ComponentTypeHandle<GoapAgent> agentType;
 
             [ReadOnly]
-            public ComponentDataFromEntity<GoapPlanner> allPlanners;
-            
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<GoapAgent> agents = batchInChunk.GetNativeArray(this.agentType);
+            public ComponentLookup<GoapPlanner> allPlanners;
+
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<GoapAgent> agents = chunk.GetNativeArray(ref this.agentType);
                 for (int i = 0; i < agents.Length; ++i) {
                     GoapAgent agent = agents[i];
                     GoapPlanner planner = this.allPlanners[agent.plannerEntity];

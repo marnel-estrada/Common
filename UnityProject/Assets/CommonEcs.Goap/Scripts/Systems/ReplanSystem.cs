@@ -106,7 +106,8 @@ namespace CommonEcs.Goap {
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
                 NativeArray<GoapAgent> agents = chunk.GetNativeArray(ref this.agentType);
 
-                for (int i = 0; i < chunk.Count; ++i) {
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     GoapAgent agent = agents[i];
                     if (!agent.replanRequested) {
                         continue;

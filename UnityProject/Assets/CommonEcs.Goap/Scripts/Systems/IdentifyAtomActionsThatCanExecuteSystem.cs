@@ -1,4 +1,5 @@
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -18,31 +19,31 @@ namespace CommonEcs.Goap {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            Job job = new Job() {
+            IdentifyJob identifyJob = new() {
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
-                allAgents = GetComponentDataFromEntity<GoapAgent>(),
-                allDebugEntities = GetComponentDataFromEntity<DebugEntity>(),
-                allActionSets = GetBufferFromEntity<ResolvedAction>()
+                allAgents = GetComponentLookup<GoapAgent>(),
+                allDebugEntities = GetComponentLookup<DebugEntity>(),
+                allActionSets = GetBufferLookup<ResolvedAction>()
             };
             
-            return job.ScheduleParallel(this.query, inputDeps);
+            return identifyJob.ScheduleParallel(this.query, inputDeps);
         }
         
         [BurstCompile]
-        private struct Job : IJobEntityBatch {
+        private struct IdentifyJob : IJobChunk {
             public ComponentTypeHandle<AtomAction> atomActionType;
 
             [ReadOnly]
-            public ComponentDataFromEntity<GoapAgent> allAgents;
+            public ComponentLookup<GoapAgent> allAgents;
 
             [ReadOnly]
-            public ComponentDataFromEntity<DebugEntity> allDebugEntities;
+            public ComponentLookup<DebugEntity> allDebugEntities;
             
             [ReadOnly]
-            public BufferFromEntity<ResolvedAction> allActionSets;
+            public BufferLookup<ResolvedAction> allActionSets;
             
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<AtomAction> atomActions = batchInChunk.GetNativeArray(this.atomActionType);
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<AtomAction> atomActions = chunk.GetNativeArray(ref this.atomActionType);
                 for (int i = 0; i < atomActions.Length; ++i) {
                     AtomAction atomAction = atomActions[i];
                     GoapAgent agent = this.allAgents[atomAction.agentEntity];

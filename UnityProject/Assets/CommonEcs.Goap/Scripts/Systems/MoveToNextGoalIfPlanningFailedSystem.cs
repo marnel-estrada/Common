@@ -1,4 +1,5 @@
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -14,27 +15,27 @@ namespace CommonEcs.Goap {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            Job job = new Job() {
-                allAgents = GetComponentDataFromEntity<GoapAgent>(true),
-                allDebug = GetComponentDataFromEntity<DebugEntity>(),
+            MoveToNextGoalJob moveToNextGoalJob = new() {
+                allAgents = GetComponentLookup<GoapAgent>(true),
+                allDebug = GetComponentLookup<DebugEntity>(),
                 plannerType = GetComponentTypeHandle<GoapPlanner>()
             };
 
-            return job.ScheduleParallel(this.query, inputDeps);
+            return moveToNextGoalJob.ScheduleParallel(this.query, inputDeps);
         }
 
         [BurstCompile]
-        private struct Job : IJobEntityBatch {
+        private struct MoveToNextGoalJob : IJobChunk {
             [ReadOnly]
-            public ComponentDataFromEntity<GoapAgent> allAgents;
+            public ComponentLookup<GoapAgent> allAgents;
 
             [ReadOnly]
-            public ComponentDataFromEntity<DebugEntity> allDebug;
+            public ComponentLookup<DebugEntity> allDebug;
 
             public ComponentTypeHandle<GoapPlanner> plannerType;
 
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<GoapPlanner> planners = batchInChunk.GetNativeArray(this.plannerType);
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<GoapPlanner> planners = chunk.GetNativeArray(ref this.plannerType);
                 for (int i = 0; i < planners.Length; ++i) {
                     GoapPlanner planner = planners[i];
 

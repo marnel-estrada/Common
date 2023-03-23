@@ -13,7 +13,7 @@ namespace CommonEcs {
         private MultipleGrid2dWrapper gridWrapper;
         
         protected override void OnUpdate() {
-            ComponentDataFromEntity<Cell2D> allCells = GetComponentDataFromEntity<Cell2D>();
+            ComponentLookup<Cell2D> allCells = GetComponentLookup<Cell2D>();
 
             this.Entities.ForEach((in MultipleGrid2D multipleGrid, in DynamicBuffer<EntityBufferElement> entityBuffer) => {
                 if (this.resolved) {

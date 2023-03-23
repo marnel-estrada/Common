@@ -6,9 +6,9 @@ using Unity.Entities;
 
 namespace CommonEcs {
     public readonly struct GetCellMatcher : IFuncOptionMatcher<Entity, Cell2D> {
-        public readonly ComponentDataFromEntity<Cell2D> allCells;
+        public readonly ComponentLookup<Cell2D> allCells;
 
-        public GetCellMatcher(ComponentDataFromEntity<Cell2D> allCells) {
+        public GetCellMatcher(ComponentLookup<Cell2D> allCells) {
             this.allCells = allCells;
         }
 

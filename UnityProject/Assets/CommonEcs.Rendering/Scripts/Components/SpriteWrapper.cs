@@ -1,4 +1,5 @@
-﻿using Common;
+﻿using System;
+using Common;
 
 using Unity.Entities;
 using Unity.Mathematics;
@@ -9,6 +10,7 @@ namespace CommonEcs {
     /// <summary>
     /// A component that we can use in GameObject to create ECS Sprite instances
     /// </summary>
+    [Obsolete]
     public class SpriteWrapper : MonoBehaviour {
         private Entity spriteManagerEntity;
 
@@ -19,12 +21,12 @@ namespace CommonEcs {
         [SerializeField]
         public float2 pivot = new float2(0.5f, 0.5f);
 
-        private GameObjectEntity goEntity;
+        // private GameObjectEntity goEntity;
         
         private EntityManager entityManager;
 
         private void Awake() {
-            this.goEntity = this.GetRequiredComponent<GameObjectEntity>();
+            //this.goEntity = this.GetRequiredComponent<GameObjectEntity>();
             
             this.entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             Assertion.NotNull(this.entityManager);
@@ -113,21 +115,21 @@ namespace CommonEcs {
         /// Synchronizes the sprite from the ECS Sprite Manager
         /// </summary>
         public void SyncSprite() {
-            Entity entity = this.goEntity.Entity;
-            if (entity != Entity.Null && this.entityManager.HasComponent<Sprite>(entity)) {
-                // This means that the sprite is already added in ECS sprite manager
-                this.sprite = this.entityManager.GetComponentData<Sprite>(entity);
-            }
+            // Entity entity = this.goEntity.Entity;
+            // if (entity != Entity.Null && this.entityManager.HasComponent<Sprite>(entity)) {
+            //     // This means that the sprite is already added in ECS sprite manager
+            //     this.sprite = this.entityManager.GetComponentData<Sprite>(entity);
+            // }
         }
 
         /// <summary>
         /// Commits the sprite unto the one in ECS Sprite Manager
         /// </summary>
         public void Commit() {
-            Entity entity = this.goEntity.Entity;
-            if (entity != Entity.Null && this.entityManager.HasComponent<Sprite>(entity)) {
-                this.entityManager.SetComponentData(entity, this.sprite);
-            }
+            // Entity entity = this.goEntity.Entity;
+            // if (entity != Entity.Null && this.entityManager.HasComponent<Sprite>(entity)) {
+            //     this.entityManager.SetComponentData(entity, this.sprite);
+            // }
         }
     }
 }

@@ -35,8 +35,8 @@ namespace CommonEcs {
 
         private SpriteManagerInstancesSystem spriteManagers;
 
-        private EntityQueryBuilder.F_ECD<Transform, Sprite> addedForEach;
-        private EntityQueryBuilder.F_ED<Added> removedForEach;
+        //private EntityQueryBuilder.F_ECD<Transform, Sprite> addedForEach;
+        //private EntityQueryBuilder.F_ED<Added> removedForEach;
 
         protected override void OnCreate() {
             this.addedQuery = GetEntityQuery(this.ConstructQuery(new ComponentType[] {
@@ -53,50 +53,50 @@ namespace CommonEcs {
 
             this.spriteManagers = this.World.GetOrCreateSystemManaged<SpriteManagerInstancesSystem>();
 
-            this.addedForEach = delegate(Entity entity, Transform transform, ref Sprite sprite) {
-                if (sprite.spriteManagerEntity == Entity.Null) {
-                    // The sprite manager entity might not have been set yet
-                    // For example, when a prefab with SpriteWrapper is instantiated, it probably
-                    // doesn't have its spriteManagerEntity value set yet.
-                    // We skip it for now and process them in the next frame.
-                    return;
-                }
-            
-                Maybe<SpriteManager> maybeManager = this.spriteManagers.Get(sprite.spriteManagerEntity);
-                float4x4 matrix = new float4x4(transform.rotation, transform.position);
-                SpriteManager spriteManager = maybeManager.Value;
-                spriteManager.Add(ref sprite, matrix);
-
-                // Add this component so it will no longer be processed by this system
-                this.PostUpdateCommands.AddComponent(entity,
-                    new Added(sprite.spriteManagerEntity, sprite.managerIndex));
-            
-                // We add the shared component so that it can be filtered using such shared component
-                // in other systems. For example, in SortRenderOrderSystem.
-                this.PostUpdateCommands.AddSharedComponent(entity, spriteManager);
-                
-                if (spriteManager.AlwaysUpdateMesh) {
-                    // We add this component so it will be excluded in IdentifySpriteManagerChangedSystem
-                    this.PostUpdateCommands.AddComponent(entity, new AlwaysUpdateMesh());
-                }
-            };
-
-            this.removedForEach = delegate(Entity entity, ref Added added) {
-                Maybe<SpriteManager> maybeManager = this.spriteManagers.Get(added.spriteManagerEntity);
-                if (maybeManager.HasValue) {
-                    maybeManager.Value.Remove(added.managerIndex);
-                }
-
-                this.PostUpdateCommands.RemoveComponent<Added>(entity);
-            };
+            // this.addedForEach = delegate(Entity entity, Transform transform, ref Sprite sprite) {
+            //     if (sprite.spriteManagerEntity == Entity.Null) {
+            //         // The sprite manager entity might not have been set yet
+            //         // For example, when a prefab with SpriteWrapper is instantiated, it probably
+            //         // doesn't have its spriteManagerEntity value set yet.
+            //         // We skip it for now and process them in the next frame.
+            //         return;
+            //     }
+            //
+            //     Maybe<SpriteManager> maybeManager = this.spriteManagers.Get(sprite.spriteManagerEntity);
+            //     float4x4 matrix = new float4x4(transform.rotation, transform.position);
+            //     SpriteManager spriteManager = maybeManager.Value;
+            //     spriteManager.Add(ref sprite, matrix);
+            //
+            //     // Add this component so it will no longer be processed by this system
+            //     this.PostUpdateCommands.AddComponent(entity,
+            //         new Added(sprite.spriteManagerEntity, sprite.managerIndex));
+            //
+            //     // We add the shared component so that it can be filtered using such shared component
+            //     // in other systems. For example, in SortRenderOrderSystem.
+            //     this.PostUpdateCommands.AddSharedComponent(entity, spriteManager);
+            //     
+            //     if (spriteManager.AlwaysUpdateMesh) {
+            //         // We add this component so it will be excluded in IdentifySpriteManagerChangedSystem
+            //         this.PostUpdateCommands.AddComponent(entity, new AlwaysUpdateMesh());
+            //     }
+            // };
+            //
+            // this.removedForEach = delegate(Entity entity, ref Added added) {
+            //     Maybe<SpriteManager> maybeManager = this.spriteManagers.Get(added.spriteManagerEntity);
+            //     if (maybeManager.HasValue) {
+            //         maybeManager.Value.Remove(added.managerIndex);
+            //     }
+            //
+            //     this.PostUpdateCommands.RemoveComponent<Added>(entity);
+            // };
         }
 
         protected override void OnUpdate() {
-            // Process added
-            this.Entities.With(this.addedQuery).ForEach(this.addedForEach);
-            
-            // Process removed
-            this.Entities.With(this.removedQuery).ForEach(this.removedForEach);
+            // // Process added
+            // this.Entities.With(this.addedQuery).ForEach(this.addedForEach);
+            //
+            // // Process removed
+            // this.Entities.With(this.removedQuery).ForEach(this.removedForEach);
         }
     }
 }

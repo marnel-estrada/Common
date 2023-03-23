@@ -6,9 +6,8 @@ namespace CommonEcs {
     [UpdateBefore(typeof(AddGameObjectSpriteToLayerSystem))]
     [UpdateBefore(typeof(AddSpritesToLayerSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class AddSpriteManagerToLayerSystem : ComponentSystem {
-        private struct Processed : IComponentData {
-        }
+    public class AddSpriteManagerToLayerSystem : SystemBase {
+        private EntityCommandBufferSystem commandBufferSystem;
 
         private EntityQuery query;
         private SharedComponentTypeHandle<SpriteManager> spriteManagerType;
@@ -16,24 +15,29 @@ namespace CommonEcs {
         private SpriteLayerInstancesSystem layers;
 
         protected override void OnCreate() {
+            this.commandBufferSystem = this.GetOrCreateSystemManaged<BeginPresentationEntityCommandBufferSystem>();
+            
             this.query = GetEntityQuery(typeof(SpriteManager), ComponentType.Exclude<Processed>(), 
                 ComponentType.Exclude<Sprite>());
-            this.layers = this.World.GetExistingSystem<SpriteLayerInstancesSystem>();
+            
+            this.layers = this.World.GetOrCreateSystemManaged<SpriteLayerInstancesSystem>();
         }
 
         protected override void OnUpdate() {
             this.spriteManagerType = GetSharedComponentTypeHandle<SpriteManager>();
-            NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
+
+            EntityCommandBuffer commandBuffer = this.commandBufferSystem.CreateCommandBuffer();
             
             for (int i = 0; i < chunks.Length; ++i) {
-                Process(chunks[i]);
+                Process(chunks[i], ref commandBuffer);
             }
             
             chunks.Dispose();
         }
         
-        private void Process(ArchetypeChunk chunk) {
-            SpriteManager manager = chunk.GetSharedComponentData(this.spriteManagerType, this.EntityManager);
+        private void Process(ArchetypeChunk chunk, ref EntityCommandBuffer commandBuffer) {
+            SpriteManager manager = chunk.GetSharedComponentManaged(this.spriteManagerType, this.EntityManager);
             if (manager.SpriteLayerEntity != Entity.Null) {
                 // There's an assigned layer. We add the manager to such layer.
                 Maybe<SpriteLayer> result = this.layers.Get(manager.SpriteLayerEntity);
@@ -43,7 +47,10 @@ namespace CommonEcs {
             }
             
             // We add this component so it will be skipped on the next frame
-            this.PostUpdateCommands.AddComponent(manager.Owner, new Processed());
+            commandBuffer.AddComponent(manager.Owner, new Processed());
+        }
+        
+        private struct Processed : IComponentData {
         }
     }
 }

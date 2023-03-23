@@ -41,7 +41,7 @@ namespace CommonEcs {
             spriteManager.Layer = this.gameObject.layer;
             spriteManager.SortingLayer = SortingLayer.GetLayerValueFromName(this.sortingLayerName); 
             spriteManager.AlwaysUpdateMesh = this.alwaysUpdateMesh;
-            this.entityManager.AddSharedComponentData(this.entity, spriteManager);
+            this.entityManager.AddSharedComponentManaged(this.entity, spriteManager);
         }
         
         public Entity Entity {

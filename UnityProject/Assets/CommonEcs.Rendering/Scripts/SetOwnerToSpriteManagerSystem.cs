@@ -6,7 +6,7 @@ using Unity.Entities;
 namespace CommonEcs {
     /// <summary>
     /// A system that sets the owner to each SpriteManager
-    /// We did this because in SpriteLayer, we are creating a SpriteManager through a command buffer
+    /// We did this way because in SpriteLayer, we are creating a SpriteManager through a command buffer
     /// in which we can't get an entity during creation.
     /// </summary>
     [UpdateBefore(typeof(AddSpriteManagerToLayerSystem))]

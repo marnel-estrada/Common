@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -17,8 +18,8 @@ namespace CommonEcs {
         private EntityQuery query;
         private ComponentTypeHandle<Sprite> spriteType;
 
-        private readonly List<SpriteManager> managers = new List<SpriteManager>(1);
-        private readonly List<int> managerIndices = new List<int>(1);
+        private readonly List<SpriteManager> managers = new(1);
+        private readonly List<int> managerIndices = new(1);
 
         protected override void OnCreate() {
             this.query = GetEntityQuery(ComponentType.ReadOnly<Sprite>(), typeof(SpriteManager), 
@@ -34,17 +35,17 @@ namespace CommonEcs {
             
             this.managers.Clear();
             this.managerIndices.Clear();
-            this.EntityManager.GetAllUniqueSharedComponentData(this.managers, this.managerIndices);
+            this.EntityManager.GetAllUniqueSharedComponentsManaged(this.managers, this.managerIndices);
             
             // Note here that we used NativeHashSet and pass it as parallel writer to the job
             // so that we can run the job in parallel. This is the safest way to do it.
             int entityCount = this.query.CalculateEntityCount();
-            NativeParallelHashSet<Entity> verticesChangedMap = new NativeParallelHashSet<Entity>(entityCount, Allocator.TempJob);
-            NativeParallelHashSet<Entity> trianglesChangedMap = new NativeParallelHashSet<Entity>(entityCount, Allocator.TempJob);
-            NativeParallelHashSet<Entity> uvChangedMap = new NativeParallelHashSet<Entity>(entityCount, Allocator.TempJob);
-            NativeParallelHashSet<Entity> colorChangedMap = new NativeParallelHashSet<Entity>(entityCount, Allocator.TempJob);
+            NativeParallelHashSet<Entity> verticesChangedMap = new(entityCount, Allocator.TempJob);
+            NativeParallelHashSet<Entity> trianglesChangedMap = new(entityCount, Allocator.TempJob);
+            NativeParallelHashSet<Entity> uvChangedMap = new(entityCount, Allocator.TempJob);
+            NativeParallelHashSet<Entity> colorChangedMap = new(entityCount, Allocator.TempJob);
 
-            Job job = new Job() {
+            PopulateUpdatedSpritesJob job = new() {
                 spriteType = this.spriteType,
                 verticesChangedMap = verticesChangedMap.AsParallelWriter(),
                 trianglesChangedMap = trianglesChangedMap.AsParallelWriter(),
@@ -65,9 +66,6 @@ namespace CommonEcs {
                     continue;
                 }
 
-                // Note that we're only checking for existence here
-                // We used OR here because the flags might have been already set to true prior to
-                // calling this system
                 manager.VerticesChanged = verticesChangedMap.Contains(owner);
                 manager.RenderOrderChanged = trianglesChangedMap.Contains(owner);
                 manager.UvChanged = uvChangedMap.Contains(owner);
@@ -84,7 +82,7 @@ namespace CommonEcs {
         }
         
         [BurstCompile]
-        private struct Job : IJobEntityBatch {
+        private struct PopulateUpdatedSpritesJob : IJobChunk {
             [ReadOnly]
             public ComponentTypeHandle<Sprite> spriteType;
 
@@ -95,16 +93,17 @@ namespace CommonEcs {
 
             public uint lastSystemVersion;
 
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                if (!batchInChunk.DidChange(this.spriteType, this.lastSystemVersion)) {
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                if (!chunk.DidChange(ref this.spriteType, this.lastSystemVersion)) {
                     // This means that the sprites in the chunk have not been queried with write access
                     // There must be no changes at the least
                     return;
                 }
                 
-                NativeArray<Sprite> sprites = batchInChunk.GetNativeArray(this.spriteType);
+                NativeArray<Sprite> sprites = chunk.GetNativeArray(ref this.spriteType);
 
-                for (int i = 0; i < batchInChunk.Count; ++i) {
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     Sprite sprite = sprites[i];
                     Entity spriteManagerEntity = sprite.spriteManagerEntity;
                     

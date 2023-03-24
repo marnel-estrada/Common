@@ -12,48 +12,53 @@ namespace CommonEcs {
     [UpdateAfter(typeof(SpriteLayerInstancesSystem))]
     [UpdateAfter(typeof(AddGameObjectSpriteToManagerSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class RemoveGameObjectSpriteFromLayerSystem : ComponentSystem {
+    public class RemoveGameObjectSpriteFromLayerSystem : SystemBase {
+        private EntityCommandBufferSystem commandBufferSystem;
+        
         private EntityQuery query;
         
         private ComponentTypeHandle<AddGameObjectSpriteToLayerSystem.Added> addedType;
         private EntityTypeHandle entityType;
         
-        private SpriteManagerInstancesSystem managers;
+        private SpriteManagerInstancesSystem managersSystem;
 
         protected override void OnCreate() {
+            this.commandBufferSystem = this.GetOrCreateSystemManaged<BeginPresentationEntityCommandBufferSystem>();
+            
             this.query = GetEntityQuery(
                 ComponentType.ReadOnly<AddGameObjectSpriteToLayerSystem.Added>(),
                 ComponentType.Exclude<Transform>(),
                 ComponentType.Exclude<Sprite>()
             );
 
-            this.managers = this.World.GetOrCreateSystem<SpriteManagerInstancesSystem>();
+            this.managersSystem = this.World.GetOrCreateSystemManaged<SpriteManagerInstancesSystem>();
         }
 
         protected override void OnUpdate() {
             this.addedType = GetComponentTypeHandle<AddGameObjectSpriteToLayerSystem.Added>();
             this.entityType = GetEntityTypeHandle();
             
-            NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
+            EntityCommandBuffer commandBuffer = this.commandBufferSystem.CreateCommandBuffer();
             for (int i = 0; i < chunks.Length; ++i) {
-                Process(chunks[i]);
+                Process(chunks[i], ref commandBuffer);
             }
             
             chunks.Dispose();
         }
 
-        private void Process(ArchetypeChunk chunk) {
-            NativeArray<AddGameObjectSpriteToLayerSystem.Added> addedList = chunk.GetNativeArray(this.addedType);
+        private void Process(ArchetypeChunk chunk, ref EntityCommandBuffer commandBuffer) {
+            NativeArray<AddGameObjectSpriteToLayerSystem.Added> addedList = chunk.GetNativeArray(ref this.addedType);
             NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
             
             for (int i = 0; i < addedList.Length; ++i) {
                 AddGameObjectSpriteToLayerSystem.Added added = addedList[i];
-                Maybe<SpriteManager> manager = this.managers.Get(added.spriteManagerEntity);
+                Maybe<SpriteManager> manager = this.managersSystem.Get(added.spriteManagerEntity);
                 Assertion.IsTrue(manager.HasValue);
                 manager.Value.Remove(added.managerIndex);
                 
                 // We remove this component so it will no longer be processed by this system
-                this.PostUpdateCommands.RemoveComponent<AddGameObjectSpriteToLayerSystem.Added>(entities[i]);
+                commandBuffer.RemoveComponent<AddGameObjectSpriteToLayerSystem.Added>(entities[i]);
             }   
         }        
     }

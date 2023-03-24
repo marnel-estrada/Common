@@ -10,22 +10,8 @@ namespace CommonEcs {
     [UpdateBefore(typeof(SpriteManagerRendererSystem))]
     [UpdateAfter(typeof(SpriteManagerInstancesSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class AddSpriteToManagerSystem : ComponentSystem {
-        // Note here that we're not using a common Added component so that each manager knows what 
-        // sprite to remove
-        public struct Added : ISystemStateComponentData {
-            // The entity of the sprite manager to where the sprite is added
-            public readonly Entity spriteManagerEntity;
-        
-            // This is the managerIndex of the sprite so we can determine what index they are if they were somehow
-            // removed
-            public readonly int managerIndex;
-
-            public Added(Entity spriteManagerEntity, int managerIndex) {
-                this.spriteManagerEntity = spriteManagerEntity;
-                this.managerIndex = managerIndex;
-            }
-        }
+    public class AddSpriteToManagerSystem : SystemBase {
+        private EntityCommandBufferSystem commandBufferSystem;
         
         private EntityQuery query;
         
@@ -40,6 +26,8 @@ namespace CommonEcs {
         private SpriteManagerInstancesSystem spriteManagers;
 
         protected override void OnCreate() {
+            this.commandBufferSystem = this.GetOrCreateSystemManaged<BeginPresentationEntityCommandBufferSystem>();
+            
             // Note here that we filter sprites that doesn't have a SpriteManager added to them
             this.query = GetEntityQuery(this.ConstructQuery(null, new ComponentType[] {
                 typeof(Added), typeof(SpriteManager)
@@ -47,26 +35,28 @@ namespace CommonEcs {
                 typeof(LocalToWorld), typeof(Sprite)
             }));
 
-            this.spriteManagers = this.World.GetOrCreateSystem<SpriteManagerInstancesSystem>();
+            this.spriteManagers = this.World.GetOrCreateSystemManaged<SpriteManagerInstancesSystem>();
         }
 
         protected override void OnUpdate() {
             this.entityType = GetEntityTypeHandle();
             this.spriteType = GetComponentTypeHandle<Sprite>();
             this.matrixType = GetComponentTypeHandle<LocalToWorld>(true);
-            NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
+
+            EntityCommandBuffer commandBuffer = this.commandBufferSystem.CreateCommandBuffer();
             
             for (int i = 0; i < chunks.Length; ++i) {
-                ProcessChunk(chunks[i]);
+                ProcessChunk(chunks[i], ref commandBuffer);
             }
             
             chunks.Dispose();
         }
         
-        private void ProcessChunk(ArchetypeChunk chunk) {
+        private void ProcessChunk(ArchetypeChunk chunk, ref EntityCommandBuffer commandBuffer) {
             NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
-            NativeArray<Sprite> sprites = chunk.GetNativeArray(this.spriteType);
-            NativeArray<LocalToWorld> matrices = chunk.GetNativeArray(this.matrixType);
+            NativeArray<Sprite> sprites = chunk.GetNativeArray(ref this.spriteType);
+            NativeArray<LocalToWorld> matrices = chunk.GetNativeArray(ref this.matrixType);
 
             for (int i = 0; i < chunk.Count; ++i) {
                 Sprite sprite = sprites[i];
@@ -81,13 +71,28 @@ namespace CommonEcs {
 
                 // Add this component so it will no longer be processed by this system
                 Added added = new Added(sprite.spriteManagerEntity, sprite.managerIndex);
-                this.PostUpdateCommands.AddComponent(entities[i], added);
+                commandBuffer.AddComponent(entities[i], added);
                 
                 // We add the shared component so that it can be filtered using such shared component
                 // in other systems. For example, in SortRenderOrderSystem.
-                this.PostUpdateCommands.AddSharedComponent(entities[i], maybeManager.Value);
+                commandBuffer.AddSharedComponentManaged(entities[i], maybeManager.Value);
             }
         }
+        
+        // Note here that we're not using a common Added component so that each manager knows what 
+        // sprite to remove
+        public struct Added : ICleanupComponentData {
+            // The entity of the sprite manager to where the sprite is added
+            public readonly Entity spriteManagerEntity;
+        
+            // This is the managerIndex of the sprite so we can determine what index they are if they were somehow
+            // removed
+            public readonly int managerIndex;
 
+            public Added(Entity spriteManagerEntity, int managerIndex) {
+                this.spriteManagerEntity = spriteManagerEntity;
+                this.managerIndex = managerIndex;
+            }
+        }
     }
 }

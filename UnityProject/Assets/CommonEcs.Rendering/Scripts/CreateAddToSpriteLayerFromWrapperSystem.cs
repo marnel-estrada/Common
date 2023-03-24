@@ -9,23 +9,25 @@
     [UpdateBefore(typeof(AddGameObjectSpriteToManagerSystem))]
     [UpdateBefore(typeof(CreateSpriteFromWrapperSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class CreateAddToSpriteLayerFromWrapperSystem : ComponentSystem {
-        private EntityQuery query;
-        
-        private struct Created : IComponentData {
-        }
+    public class CreateAddToSpriteLayerFromWrapperSystem : SystemBase {
+        private EntityCommandBufferSystem commandBufferSystem;
 
         protected override void OnCreate() {
-            this.query = GetEntityQuery(typeof(AddToSpriteLayerWrapper), ComponentType.Exclude<Created>());
+            this.commandBufferSystem = this.GetOrCreateSystemManaged<BeginPresentationEntityCommandBufferSystem>();
         }
 
         protected override void OnUpdate() {
-            this.Entities.With(this.query).ForEach((Entity entity, AddToSpriteLayerWrapper wrapper) => {
-                this.PostUpdateCommands.AddComponent(entity, wrapper.componentData);
+            EntityCommandBuffer commandBuffer = this.commandBufferSystem.CreateCommandBuffer();
+            
+            this.Entities.WithoutBurst().WithNone<Created>().ForEach((Entity entity, AddToSpriteLayerWrapper wrapper) => {
+                commandBuffer.AddComponent(entity, wrapper.componentData);
             
                 // We add this component so it will no longer be processed by this system
-                this.PostUpdateCommands.AddComponent(entity, new Created());
-            });
+                commandBuffer.AddComponent(entity, new Created());
+            }).Run();
+        }
+        
+        private struct Created : IComponentData {
         }
     }
 }

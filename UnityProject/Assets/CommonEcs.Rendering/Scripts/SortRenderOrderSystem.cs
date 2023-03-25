@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -37,12 +38,15 @@ namespace CommonEcs {
                     continue;
                 }
                 
-                this.query.SetSharedComponentFilter(spriteManager);
+                this.query.SetSharedComponentFilterManaged(spriteManager);
                 int count = this.query.CalculateEntityCount();
-                NativeArray<SortedSpriteEntry> entries = new NativeArray<SortedSpriteEntry>(count, Allocator.TempJob);
+                NativeArray<SortedSpriteEntry> entries = new(count, Allocator.TempJob);
+                
+                NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(Allocator.TempJob);
 
-                AddJob addJob = new AddJob() {
+                AddJob addJob = new() {
                     spriteType = spriteType,
+                    chunkBaseEntityIndices = chunkBaseEntityIndices,
                     sortList = entries
                 };
 
@@ -51,21 +55,22 @@ namespace CommonEcs {
                 // Sort
                 lastHandle = MultithreadedSort.Sort(entries, lastHandle);
                 
-                ResetTrianglesJob resetTrianglesJob = new ResetTrianglesJob() {
+                ResetTrianglesJob resetTrianglesJob = new() {
                     triangles = spriteManager.NativeTriangles
                 };
 
                 lastHandle = resetTrianglesJob.Schedule(spriteManager.NativeTriangles.Length,
                     64, lastHandle);
                 
-                SetTrianglesJob setTrianglesJob = new SetTrianglesJob() {
+                SetTrianglesJob setTrianglesJob = new () {
                     triangles = spriteManager.NativeTriangles,
                     sortList = entries
                 };
 
                 lastHandle = setTrianglesJob.Schedule(spriteManager.Count, 64, lastHandle);
                 
-                // Don't forget to deallocate the array
+                // Don't forget to deallocate the arrays
+                lastHandle = chunkBaseEntityIndices.Dispose(lastHandle);
                 lastHandle = entries.Dispose(lastHandle);
             }
 
@@ -80,14 +85,20 @@ namespace CommonEcs {
         private struct AddJob : IJobChunk {
             [ReadOnly]
             public ComponentTypeHandle<Sprite> spriteType;
+
+            [ReadOnly]
+            public NativeArray<int> chunkBaseEntityIndices;
             
             public NativeArray<SortedSpriteEntry> sortList;
 
-            public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {
-                NativeArray<Sprite> sprites = chunk.GetNativeArray(this.spriteType);
-                for (int i = 0; i < sprites.Length; ++i) {
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<Sprite> sprites = chunk.GetNativeArray(ref this.spriteType);
+
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                EntityIndexAide indexAide = new EntityIndexAide(ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
+                while (enumerator.NextEntityIndex(out int i)) {
                     Sprite sprite = sprites[i];
-                    int index = firstEntityIndex + i;
+                    int index = indexAide.NextEntityIndexInQuery();
                     this.sortList[index] = new SortedSpriteEntry(sprite.managerIndex, sprite.LayerOrder,
                         sprite.renderOrder, sprite.renderOrderDueToPosition);
                 }

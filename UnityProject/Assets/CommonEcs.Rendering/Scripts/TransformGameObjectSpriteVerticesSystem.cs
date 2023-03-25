@@ -1,4 +1,5 @@
 ﻿using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -23,40 +24,54 @@ namespace CommonEcs {
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             TransformAccessArray transforms = this.query.GetTransformAccessArray();
-            NativeArray<TransformStash> stashes = new NativeArray<TransformStash>(transforms.length, Allocator.TempJob);
+            NativeArray<TransformStash> stashes = new(transforms.length, Allocator.TempJob);
             
             // Job for copying to stashes
-            StashTransformsJob stashTransforms = new StashTransformsJob() {
+            StashTransformsJob stashTransforms = new() {
                 stashes = stashes
             };
-            JobHandle stashHandle = stashTransforms.Schedule(transforms, inputDeps);
+            JobHandle jobHandle = stashTransforms.Schedule(transforms, inputDeps);
+            
+            NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(Allocator.TempJob);
             
             // Job for applying to sprites
-            ApplyTransformsJob job = new ApplyTransformsJob() {
+            ApplyTransformsJob job = new() {
                 spriteType = GetComponentTypeHandle<Sprite>(),
-                stashes = stashes
+                stashes = stashes,
+                chunkBaseEntityIndices = chunkBaseEntityIndices
             };
 
-            return job.ScheduleParallel(this.query, stashHandle);
+            jobHandle = job.ScheduleParallel(this.query, jobHandle);
+            
+            // Don't forget to dispose
+            jobHandle = chunkBaseEntityIndices.Dispose(jobHandle);
+            jobHandle = stashes.Dispose(jobHandle);
+
+            return jobHandle;
         }
         
         [BurstCompile]
-        private struct ApplyTransformsJob : IJobEntityBatchWithIndex {
+        private struct ApplyTransformsJob : IJobChunk {
             public ComponentTypeHandle<Sprite> spriteType;
             
             [ReadOnly]
-            [DeallocateOnJobCompletion]
             public NativeArray<TransformStash> stashes;
 
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex, int indexOfFirstEntityInQuery) {
-                NativeArray<Sprite> sprites = batchInChunk.GetNativeArray(this.spriteType);
+            [ReadOnly]
+            public NativeArray<int> chunkBaseEntityIndices;
 
-                for (int i = 0; i < batchInChunk.Count; ++i) {
-                    int index = indexOfFirstEntityInQuery + i;
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<Sprite> sprites = chunk.GetNativeArray(ref this.spriteType);
+
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                EntityIndexAide indexAide = new(ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
+
+                while (enumerator.NextEntityIndex(out int i)) {
                     Sprite sprite = sprites[i];
-                    
+
+                    int index = indexAide.NextEntityIndexInQuery();
                     TransformStash stash = this.stashes[index];
-                    float4x4 rotationTranslationMatrix = new float4x4(stash.rotation, stash.position);
+                    float4x4 rotationTranslationMatrix = new(stash.rotation, stash.position);
                     float4x4 scaleMatrix = float4x4.Scale(stash.localScale);
                     float4x4 finalMatrix = math.mul(rotationTranslationMatrix, scaleMatrix);
                     sprite.Transform(ref finalMatrix);

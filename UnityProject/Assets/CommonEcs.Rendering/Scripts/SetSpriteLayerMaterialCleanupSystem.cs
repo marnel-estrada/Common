@@ -5,7 +5,7 @@ namespace CommonEcs {
     /// Destroys all entities with SetMaterialToSpriteManagersOfLayer components 
     /// </summary>
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class SetSpriteLayerMaterialCleanupSystem : ComponentSystem {
+    public class SetSpriteLayerMaterialCleanupSystem : SystemBase {
         private EntityQuery query;
 
         protected override void OnCreate() {

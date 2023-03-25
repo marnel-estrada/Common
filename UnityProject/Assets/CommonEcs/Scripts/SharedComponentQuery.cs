@@ -11,7 +11,7 @@ namespace CommonEcs {
     /// </summary>
     public class SharedComponentQuery<T> where T : struct, ISharedComponentData {
         private readonly ComponentSystemBase system;
-        private readonly EntityManager entityManager;
+        private EntityManager entityManager;
     
         [ReadOnly]
         private SharedComponentTypeHandle<T> sharedComponentType;

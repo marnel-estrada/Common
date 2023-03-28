@@ -1,4 +1,5 @@
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -21,24 +22,24 @@ namespace CommonEcs.UtilityBrain {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            WriteConsiderationsToOptionJob writeConsiderationsToOptions = new WriteConsiderationsToOptionJob() {
+            WriteConsiderationsToOptionJob writeConsiderationsToOptions = new() {
                 considerationType = GetComponentTypeHandle<Consideration>(true),
-                allValueLists = GetBufferFromEntity<UtilityValue>()
+                allValueLists = GetBufferLookup<UtilityValue>()
             };
             JobHandle handle = writeConsiderationsToOptions.ScheduleParallel(this.considerationsQuery, inputDeps);
 
             ComponentTypeHandle<UtilityOption> optionType = GetComponentTypeHandle<UtilityOption>();
             
-            ComputeOptionValuesJob computeOptionValues = new ComputeOptionValuesJob() {
+            ComputeOptionValuesJob computeOptionValues = new() {
                 optionType = optionType,
                 utilityValueType = GetBufferTypeHandle<UtilityValue>()
             };
             handle = computeOptionValues.ScheduleParallel(this.optionsQuery, handle);
 
-            WriteOptionsToBrainJob writeOptionsToBrain = new WriteOptionsToBrainJob() {
+            WriteOptionsToBrainJob writeOptionsToBrain = new() {
                 entityType = GetEntityTypeHandle(),
                 optionType = optionType,
-                allBrainValueBuffers = GetBufferFromEntity<UtilityValueWithOption>()
+                allBrainValueBuffers = GetBufferLookup<UtilityValueWithOption>()
             };
             handle = writeOptionsToBrain.ScheduleParallel(this.optionsQuery, handle);
             
@@ -46,17 +47,18 @@ namespace CommonEcs.UtilityBrain {
         }
         
         [BurstCompile]
-        private struct WriteConsiderationsToOptionJob : IJobEntityBatch {
+        private struct WriteConsiderationsToOptionJob : IJobChunk {
             [ReadOnly]
             public ComponentTypeHandle<Consideration> considerationType;
 
             [NativeDisableParallelForRestriction]
-            public BufferFromEntity<UtilityValue> allValueLists;
-            
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<Consideration> considerations = batchInChunk.GetNativeArray(this.considerationType);
-                
-                for (int i = 0; i < considerations.Length; ++i) {
+            public BufferLookup<UtilityValue> allValueLists;
+
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<Consideration> considerations = chunk.GetNativeArray(ref this.considerationType);
+
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     Consideration consideration = considerations[i];
                     if (!consideration.shouldExecute) {
                         // Did not execute. No need to write value.
@@ -73,18 +75,19 @@ namespace CommonEcs.UtilityBrain {
         // Computes the value for each option. Note that the UtilityValue in UtilityOption is interpreted
         // as maxRank, totalBonus, and final multiplier
         [BurstCompile]
-        private struct ComputeOptionValuesJob : IJobEntityBatch {
+        private struct ComputeOptionValuesJob : IJobChunk {
             public ComponentTypeHandle<UtilityOption> optionType;
 
             // This is the list of consideration values of each option
             [ReadOnly]
             public BufferTypeHandle<UtilityValue> utilityValueType;
             
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<UtilityOption> options = batchInChunk.GetNativeArray(this.optionType);
-                BufferAccessor<UtilityValue> considerationValuesList = batchInChunk.GetBufferAccessor(this.utilityValueType);
-                
-                for (int i = 0; i < batchInChunk.Count; ++i) {
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<UtilityOption> options = chunk.GetNativeArray(ref this.optionType);
+                BufferAccessor<UtilityValue> considerationValuesList = chunk.GetBufferAccessor(ref this.utilityValueType);
+
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     UtilityOption option = options[i];
                     if (!option.shouldExecute) {
                         // Not being executed. No need to continue.
@@ -136,7 +139,7 @@ namespace CommonEcs.UtilityBrain {
         }
 
         [BurstCompile]
-        private struct WriteOptionsToBrainJob : IJobEntityBatch {
+        private struct WriteOptionsToBrainJob : IJobChunk {
             [ReadOnly]
             public EntityTypeHandle entityType;
             
@@ -145,12 +148,14 @@ namespace CommonEcs.UtilityBrain {
 
             // Note here that the value list of UtilityBrain entity is using UtilityValueWithOption 
             [NativeDisableParallelForRestriction]
-            public BufferFromEntity<UtilityValueWithOption> allBrainValueBuffers; 
-            
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<Entity> entities = batchInChunk.GetNativeArray(this.entityType);
-                NativeArray<UtilityOption> options = batchInChunk.GetNativeArray(this.optionType);
-                for (int i = 0; i < options.Length; ++i) {
+            public BufferLookup<UtilityValueWithOption> allBrainValueBuffers;
+
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
+                NativeArray<UtilityOption> options = chunk.GetNativeArray(ref this.optionType);
+
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     UtilityOption option = options[i];
                     if (!option.shouldExecute) {
                         // Did not execute. No need to write value.

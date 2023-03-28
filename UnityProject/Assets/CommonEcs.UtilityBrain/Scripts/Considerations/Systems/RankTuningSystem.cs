@@ -7,11 +7,11 @@ namespace CommonEcs.UtilityBrain {
         }
         
         public struct Processor : IConsiderationProcess<RankTuning> {
-            public void BeforeChunkIteration(ArchetypeChunk batchInChunk, int batchIndex) {
+            public void BeforeChunkIteration(ArchetypeChunk batchInChunk) {
             }
 
-            public UtilityValue ComputeUtility(in Entity agentEntity, in RankTuning filterComponent, int indexOfFirstEntityInQuery,
-                int iterIndex) {
+            public UtilityValue ComputeUtility(in Entity agentEntity, in RankTuning filterComponent, 
+                int chunkIndex, int queryIndex) {
                 return new UtilityValue(filterComponent.rankToSet, 0);
             }
         }

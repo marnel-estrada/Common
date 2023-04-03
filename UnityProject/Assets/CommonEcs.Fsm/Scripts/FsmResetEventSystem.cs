@@ -1,4 +1,5 @@
-﻿using Unity.Entities;
+﻿using CommonEcs;
+using Unity.Entities;
 using Unity.Jobs;
 using Unity.Burst;
 using Unity.Collections;
@@ -12,7 +13,7 @@ namespace Common.Ecs.Fsm {
     [UpdateBefore(typeof(FsmActionStartSystem))]
     [UpdateAfter(typeof(FsmStatePreparationJobSystemBarrier))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class FsmResetEventSystem : JobComponentSystem {
+    public class FsmResetEventSystem : JobSystemBase {
         private EntityQuery query;
 
         protected override void OnCreate() {

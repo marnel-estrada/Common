@@ -1,5 +1,5 @@
 using Common.Ecs.Fsm;
 
-using Unity.Entities;
+using Unity.Jobs;
 
 [assembly: RegisterGenericJobType(typeof(FsmStatePreparationJobSystem<DummyComponent, DummyPreparationAction>.Job))]

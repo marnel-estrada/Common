@@ -14,7 +14,7 @@ namespace CommonEcs {
     [UpdateAfter(typeof(CollectedCommandsSystem))]
     [UpdateAfter(typeof(DurationTimerSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class MoveByDurationSystem : JobComponentSystem {
+    public class MoveByDurationSystem : JobSystemBase {
         private EntityQuery query;
 
         protected override void OnCreate() {

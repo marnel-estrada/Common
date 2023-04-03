@@ -1,4 +1,5 @@
 ﻿using System;
+using CommonEcs;
 using Unity.Entities;
 using Unity.Jobs;
 
@@ -9,7 +10,7 @@ namespace Common.Ecs.Fsm {
     [UpdateAfter(typeof(FsmActionStartSystem))]
     [UpdateBefore(typeof(FsmActionEndSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public abstract class FsmJobSystem : JobComponentSystem {
+    public abstract class FsmJobSystem : JobSystemBase {
         protected ComponentDataFromEntity<Fsm> allFsms;
         protected ComponentDataFromEntity<FsmState> allStates;
 

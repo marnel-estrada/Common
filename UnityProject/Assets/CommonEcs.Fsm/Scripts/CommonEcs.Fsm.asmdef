@@ -1,5 +1,6 @@
 {
     "name": "CommonEcs.Fsm",
+    "rootNamespace": "",
     "references": [
         "CommonCore",
         "CommonEcs",
@@ -7,9 +8,10 @@
         "Unity.Burst",
         "Unity.Mathematics",
         "Unity.Entities.Hybrid",
-        "Unity.Transforms"
+        "Unity.Transforms",
+        "Unity.Jobs",
+        "Unity.Collections"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
@@ -17,5 +19,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }

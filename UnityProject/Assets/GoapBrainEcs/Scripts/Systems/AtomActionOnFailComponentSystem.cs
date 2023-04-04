@@ -14,7 +14,7 @@ namespace GoapBrainEcs {
         }
 
         protected override void OnUpdate() {
-            this.Entities.With(this.query).ForEach(delegate(ref AtomActionOnFail onFail, ref T actionComponent) {
+            this.Entities.With(this.query).ForEach((ref AtomActionOnFail onFail, ref T actionComponent) => {
                 OnFail(ref onFail, ref actionComponent);
                 onFail.done = true;
             });

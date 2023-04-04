@@ -13,7 +13,7 @@ namespace Common.Ecs.Fsm {
     [UpdateBefore(typeof(FsmActionStartSystem))]
     [UpdateAfter(typeof(FsmStatePreparationJobSystemBarrier))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class FsmResetEventSystem : JobSystemBase {
+    public partial class FsmResetEventSystem : JobSystemBase {
         private EntityQuery query;
 
         protected override void OnCreate() {

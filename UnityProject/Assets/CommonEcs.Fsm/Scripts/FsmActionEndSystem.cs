@@ -9,7 +9,7 @@ namespace Common.Ecs.Fsm {
     /// This is just a gating system such that action systems can determine when they can execute
     /// </summary>
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class FsmActionEndSystem : JobSystemBase {
+    public partial class FsmActionEndSystem : JobSystemBase {
         private EndInitializationEntityCommandBufferSystem barrier;
 
         private EntityQuery query;

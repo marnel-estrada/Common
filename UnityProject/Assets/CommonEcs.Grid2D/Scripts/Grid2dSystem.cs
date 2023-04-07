@@ -71,16 +71,16 @@ namespace CommonEcs {
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns></returns>
-        public Option<Entity> GetCellEntity(int x, int y) {
+        public ValueTypeOption<Entity> GetCellEntity(int x, int y) {
             Assertion.IsTrue(this.resolved);
             return this.gridWrapper.GetCellEntity(x, y);
         }
         
-        public Option<Entity> GetCellEntityAtWorld(int worldX, int worldY) {
+        public ValueTypeOption<Entity> GetCellEntityAtWorld(int worldX, int worldY) {
             return this.gridWrapper.GetCellEntityAtWorld(worldX, worldY);
         }
 
-        public Option<Entity> GetCellEntityAtWorld(int2 worldCoordinate) {
+        public ValueTypeOption<Entity> GetCellEntityAtWorld(int2 worldCoordinate) {
             return this.gridWrapper.GetCellEntityAtWorld(worldCoordinate);
         }
 

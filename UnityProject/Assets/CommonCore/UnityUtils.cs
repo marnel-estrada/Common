@@ -166,12 +166,29 @@ namespace Common {
         /**
          * Looks for the object with the specified name and retrieves the specified component.
          */
-        public static TComponentType GetRequiredComponent<TComponentType>(string objectName)
-            where TComponentType : Component {
+        public static TComponent GetRequiredComponent<TComponent>(string objectName)
+            where TComponent : Component {
             GameObject gameObject = GameObject.Find(objectName);
             Assertion.NotNull(gameObject, objectName);
 
-            return gameObject.GetRequiredComponent<TComponentType>();;
+            return gameObject.GetRequiredComponent<TComponent>();;
+        }
+
+        /// <summary>
+        /// Gets the component of the GameObject with the specified name. May return none if the component
+        /// is not found.
+        /// </summary>
+        /// <param name="objectName"></param>
+        /// <typeparam name="TComponent"></typeparam>
+        /// <returns></returns>
+        public static Option<TComponent> GetComponent<TComponent>(string objectName) where TComponent : Component {
+            GameObject gameObject = GameObject.Find(objectName);
+            if (gameObject == null) {
+                // The GameObject could not be found
+                return Option<TComponent>.NONE;
+            }
+            
+            return Option<TComponent>.AsOption(gameObject.GetComponent<TComponent>());;
         }
 
         /**

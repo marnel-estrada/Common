@@ -1,4 +1,5 @@
 using Unity.Entities;
+using UnityEngine;
 
 namespace CommonEcs {
     /// <summary>
@@ -10,12 +11,17 @@ namespace CommonEcs {
     /// Components with GenerateAuthoringComponent cannot be readonly structs as it produces errors
     /// on its generated code. 
     /// </summary>
-    [GenerateAuthoringComponent]
+    //[GenerateAuthoringComponent]
     public struct NameReference : IComponentData {
         public NonNullEntity nameEntity;
 
         public NameReference(Entity nameEntity) {
             this.nameEntity = nameEntity;
         }
+    }
+
+    public class NameReferenceAuthoring : MonoBehaviour {
+        // Only added in authoring to add the component
+        // No editable values
     }
 }

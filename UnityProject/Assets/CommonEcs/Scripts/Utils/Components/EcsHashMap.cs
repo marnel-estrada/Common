@@ -4,7 +4,9 @@ using Unity.Collections;
 using Unity.Entities;
 
 namespace CommonEcs {
-    public struct EcsHashMap<K, V> : IComponentData where K : struct, IEquatable<K> where V : struct {
+    public struct EcsHashMap<K, V> : IComponentData 
+        where K : unmanaged, IEquatable<K> 
+        where V : unmanaged {
         public int count;
         
         public const byte BUCKET_COUNT = 16;

@@ -1,4 +1,5 @@
 ﻿using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -25,17 +26,18 @@ namespace CommonEcs {
         
         public uint lastSystemVersion;
         
-        private static readonly float3 OFF_SCREEN = new float3(1000, 1000, 1000);
+        private static readonly float3 OFF_SCREEN = new(1000, 1000, 1000);
 
-        public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {
-            if (!chunk.DidChange(this.spriteType, this.lastSystemVersion)) {
+        public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+            if (!chunk.DidChange(ref this.spriteType, this.lastSystemVersion)) {
                 // This means that the sprites in the chunk have not been queried with write access
                 // There must be no changes at the least
                 return;
             }
             
-            NativeArray<Sprite> sprites = chunk.GetNativeArray(this.spriteType);
-            for (int i = 0; i < sprites.Length; ++i) {
+            NativeArray<Sprite> sprites = chunk.GetNativeArray(ref this.spriteType);
+            ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+            while (enumerator.NextEntityIndex(out int i)) {
                 Sprite sprite = sprites[i];
 
                 if (sprite.VerticesChanged) {

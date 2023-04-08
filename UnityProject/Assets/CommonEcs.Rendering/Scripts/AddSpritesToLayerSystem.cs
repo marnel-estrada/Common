@@ -14,7 +14,9 @@ namespace CommonEcs {
     [UpdateAfter(typeof(SpriteLayerInstancesSystem))]
     [UpdateBefore(typeof(AddSpriteToManagerSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class AddSpritesToLayerSystem : ComponentSystem {
+    public class AddSpritesToLayerSystem : SystemBase {
+        private EntityCommandBufferSystem commandBufferSystem;
+        
         private EntityQuery query;
 
         private ComponentTypeHandle<AddToSpriteLayer> addToLayerType;
@@ -22,12 +24,13 @@ namespace CommonEcs {
         private ComponentTypeHandle<LocalToWorld> matrixType;
         private EntityTypeHandle entityType;
 
-        private SpriteLayerInstancesSystem layers;
-        private SpriteManagerInstancesSystem managers;
+        private SpriteLayerInstancesSystem layersSystem;
+        private SpriteManagerInstancesSystem managersSystem;
 
         protected override void OnCreate() {
-            this.layers = this.World.GetOrCreateSystem<SpriteLayerInstancesSystem>();
-            this.managers = this.World.GetOrCreateSystem<SpriteManagerInstancesSystem>();
+            this.commandBufferSystem = this.GetOrCreateSystemManaged<BeginPresentationEntityCommandBufferSystem>();
+            this.layersSystem = this.GetOrCreateSystemManaged<SpriteLayerInstancesSystem>();
+            this.managersSystem = this.GetOrCreateSystemManaged<SpriteManagerInstancesSystem>();
             
             this.query = GetEntityQuery(this.ConstructQuery(new ComponentType[] {
                 typeof(AddToSpriteLayer), typeof(Sprite), typeof(LocalToWorld)
@@ -42,7 +45,7 @@ namespace CommonEcs {
             this.matrixType = GetComponentTypeHandle<LocalToWorld>();
             this.entityType = GetEntityTypeHandle();
 
-            NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
             for (int i = 0; i < chunks.Length; ++i) {
                 if (!Process(chunks[i])) {
                     break;
@@ -52,17 +55,19 @@ namespace CommonEcs {
             chunks.Dispose();
         }
 
+        private NativeArray<Entity> entities;
         private NativeArray<AddToSpriteLayer> addToLayers;
         private NativeArray<Sprite> sprites;
         private NativeArray<LocalToWorld> matrices;
-        private NativeArray<Entity> entities;
 
         // Return true if processing is successful
         private bool Process(ArchetypeChunk chunk) {
-            this.addToLayers = chunk.GetNativeArray(this.addToLayerType);
-            this.sprites = chunk.GetNativeArray(this.spriteType);
-            this.matrices = chunk.GetNativeArray(this.matrixType);
             this.entities = chunk.GetNativeArray(this.entityType);
+            this.addToLayers = chunk.GetNativeArray(ref this.addToLayerType);
+            this.sprites = chunk.GetNativeArray(ref this.spriteType);
+            this.matrices = chunk.GetNativeArray(ref this.matrixType);
+
+            EntityCommandBuffer commandBuffer = this.commandBufferSystem.CreateCommandBuffer();
 
             for (int i = 0; i < chunk.Count; ++i) {
                 AddToSpriteLayer addToLayer = this.addToLayers[i];
@@ -71,7 +76,7 @@ namespace CommonEcs {
                     continue;
                 }
                 
-                Maybe<SpriteLayer> layer = this.layers.Get(addToLayer.layerEntity);
+                Maybe<SpriteLayer> layer = this.layersSystem.Get(addToLayer.layerEntity);
                 Assertion.IsTrue(layer.HasValue);
                 SpriteLayer spriteLayer = layer.Value;
 
@@ -80,11 +85,11 @@ namespace CommonEcs {
                 if (manager.HasValue) {
                     // This means that the layer has an available manager
                     // We directly add the sprite to the said manager
-                    AddSpriteToManager(manager.Value, i);
+                    AddSpriteToManager(manager.Value, i, ref commandBuffer);
                 } else {
                     // At this point, it means that the layer doesn't have an available sprite manager
                     // We create a new one and skip the current frame
-                    CreateSpriteManagerEntity(spriteLayer, addToLayer.layerEntity);
+                    CreateSpriteManagerEntity(spriteLayer, addToLayer.layerEntity, ref commandBuffer);
                     return false;
                 }
             }
@@ -92,11 +97,12 @@ namespace CommonEcs {
             return true;
         }
 
-        private void CreateSpriteManagerEntity(SpriteLayer spriteLayer, Entity spriteLayerEntity) {
-            Entity entity = this.PostUpdateCommands.CreateEntity();
+        private void CreateSpriteManagerEntity(SpriteLayer spriteLayer, Entity spriteLayerEntity, 
+            ref EntityCommandBuffer commandBuffer) {
+            Entity entity = commandBuffer.CreateEntity();
 
             // Prepare a SpriteManager
-            SpriteManager spriteManager = new SpriteManager(spriteLayer.allocationCount, this.PostUpdateCommands);
+            SpriteManager spriteManager = new(spriteLayer.allocationCount);
             spriteManager.Name = spriteLayer.Name; // Copy name for debugging purposes
             spriteManager.SpriteLayerEntity = spriteLayer.owner;
             spriteManager.SetMaterial(spriteLayer.material);
@@ -105,20 +111,20 @@ namespace CommonEcs {
             spriteManager.SortingLayerId = spriteLayer.SortingLayerId;
             spriteManager.AlwaysUpdateMesh = spriteLayer.alwaysUpdateMesh;
             spriteManager.UseMeshRenderer = spriteLayer.useMeshRenderer;
-            this.PostUpdateCommands.AddSharedComponent(entity, spriteManager);
+            commandBuffer.AddSharedComponentManaged(entity, spriteManager);
 
             if (spriteLayer.useMeshRenderer) {
                 // This means that the layer will use MeshRenderers in GameObjects to render the mesh
-                MeshRendererVessel vessel = new MeshRendererVessel(spriteLayerEntity, spriteLayer.Name, spriteLayer.material, 
+                MeshRendererVessel vessel = new(spriteLayerEntity, spriteLayer.Name, spriteLayer.material, 
                     spriteLayer.layer, spriteLayer.SortingLayerId, spriteLayer.SortingOrder);
-                this.PostUpdateCommands.AddSharedComponent(entity, vessel);
+                commandBuffer.AddSharedComponentManaged(entity, vessel);
             }
         }
 
         private Maybe<SpriteManager> ResolveAvailable(ref SpriteLayer layer) {
             for (int i = 0; i < layer.spriteManagerEntities.Count; ++i) {
                 Entity managerEntity = layer.spriteManagerEntities[i];
-                Maybe<SpriteManager> result = this.managers.Get(managerEntity);
+                Maybe<SpriteManager> result = this.managersSystem.Get(managerEntity);
                 if (result.HasValue && result.Value.HasAvailableSpace) {
                     return new Maybe<SpriteManager>(result.Value);
                 }
@@ -127,7 +133,7 @@ namespace CommonEcs {
             return Maybe<SpriteManager>.Nothing;
         }
 
-        private void AddSpriteToManager(SpriteManager manager, int index) {
+        private void AddSpriteToManager(SpriteManager manager, int index, ref EntityCommandBuffer commandBuffer) {
             Sprite sprite = this.sprites[index];
 
             Assertion.IsTrue(manager.Owner != Entity.Null); // Should have been set already
@@ -138,14 +144,14 @@ namespace CommonEcs {
             this.sprites[index] = sprite; // Modify the data
 
             // We add this component so it will be skipped by this system on the next frame
-            this.PostUpdateCommands.AddComponent(this.entities[index], new Added(manager.Owner, sprite.managerIndex));
+            commandBuffer.AddComponent(this.entities[index], new Added(manager.Owner, sprite.managerIndex));
 
             // We add the shared component so that it can be filtered using such shared component
             // in other systems. For example, in SortRenderOrderSystem.
-            this.PostUpdateCommands.AddSharedComponent(this.entities[index], manager);
+            commandBuffer.AddSharedComponentManaged(this.entities[index], manager);
         }
 
-        public struct Added : ISystemStateComponentData {
+        public struct Added : ICleanupComponentData {
             // The entity of the sprite manager to where the sprite is added
             public readonly Entity spriteManagerEntity;
 

@@ -3,6 +3,7 @@ using System;
 using Common;
 
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -22,7 +23,7 @@ namespace CommonEcs.Goap {
         protected bool isFilterZeroSized;
 
         protected override void OnCreate() {
-            this.textDbSystem = GetOrCreateSystem<GoapTextDbSystem>();
+            this.textDbSystem = GetOrCreateSystemManaged<GoapTextDbSystem>();
             
             this.query = GetEntityQuery(typeof(ConditionResolver), typeof(TResolverFilter));
             this.isFilterZeroSized = TypeManager.GetTypeInfo(TypeManager.GetTypeIndex<TResolverFilter>()).IsZeroSized;
@@ -33,10 +34,12 @@ namespace CommonEcs.Goap {
                 throw new CantBeNullException(nameof(this.textDbSystem));
             }
             
-            ExecuteResolversJob job = new ExecuteResolversJob() {
+            NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(Allocator.TempJob);
+            ExecuteResolversJob job = new() {
+                chunkBaseEntityIndices = chunkBaseEntityIndices,
                 resolverType = GetComponentTypeHandle<ConditionResolver>(),
                 filterType = GetComponentTypeHandle<TResolverFilter>(),
-                allDebugEntity = GetComponentDataFromEntity<DebugEntity>(),
+                allDebugEntity = GetComponentLookup<DebugEntity>(),
                 textResolver = this.textDbSystem.TextResolver,
                 filterHasArray = !this.isFilterZeroSized, // Filter has array if it's not zero sized
                 processor = PrepareProcessor()
@@ -46,6 +49,9 @@ namespace CommonEcs.Goap {
                 JobHandle handle = this.ShouldScheduleParallel ? job.ScheduleParallel(this.query, inputDeps) :
                     job.Schedule(this.query, inputDeps);
                 AfterJobScheduling(handle);
+                
+                // Don't forget to dispose
+                handle = chunkBaseEntityIndices.Dispose(handle);
                 
                 return handle;
             } catch (InvalidOperationException) {
@@ -87,12 +93,15 @@ namespace CommonEcs.Goap {
         protected abstract TResolverProcessor PrepareProcessor();
         
         [BurstCompile]
-        public struct ExecuteResolversJob : IJobEntityBatchWithIndex {
+        public struct ExecuteResolversJob : IJobChunk {
+            [ReadOnly]
+            public NativeArray<int> chunkBaseEntityIndices;
+            
             public ComponentTypeHandle<ConditionResolver> resolverType;
             public ComponentTypeHandle<TResolverFilter> filterType;
 
             [ReadOnly]
-            public ComponentDataFromEntity<DebugEntity> allDebugEntity;
+            public ComponentLookup<DebugEntity> allDebugEntity;
 
             [ReadOnly]
             public GoapTextResolver textResolver;
@@ -100,25 +109,28 @@ namespace CommonEcs.Goap {
             public bool filterHasArray;
             public TResolverProcessor processor;
             
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex, int indexOfFirstEntityInQuery) {
-                NativeArray<ConditionResolver> resolvers = batchInChunk.GetNativeArray(this.resolverType);
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<ConditionResolver> resolvers = chunk.GetNativeArray(this.resolverType);
                 
-                NativeArray<TResolverFilter> filters = this.filterHasArray ? batchInChunk.GetNativeArray(this.filterType) : default;
+                NativeArray<TResolverFilter> filters = this.filterHasArray ? chunk.GetNativeArray(this.filterType) : default;
                 TResolverFilter defaultFilter = default; // This will be used if TActionFilter has no chunk (it's a tag component)
                 
-                this.processor.BeforeChunkIteration(batchInChunk, batchIndex);
+                this.processor.BeforeChunkIteration(chunk);
                 
-                int count = batchInChunk.Count;
-                for (int i = 0; i < count; ++i) {
+                EntityIndexAide indexAide = new(ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     ConditionResolver resolver = resolvers[i];
                     if (resolver.resolved) {
                         // Already resolved
                         continue;
                     }
+                    
+                    int queryIndex = indexAide.NextEntityIndexInQuery();
 
                     if (this.filterHasArray) {
                         TResolverFilter filter = filters[i];
-                        ExecuteResolver(ref resolver, ref filter, indexOfFirstEntityInQuery, i);
+                        ExecuteResolver(ref resolver, ref filter, i, queryIndex);
                         
                         // Modify
                         resolvers[i] = resolver;
@@ -126,7 +138,7 @@ namespace CommonEcs.Goap {
                     } else {
                         // There's no array for the TResolverFilter. It must be a tag component.
                         // Use a default filter component
-                        ExecuteResolver(ref resolver, ref defaultFilter, indexOfFirstEntityInQuery, i);
+                        ExecuteResolver(ref resolver, ref defaultFilter, i, queryIndex);
                         
                         // Modify
                         resolvers[i] = resolver;
@@ -134,8 +146,8 @@ namespace CommonEcs.Goap {
                 }
             }
 
-            private void ExecuteResolver(ref ConditionResolver resolver, ref TResolverFilter resolverFilter, int indexOfFirstEntityInQuery, int iterIndex) {
-                resolver.result = this.processor.IsMet(resolver.agentEntity, ref resolverFilter, indexOfFirstEntityInQuery, iterIndex);
+            private void ExecuteResolver(ref ConditionResolver resolver, ref TResolverFilter resolverFilter, int chunkIndex, int queryIndex) {
+                resolver.result = this.processor.IsMet(resolver.agentEntity, ref resolverFilter, chunkIndex, queryIndex);
                 resolver.resolved = true;
 
 #if UNITY_EDITOR

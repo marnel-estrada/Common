@@ -1,4 +1,5 @@
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -8,52 +9,66 @@ namespace CommonEcs {
     /// Handles the signals by batches. This is different from SignalHandlerJobComponentSystem which handles
     /// signals one after another.
     /// </summary>
-    /// <typeparam name="ParameterType"></typeparam>
-    /// <typeparam name="ProcessorType"></typeparam>
-    public abstract partial class SignalHandlerBatchJobSystem<ParameterType, ProcessorType> : JobSystemBase 
-        where ParameterType : struct, IComponentData
-        where ProcessorType : struct, ISignalProcessor<ParameterType> {
+    /// <typeparam name="TParameterType"></typeparam>
+    /// <typeparam name="TProcessorType"></typeparam>
+    public abstract partial class SignalHandlerBatchJobSystem<TParameterType, TProcessorType> : JobSystemBase 
+        where TParameterType : unmanaged, IComponentData
+        where TProcessorType : unmanaged, ISignalProcessor<TParameterType> {
         private EntityQuery query;
-        private EndInitializationEntityCommandBufferSystem barrier;
+        private EndInitializationEntityCommandBufferSystem commandBufferSystem;
 
         protected override void OnCreate() {
-            this.query = GetEntityQuery(typeof(Signal), typeof(ParameterType), ComponentType.Exclude<ProcessedBySystem>());;
-            this.barrier = this.World.GetOrCreateSystem<EndInitializationEntityCommandBufferSystem>();
+            this.query = GetEntityQuery(typeof(Signal), typeof(TParameterType), ComponentType.Exclude<ProcessedBySystem>());;
+            this.commandBufferSystem = this.World.GetOrCreateSystemManaged<EndInitializationEntityCommandBufferSystem>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             ProcessJob job = new ProcessJob() {
                 entityType = GetEntityTypeHandle(),
-                parameterType = GetComponentTypeHandle<ParameterType>(true),
+                parameterType = GetComponentTypeHandle<TParameterType>(true),
                 processor = PrepareProcessor(),
-                commandBuffer = this.barrier.CreateCommandBuffer()
+                commandBuffer = this.commandBufferSystem.CreateCommandBuffer()
             };
             
             // We don't use ScheduleParallel() since the processor might have used ComponentDataFromEntity
             // or BufferFromEntity
             JobHandle handle = job.Schedule(this.query, inputDeps);
             
-            this.barrier.AddJobHandleForProducer(handle);
+            this.commandBufferSystem.AddJobHandleForProducer(handle);
             
             return handle;
         }
 
         [BurstCompile]
-        public struct ProcessJob : IJobEntityBatch {
+        public struct ProcessJob : IJobChunk {
             [ReadOnly]
             public EntityTypeHandle entityType;
             
             [ReadOnly]
-            public ComponentTypeHandle<ParameterType> parameterType;
+            public ComponentTypeHandle<TParameterType> parameterType;
 
-            public ProcessorType processor;
+            public TProcessorType processor;
 
             public EntityCommandBuffer commandBuffer;
 
             public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
                 NativeArray<Entity> entities = batchInChunk.GetNativeArray(this.entityType);
-                NativeArray<ParameterType> parameters = batchInChunk.GetNativeArray(this.parameterType);
+                NativeArray<TParameterType> parameters = batchInChunk.GetNativeArray(this.parameterType);
                 for (int i = 0; i < batchInChunk.Count; ++i) {
+                    Entity entity = entities[i];
+                    this.processor.Execute(entity, parameters[i]);
+                    
+                    // We added this component so that they will not be processed again
+                    this.commandBuffer.AddComponent<ProcessedBySystem>(entity);
+                }
+            }
+
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
+                NativeArray<TParameterType> parameters = chunk.GetNativeArray(ref this.parameterType);
+
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     Entity entity = entities[i];
                     this.processor.Execute(entity, parameters[i]);
                     
@@ -63,7 +78,7 @@ namespace CommonEcs {
             }
         }
 
-        protected abstract ProcessorType PrepareProcessor();
+        protected abstract TProcessorType PrepareProcessor();
         
         // Tag that identifies a signal entity that it has been already processed
         public struct ProcessedBySystem : IComponentData {

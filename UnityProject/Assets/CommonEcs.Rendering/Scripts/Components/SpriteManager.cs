@@ -27,17 +27,6 @@ namespace CommonEcs {
         }
 
         /// <summary>
-        /// Another version of Init() that accepts an EntityCommandBuffer
-        /// </summary>
-        /// <param name="allocationCount"></param>
-        /// <param name="commands"></param>
-        public SpriteManager(int allocationCount, EntityCommandBuffer commands) {
-            this.internalInstance = new Internal();
-            this.internalInstance.Init(allocationCount, commands);
-            this.id = ID_GENERATOR.Generate();
-        }
-
-        /// <summary>
         /// Updates the mesh
         /// </summary>
         public void UpdateMesh() {
@@ -375,19 +364,6 @@ namespace CommonEcs {
 
                 // We add a dummy sprite that has zero width and height so we just prevent the artifacting
                 AddInvisibleSprite();
-            }
-
-            /// <summary>
-            /// Another version of Init() that accepts an EntityCommandBuffer
-            /// This is used when a SpriteManager is prepared inside systems instead of outside ECS
-            /// </summary>
-            /// <param name="allocationCount"></param>
-            /// <param name="commands"></param>
-            public void Init(int allocationCount, EntityCommandBuffer commands) {
-                InitVariables(allocationCount);
-                
-                // Note here that we can't add invisible sprite for this version since we
-                // can't determine the owner
             }
 
             private void InitVariables(int allocationCount) {

@@ -1,4 +1,5 @@
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -28,14 +29,14 @@ namespace CommonEcs.Goap {
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             ComponentTypeHandle<GoapAgent> agentType = GetComponentTypeHandle<GoapAgent>();
             
-            ChangeStateFromCleanupToIdleJob changeFromCleanupToIdleJob = new ChangeStateFromCleanupToIdleJob() {
+            ChangeStateFromCleanupToIdleJob changeFromCleanupToIdleJob = new() {
                 agentType = agentType
             };
             JobHandle handle = changeFromCleanupToIdleJob.ScheduleParallel(this.agentsQuery, inputDeps);
 
-            ComponentDataFromEntity<GoapAgent> allAgents = GetComponentDataFromEntity<GoapAgent>();
+            ComponentLookup<GoapAgent> allAgents = GetComponentLookup<GoapAgent>();
             
-            ProcessAtomActionsJob processAtomActionsJob = new ProcessAtomActionsJob() {
+            ProcessAtomActionsJob processAtomActionsJob = new() {
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
                 allAgents = allAgents
             };
@@ -43,16 +44,16 @@ namespace CommonEcs.Goap {
             
             // We try to reset the goal index first so that GoapAgent.state remains Executing.
             // Note that it is set to Idle in MoveToNextActionJob when last action failed or ended
-            ResetPlannerGoalIndexJob resetGoalIndexJob = new ResetPlannerGoalIndexJob() {
+            ResetPlannerGoalIndexJob resetGoalIndexJob = new() {
                 plannerType = GetComponentTypeHandle<GoapPlanner>(), 
                 allAgents = allAgents
             };
             handle = resetGoalIndexJob.ScheduleParallel(this.plannersQuery, handle);
 
-            MoveToNextActionJob moveToNextActionJob = new MoveToNextActionJob() {
+            MoveToNextActionJob moveToNextActionJob = new() {
                 agentType = agentType, 
                 debugEntityType = GetComponentTypeHandle<DebugEntity>(),
-                allActionSets = GetBufferFromEntity<ResolvedAction>()
+                allActionSets = GetBufferLookup<ResolvedAction>()
             };
             handle = moveToNextActionJob.ScheduleParallel(this.agentsQuery, handle);
 
@@ -69,12 +70,14 @@ namespace CommonEcs.Goap {
         /// Cleanup. After one frame, atom actions should have already executed their cleanup.
         /// </summary>
         [BurstCompile]
-        private struct ChangeStateFromCleanupToIdleJob : IJobEntityBatch {
+        private struct ChangeStateFromCleanupToIdleJob : IJobChunk {
             public ComponentTypeHandle<GoapAgent> agentType;
         
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<GoapAgent> agents = batchInChunk.GetNativeArray(this.agentType);
-                for (int i = 0; i < agents.Length; ++i) {
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<GoapAgent> agents = chunk.GetNativeArray(ref this.agentType);
+
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     GoapAgent agent = agents[i];
                     if (agent.state != AgentState.CLEANUP) {
                         // Not yet cleaning up. Skip.
@@ -91,15 +94,17 @@ namespace CommonEcs.Goap {
         /// Routines like setting AtomAction.executing and setting GoapAgent.lastResult is done here
         /// </summary>
         [BurstCompile]
-        private struct ProcessAtomActionsJob : IJobEntityBatch {
+        private struct ProcessAtomActionsJob : IJobChunk {
             public ComponentTypeHandle<AtomAction> atomActionType;
 
             [NativeDisableParallelForRestriction]
-            public ComponentDataFromEntity<GoapAgent> allAgents;
+            public ComponentLookup<GoapAgent> allAgents;
             
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<AtomAction> atomActions = batchInChunk.GetNativeArray(this.atomActionType);
-                for (int i = 0; i < atomActions.Length; ++i) {
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<AtomAction> atomActions = chunk.GetNativeArray(ref this.atomActionType);
+
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     AtomAction atomAction = atomActions[i];
 
                     // Apply only to atom actions that were executing
@@ -125,15 +130,17 @@ namespace CommonEcs.Goap {
         }
         
         [BurstCompile]
-        private struct ResetPlannerGoalIndexJob : IJobEntityBatch {
+        private struct ResetPlannerGoalIndexJob : IJobChunk {
             public ComponentTypeHandle<GoapPlanner> plannerType;
 
             [ReadOnly]
-            public ComponentDataFromEntity<GoapAgent> allAgents;
+            public ComponentLookup<GoapAgent> allAgents;
 
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<GoapPlanner> planners = batchInChunk.GetNativeArray(this.plannerType);
-                for (int i = 0; i < batchInChunk.Count; ++i) {
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<GoapPlanner> planners = chunk.GetNativeArray(ref this.plannerType);
+
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     GoapPlanner planner = planners[i];
                     GoapAgent agent = this.allAgents[planner.agentEntity];
                     
@@ -157,19 +164,20 @@ namespace CommonEcs.Goap {
         }
         
         [BurstCompile]
-        private struct MoveToNextActionJob : IJobEntityBatch {
+        private struct MoveToNextActionJob : IJobChunk {
             public ComponentTypeHandle<GoapAgent> agentType;
 
             public ComponentTypeHandle<DebugEntity> debugEntityType;
 
             [ReadOnly]
-            public BufferFromEntity<ResolvedAction> allActionSets;
+            public BufferLookup<ResolvedAction> allActionSets;
             
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<GoapAgent> agents = batchInChunk.GetNativeArray(this.agentType);
-                NativeArray<DebugEntity> debugEntities = batchInChunk.GetNativeArray(this.debugEntityType);
-                
-                for (int i = 0; i < agents.Length; ++i) {
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<GoapAgent> agents = chunk.GetNativeArray(ref this.agentType);
+                NativeArray<DebugEntity> debugEntities = chunk.GetNativeArray(ref this.debugEntityType);
+
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     GoapAgent agent = agents[i];
                     if (agent.state != AgentState.EXECUTING) {
                         // Skip agents that are not executing

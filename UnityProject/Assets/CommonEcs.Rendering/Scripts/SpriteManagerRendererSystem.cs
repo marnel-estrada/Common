@@ -9,7 +9,7 @@ namespace CommonEcs {
     [UpdateAfter(typeof(TransformVerticesSystem))]
     [UpdateAfter(typeof(SpriteManagerJobsFinisher))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class SpriteManagerRendererSystem : ComponentSystem {
+    public class SpriteManagerRendererSystem : SystemBase {
         private EntityQuery query;
         private SharedComponentQuery<SpriteManager> spriteManagerQuery;
         
@@ -23,7 +23,7 @@ namespace CommonEcs {
 
         protected override void OnUpdate() {
             this.spriteManagerQuery.Update();
-            NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
             AddAndSort(chunks);
             chunks.Dispose();
             

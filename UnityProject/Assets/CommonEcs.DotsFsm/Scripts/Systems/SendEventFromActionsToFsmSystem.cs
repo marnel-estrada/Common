@@ -1,4 +1,5 @@
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 
@@ -20,23 +21,25 @@ namespace CommonEcs.DotsFsm {
         }
 
         protected override void OnUpdate() {
-            Job job = new Job() {
+            SendEventFromActionsJob job = new SendEventFromActionsJob() {
                 actionType = GetComponentTypeHandle<DotsFsmAction>(),
-                allFsms = GetComponentDataFromEntity<DotsFsm>()
+                allFsms = GetComponentLookup<DotsFsm>()
             };
             this.Dependency = job.ScheduleParallel(this.actionsQuery, this.Dependency);
         } 
 
         [BurstCompile]
-        private struct Job : IJobEntityBatch {
+        private struct SendEventFromActionsJob : IJobChunk {
             public ComponentTypeHandle<DotsFsmAction> actionType;
 
             [NativeDisableParallelForRestriction]
-            public ComponentDataFromEntity<DotsFsm> allFsms;
-            
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<DotsFsmAction> actions = batchInChunk.GetNativeArray(this.actionType);
-                for (int i = 0; i < actions.Length; ++i) {
+            public ComponentLookup<DotsFsm> allFsms;
+
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<DotsFsmAction> actions = chunk.GetNativeArray(ref this.actionType);
+
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     DotsFsmAction action = actions[i];
                     if (action.pendingEvent.IsSome) {
                         DotsFsm fsm = this.allFsms[action.fsmEntity];

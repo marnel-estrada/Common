@@ -1,4 +1,5 @@
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -18,14 +19,14 @@ namespace CommonEcs.Goap {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            StartPlanningJob startPlanningJob = new StartPlanningJob() {
+            StartPlanningJob startPlanningJob = new() {
                 plannerType = GetComponentTypeHandle<GoapPlanner>(),
                 bucketType = GetBufferTypeHandle<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>>(),
-                allAgents = GetComponentDataFromEntity<GoapAgent>()
+                allAgents = GetComponentLookup<GoapAgent>()
             };
             JobHandle handle = startPlanningJob.ScheduleParallel(this.plannerQuery, inputDeps);
 
-            SetIdleAgentsWithGoalsToPlanningJob setToPlanningJob = new SetIdleAgentsWithGoalsToPlanningJob() {
+            SetIdleAgentsWithGoalsToPlanningJob setToPlanningJob = new() {
                 agentType = GetComponentTypeHandle<GoapAgent>()
             };
             handle = setToPlanningJob.ScheduleParallel(this.agentsQuery, handle);
@@ -34,18 +35,20 @@ namespace CommonEcs.Goap {
         }
 
         [BurstCompile]
-        private struct StartPlanningJob : IJobEntityBatch {
+        private struct StartPlanningJob : IJobChunk {
             public ComponentTypeHandle<GoapPlanner> plannerType;
             public BufferTypeHandle<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> bucketType;
             
             [ReadOnly]
-            public ComponentDataFromEntity<GoapAgent> allAgents;
-            
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<GoapPlanner> planners = batchInChunk.GetNativeArray(this.plannerType);
-                BufferAccessor<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> buckets = batchInChunk.GetBufferAccessor(this.bucketType);
-                
-                for (int i = 0; i < planners.Length; ++i) {
+            public ComponentLookup<GoapAgent> allAgents;
+
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<GoapPlanner> planners = chunk.GetNativeArray(ref this.plannerType);
+                BufferAccessor<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> buckets = 
+                    chunk.GetBufferAccessor(ref this.bucketType);
+
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while(enumerator.NextEntityIndex(out int i)) {
                     GoapPlanner planner = planners[i];
                     
                     GoapAgent agent = this.allAgents[planner.agentEntity];
@@ -73,13 +76,14 @@ namespace CommonEcs.Goap {
         }
         
         [BurstCompile]
-        private struct SetIdleAgentsWithGoalsToPlanningJob : IJobEntityBatch {
+        private struct SetIdleAgentsWithGoalsToPlanningJob : IJobChunk {
             public ComponentTypeHandle<GoapAgent> agentType;
 
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<GoapAgent> agents = batchInChunk.GetNativeArray(this.agentType);
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<GoapAgent> agents = chunk.GetNativeArray(ref this.agentType);
 
-                for (int i = 0; i < batchInChunk.Count; ++i) {
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while(enumerator.NextEntityIndex(out int i)) {
                     GoapAgent agent = agents[i];
                     
                     if (agent.state == AgentState.IDLE && agent.goals.Count > 0) {

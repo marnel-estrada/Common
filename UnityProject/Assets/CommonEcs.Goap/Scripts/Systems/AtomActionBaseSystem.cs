@@ -1,5 +1,6 @@
 using System;
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -15,8 +16,8 @@ namespace CommonEcs.Goap {
     [UpdateAfter(typeof(IdentifyAtomActionsThatCanExecuteSystem))]
     [UpdateBefore(typeof(EndAtomActionsSystem))]
     public abstract partial class AtomActionBaseSystem<TActionFilter, TProcessor> : JobSystemBase
-        where TActionFilter : struct, IAtomActionComponent
-        where TProcessor : struct, IAtomActionProcess<TActionFilter> {
+        where TActionFilter : unmanaged, IAtomActionComponent
+        where TProcessor : unmanaged, IAtomActionProcess<TActionFilter> {
         private EntityQuery query;
         protected bool isActionFilterHasArray;
 
@@ -32,20 +33,26 @@ namespace CommonEcs.Goap {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            ExecuteAtomActionJob job = new ExecuteAtomActionJob() {
+            NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(Allocator.TempJob);
+            ExecuteAtomActionJob job = new() {
+                chunkBaseEntityIndices = chunkBaseEntityIndices,
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
                 actionFilterType = GetComponentTypeHandle<TActionFilter>(),
                 isActionFilterHasArray = this.isActionFilterHasArray, // Action filter has array if it's not zero sized
                 processor = PrepareProcessor(),
-                allAgents = GetComponentDataFromEntity<GoapAgent>(),
-                allDebugEntities = GetComponentDataFromEntity<DebugEntity>()
+                allAgents = GetComponentLookup<GoapAgent>(),
+                allDebugEntities = GetComponentLookup<DebugEntity>()
             };
 
             try {
-                JobHandle handle = this.ShouldScheduleParallel ?
+                inputDeps = this.ShouldScheduleParallel ?
                     job.ScheduleParallel(this.query, inputDeps) : job.Schedule(this.query, inputDeps);
-                AfterJobScheduling(handle);
-                return handle;
+                AfterJobScheduling(inputDeps);
+                
+                // Don't forget to dispose
+                inputDeps = chunkBaseEntityIndices.Dispose(inputDeps);
+                
+                return inputDeps;
             } catch (InvalidOperationException) {
                 Debug.LogError(typeof(TActionFilter));
                 throw;
@@ -76,28 +83,32 @@ namespace CommonEcs.Goap {
 
         // We need this to be public so it can be referenced in AssemblyInfo
         [BurstCompile]
-        public struct ExecuteAtomActionJob : IJobEntityBatchWithIndex {
+        public struct ExecuteAtomActionJob : IJobChunk {
+            [ReadOnly]
+            public NativeArray<int> chunkBaseEntityIndices;
+            
             public ComponentTypeHandle<AtomAction> atomActionType;
             public ComponentTypeHandle<TActionFilter> actionFilterType;
             public bool isActionFilterHasArray;
             public TProcessor processor;
 
             [ReadOnly]
-            public ComponentDataFromEntity<GoapAgent> allAgents;
+            public ComponentLookup<GoapAgent> allAgents;
 
             [ReadOnly]
-            public ComponentDataFromEntity<DebugEntity> allDebugEntities;
+            public ComponentLookup<DebugEntity> allDebugEntities;
+            
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<AtomAction> atomActions = chunk.GetNativeArray(ref this.atomActionType);
 
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex, int indexOfFirstEntityInQuery) {
-                NativeArray<AtomAction> atomActions = batchInChunk.GetNativeArray(this.atomActionType);
-
-                NativeArray<TActionFilter> filterActions = this.isActionFilterHasArray ? batchInChunk.GetNativeArray(this.actionFilterType) : default;
+                NativeArray<TActionFilter> filterActions = this.isActionFilterHasArray ? chunk.GetNativeArray(ref this.actionFilterType) : default;
                 TActionFilter defaultActionFilter = default; // This will be used if TActionFilter has no chunk (it's a tag component)
 
-                this.processor.BeforeChunkIteration(batchInChunk, batchIndex);
-
-                int count = batchInChunk.Count;
-                for (int i = 0; i < count; ++i) {
+                this.processor.BeforeChunkIteration(chunk);
+                
+                EntityIndexAide indexAide = new(ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     AtomAction atomAction = atomActions[i];
                     GoapAgent agent = this.allAgents[atomAction.agentEntity];
                     DebugEntity debug = this.allDebugEntities[atomAction.agentEntity];
@@ -107,9 +118,11 @@ namespace CommonEcs.Goap {
                         ++breakpoint;
                     }
 
+                    int queryIndex = indexAide.NextEntityIndexInQuery();
+
                     if (agent.state == AgentState.CLEANUP) {
                         // Time to cleanup
-                        Cleanup(ref atomAction, ref atomActions, ref filterActions, indexOfFirstEntityInQuery, i);
+                        Cleanup(ref atomAction, ref atomActions, ref filterActions, i, queryIndex);
                         continue;
                     }
 
@@ -121,39 +134,39 @@ namespace CommonEcs.Goap {
 
                     if (this.isActionFilterHasArray) {
                         TActionFilter actionFilter = filterActions[i];
-                        ExecuteAction(ref atomAction, ref actionFilter, indexOfFirstEntityInQuery, i);
+                        ExecuteAction(ref atomAction, ref actionFilter, i, queryIndex);
                         filterActions[i] = actionFilter; // Modify
                     } else {
                         // There's no array for the TActionFilter. It must be a tag component.
                         // Use a default filter component
-                        ExecuteAction(ref atomAction, ref defaultActionFilter, indexOfFirstEntityInQuery, i);
+                        ExecuteAction(ref atomAction, ref defaultActionFilter, i, queryIndex);
                     }
 
                     atomActions[i] = atomAction; // Modify
                 }
             }
 
-            private void Cleanup(ref AtomAction atomAction, ref NativeArray<AtomAction> atomActions, ref NativeArray<TActionFilter> filterActions, int indexOfFirstEntityInQuery, int index) {
+            private void Cleanup(ref AtomAction atomAction, ref NativeArray<AtomAction> atomActions, ref NativeArray<TActionFilter> filterActions, int chunkIndex, int queryIndex) {
                 if (this.isActionFilterHasArray) {
-                    TActionFilter actionFilter = filterActions[index];
-                    this.processor.Cleanup(ref atomAction, ref actionFilter, indexOfFirstEntityInQuery, index);
+                    TActionFilter actionFilter = filterActions[chunkIndex];
+                    this.processor.Cleanup(ref atomAction, ref actionFilter, chunkIndex, queryIndex);
 
                     // Modify
-                    filterActions[index] = actionFilter;
+                    filterActions[chunkIndex] = actionFilter;
                 } else {
                     // Filter action has no data. Only a tag. We pass default.
                     TActionFilter actionFilter = default;
-                    this.processor.Cleanup(ref atomAction, ref actionFilter, indexOfFirstEntityInQuery, index);
+                    this.processor.Cleanup(ref atomAction, ref actionFilter, chunkIndex, queryIndex);
                 }
 
                 // Modify
-                atomActions[index] = atomAction;
+                atomActions[chunkIndex] = atomAction;
             }
 
-            private void ExecuteAction(ref AtomAction atomAction, ref TActionFilter actionFilter, int indexOfFirstEntityInQuery, int index) {
+            private void ExecuteAction(ref AtomAction atomAction, ref TActionFilter actionFilter, int chunkIndex, int queryIndex) {
                 if (!atomAction.started) {
                     // We call Start() if not yet started
-                    atomAction.result = this.processor.Start(ref atomAction, ref actionFilter, indexOfFirstEntityInQuery, index);
+                    atomAction.result = this.processor.Start(ref atomAction, ref actionFilter, chunkIndex, queryIndex);
                     atomAction.started = true;
 
                     if (atomAction.result == GoapResult.FAILED || atomAction.result == GoapResult.SUCCESS) {
@@ -162,7 +175,7 @@ namespace CommonEcs.Goap {
                     }
                 }
 
-                atomAction.result = this.processor.Update(ref atomAction, ref actionFilter, indexOfFirstEntityInQuery, index);
+                atomAction.result = this.processor.Update(ref atomAction, ref actionFilter, chunkIndex, queryIndex);
             }
         }
     }

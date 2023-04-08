@@ -7,7 +7,9 @@ namespace CommonEcs {
     [UpdateAfter(typeof(SpriteManagerRendererSystem))]
     [UpdateAfter(typeof(UpdateChangedVerticesSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class RemoveSpriteFromManagerSystem : ComponentSystem {
+    public class RemoveSpriteFromManagerSystem : SystemBase {
+        private EntityCommandBufferSystem commandBufferSystem;
+        
         private EntityQuery query;
 
         private ComponentTypeHandle<Sprite> spriteType;
@@ -16,25 +18,28 @@ namespace CommonEcs {
         private SpriteManagerInstancesSystem spriteManagers;
 
         protected override void OnCreate() {
+            this.commandBufferSystem = this.GetOrCreateSystemManaged<BeginPresentationEntityCommandBufferSystem>();
+            
             this.query = GetEntityQuery(typeof(Sprite), typeof(ForRemoval));
-            this.spriteManagers = this.World.GetOrCreateSystem<SpriteManagerInstancesSystem>();
+            this.spriteManagers = this.GetOrCreateSystemManaged<SpriteManagerInstancesSystem>();
         }
 
         protected override void OnUpdate() {
             this.spriteType = GetComponentTypeHandle<Sprite>();
             this.entityType = GetEntityTypeHandle();
             
-            NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
+            EntityCommandBuffer commandBuffer = this.commandBufferSystem.CreateCommandBuffer();
             for (int i = 0; i < chunks.Length; ++i) {
                 ArchetypeChunk chunk = chunks[i];
-                Process(ref chunk);
+                Process(ref chunk, ref commandBuffer);
             }
             
             chunks.Dispose();
         }
 
-        private void Process(ref ArchetypeChunk chunk) {
-            NativeArray<Sprite> sprites = chunk.GetNativeArray(this.spriteType);
+        private void Process(ref ArchetypeChunk chunk, ref EntityCommandBuffer commandBuffer) {
+            NativeArray<Sprite> sprites = chunk.GetNativeArray(ref this.spriteType);
             NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
             
             for (int i = 0; i < sprites.Length; ++i) {
@@ -44,7 +49,7 @@ namespace CommonEcs {
                 maybeManager.Value.Remove(sprite);
             
                 // Entities with ForRemoval means that the entity will be removed
-                this.PostUpdateCommands.DestroyEntity(entities[i]);
+                commandBuffer.DestroyEntity(entities[i]);
             }
         }        
     }

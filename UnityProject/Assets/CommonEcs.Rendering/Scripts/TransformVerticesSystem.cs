@@ -1,6 +1,7 @@
 ﻿using System;
 
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -12,11 +13,6 @@ namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public partial class TransformVerticesSystem : JobSystemBase {
         private EntityQuery query;
-
-        private ComponentTypeHandle<Sprite> spriteType;
-
-        [ReadOnly]
-        private ComponentTypeHandle<LocalToWorld> matrixType;
 
         protected override void OnCreate() {
             // All entities that has Sprite and LocalToWorld, but no Static
@@ -34,29 +30,27 @@ namespace CommonEcs {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            this.spriteType = GetComponentTypeHandle<Sprite>();
-            this.matrixType = GetComponentTypeHandle<LocalToWorld>(true);
-
-            Job job = new Job() {
-                spriteType = this.spriteType, 
-                matrixType = this.matrixType
+            TransformJob transformJob = new TransformJob() {
+                spriteType = GetComponentTypeHandle<Sprite>(), 
+                matrixType = GetComponentTypeHandle<LocalToWorld>(true)
             };
 
-            return job.ScheduleParallel(this.query, inputDeps);
+            return transformJob.ScheduleParallel(this.query, inputDeps);
         }
 
         [BurstCompile]
-        private struct Job : IJobChunk {
+        private struct TransformJob : IJobChunk {
             public ComponentTypeHandle<Sprite> spriteType;
 
             [ReadOnly]
             public ComponentTypeHandle<LocalToWorld> matrixType;
 
-            public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {
-                NativeArray<Sprite> sprites = chunk.GetNativeArray(this.spriteType);
-                NativeArray<LocalToWorld> matrices = chunk.GetNativeArray(this.matrixType);
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<Sprite> sprites = chunk.GetNativeArray(ref this.spriteType);
+                NativeArray<LocalToWorld> matrices = chunk.GetNativeArray(ref this.matrixType);
 
-                for (int i = 0; i < chunk.Count; ++i) {
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     Sprite sprite = sprites[i];
                     LocalToWorld transform = matrices[i];
                     sprite.Transform(ref transform.Value);

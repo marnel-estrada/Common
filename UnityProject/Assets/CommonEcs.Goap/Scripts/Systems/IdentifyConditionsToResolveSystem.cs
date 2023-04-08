@@ -1,4 +1,5 @@
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -14,27 +15,27 @@ namespace CommonEcs.Goap {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            IdentifyJob job = new IdentifyJob() {
+            IdentifyJob job = new() {
                 resolverHandle = GetComponentTypeHandle<ConditionResolver>(),
-                allPlanners = GetComponentDataFromEntity<GoapPlanner>(),
-                allRequiredConditions = GetBufferFromEntity<RequiredCondition>()
+                allPlanners = GetComponentLookup<GoapPlanner>(),
+                allRequiredConditions = GetBufferLookup<RequiredCondition>()
             };
             
             return job.ScheduleParallel(this.query, inputDeps);
         }
         
         [BurstCompile]
-        private struct IdentifyJob : IJobEntityBatch {
+        private struct IdentifyJob : IJobChunk {
             public ComponentTypeHandle<ConditionResolver> resolverHandle;
 
             [ReadOnly]
-            public ComponentDataFromEntity<GoapPlanner> allPlanners;
+            public ComponentLookup<GoapPlanner> allPlanners;
 
             [ReadOnly]
-            public BufferFromEntity<RequiredCondition> allRequiredConditions;
+            public BufferLookup<RequiredCondition> allRequiredConditions;
             
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<ConditionResolver> resolvers = batchInChunk.GetNativeArray(this.resolverHandle);
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<ConditionResolver> resolvers = chunk.GetNativeArray(ref this.resolverHandle);
                 for (int i = 0; i < resolvers.Length; ++i) {
                     ConditionResolver resolver = resolvers[i];
                     GoapPlanner planner = this.allPlanners[resolver.plannerEntity];

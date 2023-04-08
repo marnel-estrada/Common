@@ -23,12 +23,12 @@ namespace CommonEcs {
 
         public MultipleGrid2dWrapper gridWrapper;
         
-        public ComponentDataFromEntity<Path> allPaths;
+        public ComponentLookup<Path> allPaths;
         
         [ReadOnly]
-        public BufferFromEntity<Int3BufferElement> allPathLists;
+        public BufferLookup<Int3BufferElement> allPathLists;
 
-        public ComponentDataFromEntity<Waiting> allWaiting;
+        public ComponentLookup<Waiting> allWaiting;
 
         // This is the master container for all AStarNodes. The key is the hash code of the position.
         // This will be specified by client code

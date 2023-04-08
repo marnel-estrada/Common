@@ -68,8 +68,8 @@
             };
         }
 
-        public static T GetOrCreateSystem<T>(this ComponentSystemBase self) where T : ComponentSystemBase {
-            return self.World.GetOrCreateSystem<T>();
+        public static T GetOrCreateSystemManaged<T>(this ComponentSystemBase self) where T : ComponentSystemBase {
+            return self.World.GetOrCreateSystemManaged<T>();
         }
     }
 }

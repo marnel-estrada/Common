@@ -9,26 +9,26 @@ namespace CommonEcs.DotsFsm {
 
         protected override void OnCreate() {
             base.OnCreate();
-            this.dotsFsmSystemGroup = this.World.GetOrCreateSystem<DotsFsmSystemGroup>();
+            this.dotsFsmSystemGroup = this.World.GetOrCreateSystemManaged<DotsFsmSystemGroup>();
         }
 
         public struct Execution : IFsmActionExecution<MoveTo> {
             [NativeDisableParallelForRestriction]
-            public ComponentDataFromEntity<Translation> allTranslation;
+            public ComponentLookup<LocalTransform> allTransform;
             
             [NativeDisableParallelForRestriction]
             public NativeReference<bool> rerunGroup;
             
             public float deltaTime;
             
-            public void BeforeChunkIteration(ArchetypeChunk batchInChunk, int batchIndex) {
+            public void BeforeChunkIteration(ArchetypeChunk chunk) {
             }
             
-            public void OnEnter(Entity actionEntity, ref DotsFsmAction action, ref MoveTo move, int indexOfFirstEntityInQuery, int iterIndex) {
+            public void OnEnter(Entity actionEntity, ref DotsFsmAction action, ref MoveTo move, int indexInQuery) {
+                LocalTransform transform = this.allTransform[move.targetEntity];
+                
                 // Set to start position
-                this.allTranslation[move.targetEntity] = new Translation() {
-                    Value = move.start
-                };
+                this.allTransform[move.targetEntity] = transform.WithPosition(move.start);
                 
                 // Note here that the timer was already reset when MoveTo.Init() was invoked 
                 if (move.timer.duration.IsZero()) {
@@ -38,7 +38,7 @@ namespace CommonEcs.DotsFsm {
                 }
             }
 
-            public void OnUpdate(Entity actionEntity, ref DotsFsmAction action, ref MoveTo move, int indexOfFirstEntityInQuery, int iterIndex) {
+            public void OnUpdate(Entity actionEntity, ref DotsFsmAction action, ref MoveTo move, int indexInQuery) {
                 move.timer.Update(this.deltaTime);
                 
                 if (move.timer.HasElapsed) {
@@ -50,19 +50,17 @@ namespace CommonEcs.DotsFsm {
                 // Timer is not done yet
                 // Let's interpolate
                 float3 newPosition = math.lerp(move.start, move.destination, move.timer.Ratio);
-                this.allTranslation[move.targetEntity] = new Translation() {
-                    Value = newPosition
-                };
+                LocalTransform transform = this.allTransform[move.targetEntity];
+                this.allTransform[move.targetEntity] = transform.WithPosition(newPosition);
             }
 
-            public void OnExit(Entity actionEntity, DotsFsmAction action, ref MoveTo move, int indexOfFirstEntityInQuery, int iterIndex) {
+            public void OnExit(Entity actionEntity, DotsFsmAction action, ref MoveTo move, int indexInQuery) {
             }
             
             private void Finish(ref DotsFsmAction action, ref MoveTo moveTo) {
                 // Snap to destination
-                this.allTranslation[moveTo.targetEntity] = new Translation() {
-                    Value = moveTo.destination
-                };
+                LocalTransform transform = this.allTransform[moveTo.targetEntity];
+                this.allTransform[moveTo.targetEntity] = transform.WithPosition(moveTo.destination);
                 
                 // Send finish event if it exists
                 if (moveTo.finishEvent.IsSome) {
@@ -81,7 +79,7 @@ namespace CommonEcs.DotsFsm {
             float deltaTime = this.dotsFsmSystemGroup.RerunCounter == 0 ? UnityEngine.Time.deltaTime : 0;
             
             return new Execution() {
-                allTranslation = GetComponentDataFromEntity<Translation>(),
+                allTransform = GetComponentLookup<LocalTransform>(),
                 rerunGroup = this.dotsFsmSystemGroup.RerunGroup,
                 deltaTime = deltaTime
             };

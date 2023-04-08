@@ -8,7 +8,8 @@ using Unity.Entities;
 
 namespace CommonEcs {
     public struct EcsHashMapEnumerator<K, V> : IEnumerator<EcsHashMapEntry<K, V>>
-        where K : struct, IEquatable<K> where V : struct {
+        where K : unmanaged, IEquatable<K> 
+        where V : unmanaged {
         private readonly DynamicBuffer<EntityBufferElement> buckets;
         private readonly Maybe<BufferLookup<EcsHashMapEntry<K, V>>> allEntryLists;
         private readonly ValueTypeOption<EntityManager> entityManager;

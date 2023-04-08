@@ -2,6 +2,7 @@
 
 using Unity.Entities;
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Jobs;
 
@@ -65,9 +66,11 @@ namespace CommonEcs {
             public ComponentTypeHandle<DurationTimer> timerType;
             public float scaledDeltaTime;
 
-            public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {
-                NativeArray<DurationTimer> timers = chunk.GetNativeArray(this.timerType);
-                for (int i = 0; i < timers.Length; ++i) {
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<DurationTimer> timers = chunk.GetNativeArray(ref this.timerType);
+
+                ChunkEntityEnumerator enumerator = new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     DurationTimer timer = timers[i];
                     if (timer.polledTime < timer.durationTime) {
                         timer.polledTime += this.scaledDeltaTime;
@@ -82,9 +85,12 @@ namespace CommonEcs {
             public ComponentTypeHandle<DurationTimer> timerType;
             public float deltaTime;
 
-            public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex) {
-                NativeArray<DurationTimer> timers = chunk.GetNativeArray(this.timerType);
-                for (int i = 0; i < chunk.Count; ++i) {
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<DurationTimer> timers = chunk.GetNativeArray(ref this.timerType);
+
+                ChunkEntityEnumerator enumerator =
+                    new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     DurationTimer timer = timers[i];
                     if (timer.polledTime < timer.durationTime) {
                         timer.polledTime += this.deltaTime;

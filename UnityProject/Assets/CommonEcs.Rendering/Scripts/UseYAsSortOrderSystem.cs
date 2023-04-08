@@ -1,4 +1,5 @@
 ﻿using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -15,12 +16,12 @@ namespace CommonEcs {
             this.query = GetEntityQuery(this.ConstructQuery(null, new ComponentType[] {
                 typeof(Static)
             }, new ComponentType[] {
-                typeof(Sprite), typeof(Translation), typeof(LocalToWorld), typeof(UseYAsSortOrder)
+                typeof(Sprite), typeof(LocalToWorld), typeof(UseYAsSortOrder)
             }));
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            Job job = new Job() {
+            UseYAsSortOrderJob job = new UseYAsSortOrderJob() {
                 spriteType = GetComponentTypeHandle<Sprite>(),
                 localToWorldType = GetComponentTypeHandle<LocalToWorld>(true),
                 useYType = GetComponentTypeHandle<UseYAsSortOrder>(true)
@@ -30,7 +31,7 @@ namespace CommonEcs {
         }
         
         [BurstCompile]
-        private struct Job : IJobEntityBatch {
+        private struct UseYAsSortOrderJob : IJobChunk {
             public ComponentTypeHandle<Sprite> spriteType;
 
             [ReadOnly]
@@ -38,13 +39,13 @@ namespace CommonEcs {
             
             [ReadOnly]
             public ComponentTypeHandle<UseYAsSortOrder> useYType;
-            
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<Sprite> sprites = batchInChunk.GetNativeArray(this.spriteType);
-                NativeArray<LocalToWorld> localToWorldList = batchInChunk.GetNativeArray(this.localToWorldType);
-                NativeArray<UseYAsSortOrder> useYArray = batchInChunk.GetNativeArray(this.useYType);
 
-                for (int i = 0; i < batchInChunk.Count; ++i) {
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<Sprite> sprites = chunk.GetNativeArray(ref this.spriteType);
+                NativeArray<LocalToWorld> localToWorldList = chunk.GetNativeArray(ref this.localToWorldType);
+                NativeArray<UseYAsSortOrder> useYArray = chunk.GetNativeArray(ref this.useYType);
+
+                for (int i = 0; i < chunk.Count; ++i) {
                     UseYAsSortOrder useY = useYArray[i];
                     
                     // We set the order by modifying the RenderOrder

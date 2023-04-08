@@ -3,6 +3,7 @@ using System;
 using Common;
 
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -22,7 +23,7 @@ namespace CommonEcs.Goap {
         private BufferTypeHandle<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> bucketType;
 
         protected override void OnCreate() {
-            this.textDbSystem = GetOrCreateSystem<GoapTextDbSystem>();
+            this.textDbSystem = GetOrCreateSystemManaged<GoapTextDbSystem>();
             
             this.query = GetEntityQuery(typeof(GoapPlanner), typeof(ResolvedAction),
                 typeof(DynamicBufferHashMap<ConditionId, bool>),
@@ -42,20 +43,20 @@ namespace CommonEcs.Goap {
             this.resolvedActionType.Update(this);
             this.bucketType.Update(this);
             
-            ResolveActionsJob job = new ResolveActionsJob() {
+            ResolveActionsJob job = new() {
                 plannerType = this.plannerType,
                 resolvedActionType = this.resolvedActionType,
                 bucketType = this.bucketType,
-                allAgents = GetComponentDataFromEntity<GoapAgent>(true),
-                allDebug = GetComponentDataFromEntity<DebugEntity>(true),
+                allAgents = GetComponentLookup<GoapAgent>(true),
+                allDebug = GetComponentLookup<DebugEntity>(true),
                 textResolver = this.textDbSystem.TextResolver
             };
 
-            return job.ScheduleParallel(this.query, ScheduleGranularity.Entity, default, inputDeps);
+            return job.ScheduleParallel(this.query, inputDeps);
         }
 
         [BurstCompile]
-        private struct ResolveActionsJob : IJobEntityBatch {
+        private struct ResolveActionsJob : IJobChunk {
             public ComponentTypeHandle<GoapPlanner> plannerType;
             public BufferTypeHandle<ResolvedAction> resolvedActionType;
 
@@ -63,21 +64,22 @@ namespace CommonEcs.Goap {
             public BufferTypeHandle<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> bucketType;
 
             [ReadOnly]
-            public ComponentDataFromEntity<GoapAgent> allAgents;
+            public ComponentLookup<GoapAgent> allAgents;
 
             [ReadOnly]
-            public ComponentDataFromEntity<DebugEntity> allDebug;
+            public ComponentLookup<DebugEntity> allDebug;
 
             // We need this to resolve condition and action names.
             [ReadOnly]
             public GoapTextResolver textResolver;
 
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<GoapPlanner> planners = batchInChunk.GetNativeArray(this.plannerType);
-                BufferAccessor<ResolvedAction> resolvedActionBuffers = batchInChunk.GetBufferAccessor(this.resolvedActionType);
-                BufferAccessor<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> buckets = batchInChunk.GetBufferAccessor(this.bucketType);
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<GoapPlanner> planners = chunk.GetNativeArray(ref this.plannerType);
+                BufferAccessor<ResolvedAction> resolvedActionBuffers = chunk.GetBufferAccessor(ref this.resolvedActionType);
+                BufferAccessor<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> buckets = chunk.GetBufferAccessor(ref this.bucketType);
 
-                for (int i = 0; i < batchInChunk.Count; ++i) {
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     GoapPlanner planner = planners[i];
                     if (planner.state != PlanningState.RESOLVING_ACTIONS) {
                         // No need to continue if planner is no longer resolving actions
@@ -108,8 +110,8 @@ namespace CommonEcs.Goap {
                     DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> bucket = buckets[i];
                     BoolHashMap boolHashMap = ToBoolHashMap(bucket);
 
-                    NativeList<ResolvedAction> actionList = new NativeList<ResolvedAction>(Allocator.Temp);
-                    NativeHashSet<int> actionsBeingEvaluated = new NativeHashSet<int>(4, Allocator.Temp);
+                    NativeList<ResolvedAction> actionList = new(Allocator.Temp);
+                    NativeHashSet<int> actionsBeingEvaluated = new(4, Allocator.Temp);
                     Condition currentGoal = planner.currentGoal.ValueOrError();
                     bool result = SearchActions(currentGoal, domain, ref boolHashMap, ref actionList, ref actionsBeingEvaluated, debug.enabled);
 
@@ -141,7 +143,7 @@ namespace CommonEcs.Goap {
 
             private static BoolHashMap ToBoolHashMap(
                 in DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> bucket) {
-                BoolHashMap hashMap = new BoolHashMap();
+                BoolHashMap hashMap = new();
 
                 // Add only those with value
                 for (int i = 0; i < bucket.Length; ++i) {

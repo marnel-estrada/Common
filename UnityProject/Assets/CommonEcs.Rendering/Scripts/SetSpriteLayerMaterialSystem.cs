@@ -9,7 +9,7 @@ namespace CommonEcs {
     [UpdateBefore(typeof(SetSpriteLayerMaterialCleanupSystem))]
     [UpdateBefore(typeof(SpriteManagerRendererSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class SetSpriteLayerMaterialSystem : ComponentSystem {
+    public class SetSpriteLayerMaterialSystem : SystemBase {
         private EntityQuery query;
         private SharedComponentQuery<SetSpriteLayerMaterial> setMaterialQuery;
         
@@ -29,7 +29,7 @@ namespace CommonEcs {
             this.spriteManagerQuery.Update();
             this.vesselQuery.Update();
 
-            NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
             for (int i = 0; i < chunks.Length; ++i) {
                 Process(chunks[i]);
             }

@@ -6,12 +6,14 @@ using Unity.Entities;
 namespace CommonEcs {
     /// <summary>
     /// A system that sets the owner to each SpriteManager
-    /// We did this because in SpriteLayer, we are creating a SpriteManager through a command buffer
+    /// We did this way because in SpriteLayer, we are creating a SpriteManager through a command buffer
     /// in which we can't get an entity during creation.
     /// </summary>
     [UpdateBefore(typeof(AddSpriteManagerToLayerSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class SetOwnerToSpriteManagerSystem : ComponentSystem {
+    public class SetOwnerToSpriteManagerSystem : SystemBase {
+        private EntityCommandBufferSystem commandBufferSystem;
+    
         private EntityQuery query;
         
         [ReadOnly]
@@ -23,6 +25,8 @@ namespace CommonEcs {
         }
 
         protected override void OnCreate() {
+            this.commandBufferSystem = this.GetOrCreateSystemManaged<BeginPresentationEntityCommandBufferSystem>();
+            
             // We added sprite for subtractive here because we only want to process those manager entities
             // and not the sprite entities where the SpriteManager is added as shared component
             this.query = GetEntityQuery(this.ConstructQuery(null, new ComponentType[] {
@@ -38,17 +42,19 @@ namespace CommonEcs {
         protected override void OnUpdate() {
             this.spriteManagerQuery.Update();
             this.entityType = GetEntityTypeHandle();
-            NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
+
+            EntityCommandBuffer commandBuffer = this.commandBufferSystem.CreateCommandBuffer();
             
             for (int i = 0; i < chunks.Length; ++i) {
                 ArchetypeChunk chunk = chunks[i];
-                Process(ref chunk);
+                Process(ref chunk, ref commandBuffer);
             }
             
             chunks.Dispose();
         }
 
-        private void Process(ref ArchetypeChunk chunk) {
+        private void Process(ref ArchetypeChunk chunk, ref EntityCommandBuffer commandBuffer) {
             SpriteManager spriteManager = this.spriteManagerQuery.GetSharedComponent(ref chunk);
             Assertion.IsTrue(spriteManager.HasInternalInstance);
             
@@ -61,7 +67,7 @@ namespace CommonEcs {
                 }
 
                 // We add this component so that the entity won't be processed again
-                this.PostUpdateCommands.AddComponent(entities[0], new OwnerSet());
+                commandBuffer.AddComponent(entities[0], new OwnerSet());
             }
         }       
     }

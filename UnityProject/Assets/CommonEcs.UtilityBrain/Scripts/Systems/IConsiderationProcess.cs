@@ -12,8 +12,8 @@ namespace CommonEcs.UtilityBrain {
         /// </summary>
         /// <param name="batchInChunk"></param>
         /// <param name="batchIndex"></param>
-        void BeforeChunkIteration(ArchetypeChunk batchInChunk, int batchIndex);
+        void BeforeChunkIteration(ArchetypeChunk batchInChunk);
         
-        UtilityValue ComputeUtility(in Entity agentEntity, in T filterComponent, int indexOfFirstEntityInQuery, int iterIndex);
+        UtilityValue ComputeUtility(in Entity agentEntity, in T filterComponent, int chunkIndex, int queryIndex);
     }
 }

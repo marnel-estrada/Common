@@ -5,7 +5,7 @@ using Unity.Mathematics;
 using Common;
 
 namespace CommonEcs {
-    public class Grid2dSystem : ComponentSystem {
+    public class Grid2dSystem : SystemBase {
         private EntityQuery query;
         private ComponentTypeHandle<Grid2D> gridType;
         private BufferTypeHandle<EntityBufferElement> bufferType;

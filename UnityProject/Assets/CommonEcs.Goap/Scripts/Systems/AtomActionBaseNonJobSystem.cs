@@ -10,7 +10,8 @@ namespace CommonEcs.Goap {
     [UpdateInGroup(typeof(GoapSystemGroup))]
     [UpdateAfter(typeof(IdentifyAtomActionsThatCanExecuteSystem))]
     [UpdateBefore(typeof(EndAtomActionsSystem))]
-    public abstract partial class AtomActionBaseNonJobSystem<TActionFilter> : SystemBase where TActionFilter : struct, IAtomActionComponent {
+    public abstract partial class AtomActionBaseNonJobSystem<TActionFilter> : SystemBase 
+        where TActionFilter : unmanaged, IAtomActionComponent {
         private EntityQuery query;
         private bool isActionFilterHasArray;
 
@@ -36,7 +37,7 @@ namespace CommonEcs.Goap {
             CollectActionsThatCanExecuteJob collectJob = new CollectActionsThatCanExecuteJob() {
                 entityType = GetEntityTypeHandle(),
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
-                allDebugEntities = GetComponentDataFromEntity<DebugEntity>(),
+                allDebugEntities = GetComponentLookup<DebugEntity>(),
                 resultList = actionsThatCanExecuteList.AsParallelWriter()
             };
             collectJob.ScheduleParallel(this.query, this.Dependency).Complete();
@@ -50,9 +51,9 @@ namespace CommonEcs.Goap {
             }
 
             // Execute each action that can execute
-            ComponentDataFromEntity<AtomAction> allAtomActions = GetComponentDataFromEntity<AtomAction>();
-            ComponentDataFromEntity<TActionFilter> allFilterActions =
-                this.isActionFilterHasArray ? GetComponentDataFromEntity<TActionFilter>() : default;
+            ComponentLookup<AtomAction> allAtomActions = GetComponentLookup<AtomAction>();
+            ComponentLookup<TActionFilter> allFilterActions =
+                this.isActionFilterHasArray ? GetComponentLookup<TActionFilter>() : default;
 
             BeforeActionsExecution();
 

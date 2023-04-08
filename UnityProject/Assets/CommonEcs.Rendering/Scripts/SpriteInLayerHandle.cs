@@ -41,14 +41,8 @@ namespace CommonEcs {
             EntityCommandBuffer buffer = new EntityCommandBuffer(Allocator.TempJob);
             
             buffer.AddComponent(this.spriteEntity, sprite);
-
-            buffer.AddComponent(this.spriteEntity, new Translation() {
-                Value = translation
-            });
             
-            buffer.AddComponent(this.spriteEntity, new Rotation() {
-                Value = rotation
-            });
+            buffer.AddComponent(this.spriteEntity, LocalTransform.FromPositionRotation(translation, rotation));
             
             buffer.AddComponent(this.spriteEntity, new LocalToWorld());
 

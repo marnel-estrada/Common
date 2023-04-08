@@ -17,8 +17,8 @@ namespace CommonEcs {
     /// <typeparam name="K"></typeparam>
     /// <typeparam name="V"></typeparam>
     public struct EcsHashMapWrapper<K, V> 
-        where K : struct, IEquatable<K> 
-        where V : struct, IEquatable<V> {
+        where K : unmanaged, IEquatable<K> 
+        where V : unmanaged, IEquatable<V> {
         // The entity that points to the buckets
         private readonly Entity hashMapEntity;
 

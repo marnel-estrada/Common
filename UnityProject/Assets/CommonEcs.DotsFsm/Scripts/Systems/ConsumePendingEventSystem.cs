@@ -1,6 +1,7 @@
 using Common;
 
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -36,15 +37,15 @@ namespace CommonEcs.DotsFsm {
                 fsmType = this.fsmType,
                 transitionType = this.transitionType,
                 debugType = this.debugType,
-                allNameReferences = GetComponentDataFromEntity<NameReference>(true),
-                allNames = GetComponentDataFromEntity<Name>(true)
+                allNameReferences = GetComponentLookup<NameReference>(true),
+                allNames = GetComponentLookup<Name>(true)
             };
             
             return consumeJob.ScheduleParallel(this.query, inputDeps);
         }
         
         [BurstCompile]
-        private struct ConsumeJob : IJobEntityBatch {
+        private struct ConsumeJob : IJobChunk {
             public ComponentTypeHandle<DotsFsm> fsmType;
 
             [ReadOnly]
@@ -54,17 +55,18 @@ namespace CommonEcs.DotsFsm {
             public ComponentTypeHandle<DebugFsm> debugType;
             
             [ReadOnly]
-            public ComponentDataFromEntity<NameReference> allNameReferences;
+            public ComponentLookup<NameReference> allNameReferences;
 
             [ReadOnly]
-            public ComponentDataFromEntity<Name> allNames;
-            
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<DotsFsm> fsms = batchInChunk.GetNativeArray(this.fsmType);
-                BufferAccessor<Transition> transitionLists = batchInChunk.GetBufferAccessor(this.transitionType);
-                NativeArray<DebugFsm> debugList = batchInChunk.GetNativeArray(this.debugType);
+            public ComponentLookup<Name> allNames;
 
-                for (int i = 0; i < batchInChunk.Count; ++i) {
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<DotsFsm> fsms = chunk.GetNativeArray(ref this.fsmType);
+                BufferAccessor<Transition> transitionLists = chunk.GetBufferAccessor(ref this.transitionType);
+                NativeArray<DebugFsm> debugList = chunk.GetNativeArray(ref this.debugType);
+
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     DotsFsm fsm = fsms[i];
                     DynamicBuffer<Transition> transitions = transitionLists[i];
                     
@@ -97,10 +99,10 @@ namespace CommonEcs.DotsFsm {
             public DynamicBuffer<Transition> transitions;
 
             [ReadOnly]
-            public ComponentDataFromEntity<NameReference> allNameReferences;
+            public ComponentLookup<NameReference> allNameReferences;
             
             [ReadOnly]
-            public ComponentDataFromEntity<Name> allNames;
+            public ComponentLookup<Name> allNames;
 
             public bool isDebug;
 

@@ -6,26 +6,28 @@ namespace CommonEcs.DotsFsm {
         /// Routines before chunk iteration. Calling ArchetypeChunk.GetNativeArray()
         /// can be called here.
         /// </summary>
-        /// <param name="batchInChunk"></param>
+        /// <param name="chunk"></param>
         /// <param name="batchIndex"></param>
-        void BeforeChunkIteration(ArchetypeChunk batchInChunk, int batchIndex);
-        
+        void BeforeChunkIteration(ArchetypeChunk chunk);
+
         /// <summary>
         /// DotsFsm is passed here so that the action can send events
         /// </summary>
         /// <param name="actionEntity"></param>
         /// <param name="action"></param>
         /// <param name="actionComponent"></param>
-        void OnEnter(Entity actionEntity, ref DotsFsmAction action, ref T actionComponent, int indexOfFirstEntityInQuery, int iterIndex);
-        
+        /// <param name="indexInQuery"></param>
+        void OnEnter(Entity actionEntity, ref DotsFsmAction action, ref T actionComponent, int indexInQuery);
+
         /// <summary>
         /// DotsFsm is passed here so that the action can send events
         /// </summary>
         /// <param name="actionEntity"></param>
         /// <param name="action"></param>
         /// <param name="actionComponent"></param>
-        void OnUpdate(Entity actionEntity, ref DotsFsmAction action, ref T actionComponent, int indexOfFirstEntityInQuery, int iterIndex);
+        /// <param name="indexInQuery"></param>
+        void OnUpdate(Entity actionEntity, ref DotsFsmAction action, ref T actionComponent, int indexInQuery);
         
-        void OnExit(Entity actionEntity, DotsFsmAction action, ref T actionComponent, int indexOfFirstEntityInQuery, int iterIndex);
+        void OnExit(Entity actionEntity, DotsFsmAction action, ref T actionComponent, int indexInQuery);
     }
 }

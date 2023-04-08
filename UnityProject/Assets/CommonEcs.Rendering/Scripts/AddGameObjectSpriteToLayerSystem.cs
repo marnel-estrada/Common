@@ -13,7 +13,7 @@ namespace CommonEcs {
     [UpdateBefore(typeof(AddGameObjectSpriteToManagerSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public partial class AddGameObjectSpriteToLayerSystem : SystemBase {
-        public struct Added : ISystemStateComponentData {
+        public struct Added : ICleanupComponentData {
             // The entity of the sprite manager to where the sprite is added
             public readonly Entity spriteManagerEntity;
         
@@ -27,18 +27,18 @@ namespace CommonEcs {
             }
         }
 
-        private SpriteLayerInstancesSystem layers;
-        private SpriteManagerInstancesSystem managers;
-        private EndSimulationEntityCommandBufferSystem barrier;
+        private SpriteLayerInstancesSystem layersSystem;
+        private SpriteManagerInstancesSystem managersSystem;
+        private EntityCommandBufferSystem commandBufferSystem;
 
         protected override void OnCreate() {
-            this.layers = this.World.GetOrCreateSystem<SpriteLayerInstancesSystem>();
-            this.managers = this.World.GetOrCreateSystem<SpriteManagerInstancesSystem>();
-            this.barrier = this.World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+            this.layersSystem = this.World.GetOrCreateSystemManaged<SpriteLayerInstancesSystem>();
+            this.managersSystem = this.World.GetOrCreateSystemManaged<SpriteManagerInstancesSystem>();
+            this.commandBufferSystem = this.World.GetOrCreateSystemManaged<BeginPresentationEntityCommandBufferSystem>();
         }
 
         protected override void OnUpdate() {
-            EntityCommandBuffer commandBuffer = this.barrier.CreateCommandBuffer();
+            EntityCommandBuffer commandBuffer = this.commandBufferSystem.CreateCommandBuffer();
             bool hasManager = true;
             
             this.Entities.WithNone<Added>().ForEach((Entity entity, Transform transform, ref Sprite sprite, ref AddToSpriteLayer addToLayer) => {
@@ -52,7 +52,7 @@ namespace CommonEcs {
         }
 
         private bool ProcessThenReturnIfSuccess(Entity spriteEntity, Transform transform, ref Sprite sprite, ref AddToSpriteLayer addToLayer, EntityCommandBuffer commandBuffer) {
-            Maybe<SpriteLayer> layer = this.layers.Get(addToLayer.layerEntity);
+            Maybe<SpriteLayer> layer = this.layersSystem.Get(addToLayer.layerEntity);
             Assertion.IsTrue(layer.HasValue);
             SpriteLayer spriteLayer = layer.Value;
 
@@ -71,14 +71,14 @@ namespace CommonEcs {
             Entity spriteManagerEntity = commandBuffer.CreateEntity();
 
             // Prepare a SpriteManager
-            SpriteManager spriteManager = new SpriteManager(spriteLayer.allocationCount, commandBuffer);
+            SpriteManager spriteManager = new(spriteLayer.allocationCount);
             spriteManager.SpriteLayerEntity = layer.Value.owner;
             spriteManager.SetMaterial(spriteLayer.material);
             spriteManager.Layer = spriteLayer.layer;
             spriteManager.SortingLayerId = spriteLayer.SortingLayerId;
             spriteManager.SortingLayer = spriteLayer.SortingLayer;
             spriteManager.AlwaysUpdateMesh = spriteLayer.alwaysUpdateMesh;
-            commandBuffer.AddSharedComponent(spriteManagerEntity, spriteManager);
+            commandBuffer.AddSharedComponentManaged(spriteManagerEntity, spriteManager);
 
             return false;
         }
@@ -96,7 +96,7 @@ namespace CommonEcs {
             
             // We add the shared component so that it can be filtered using such shared component
             // in other systems. For example, in SortRenderOrderSystem.
-            commandBuffer.AddSharedComponent(spriteEntity, manager);
+            commandBuffer.AddSharedComponentManaged(spriteEntity, manager);
 
             if (manager.AlwaysUpdateMesh) {
                 // We add this component so it will be excluded in IdentifySpriteManagerChangedSystem
@@ -107,7 +107,7 @@ namespace CommonEcs {
         private Maybe<SpriteManager> ResolveAvailable(ref SpriteLayer layer) {
             for (int i = 0; i < layer.spriteManagerEntities.Count; ++i) {
                 Entity managerEntity = layer.spriteManagerEntities[i];
-                Maybe<SpriteManager> result = this.managers.Get(managerEntity);
+                Maybe<SpriteManager> result = this.managersSystem.Get(managerEntity);
                 if (result.HasValue && result.Value.HasAvailableSpace) {
                     return new Maybe<SpriteManager>(result.Value);
                 }

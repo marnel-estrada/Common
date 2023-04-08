@@ -10,7 +10,9 @@ namespace CommonEcs {
     [UpdateAfter(typeof(SpriteLayerInstancesSystem))]
     [UpdateAfter(typeof(AddSpritesToLayerSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class RemoveSpritesFromLayerSystem : ComponentSystem {
+    public class RemoveSpritesFromLayerSystem : SystemBase {
+        private EntityCommandBufferSystem commandBufferSystem;
+        
         private EntityQuery query;
         private ComponentTypeHandle<AddSpritesToLayerSystem.Added> addedType;
         private EntityTypeHandle entityType;
@@ -18,7 +20,8 @@ namespace CommonEcs {
         private SpriteManagerInstancesSystem managers;
 
         protected override void OnCreate() {
-            this.managers = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<SpriteManagerInstancesSystem>();
+            this.commandBufferSystem = this.GetOrCreateSystemManaged<BeginPresentationEntityCommandBufferSystem>();
+            this.managers = this.GetOrCreateSystemManaged<SpriteManagerInstancesSystem>();
 
             this.query = GetEntityQuery(ComponentType.ReadOnly<AddSpritesToLayerSystem.Added>(),
                 ComponentType.Exclude<Sprite>());
@@ -28,16 +31,17 @@ namespace CommonEcs {
             this.addedType = GetComponentTypeHandle<AddSpritesToLayerSystem.Added>();
             this.entityType = GetEntityTypeHandle();
 
-            NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
+            EntityCommandBuffer commandBuffer = this.commandBufferSystem.CreateCommandBuffer();
             for (int i = 0; i < chunks.Length; ++i) {
-                Process(chunks[i]);
+                Process(chunks[i], ref commandBuffer);
             }
             
             chunks.Dispose();
         }
 
-        private void Process(ArchetypeChunk chunk) {
-            NativeArray<AddSpritesToLayerSystem.Added> addedList = chunk.GetNativeArray(this.addedType);
+        private void Process(ArchetypeChunk chunk, ref EntityCommandBuffer commandBuffer) {
+            NativeArray<AddSpritesToLayerSystem.Added> addedList = chunk.GetNativeArray(ref this.addedType);
             NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
 
             for (int i = 0; i < chunk.Count; ++i) {
@@ -47,7 +51,7 @@ namespace CommonEcs {
                 manager.Value.Remove(added.managerIndex);
                 
                 // We remove this component so it will no longer be processed by this system
-                this.PostUpdateCommands.RemoveComponent<AddSpritesToLayerSystem.Added>(entities[i]);
+                commandBuffer.RemoveComponent<AddSpritesToLayerSystem.Added>(entities[i]);
             }
         }
     }

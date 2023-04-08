@@ -1,4 +1,5 @@
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -13,20 +14,22 @@ namespace CommonEcs.DotsFsm {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            Job job = new Job() {
+            StartFsmJob startFsmJob = new StartFsmJob() {
                 fsmType = GetComponentTypeHandle<DotsFsm>()
             };
 
-            return job.ScheduleParallel(this.query, inputDeps);
+            return startFsmJob.ScheduleParallel(this.query, inputDeps);
         }
         
         [BurstCompile]
-        private struct Job : IJobEntityBatch {
+        private struct StartFsmJob : IJobChunk {
             public ComponentTypeHandle<DotsFsm> fsmType;
-            
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<DotsFsm> fsms = batchInChunk.GetNativeArray(this.fsmType);
-                for (int i = 0; i < fsms.Length; ++i) {
+
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<DotsFsm> fsms = chunk.GetNativeArray(ref this.fsmType);
+
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     DotsFsm fsm = fsms[i];
                     if (fsm.startState.IsNone) {
                         // No start state

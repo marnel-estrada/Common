@@ -1,6 +1,7 @@
 using System;
 
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -30,33 +31,33 @@ namespace CommonEcs.Goap {
             this.plannerType.Update(this);
             this.requiredConditionType.Update(this);
             
-            Job job = new Job() {
+            PopulateJob populateJob = new() {
                 plannerType = this.plannerType,
                 requiredConditionType = this.requiredConditionType,
-                allAgents = GetComponentDataFromEntity<GoapAgent>()
+                allAgents = GetComponentLookup<GoapAgent>()
             };
             
-            return job.ScheduleParallel(this.query, inputDeps);
+            return populateJob.ScheduleParallel(this.query, inputDeps);
         }
         
         [BurstCompile]
-        private struct Job : IJobEntityBatch {
+        private struct PopulateJob : IJobChunk {
             [ReadOnly]
             public ComponentTypeHandle<GoapPlanner> plannerType;
             
             public BufferTypeHandle<RequiredCondition> requiredConditionType;
 
             [ReadOnly]
-            public ComponentDataFromEntity<GoapAgent> allAgents;
+            public ComponentLookup<GoapAgent> allAgents;
             
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<GoapPlanner> planners = batchInChunk.GetNativeArray(this.plannerType);
-                BufferAccessor<RequiredCondition> requiredConditionsList = batchInChunk.GetBufferAccessor(this.requiredConditionType);
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<GoapPlanner> planners = chunk.GetNativeArray(ref this.plannerType);
+                BufferAccessor<RequiredCondition> requiredConditionsList = chunk.GetBufferAccessor(ref this.requiredConditionType);
                 
                 // This is used to keep track of actions that were already added
-                NativeHashSet<int> addedActions = new NativeHashSet<int>(50, Allocator.Temp);
+                NativeHashSet<int> addedActions = new(50, Allocator.Temp);
 
-                for (int i = 0; i < batchInChunk.Count; ++i) {
+                for (int i = 0; i < chunk.Count; ++i) {
                     GoapPlanner planner = planners[i];
                     if (planner.state != PlanningState.RESOLVING_CONDITIONS) {
                         // No need to continue if planner is no longer resolving conditions

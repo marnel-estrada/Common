@@ -6,10 +6,10 @@ namespace CommonEcs.Goap {
         /// Routines before chunk iteration. Calling ArchetypeChunk.GetNativeArray()
         /// can be called here.
         /// </summary>
-        /// <param name="batchInChunk"></param>
+        /// <param name="chunk"></param>
         /// <param name="batchIndex"></param>
-        void BeforeChunkIteration(ArchetypeChunk batchInChunk, int batchIndex);
+        void BeforeChunkIteration(ArchetypeChunk chunk);
         
-        bool IsMet(in Entity agentEntity, ref T resolverComponent, int indexOfFirstEntityInQuery, int iterIndex);
+        bool IsMet(in Entity agentEntity, ref T resolverComponent, int chunkIndex, int queryIndex);
     }
 }

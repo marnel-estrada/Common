@@ -59,7 +59,7 @@ namespace GoapBrain {
             this.domainDbReference = builder.CreateBlobAssetReference<GoapDomainDatabase>(Allocator.Persistent);
             
             // Don't forget to create the text DB after all domains are parsed
-            GoapTextDbSystem textDbSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<GoapTextDbSystem>();
+            GoapTextDbSystem textDbSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystemManaged<GoapTextDbSystem>();
             Assertion.NotNull(textDbSystem);
             textDbSystem.CreateTextDb(this.textMap);
             this.textMap.Clear(); // We clear to conserve memory

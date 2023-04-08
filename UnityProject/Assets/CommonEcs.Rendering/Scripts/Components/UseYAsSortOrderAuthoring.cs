@@ -1,13 +1,14 @@
 ﻿using System;
 
 using Unity.Entities;
+using UnityEngine;
 
 namespace CommonEcs {
     /// <summary>
     /// A component that identifies whether or not to use Y as the sort order
     /// </summary>
     [Serializable]
-    [GenerateAuthoringComponent]
+    //[GenerateAuthoringComponent]
     public struct UseYAsSortOrder : IComponentData {
         // We may want to offset the y position such that we don't have to rely on a parent
         // transform to get the correct y value.
@@ -20,5 +21,9 @@ namespace CommonEcs {
         public UseYAsSortOrder(float offset) : this() {
             this.offset = offset;
         }
+    }
+
+    public class UseYAsSortOrderAuthoring : MonoBehaviour {
+        public float offset;
     }
 }

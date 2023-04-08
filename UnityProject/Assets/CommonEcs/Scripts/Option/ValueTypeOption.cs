@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.Contracts;
 using Common;
 using Unity.Burst;
 
@@ -76,6 +77,7 @@ namespace CommonEcs {
             return this.IsSome ? matcher.OnSome(this.value) : matcher.OnNone();
         }
 
+        [Pure]
         public T ValueOr(T other) {
             return this.IsSome ? this.value : other;
         }

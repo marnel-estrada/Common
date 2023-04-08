@@ -1,4 +1,5 @@
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -13,28 +14,30 @@ namespace CommonEcs.UtilityBrain {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            ResolveBestOptionJob resolveBestOptionJob = new ResolveBestOptionJob() {
+            ResolveBestOptionJob resolveBestOptionJob = new() {
                 brainType = GetComponentTypeHandle<UtilityBrain>(),
                 valueBufferType = GetBufferTypeHandle<UtilityValueWithOption>(),
-                allDebug = GetComponentDataFromEntity<DebugEntity>()
+                allDebug = GetComponentLookup<DebugEntity>()
             };
             return resolveBestOptionJob.ScheduleParallel(this.query, inputDeps);
         }
         
         [BurstCompile]
-        private struct ResolveBestOptionJob : IJobEntityBatch {
+        private struct ResolveBestOptionJob : IJobChunk {
             public ComponentTypeHandle<UtilityBrain> brainType;
             
             [ReadOnly]
             public BufferTypeHandle<UtilityValueWithOption> valueBufferType;
 
             [ReadOnly]
-            public ComponentDataFromEntity<DebugEntity> allDebug;
+            public ComponentLookup<DebugEntity> allDebug;
             
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<UtilityBrain> brains = batchInChunk.GetNativeArray(this.brainType);
-                BufferAccessor<UtilityValueWithOption> valuesList = batchInChunk.GetBufferAccessor(this.valueBufferType);
-                for (int i = 0; i < batchInChunk.Count; ++i) {
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<UtilityBrain> brains = chunk.GetNativeArray(ref this.brainType);
+                BufferAccessor<UtilityValueWithOption> valuesList = chunk.GetBufferAccessor(ref this.valueBufferType);
+
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     UtilityBrain brain = brains[i];
                     if (!brain.shouldExecute) {
                         // It did not execute. Skip.

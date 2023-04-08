@@ -1,4 +1,5 @@
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -22,13 +23,13 @@ namespace CommonEcs.Goap {
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             // This can run in parallel
-            SetResultsToPlannerBucketJob setResultsJob = new SetResultsToPlannerBucketJob() {
+            SetResultsToPlannerBucketJob setResultsJob = new() {
                 resolverType = GetComponentTypeHandle<ConditionResolver>(),
-                allBuckets = GetBufferFromEntity<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>>()
+                allBuckets = GetBufferLookup<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>>()
             };
             JobHandle handle = setResultsJob.ScheduleParallel(this.resolversQuery, inputDeps);
 
-            SetPlannerToResolvingActionsJob setToResolvingActionsJob = new SetPlannerToResolvingActionsJob() {
+            SetPlannerToResolvingActionsJob setToResolvingActionsJob = new() {
                 plannerType = GetComponentTypeHandle<GoapPlanner>()
             };
             handle = setToResolvingActionsJob.ScheduleParallel(this.plannersQuery, handle);
@@ -37,16 +38,18 @@ namespace CommonEcs.Goap {
         }
 
         [BurstCompile]
-        private struct SetResultsToPlannerBucketJob : IJobEntityBatch {
+        private struct SetResultsToPlannerBucketJob : IJobChunk {
             [ReadOnly]
             public ComponentTypeHandle<ConditionResolver> resolverType;
 
             [NativeDisableParallelForRestriction]
-            public BufferFromEntity<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> allBuckets;
-            
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<ConditionResolver> resolvers = batchInChunk.GetNativeArray(this.resolverType);
-                for (int i = 0; i < resolvers.Length; ++i) {
+            public BufferLookup<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> allBuckets;
+
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<ConditionResolver> resolvers = chunk.GetNativeArray(ref this.resolverType);
+
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     ConditionResolver resolver = resolvers[i];
                     
                     // Set the value
@@ -57,12 +60,14 @@ namespace CommonEcs.Goap {
         }
         
         [BurstCompile]
-        private struct SetPlannerToResolvingActionsJob : IJobEntityBatch {
+        private struct SetPlannerToResolvingActionsJob : IJobChunk {
             public ComponentTypeHandle<GoapPlanner> plannerType;
-            
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
-                NativeArray<GoapPlanner> planners = batchInChunk.GetNativeArray(this.plannerType);
-                for (int i = 0; i < planners.Length; ++i) {
+
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<GoapPlanner> planners = chunk.GetNativeArray(ref this.plannerType);
+
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     GoapPlanner planner = planners[i];
                     if (planner.state == PlanningState.RESOLVING_CONDITIONS) {
                         planner.state = PlanningState.RESOLVING_ACTIONS;

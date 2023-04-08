@@ -14,7 +14,7 @@ namespace CommonEcs {
     [UpdateAfter(typeof(SpriteLayerInstancesSystem))]
     [UpdateBefore(typeof(AddSpriteToManagerSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class AddSpritesToLayerSystem : SystemBase {
+    public partial class AddSpritesToLayerSystem : SystemBase {
         private EntityCommandBufferSystem commandBufferSystem;
         
         private EntityQuery query;

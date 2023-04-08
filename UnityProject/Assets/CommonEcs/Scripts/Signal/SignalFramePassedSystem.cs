@@ -2,7 +2,7 @@ using Unity.Entities;
 
 namespace CommonEcs {
     [UpdateAfter(typeof(DestroySignalsSystem))]
-    public class SignalFramePassedSystem : SystemBase {
+    public partial class SignalFramePassedSystem : SystemBase {
         private EntityQuery query;
 
         private EntityCommandBufferSystem commandBufferSystem;

@@ -8,7 +8,7 @@ namespace CommonEcs {
     /// either by UV or color 
     /// </summary>
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class UpdateChangedVerticesSystem : UpdateVerticesSystem {
+    public partial class UpdateChangedVerticesSystem : UpdateVerticesSystem {
         protected override EntityQuery ResolveQuery() {
             return GetEntityQuery(ComponentType.ReadOnly<Sprite>(), 
                 //ComponentType.ReadOnly<Changed>(), 

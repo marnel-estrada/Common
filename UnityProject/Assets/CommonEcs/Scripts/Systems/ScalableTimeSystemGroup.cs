@@ -6,7 +6,7 @@ namespace CommonEcs {
     /// <summary>
     /// A system group which can be controlled how many times it runs per frame 
     /// </summary>
-    public class ScalableTimeSystemGroup : ComponentSystemGroup {
+    public partial class ScalableTimeSystemGroup : ComponentSystemGroup {
         private int updateCount = 1;
 
         public int UpdateCount {

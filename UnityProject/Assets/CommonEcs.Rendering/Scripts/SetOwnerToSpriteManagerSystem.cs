@@ -11,7 +11,7 @@ namespace CommonEcs {
     /// </summary>
     [UpdateBefore(typeof(AddSpriteManagerToLayerSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class SetOwnerToSpriteManagerSystem : SystemBase {
+    public partial class SetOwnerToSpriteManagerSystem : SystemBase {
         private EntityCommandBufferSystem commandBufferSystem;
     
         private EntityQuery query;

@@ -5,7 +5,7 @@ using Unity.Mathematics;
 using Common;
 
 namespace CommonEcs {
-    public class Grid2dSystem : SystemBase {
+    public partial class Grid2dSystem : SystemBase {
         private EntityQuery query;
         private ComponentTypeHandle<Grid2D> gridType;
         private BufferTypeHandle<EntityBufferElement> bufferType;
@@ -34,7 +34,7 @@ namespace CommonEcs {
 
             this.gridType = GetComponentTypeHandle<Grid2D>(true);
             this.bufferType = GetBufferTypeHandle<EntityBufferElement>(true);
-            NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
             for (int i = 0; i < chunks.Length; ++i) {
                 Process(chunks[i]);
             }
@@ -46,8 +46,8 @@ namespace CommonEcs {
 
         private void Process(in ArchetypeChunk chunk) {
             Assertion.IsTrue(chunk.Count > 0);
-            NativeArray<Grid2D> grids = chunk.GetNativeArray(this.gridType);
-            BufferAccessor<EntityBufferElement> buffers = chunk.GetBufferAccessor(this.bufferType);
+            NativeArray<Grid2D> grids = chunk.GetNativeArray(ref this.gridType);
+            BufferAccessor<EntityBufferElement> buffers = chunk.GetBufferAccessor(ref this.bufferType);
             
             // Store only the first one
             this.grid = grids[0];

@@ -9,7 +9,7 @@
     [UpdateBefore(typeof(AddGameObjectSpriteToManagerSystem))]
     [UpdateBefore(typeof(CreateSpriteFromWrapperSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class CreateAddToSpriteLayerFromWrapperSystem : SystemBase {
+    public partial  class CreateAddToSpriteLayerFromWrapperSystem : SystemBase {
         private EntityCommandBufferSystem commandBufferSystem;
 
         protected override void OnCreate() {

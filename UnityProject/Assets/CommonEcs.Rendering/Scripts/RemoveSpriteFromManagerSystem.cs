@@ -7,7 +7,7 @@ namespace CommonEcs {
     [UpdateAfter(typeof(SpriteManagerRendererSystem))]
     [UpdateAfter(typeof(UpdateChangedVerticesSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class RemoveSpriteFromManagerSystem : SystemBase {
+    public partial class RemoveSpriteFromManagerSystem : SystemBase {
         private EntityCommandBufferSystem commandBufferSystem;
         
         private EntityQuery query;

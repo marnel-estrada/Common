@@ -7,7 +7,7 @@ namespace CommonEcs {
     /// other systems.
     /// </summary>
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class SpriteManagerInstancesSystem : CollectSharedComponentsSystem<SpriteManager> {
+    public partial class SpriteManagerInstancesSystem : CollectSharedComponentsSystem<SpriteManager> {
         protected override EntityQuery ResolveQuery() {
             // We added sprite as subtractive here because we don't want to count those sprites
             // where the SpriteManager is just added

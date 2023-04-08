@@ -10,7 +10,7 @@ namespace CommonEcs {
     [UpdateBefore(typeof(SpriteManagerRendererSystem))]
     [UpdateAfter(typeof(SpriteManagerInstancesSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class AddSpriteToManagerSystem : SystemBase {
+    public partial class AddSpriteToManagerSystem : SystemBase {
         private EntityCommandBufferSystem commandBufferSystem;
         
         private EntityQuery query;

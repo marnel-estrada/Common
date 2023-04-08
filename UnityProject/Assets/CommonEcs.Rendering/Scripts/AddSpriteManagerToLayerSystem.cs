@@ -6,7 +6,7 @@ namespace CommonEcs {
     [UpdateBefore(typeof(AddGameObjectSpriteToLayerSystem))]
     [UpdateBefore(typeof(AddSpritesToLayerSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class AddSpriteManagerToLayerSystem : SystemBase {
+    public partial class AddSpriteManagerToLayerSystem : SystemBase {
         private EntityCommandBufferSystem commandBufferSystem;
 
         private EntityQuery query;

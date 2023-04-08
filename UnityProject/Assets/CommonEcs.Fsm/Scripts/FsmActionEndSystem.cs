@@ -15,7 +15,7 @@ namespace Common.Ecs.Fsm {
         private EntityQuery query;
 
         protected override void OnCreate() {
-            this.barrier = this.World.GetOrCreateSystem<EndInitializationEntityCommandBufferSystem>();
+            this.barrier = this.World.GetOrCreateSystemManaged<EndInitializationEntityCommandBufferSystem>();
 
             this.query = GetEntityQuery(typeof(FsmAction));
         }

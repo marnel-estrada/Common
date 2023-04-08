@@ -12,7 +12,7 @@ namespace CommonEcs {
     [UpdateAfter(typeof(SpriteLayerInstancesSystem))]
     [UpdateAfter(typeof(AddGameObjectSpriteToManagerSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class RemoveGameObjectSpriteFromLayerSystem : SystemBase {
+    public partial class RemoveGameObjectSpriteFromLayerSystem : SystemBase {
         private EntityCommandBufferSystem commandBufferSystem;
         
         private EntityQuery query;

@@ -5,7 +5,7 @@ namespace CommonEcs {
     [UpdateBefore(typeof(AddGameObjectSpriteToLayerSystem))]
     [UpdateBefore(typeof(AddGameObjectSpriteToManagerSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class CreateSpriteFromWrapperSystem : SystemBase {
+    public partial class CreateSpriteFromWrapperSystem : SystemBase {
         private EntityCommandBufferSystem commandBufferSystem;
 
         protected override void OnCreate() {

@@ -5,7 +5,7 @@ using Unity.Entities;
 namespace CommonEcs {
     [UpdateBefore(typeof(SpriteManagerRendererSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class SetSpriteLayerVesselsEnabledSystem : SignalHandlerComponentSystem<SetSpriteLayerVesselsEnabled> {
+    public partial class SetSpriteLayerVesselsEnabledSystem : SignalHandlerComponentSystem<SetSpriteLayerVesselsEnabled> {
         private SharedComponentQuery<MeshRendererVessel> vesselQuery;
         
         protected override void OnCreate() {

@@ -2,7 +2,7 @@ using Unity.Entities;
 
 namespace CommonEcs {
     [UpdateBefore(typeof(DestroySignalsSystem))]
-    public abstract class SignalHandlerComponentSystem<T> : SystemBase where T : unmanaged, IComponentData {
+    public abstract partial class SignalHandlerComponentSystem<T> : SystemBase where T : unmanaged, IComponentData {
         private EntityQuery signalQuery;
         private SignalHandler<T> signalHandler;
 

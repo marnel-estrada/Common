@@ -13,7 +13,7 @@ namespace Common.Ecs.Fsm {
     [UpdateBefore(typeof(FsmStatePreparationJobSystemBarrier))]
     [UpdateBefore(typeof(FsmResetEventSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public abstract class FsmStatePreparationJobSystem<TTagType, TPrepareActionType> : JobSystemBase
+    public abstract partial class FsmStatePreparationJobSystem<TTagType, TPrepareActionType> : JobSystemBase
         where TTagType : struct, IComponentData
         where TPrepareActionType : struct, IFsmStatePreparationAction {
         protected FsmStatePreparationJobSystemBarrier barrier;
@@ -22,7 +22,7 @@ namespace Common.Ecs.Fsm {
         private ComponentTypeHandle<FsmState> stateType;
 
         protected override void OnCreate() {
-            this.barrier = this.World.GetOrCreateSystem<FsmStatePreparationJobSystemBarrier>();
+            this.barrier = this.World.GetOrCreateSystemManaged<FsmStatePreparationJobSystemBarrier>();
             this.query = GetEntityQuery(typeof(FsmState), typeof(StateJustTransitioned), 
                 typeof(TTagType));
         }

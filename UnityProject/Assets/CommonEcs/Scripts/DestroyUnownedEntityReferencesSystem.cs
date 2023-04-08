@@ -2,7 +2,6 @@ using Unity.Collections;
 using Unity.Entities;
 
 namespace CommonEcs {
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
     public partial class DestroyUnownedEntityReferencesSystem : SystemBase {
         private EntityCommandBufferSystem commandBufferSystem;
         

@@ -1,8 +1,7 @@
 ﻿using Unity.Entities;
 
 namespace CommonEcs {
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class EntityDestructionSystem : SystemBase {
+    public partial class EntityDestructionSystem : SystemBase {
         private EntityQuery query;
 
         protected override void OnCreate() {

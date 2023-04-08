@@ -9,7 +9,6 @@ namespace CommonEcs {
     /// <typeparam name="T"></typeparam>
     /// <typeparam name="S"></typeparam>
     [UpdateBefore(typeof(DestroySignalsSystem))]
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
     public abstract partial class SignalHandlerSystem<T, S> : SystemBase where T : unmanaged, IComponentData
         where S : SignalHandlerSystem<T, S> {
         private SignalHandler<T> signalHandler;

@@ -12,7 +12,6 @@ namespace Common.Ecs.Fsm {
     /// <typeparam name="ComposerType"></typeparam>
     /// <typeparam name="JobActionType"></typeparam>
     [UpdateBefore(typeof(FsmActionJobSystemBarrier))]
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
     public abstract class FsmActionJobSystem<ComposerType, JobActionType> : FsmJobSystem
         where ComposerType : struct, IFsmJobActionComposer<JobActionType>
         where JobActionType : struct, IFsmJobAction {

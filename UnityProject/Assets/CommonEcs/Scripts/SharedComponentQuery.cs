@@ -32,7 +32,7 @@ namespace CommonEcs {
             
             this.sharedComponents.Clear();
             this.indices.Clear();
-            this.entityManager.GetAllUniqueSharedComponentData(this.sharedComponents, this.indices);
+            this.entityManager.GetAllUniqueSharedComponentsManaged(this.sharedComponents, this.indices);
         }
     
         /// <summary>

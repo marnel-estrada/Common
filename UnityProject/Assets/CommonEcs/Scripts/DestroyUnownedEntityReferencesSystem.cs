@@ -17,7 +17,7 @@ namespace CommonEcs {
             this.entityType = GetEntityTypeHandle();
             this.referenceType = GetComponentTypeHandle<EntityReference>(true);
     
-            NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
             
             // Collection of referenced entities
             NativeParallelHashMap<Entity, byte> referencedEntities = new NativeParallelHashMap<Entity, byte>(10, Allocator.TempJob);

@@ -10,7 +10,7 @@ namespace CommonEcs {
     public struct EcsHashMapEnumerator<K, V> : IEnumerator<EcsHashMapEntry<K, V>>
         where K : struct, IEquatable<K> where V : struct {
         private readonly DynamicBuffer<EntityBufferElement> buckets;
-        private readonly Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists;
+        private readonly Maybe<BufferLookup<EcsHashMapEntry<K, V>>> allEntryLists;
         private readonly ValueTypeOption<EntityManager> entityManager;
 
         private int bucketIndex;
@@ -24,7 +24,7 @@ namespace CommonEcs {
         /// <param name="buckets"></param>
         /// <param name="allEntryLists"></param>
         public EcsHashMapEnumerator(DynamicBuffer<EntityBufferElement> buckets,
-            Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists) {
+            Maybe<BufferLookup<EcsHashMapEntry<K, V>>> allEntryLists) {
             this.buckets = buckets;
             this.allEntryLists = allEntryLists;
             this.bucketIndex = 0;
@@ -37,7 +37,7 @@ namespace CommonEcs {
 
         public EcsHashMapEnumerator(DynamicBuffer<EntityBufferElement> buckets, EntityManager entityManager) {
             this.buckets = buckets;
-            this.allEntryLists = Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>>.Nothing;
+            this.allEntryLists = Maybe<BufferLookup<EcsHashMapEntry<K, V>>>.Nothing;
             this.entityManager = ValueTypeOption<EntityManager>.Some(entityManager);
 
             this.bucketIndex = 0;
@@ -93,9 +93,9 @@ namespace CommonEcs {
 
         private readonly struct ResolveEntryListMatcher : IFuncOptionMatcher<EntityManager, DynamicBuffer<EcsHashMapEntry<K, V>>> {
             private readonly Entity entryListEntity;
-            private readonly Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists;
+            private readonly Maybe<BufferLookup<EcsHashMapEntry<K, V>>> allEntryLists;
 
-            public ResolveEntryListMatcher(Entity entryListEntity, Maybe<BufferFromEntity<EcsHashMapEntry<K, V>>> allEntryLists) {
+            public ResolveEntryListMatcher(Entity entryListEntity, Maybe<BufferLookup<EcsHashMapEntry<K, V>>> allEntryLists) {
                 this.entryListEntity = entryListEntity;
                 this.allEntryLists = allEntryLists;
             }

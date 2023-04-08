@@ -33,7 +33,7 @@ namespace CommonEcs {
 
             JobHandle lastHandle = inputDeps;
 
-            NativeArray<ArchetypeChunk> chunks = this.query.CreateArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
             for (int i = 0; i < chunks.Length; ++i) {
                 lastHandle = Process(chunks[i], lastHandle);
             }

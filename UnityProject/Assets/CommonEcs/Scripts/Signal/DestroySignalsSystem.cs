@@ -1,7 +1,7 @@
 ﻿using Unity.Entities;
 
 namespace CommonEcs {
-    public class DestroySignalsSystem : SystemBase {
+    public partial class DestroySignalsSystem : SystemBase {
         private EntityQuery query;
 
         protected override void OnCreate() {

@@ -5,7 +5,7 @@ namespace CommonEcs {
     /// <summary>
     /// A common system with template methods that we can use to simplify writing systems
     /// </summary>
-    public abstract class TemplateComponentSystem : SystemBase {
+    public abstract partial class TemplateComponentSystem : SystemBase {
         private EntityQuery query;
         
         protected override void OnCreate() {

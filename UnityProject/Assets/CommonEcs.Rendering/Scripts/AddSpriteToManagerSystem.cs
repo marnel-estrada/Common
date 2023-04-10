@@ -9,7 +9,7 @@ namespace CommonEcs {
     [UpdateBefore(typeof(TransformVerticesSystem))]
     [UpdateBefore(typeof(SpriteManagerRendererSystem))]
     [UpdateAfter(typeof(SpriteManagerInstancesSystem))]
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateInGroup(typeof(Rendering2dSystemGroup))]
     public partial class AddSpriteToManagerSystem : SystemBase {
         private EntityCommandBufferSystem commandBufferSystem;
         

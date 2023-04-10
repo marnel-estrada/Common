@@ -9,7 +9,7 @@ namespace CommonEcs {
     [UpdateAfter(typeof(SpriteManagerInstancesSystem))]
     [UpdateAfter(typeof(SpriteLayerInstancesSystem))]
     [UpdateAfter(typeof(AddSpritesToLayerSystem))]
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateInGroup(typeof(Rendering2dSystemGroup))]
     public partial class RemoveSpritesFromLayerSystem : SystemBase {
         private EntityCommandBufferSystem commandBufferSystem;
         

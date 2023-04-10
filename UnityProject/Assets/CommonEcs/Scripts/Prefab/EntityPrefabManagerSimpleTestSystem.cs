@@ -17,7 +17,11 @@ namespace CommonEcs {
             // Left click
             if (Input.GetMouseButtonDown(0)) {
                 // Instantiate 1
-                EntityPrefabManager prefabManager = SystemAPI.GetSingleton<EntityPrefabManager>();
+                if (!SystemAPI.TryGetSingleton(out EntityPrefabManager prefabManager)) {
+                    // No PrefabManager found. Maybe it's not prepared.
+                    return;
+                }
+                
                 ValueTypeOption<Entity> prefab = prefabManager.GetPrefab("SamplePrefab");
                 if (prefab.IsSome) {
                     this.EntityManager.Instantiate(prefab.value);

@@ -10,7 +10,7 @@ namespace CommonEcs {
     /// in which we can't get an entity during creation.
     /// </summary>
     [UpdateBefore(typeof(AddSpriteManagerToLayerSystem))]
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateInGroup(typeof(Rendering2dSystemGroup))]
     public partial class SetOwnerToSpriteManagerSystem : SystemBase {
         private EntityCommandBufferSystem commandBufferSystem;
     

@@ -3,9 +3,8 @@ using Unity.Entities;
 
 namespace CommonEcs {
     [UpdateAfter(typeof(SpriteLayerInstancesSystem))]
-    [UpdateBefore(typeof(AddGameObjectSpriteToLayerSystem))]
     [UpdateBefore(typeof(AddSpritesToLayerSystem))]
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateInGroup(typeof(Rendering2dSystemGroup))]
     public partial class AddSpriteManagerToLayerSystem : SystemBase {
         private EntityCommandBufferSystem commandBufferSystem;
 

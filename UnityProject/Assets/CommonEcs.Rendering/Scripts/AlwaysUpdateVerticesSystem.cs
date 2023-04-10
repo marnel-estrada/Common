@@ -4,7 +4,7 @@ namespace CommonEcs {
     /// <summary>
     /// The UpdateVerticesSystem for sprites in managers that's been set with AlwaysUpdateMesh = true.
     /// </summary>
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateInGroup(typeof(Rendering2dSystemGroup))]
     public partial class AlwaysUpdateVerticesSystem : UpdateVerticesSystem {
         protected override EntityQuery ResolveQuery() {
             return GetEntityQuery(ComponentType.ReadOnly<Sprite>(),

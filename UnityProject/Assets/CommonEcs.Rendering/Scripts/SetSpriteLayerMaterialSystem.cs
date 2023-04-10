@@ -8,7 +8,7 @@ using Unity.Entities;
 namespace CommonEcs {
     [UpdateBefore(typeof(SetSpriteLayerMaterialCleanupSystem))]
     [UpdateBefore(typeof(SpriteManagerRendererSystem))]
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateInGroup(typeof(Rendering2dSystemGroup))]
     public partial class SetSpriteLayerMaterialSystem : SystemBase {
         private EntityQuery query;
         private SharedComponentQuery<SetSpriteLayerMaterial> setMaterialQuery;

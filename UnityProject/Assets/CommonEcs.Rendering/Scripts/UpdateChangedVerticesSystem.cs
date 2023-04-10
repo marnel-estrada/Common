@@ -7,7 +7,7 @@ namespace CommonEcs {
     /// This is useful for layers that are static by majority but have some few sprites that animates
     /// either by UV or color 
     /// </summary>
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateInGroup(typeof(Rendering2dSystemGroup))]
     public partial class UpdateChangedVerticesSystem : UpdateVerticesSystem {
         protected override EntityQuery ResolveQuery() {
             return GetEntityQuery(ComponentType.ReadOnly<Sprite>(), 

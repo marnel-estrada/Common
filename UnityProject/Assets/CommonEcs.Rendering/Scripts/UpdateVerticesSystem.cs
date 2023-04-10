@@ -7,12 +7,11 @@ namespace CommonEcs {
     /// <summary>
     /// Common base class for systems that updates vertices
     /// </summary>
-    [UpdateAfter(typeof(TransformGameObjectSpriteVerticesSystem))]
     [UpdateAfter(typeof(TransformVerticesSystem))]
     [UpdateAfter(typeof(IdentifySpriteManagerChangedSystem))]
     [UpdateBefore(typeof(SpriteManagerRendererSystem))]
     [UpdateBefore(typeof(SpriteManagerJobsFinisher))]
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateInGroup(typeof(Rendering2dSystemGroup))]
     public abstract partial class UpdateVerticesSystem : JobSystemBase {        
         private SharedComponentQuery<SpriteManager> spriteManagerQuery;
 

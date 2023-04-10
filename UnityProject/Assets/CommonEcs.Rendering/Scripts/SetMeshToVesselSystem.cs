@@ -4,7 +4,7 @@ using Unity.Entities;
 namespace CommonEcs {
     [UpdateAfter(typeof(SpriteManagerRendererSystem))]
     [UpdateBefore(typeof(ResetSpriteManagerFlagsSystem))]
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateInGroup(typeof(Rendering2dSystemGroup))]
     public partial class SetMeshToVesselSystem : SystemBase {
         private EntityQuery query;
         private SharedComponentQuery<SpriteManager> spriteManagerQuery;

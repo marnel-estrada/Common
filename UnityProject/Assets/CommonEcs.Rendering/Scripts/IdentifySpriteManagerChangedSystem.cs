@@ -8,12 +8,10 @@ using Unity.Jobs;
 
 namespace CommonEcs {
     [UpdateAfter(typeof(TransformVerticesSystem))]
-    [UpdateAfter(typeof(TransformGameObjectSpriteVerticesSystem))]
     [UpdateAfter(typeof(UseYAsSortOrderSystem))]
-    [UpdateAfter(typeof(UseYAsSortOrderGameObjectSystem))]
     [UpdateBefore(typeof(SortRenderOrderSystem))]
     [UpdateBefore(typeof(UpdateChangedVerticesSystem))]
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateInGroup(typeof(Rendering2dSystemGroup))]
     public partial class IdentifySpriteManagerChangedSystem : SystemBase {
         private EntityQuery query;
         private ComponentTypeHandle<Sprite> spriteType;

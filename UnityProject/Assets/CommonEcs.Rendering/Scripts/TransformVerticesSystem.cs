@@ -10,7 +10,7 @@ using Unity.Transforms;
 using UnityEngine;
 
 namespace CommonEcs {
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateInGroup(typeof(Rendering2dSystemGroup))]
     public partial class TransformVerticesSystem : JobSystemBase {
         private EntityQuery query;
 

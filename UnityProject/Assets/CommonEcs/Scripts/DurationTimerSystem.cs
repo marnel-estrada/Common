@@ -25,7 +25,14 @@ namespace CommonEcs {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            return ScheduleScaled(ScheduleNonScaled(inputDeps));
+            // Schedule non scaled first
+            NonScaledJob job = new() {
+                timerType = GetComponentTypeHandle<DurationTimer>(),
+                deltaTime = UnityEngine.Time.deltaTime
+            };
+            JobHandle handle = job.Schedule(this.nonScaledQuery, inputDeps);
+            
+            return ScheduleScaled(handle);
         }
 
         private JobHandle ScheduleScaled(JobHandle dependency) {
@@ -52,15 +59,6 @@ namespace CommonEcs {
             return lastHandle;
         }
 
-        private JobHandle ScheduleNonScaled(JobHandle dependency) {
-            NonScaledJob job = new NonScaledJob() {
-                timerType = GetComponentTypeHandle<DurationTimer>(),
-                deltaTime = UnityEngine.Time.deltaTime
-            };
-
-            return job.Schedule(this.nonScaledQuery, dependency);
-        }
-
         [BurstCompile]
         private struct ScaledJob : IJobChunk {
             public ComponentTypeHandle<DurationTimer> timerType;
@@ -69,7 +67,7 @@ namespace CommonEcs {
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
                 NativeArray<DurationTimer> timers = chunk.GetNativeArray(ref this.timerType);
 
-                ChunkEntityEnumerator enumerator = new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
                 while (enumerator.NextEntityIndex(out int i)) {
                     DurationTimer timer = timers[i];
                     if (timer.polledTime < timer.durationTime) {
@@ -88,8 +86,7 @@ namespace CommonEcs {
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
                 NativeArray<DurationTimer> timers = chunk.GetNativeArray(ref this.timerType);
 
-                ChunkEntityEnumerator enumerator =
-                    new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
                 while (enumerator.NextEntityIndex(out int i)) {
                     DurationTimer timer = timers[i];
                     if (timer.polledTime < timer.durationTime) {

@@ -4,7 +4,7 @@ namespace CommonEcs {
     /// <summary>
     /// Destroys all entities with SetMaterialToSpriteManagersOfLayer components 
     /// </summary>
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateInGroup(typeof(Rendering2dSystemGroup))]
     public partial class SetSpriteLayerMaterialCleanupSystem : SystemBase {
         private EntityQuery query;
 

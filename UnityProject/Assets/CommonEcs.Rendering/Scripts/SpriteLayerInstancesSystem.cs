@@ -1,7 +1,7 @@
 ﻿using Unity.Entities;
 
 namespace CommonEcs {
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateInGroup(typeof(Rendering2dSystemGroup))]
     public partial class SpriteLayerInstancesSystem : CollectSharedComponentsSystem<SpriteLayer> {
     }
 }

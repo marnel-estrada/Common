@@ -8,7 +8,7 @@ using UnityEngine;
 namespace CommonEcs {
     [UpdateAfter(typeof(TransformVerticesSystem))]
     [UpdateAfter(typeof(SpriteManagerJobsFinisher))]
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateInGroup(typeof(Rendering2dSystemGroup))]
     public partial class SpriteManagerRendererSystem : SystemBase {
         private EntityQuery query;
         private SharedComponentQuery<SpriteManager> spriteManagerQuery;

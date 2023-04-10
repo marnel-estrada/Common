@@ -9,7 +9,7 @@ namespace CommonEcs {
     [UpdateBefore(typeof(TransformVerticesSystem))]
     [UpdateBefore(typeof(SortRenderOrderSystem))]
     [UpdateAfter(typeof(AddSpriteToManagerSystem))]
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateInGroup(typeof(Rendering2dSystemGroup))]
     public partial class UseYAsSortOrderSystem : JobSystemBase {
         private EntityQuery query;
 

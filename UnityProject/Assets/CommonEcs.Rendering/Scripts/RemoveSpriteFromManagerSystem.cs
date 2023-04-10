@@ -6,7 +6,7 @@ using Unity.Entities;
 namespace CommonEcs {
     [UpdateAfter(typeof(SpriteManagerRendererSystem))]
     [UpdateAfter(typeof(UpdateChangedVerticesSystem))]
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateInGroup(typeof(Rendering2dSystemGroup))]
     public partial class RemoveSpriteFromManagerSystem : SystemBase {
         private EntityCommandBufferSystem commandBufferSystem;
         

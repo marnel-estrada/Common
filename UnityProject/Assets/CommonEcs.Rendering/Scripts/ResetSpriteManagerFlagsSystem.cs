@@ -5,7 +5,7 @@ using Unity.Entities;
 namespace CommonEcs {
     [AlwaysUpdateSystem]
     [UpdateAfter(typeof(SpriteManagerRendererSystem))]
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateInGroup(typeof(Rendering2dSystemGroup))]
     public partial class ResetSpriteManagerFlagsSystem : SystemBase {
         private SharedComponentQuery<SpriteManager> query;
 

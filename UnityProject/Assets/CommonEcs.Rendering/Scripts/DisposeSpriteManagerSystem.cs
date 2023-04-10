@@ -6,7 +6,7 @@
     /// <summary>
     /// A system that disposes the NativeArray<Vector3> instance of each SpriteManager
     /// </summary>
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateInGroup(typeof(Rendering2dSystemGroup))]
     public partial class DisposeSpriteManagerSystem : SystemBase {
         private readonly List<SpriteManager> managers = new(1);
         private readonly List<int> managerIndices = new(1);

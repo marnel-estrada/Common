@@ -9,7 +9,7 @@ namespace CommonEcs {
     [UpdateAfter(typeof(TransformVerticesSystem))]
     [UpdateAfter(typeof(SpriteManagerJobsFinisher))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class SpriteManagerRendererSystem : SystemBase {
+    public partial class SpriteManagerRendererSystem : SystemBase {
         private EntityQuery query;
         private SharedComponentQuery<SpriteManager> spriteManagerQuery;
         

@@ -8,6 +8,7 @@ using Unity.Transforms;
 namespace CommonEcs {
     [UpdateBefore(typeof(TransformVerticesSystem))]
     [UpdateBefore(typeof(SortRenderOrderSystem))]
+    [UpdateAfter(typeof(AddSpriteToManagerSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public partial class UseYAsSortOrderSystem : JobSystemBase {
         private EntityQuery query;
@@ -21,7 +22,7 @@ namespace CommonEcs {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            UseYAsSortOrderJob job = new UseYAsSortOrderJob() {
+            UseYAsSortOrderJob job = new() {
                 spriteType = GetComponentTypeHandle<Sprite>(),
                 localToWorldType = GetComponentTypeHandle<LocalToWorld>(true),
                 useYType = GetComponentTypeHandle<UseYAsSortOrder>(true)
@@ -45,7 +46,8 @@ namespace CommonEcs {
                 NativeArray<LocalToWorld> localToWorldList = chunk.GetNativeArray(ref this.localToWorldType);
                 NativeArray<UseYAsSortOrder> useYArray = chunk.GetNativeArray(ref this.useYType);
 
-                for (int i = 0; i < chunk.Count; ++i) {
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
                     UseYAsSortOrder useY = useYArray[i];
                     
                     // We set the order by modifying the RenderOrder

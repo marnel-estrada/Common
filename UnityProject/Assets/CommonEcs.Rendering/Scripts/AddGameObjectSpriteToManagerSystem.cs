@@ -13,7 +13,7 @@ namespace CommonEcs {
     [UpdateAfter(typeof(SpriteManagerInstancesSystem))]
     [UpdateAfter(typeof(AddGameObjectSpriteToLayerSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class AddGameObjectSpriteToManagerSystem : SystemBase {
+    public partial class AddGameObjectSpriteToManagerSystem : SystemBase {
         // Note here that we're not using a common Added component so that each manager knows what 
         // sprite to remove
         public struct Added : ICleanupComponentData {

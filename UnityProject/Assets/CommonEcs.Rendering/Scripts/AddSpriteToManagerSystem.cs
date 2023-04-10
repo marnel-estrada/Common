@@ -70,7 +70,7 @@ namespace CommonEcs {
                 sprites[i] = sprite; // Modify the sprite data
 
                 // Add this component so it will no longer be processed by this system
-                Added added = new Added(sprite.spriteManagerEntity, sprite.managerIndex);
+                Added added = new(sprite.spriteManagerEntity, sprite.managerIndex);
                 commandBuffer.AddComponent(entities[i], added);
                 
                 // We add the shared component so that it can be filtered using such shared component

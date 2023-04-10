@@ -5,6 +5,6 @@ namespace CommonEcs.Goap {
     /// System group for CommonEcs.Goap systems
     /// </summary>
     [UpdateInGroup(typeof(ScalableTimeSystemGroup))]
-    public class GoapSystemGroup : ComponentSystemGroup {
+    public partial class GoapSystemGroup : ComponentSystemGroup {
     }
 }

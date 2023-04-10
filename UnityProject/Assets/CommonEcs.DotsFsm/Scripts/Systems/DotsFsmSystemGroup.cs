@@ -3,7 +3,7 @@ using Unity.Entities;
 
 namespace CommonEcs.DotsFsm {
     [UpdateInGroup(typeof(ScalableTimeSystemGroup))]
-    public class DotsFsmSystemGroup : ComponentSystemGroup {
+    public partial class DotsFsmSystemGroup : ComponentSystemGroup {
         private NativeReference<bool> rerunGroup;
         private int rerunCounter;
 

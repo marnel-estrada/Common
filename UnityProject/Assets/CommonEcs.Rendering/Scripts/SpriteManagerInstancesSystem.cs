@@ -10,11 +10,12 @@ namespace CommonEcs {
     public partial class SpriteManagerInstancesSystem : CollectSharedComponentsSystem<SpriteManager> {
         protected override EntityQuery ResolveQuery() {
             // We added sprite as subtractive here because we don't want to count those sprites
-            // where the SpriteManager is just added
+            // where the SpriteManager is just added. We just want those entities with just the
+            // SpriteManager shared component.
             return new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<Collected>()
-                .WithAll<Sprite>()
-                .WithNone<SpriteManager>().Build(this);
+                .WithAll<SpriteManager>()
+                .WithNone<Collected>()
+                .WithNone<Sprite>().Build(this);
         }
     }
 }

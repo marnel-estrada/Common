@@ -4,7 +4,7 @@ using Unity.Mathematics;
 using Unity.Transforms;
 
 namespace CommonEcs.DotsFsm {
-    public class MoveToSystem : DotsFsmActionSystem<MoveTo, MoveToSystem.Execution> {
+    public partial class MoveToSystem : DotsFsmActionSystem<MoveTo, MoveToSystem.Execution> {
         private DotsFsmSystemGroup dotsFsmSystemGroup;
 
         protected override void OnCreate() {

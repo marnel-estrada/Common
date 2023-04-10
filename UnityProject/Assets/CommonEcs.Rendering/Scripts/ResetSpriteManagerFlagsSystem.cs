@@ -6,7 +6,7 @@ namespace CommonEcs {
     [AlwaysUpdateSystem]
     [UpdateAfter(typeof(SpriteManagerRendererSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class ResetSpriteManagerFlagsSystem : SystemBase {
+    public partial class ResetSpriteManagerFlagsSystem : SystemBase {
         private SharedComponentQuery<SpriteManager> query;
 
         protected override void OnCreate() {

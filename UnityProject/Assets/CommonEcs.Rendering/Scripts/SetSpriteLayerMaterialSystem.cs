@@ -9,7 +9,7 @@ namespace CommonEcs {
     [UpdateBefore(typeof(SetSpriteLayerMaterialCleanupSystem))]
     [UpdateBefore(typeof(SpriteManagerRendererSystem))]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public class SetSpriteLayerMaterialSystem : SystemBase {
+    public partial class SetSpriteLayerMaterialSystem : SystemBase {
         private EntityQuery query;
         private SharedComponentQuery<SetSpriteLayerMaterial> setMaterialQuery;
         

@@ -18,6 +18,8 @@ namespace CommonEcs {
 
         protected override void OnCreate() {
             this.query = GetEntityQuery(ComponentType.ReadOnly<Sprite>(), ComponentType.ReadOnly<SpriteManager>());
+            RequireForUpdate(this.query);
+            
             this.managerQuery = new SharedComponentQuery<SpriteManager>(this, this.EntityManager);
         }
 
@@ -89,6 +91,7 @@ namespace CommonEcs {
             [ReadOnly]
             public NativeArray<int> chunkBaseEntityIndices;
             
+            [NativeDisableParallelForRestriction]
             public NativeArray<SortedSpriteEntry> sortList;
 
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
@@ -109,6 +112,7 @@ namespace CommonEcs {
         // We do this so that this remainder indeces will not render on top of the sorted ones
         [BurstCompile]
         private struct ResetTrianglesJob : IJobParallelFor {
+            [NativeDisableParallelForRestriction]
             public NativeArray<int> triangles;
 
             public void Execute(int index) {

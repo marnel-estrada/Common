@@ -25,7 +25,7 @@ namespace CommonEcs {
         //     Assertion.NotNull(this.items);
         //
         //     EntityPrefabManagerSystem manager =
-        //         World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EntityPrefabManagerSystem>();
+        //         World.DefaultGameObjectInjectionWorld.GetOrCreateSystemManaged<EntityPrefabManagerSystem>();
         //     
         //     IReadOnlyList<EntityPrefabItem> prefabs = this.items.Prefabs;
         //     for (int i = 0; i < prefabs.Count; ++i) {

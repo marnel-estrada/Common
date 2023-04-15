@@ -91,7 +91,7 @@ namespace CommonEcs.Goap {
         }
 
         protected virtual void BeforeActionsExecution() {
-            // Caching of ComponentDataFromEntity or BufferFromEntity can be done here.
+            // Caching of ComponentLookup or BufferLookup can be done here.
         }
 
         protected abstract GoapResult Start(ref AtomAction atomAction, ref TActionFilter actionComponent);

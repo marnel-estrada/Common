@@ -65,7 +65,7 @@ namespace CommonEcs.Goap {
 
         /// <summary>
         /// There may be times that the action system might not want to schedule in parallel
-        /// Like for cases when they write using ComponentDataFromEntity
+        /// Like for cases when they write using ComponentLookup
         /// </summary>
         protected virtual bool ShouldScheduleParallel {
             get {

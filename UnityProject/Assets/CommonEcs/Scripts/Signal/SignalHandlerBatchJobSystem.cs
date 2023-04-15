@@ -30,8 +30,8 @@ namespace CommonEcs {
                 commandBuffer = this.commandBufferSystem.CreateCommandBuffer()
             };
             
-            // We don't use ScheduleParallel() since the processor might have used ComponentDataFromEntity
-            // or BufferFromEntity
+            // We don't use ScheduleParallel() since the processor might have used ComponentLookup
+            // or BufferLookup
             JobHandle handle = job.Schedule(this.query, inputDeps);
             
             this.commandBufferSystem.AddJobHandleForProducer(handle);

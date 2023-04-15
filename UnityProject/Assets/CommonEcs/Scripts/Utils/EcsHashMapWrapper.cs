@@ -45,7 +45,7 @@ namespace CommonEcs {
             this.entityManager = new ValueTypeOption<EntityManager>();
         }
 
-        // This is another version that uses EntityManager instead of BufferFromEntity
+        // This is another version that uses EntityManager instead of BufferLookup
         public EcsHashMapWrapper(Entity hashMapEntity, ComponentLookup<EcsHashMap<K, V>> allHashMaps,
             EntityManager entityManager) {
             this.hashMapEntity = hashMapEntity;
@@ -159,7 +159,7 @@ namespace CommonEcs {
             }
 
             public DynamicBuffer<EcsHashMapEntry<K, V>> OnNone() {
-                // EntityManager was not specified. Use BufferFromEntity
+                // EntityManager was not specified. Use BufferLookup
                 DynamicBuffer<EntityBufferElement> buckets = this.allBuckets.Value[this.hashMapEntity];
                 Entity entryListEntity = buckets[this.bucketIndex].entity;
 

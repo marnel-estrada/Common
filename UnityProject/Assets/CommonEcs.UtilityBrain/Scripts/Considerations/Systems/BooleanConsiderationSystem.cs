@@ -3,7 +3,7 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 
 namespace CommonEcs.UtilityBrain {
-    public abstract class BooleanConsiderationSystem<TConsiderationComponent, TCondition> : ConsiderationBaseSystem<TConsiderationComponent, BooleanConsiderationSystem<TConsiderationComponent, TCondition>.Processor>
+    public abstract partial class BooleanConsiderationSystem<TConsiderationComponent, TCondition> : ConsiderationBaseSystem<TConsiderationComponent, BooleanConsiderationSystem<TConsiderationComponent, TCondition>.Processor>
         where TConsiderationComponent : unmanaged, IConsiderationComponent
         where TCondition : unmanaged, IConsiderationCondition<TConsiderationComponent> {
         // Must be implemented by deriving class

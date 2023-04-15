@@ -3,7 +3,7 @@ using CommonEcs.Goap;
 using Unity.Entities;
 
 namespace GoapBrain {
-    public class ForcedValueResolverSystem : ConditionResolverBaseSystem<ForcedValueResolver, ForcedValueResolverSystem.Processor> {
+    public partial class ForcedValueResolverSystem : ConditionResolverBaseSystem<ForcedValueResolver, ForcedValueResolverSystem.Processor> {
         public struct Processor : IConditionResolverProcess<ForcedValueResolver> {
             public void BeforeChunkIteration(ArchetypeChunk batchInChunk) {
             }

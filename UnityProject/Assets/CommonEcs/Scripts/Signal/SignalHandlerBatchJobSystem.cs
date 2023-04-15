@@ -51,7 +51,7 @@ namespace CommonEcs {
 
             public EntityCommandBuffer commandBuffer;
 
-            public void Execute(ArchetypeChunk batchInChunk, int batchIndex) {
+            public void Execute(ArchetypeChunk batchInChunk) {
                 NativeArray<Entity> entities = batchInChunk.GetNativeArray(this.entityType);
                 NativeArray<TParameterType> parameters = batchInChunk.GetNativeArray(this.parameterType);
                 for (int i = 0; i < batchInChunk.Count; ++i) {

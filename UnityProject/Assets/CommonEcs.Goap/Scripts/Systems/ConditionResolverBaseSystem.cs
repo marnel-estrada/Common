@@ -110,9 +110,9 @@ namespace CommonEcs.Goap {
             public TResolverProcessor processor;
             
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
-                NativeArray<ConditionResolver> resolvers = chunk.GetNativeArray(this.resolverType);
+                NativeArray<ConditionResolver> resolvers = chunk.GetNativeArray(ref this.resolverType);
                 
-                NativeArray<TResolverFilter> filters = this.filterHasArray ? chunk.GetNativeArray(this.filterType) : default;
+                NativeArray<TResolverFilter> filters = this.filterHasArray ? chunk.GetNativeArray(ref this.filterType) : default;
                 TResolverFilter defaultFilter = default; // This will be used if TActionFilter has no chunk (it's a tag component)
                 
                 this.processor.BeforeChunkIteration(chunk);

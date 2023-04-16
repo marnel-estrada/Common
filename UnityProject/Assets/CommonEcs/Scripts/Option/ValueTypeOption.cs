@@ -82,6 +82,7 @@ namespace CommonEcs {
             return this.IsSome ? this.value : other;
         }
 
+        [Pure]
         public T ValueOrError() {
             if (this.IsSome) {
                 return this.value;

@@ -45,7 +45,7 @@ namespace CommonEcs {
         private void StoreReferencedEntities(ArchetypeChunk chunk,
             ref NativeParallelHashMap<Entity, byte> referencedEntities) {
             NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
-            NativeArray<EntityReference> references = chunk.GetNativeArray(this.referenceType);
+            NativeArray<EntityReference> references = chunk.GetNativeArray(ref this.referenceType);
             for (int i = 0; i < references.Length; ++i) {
                 EntityReference entityReference = references[i];
                 
@@ -65,7 +65,7 @@ namespace CommonEcs {
         private void DestroyUnownedReferences(ArchetypeChunk chunk, ref NativeParallelHashMap<Entity, byte> referencedEntities,
             ref EntityCommandBuffer commandBuffer) {
             NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
-            NativeArray<EntityReference> references = chunk.GetNativeArray(this.referenceType);
+            NativeArray<EntityReference> references = chunk.GetNativeArray(ref this.referenceType);
             for (int i = 0; i < references.Length; ++i) {
                 EntityReference entityReference = references[i];
                 

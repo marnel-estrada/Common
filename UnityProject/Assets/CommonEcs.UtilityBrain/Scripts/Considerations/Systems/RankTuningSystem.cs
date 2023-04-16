@@ -1,7 +1,7 @@
 using Unity.Entities;
 
 namespace CommonEcs.UtilityBrain {
-    public class RankTuningSystem : ConsiderationBaseSystem<RankTuning, RankTuningSystem.Processor> {
+    public partial class RankTuningSystem : ConsiderationBaseSystem<RankTuning, RankTuningSystem.Processor> {
         protected override Processor PrepareProcessor() {
             return new Processor();
         }

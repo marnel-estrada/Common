@@ -23,6 +23,7 @@ namespace CommonEcs.UtilityBrain {
             NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(Allocator.TempJob);
             
             ComputeConsiderationsJob job = new() {
+                chunkBaseEntityIndices = chunkBaseEntityIndices,
                 considerationType = GetComponentTypeHandle<Consideration>(),
                 filterType = GetComponentTypeHandle<TFilter>(),
                 filterHasArray = !this.isFilterZeroSized, // Filter has array if it's not zero sized
@@ -52,13 +53,13 @@ namespace CommonEcs.UtilityBrain {
         
         [BurstCompile]
         public struct ComputeConsiderationsJob : IJobChunk {
-            public ComponentTypeHandle<Consideration> considerationType;
-            
-            public ComponentTypeHandle<TFilter> filterType;
-            
             [ReadOnly]
             public NativeArray<int> chunkBaseEntityIndices;
-            
+
+            public ComponentTypeHandle<Consideration> considerationType;
+
+            public ComponentTypeHandle<TFilter> filterType;
+
             public bool filterHasArray;
             public TProcessor processor;
 

@@ -10,9 +10,9 @@ namespace CommonEcs.UtilityBrain {
         /// Routines before chunk iteration. Calling ArchetypeChunk.GetNativeArray()
         /// can be called here.
         /// </summary>
-        /// <param name="batchInChunk"></param>
+        /// <param name="chunk"></param>
         /// <param name="batchIndex"></param>
-        void BeforeChunkIteration(ArchetypeChunk batchInChunk);
+        void BeforeChunkIteration(ArchetypeChunk chunk);
         
         UtilityValue ComputeUtility(in Entity agentEntity, in T filterComponent, int chunkIndex, int queryIndex);
     }

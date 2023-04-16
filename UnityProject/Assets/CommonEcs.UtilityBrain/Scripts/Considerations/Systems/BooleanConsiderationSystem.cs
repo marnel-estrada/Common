@@ -28,8 +28,8 @@ namespace CommonEcs.UtilityBrain {
             [NativeDisableContainerSafetyRestriction]
             private NativeArray<BooleanConsiderationValues> booleanConsiderationValuesList;
             
-            public void BeforeChunkIteration(ArchetypeChunk batchInChunk) {
-                this.booleanConsiderationValuesList = batchInChunk.GetNativeArray(ref this.booleanConsiderationType);
+            public void BeforeChunkIteration(ArchetypeChunk chunk) {
+                this.booleanConsiderationValuesList = chunk.GetNativeArray(ref this.booleanConsiderationType);
             }
 
             public UtilityValue ComputeUtility(in Entity agentEntity, in TConsiderationComponent filterComponent,

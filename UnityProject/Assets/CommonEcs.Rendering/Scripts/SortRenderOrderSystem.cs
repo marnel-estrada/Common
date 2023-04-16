@@ -86,11 +86,11 @@ namespace CommonEcs {
         [BurstCompile]
         private struct AddJob : IJobChunk {
             [ReadOnly]
-            public ComponentTypeHandle<Sprite> spriteType;
+            public NativeArray<int> chunkBaseEntityIndices;
 
             [ReadOnly]
-            public NativeArray<int> chunkBaseEntityIndices;
-            
+            public ComponentTypeHandle<Sprite> spriteType;
+
             [NativeDisableParallelForRestriction]
             public NativeArray<SortedSpriteEntry> sortList;
 

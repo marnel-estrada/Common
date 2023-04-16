@@ -23,6 +23,7 @@ namespace CommonEcs.DotsFsm {
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(Allocator.TempJob);
             ExecuteActionJob job = new() {
+                chunkBaseEntityIndices = chunkBaseEntityIndices,
                 entityHandle = GetEntityTypeHandle(),
                 fsmActionHandle = GetComponentTypeHandle<DotsFsmAction>(),
                 customActionHandle = GetComponentTypeHandle<TActionType>(),
@@ -54,11 +55,11 @@ namespace CommonEcs.DotsFsm {
         [BurstCompile]
         public struct ExecuteActionJob : IJobChunk {
             [ReadOnly]
-            public EntityTypeHandle entityHandle;
-            
-            [ReadOnly]
             public NativeArray<int> chunkBaseEntityIndices;
-            
+
+            [ReadOnly]
+            public EntityTypeHandle entityHandle;
+
             public ComponentTypeHandle<DotsFsmAction> fsmActionHandle;
             public ComponentTypeHandle<TActionType> customActionHandle;
 

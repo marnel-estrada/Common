@@ -97,12 +97,11 @@ namespace CommonEcs {
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
                 NativeArray<Sprite> sprites = chunk.GetNativeArray(ref this.spriteType);
 
-                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
-                EntityIndexAide indexAide = new EntityIndexAide(ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
-                while (enumerator.NextEntityIndex(out int i)) {
+                ChunkEntityEnumeratorWithQueryIndex enumerator = new(
+                    useEnabledMask, chunkEnabledMask, chunk.Count, ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
+                while (enumerator.NextEntity(out int i, out int queryIndex)) {
                     Sprite sprite = sprites[i];
-                    int index = indexAide.NextEntityIndexInQuery();
-                    this.sortList[index] = new SortedSpriteEntry(sprite.managerIndex, sprite.LayerOrder,
+                    this.sortList[queryIndex] = new SortedSpriteEntry(sprite.managerIndex, sprite.LayerOrder,
                         sprite.renderOrder, sprite.renderOrderDueToPosition);
                 }
             }

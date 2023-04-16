@@ -71,16 +71,14 @@ namespace CommonEcs.DotsFsm {
                 
                 this.execution.BeforeChunkIteration(chunk);
 
-                EntityIndexAide indexAide = new(ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
-
-                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
-                while (enumerator.NextEntityIndex(out int i)) {
+                ChunkEntityEnumeratorWithQueryIndex enumerator = new(
+                    useEnabledMask, chunkEnabledMask, chunk.Count, ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
+                while (enumerator.NextEntity(out int i, out int queryIndex)) {
                     Entity actionEntity = entities[i];
                     DotsFsmAction fsmAction = fsmActions[i];
                     TActionType customAction = customActions[i];
 
-                    int indexInQuery = indexAide.NextEntityIndexInQuery();
-                    Process(actionEntity, ref fsmAction, ref customAction, indexInQuery);
+                    Process(actionEntity, ref fsmAction, ref customAction, queryIndex);
                     
                     // Modify
                     fsmActions[i] = fsmAction;

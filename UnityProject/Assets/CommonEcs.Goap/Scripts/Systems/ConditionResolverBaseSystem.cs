@@ -117,16 +117,14 @@ namespace CommonEcs.Goap {
                 
                 this.processor.BeforeChunkIteration(chunk);
                 
-                EntityIndexAide indexAide = new(ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
-                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
-                while (enumerator.NextEntityIndex(out int i)) {
+                ChunkEntityEnumeratorWithQueryIndex enumerator = new(
+                    useEnabledMask, chunkEnabledMask, chunk.Count, ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
+                while (enumerator.NextEntity(out int i, out int queryIndex)) {
                     ConditionResolver resolver = resolvers[i];
                     if (resolver.resolved) {
                         // Already resolved
                         continue;
                     }
-                    
-                    int queryIndex = indexAide.NextEntityIndexInQuery();
 
                     if (this.filterHasArray) {
                         TResolverFilter filter = filters[i];

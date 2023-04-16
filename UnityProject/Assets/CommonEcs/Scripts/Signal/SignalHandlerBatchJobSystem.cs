@@ -51,18 +51,6 @@ namespace CommonEcs {
 
             public EntityCommandBuffer commandBuffer;
 
-            public void Execute(ArchetypeChunk chunk) {
-                NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
-                NativeArray<TParameterType> parameters = chunk.GetNativeArray(ref this.parameterType);
-                for (int i = 0; i < chunk.Count; ++i) {
-                    Entity entity = entities[i];
-                    this.processor.Execute(entity, parameters[i]);
-                    
-                    // We added this component so that they will not be processed again
-                    this.commandBuffer.AddComponent<ProcessedBySystem>(entity);
-                }
-            }
-
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
                 NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
                 NativeArray<TParameterType> parameters = chunk.GetNativeArray(ref this.parameterType);

@@ -6,7 +6,7 @@ namespace CommonEcs {
     /// We did this because it's so cumbersome to write for the moment
     /// This is based from https://docs.unity3d.com/Packages/com.unity.entities@1.0/manual/upgrade-guide.html#jobs-that-need-firstentityindex
     /// </summary>
-    public struct EntityIndexAide {
+    internal struct EntityIndexAide {
         private readonly int baseEntityIndex;
         private int validEntitiesInChunk;
 

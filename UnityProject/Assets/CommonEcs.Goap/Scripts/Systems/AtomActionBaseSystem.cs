@@ -106,9 +106,10 @@ namespace CommonEcs.Goap {
 
                 this.processor.BeforeChunkIteration(chunk);
                 
-                EntityIndexAide indexAide = new(ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
-                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
-                while (enumerator.NextEntityIndex(out int i)) {
+                ChunkEntityEnumeratorWithQueryIndex enumerator = new(
+                    useEnabledMask, chunkEnabledMask, chunk.Count, ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
+                while (enumerator.NextEntity(out int i, out int queryIndex)) {
+                    
                     AtomAction atomAction = atomActions[i];
                     GoapAgent agent = this.allAgents[atomAction.agentEntity];
                     DebugEntity debug = this.allDebugEntities[atomAction.agentEntity];
@@ -117,8 +118,6 @@ namespace CommonEcs.Goap {
                         int breakpoint = 0;
                         ++breakpoint;
                     }
-
-                    int queryIndex = indexAide.NextEntityIndexInQuery();
 
                     if (agent.state == AgentState.CLEANUP) {
                         // Time to cleanup

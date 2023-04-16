@@ -70,16 +70,14 @@ namespace CommonEcs.UtilityBrain {
                 
                 this.processor.BeforeChunkIteration(chunk);
 
-                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
-                EntityIndexAide indexAide = new(ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
-                while (enumerator.NextEntityIndex(out int i)) {
+                ChunkEntityEnumeratorWithQueryIndex enumerator = new(
+                    useEnabledMask, chunkEnabledMask, chunk.Count, ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
+                while (enumerator.NextEntity(out int i, out int queryIndex)) {
                     Consideration consideration = considerations[i];
                     if (!consideration.shouldExecute) {
                         // Not time to execute yet
                         continue;
                     }
-
-                    int queryIndex = indexAide.NextEntityIndexInQuery();
 
                     // Compute the utility
                     if (this.filterHasArray) {

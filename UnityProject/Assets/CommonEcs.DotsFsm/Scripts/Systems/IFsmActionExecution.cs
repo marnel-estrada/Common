@@ -16,8 +16,8 @@ namespace CommonEcs.DotsFsm {
         /// <param name="actionEntity"></param>
         /// <param name="action"></param>
         /// <param name="actionComponent"></param>
-        /// <param name="indexInQuery"></param>
-        void OnEnter(Entity actionEntity, ref DotsFsmAction action, ref T actionComponent, int indexInQuery);
+        /// <param name="queryIndex"></param>
+        void OnEnter(Entity actionEntity, ref DotsFsmAction action, ref T actionComponent, int queryIndex);
 
         /// <summary>
         /// DotsFsm is passed here so that the action can send events
@@ -25,9 +25,9 @@ namespace CommonEcs.DotsFsm {
         /// <param name="actionEntity"></param>
         /// <param name="action"></param>
         /// <param name="actionComponent"></param>
-        /// <param name="indexInQuery"></param>
-        void OnUpdate(Entity actionEntity, ref DotsFsmAction action, ref T actionComponent, int indexInQuery);
+        /// <param name="queryIndex"></param>
+        void OnUpdate(Entity actionEntity, ref DotsFsmAction action, ref T actionComponent, int queryIndex);
         
-        void OnExit(Entity actionEntity, DotsFsmAction action, ref T actionComponent, int indexInQuery);
+        void OnExit(Entity actionEntity, DotsFsmAction action, ref T actionComponent, int queryIndex);
     }
 }

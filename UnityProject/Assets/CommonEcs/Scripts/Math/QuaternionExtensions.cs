@@ -1,3 +1,4 @@
+using CommonEcs.Scripts.Math;
 using Unity.Mathematics;
 
 namespace CommonEcs {
@@ -82,6 +83,11 @@ namespace CommonEcs {
             }
 
             return angle;
+        }
+
+        public static bool IsIdentity(this quaternion q) {
+            float4 value = q.value;
+            return value.xyz.IsZero() && value.w.TolerantEquals(1.0f);
         }
     }
 }

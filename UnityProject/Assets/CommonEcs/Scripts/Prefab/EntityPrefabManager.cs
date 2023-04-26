@@ -3,7 +3,7 @@ using Unity.Entities;
 
 namespace CommonEcs {
     public struct EntityPrefabManager : IComponentData {
-        private LinearHashMap16<int, Entity> prefabMap;
+        private LinearHashMap128<int, Entity> prefabMap;
 
         /// <summary>
         /// Adds a prefab

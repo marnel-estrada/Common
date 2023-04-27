@@ -17,7 +17,7 @@ namespace CommonEcs {
         
         class Baker : Baker<EntityPrefabManagerAuthoring> {
             public override void Bake(EntityPrefabManagerAuthoring authoring) {
-                EntityPrefabManager prefabManager = new EntityPrefabManager();
+                EntityPrefabManager prefabManager = new();
          
                 IReadOnlyList<EntityPrefabItem> prefabs = authoring.Items.Prefabs;
                 for (int i = 0; i < prefabs.Count; ++i) {

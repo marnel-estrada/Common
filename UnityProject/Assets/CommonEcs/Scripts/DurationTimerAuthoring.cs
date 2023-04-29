@@ -8,7 +8,6 @@ namespace CommonEcs {
     /// <summary>
     /// Component for duration timing
     /// </summary>
-    //[GenerateAuthoringComponent]
     public struct DurationTimer : IComponentData {
         public float durationTime;
         public float polledTime;
@@ -66,7 +65,12 @@ namespace CommonEcs {
     }
 
     public class DurationTimerAuthoring : MonoBehaviour {
-        // Only added in authoring to add the component
-        // No editable values
+        public float duration;
+        
+        internal class Baker : Baker<DurationTimerAuthoring> {
+            public override void Bake(DurationTimerAuthoring authoring) {
+                AddComponent(this.GetPrimaryEntity(), new DurationTimer(authoring.duration));
+            }
+        }
     }
 }

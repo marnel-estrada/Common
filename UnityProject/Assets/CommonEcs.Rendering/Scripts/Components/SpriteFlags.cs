@@ -1,8 +1,4 @@
 namespace CommonEcs {
-    /// <summary>
-    /// We placed these constants here because GenerateAuthoringComponent generates assignment
-    /// when this is placed in the component.
-    /// </summary>
     public static class SpriteFlags {
         // Active here means whether or not it is active in SpriteManager or is a recycled instance
         public const int ACTIVE = 0;

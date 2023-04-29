@@ -3,7 +3,6 @@ using Unity.Entities;
 using UnityEngine;
 
 namespace CommonEcs.Goap {
-    // [GenerateAuthoringComponent]
     public struct GoapAgent : IComponentData {
         // Note here that the first goal is the main goal. Then if it can't resolve
         // actions, it will try to resolve the next goals.
@@ -85,5 +84,14 @@ namespace CommonEcs.Goap {
 
     public class GoapAgentAuthoring : MonoBehaviour {
         public int domainId;
+        
+        internal class Baker : Baker<GoapAgentAuthoring> {
+            public override void Bake(GoapAgentAuthoring authoring) {
+                GoapAgent agent = new() {
+                    domainId = authoring.domainId
+                };
+                AddComponent(this.GetPrimaryEntity(), agent);
+            }
+        }
     }
 }

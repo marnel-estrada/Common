@@ -8,7 +8,6 @@ namespace CommonEcs {
     /// A component that identifies whether or not to use Y as the sort order
     /// </summary>
     [Serializable]
-    //[GenerateAuthoringComponent]
     public struct UseYAsSortOrder : IComponentData {
         // We may want to offset the y position such that we don't have to rely on a parent
         // transform to get the correct y value.
@@ -25,5 +24,12 @@ namespace CommonEcs {
 
     public class UseYAsSortOrderAuthoring : MonoBehaviour {
         public float offset;
+        
+        internal class Baker : Baker<UseYAsSortOrderAuthoring> {
+            public override void Bake(UseYAsSortOrderAuthoring authoring) {
+                Entity entity = GetEntity(TransformUsageFlags.Renderable);
+                AddComponent(entity, new UseYAsSortOrder(authoring.offset));
+            }
+        }
     }
 }

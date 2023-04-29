@@ -5,7 +5,6 @@ namespace CommonEcs {
     /// <summary>
     /// A component that identifies a certain sprite to add to sprite layer
     /// </summary>
-    //[GenerateAuthoringComponent]
     public struct AddToSpriteLayer : IComponentData {
         public Entity layerEntity;
 
@@ -16,5 +15,13 @@ namespace CommonEcs {
 
     public class AddToSpriteLayerAuthoring : MonoBehaviour {
         public GameObject layerEntity;
+        
+        internal class Baker : Baker<AddToSpriteLayerAuthoring> {
+            public override void Bake(AddToSpriteLayerAuthoring authoring) {
+                Entity primaryEntity = GetEntity(TransformUsageFlags.Renderable);
+                Entity layerEntity = GetEntity(authoring.layerEntity, TransformUsageFlags.None);
+                AddComponent(primaryEntity, new AddToSpriteLayer(layerEntity));
+            }
+        }
     }
 }

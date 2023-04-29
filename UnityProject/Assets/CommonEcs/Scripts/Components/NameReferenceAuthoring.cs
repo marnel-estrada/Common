@@ -6,12 +6,8 @@ namespace CommonEcs {
     /// For most cases, names might not be added unto the components
     /// Instead, an entity will have a NameReference that will point to an entity with the
     /// Name component. We did it this way to avoid filling up the chunk when names are added
-    /// to entities.
-    ///
-    /// Components with GenerateAuthoringComponent cannot be readonly structs as it produces errors
-    /// on its generated code. 
+    /// to entities. 
     /// </summary>
-    //[GenerateAuthoringComponent]
     public struct NameReference : IComponentData {
         public NonNullEntity nameEntity;
 
@@ -23,5 +19,7 @@ namespace CommonEcs {
     public class NameReferenceAuthoring : MonoBehaviour {
         // Only added in authoring to add the component
         // No editable values
+        internal class Baker : SingleComponentBaker<NameReferenceAuthoring, NameReference> {
+        }
     }
 }

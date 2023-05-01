@@ -10,7 +10,8 @@ namespace CommonEcs {
     public class LinkedEntityGroupAuthoring : MonoBehaviour {
         internal class Baker : Baker<LinkedEntityGroupAuthoring> {
             public override void Bake(LinkedEntityGroupAuthoring authoring) {
-                AddBuffer<LinkedEntityGroup>();
+                Entity entity = GetEntity(TransformUsageFlags.None);
+                AddBuffer<LinkedEntityGroup>(entity);
             }
         }
     }

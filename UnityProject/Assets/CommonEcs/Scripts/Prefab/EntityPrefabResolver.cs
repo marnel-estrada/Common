@@ -8,18 +8,19 @@ namespace CommonEcs {
     /// Used to wrap NativeHashMap so we don't pass it around when used in jobs
     /// </summary>
     public struct EntityPrefabResolver {
-        private NativeParallelHashMap<FixedString64Bytes, Entity> map;
+        private EntityPrefabManager prefabManager;
 
-        public EntityPrefabResolver(NativeParallelHashMap<FixedString64Bytes, Entity> map) {
-            this.map = map;
+        public EntityPrefabResolver(in EntityPrefabManager prefabManager) {
+            this.prefabManager = prefabManager;
         }
 
         public Entity GetEntityPrefab(FixedString64Bytes id) {
-            if (this.map.TryGetValue(id, out Entity prefabEntity)) {
-                return prefabEntity;
+            ValueTypeOption<Entity> prefab = this.prefabManager.GetPrefab(id);
+            if (prefab.IsNone) {
+                throw new Exception($"The prefab pool does not contain an entry for {id}");
             }
-            
-            throw new Exception($"The prefab pool does not contain an entry for {id}");
+
+            return prefab.ValueOrError();
         }
     }
 }

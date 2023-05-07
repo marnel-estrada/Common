@@ -19,7 +19,16 @@ namespace CommonEcs.UtilityBrain {
             this.isFilterZeroSized = TypeManager.GetTypeInfo(TypeManager.GetTypeIndex<TFilter>()).IsZeroSized;
         }
 
+        protected virtual bool CanExecute {
+            get;
+        }
+
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
+            if (!this.CanExecute) {
+                // Can't execute based on some logic. The deriving system might be waiting for something.
+                return inputDeps;
+            }
+            
             NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(Allocator.TempJob);
             
             ComputeConsiderationsJob job = new() {

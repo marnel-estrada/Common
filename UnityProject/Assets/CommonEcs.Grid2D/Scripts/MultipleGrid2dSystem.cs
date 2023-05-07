@@ -5,6 +5,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 
 namespace CommonEcs {
+    [UpdateBefore(typeof(ScalableTimeSystemGroup))]
     public partial class MultipleGrid2dSystem : SystemBase {
         private bool resolved;
         private MultipleGrid2D grid;

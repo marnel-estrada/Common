@@ -1,35 +1,31 @@
 using System;
-
+using Common;
 using Unity.Collections;
 using Unity.Entities;
+using UnityEngine;
 
 namespace CommonEcs {
     /// <summary>
     /// Holds the mapping from integer ID to the Entity prefab
     /// </summary>
     public partial class EntityPrefabManagerSystem : SystemBase {
-        private NativeParallelHashMap<FixedString64Bytes, Entity> map;
+        private Option<EntityPrefabManager> prefabManager;
+        
+        private EntityQuery query;
         
         protected override void OnCreate() {
-            this.map = new NativeParallelHashMap<FixedString64Bytes, Entity>(10, Allocator.Persistent);
+            this.query = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<EntityPrefabManager>().Build(this);
         }
 
         protected override void OnDestroy() {
-            if (this.map.IsCreated) {
-                this.map.Dispose();
-            }
         }
 
-        /// <summary>
-        /// Adds a prefab to maintain
-        /// </summary>
-        /// <param name="item"></param>
-        public void Add(FixedString64Bytes id, Entity entityPrefab) {
-            if (this.map.ContainsKey(id)) {
-                throw new Exception($"The prefab pool already contains an entry for {id}");
+        // It is only prepared when the prefabManager has been resolved
+        public bool IsPrepared {
+            get {
+                return this.prefabManager.IsSome;
             }
-
-            this.map[id] = entityPrefab;
         }
 
         /// <summary>
@@ -37,19 +33,41 @@ namespace CommonEcs {
         /// </summary>
         public EntityPrefabResolver EntityPrefabResolver {
             get {
-                return new EntityPrefabResolver(this.map);
+                if (this.prefabManager.IsNone) {
+                    throw new Exception("The prefab manager is not resolved yet.");
+                }
+                
+                return new EntityPrefabResolver(this.prefabManager.ValueOrError());
             }
         }
 
         public Entity GetEntityPrefab(FixedString64Bytes id) {
-            if (this.map.TryGetValue(id, out Entity prefabEntity)) {
-                return prefabEntity;
+            if (this.prefabManager.IsNone) {
+                throw new Exception("The prefab manager is not resolved yet.");
             }
-            
-            throw new Exception($"The prefab pool does not contain an entry for {id}");
+
+            ValueTypeOption<Entity> prefab = this.prefabManager.ValueOrError().GetPrefab(id);
+            if (prefab.IsNone) {
+                throw new Exception($"The prefab pool does not contain an entry for {id}");    
+            }
+
+            return prefab.ValueOrError();
         }
 
         protected override void OnUpdate() {
+            if (this.prefabManager.IsSome) {
+                // Value was already resolved
+                return;
+            }
+
+            if (this.query.CalculateEntityCount() > 0) {
+                Debug.Log("The EntityPrefabManager is found.");
+            }
+            
+            // Resolve value here using SystemAPI.GetSingleton()
+            if (SystemAPI.TryGetSingleton(out EntityPrefabManager prefabManager)) {
+                this.prefabManager = Option<EntityPrefabManager>.AsOption(prefabManager);
+            }
         }
     }
 }

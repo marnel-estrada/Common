@@ -8,6 +8,7 @@ namespace CommonEcs {
     /// <summary>
     /// Holds the mapping from integer ID to the Entity prefab
     /// </summary>
+    [UpdateInGroup(typeof(InitializationSystemGroup))]
     public partial class EntityPrefabManagerSystem : SystemBase {
         private Option<EntityPrefabManager> prefabManager;
         

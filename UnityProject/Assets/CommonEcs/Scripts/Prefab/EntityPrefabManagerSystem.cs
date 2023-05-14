@@ -12,11 +12,7 @@ namespace CommonEcs {
     public partial class EntityPrefabManagerSystem : SystemBase {
         private Option<EntityPrefabManager> prefabManager;
         
-        private EntityQuery query;
-        
         protected override void OnCreate() {
-            this.query = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<EntityPrefabManager>().Build(this);
         }
 
         protected override void OnDestroy() {
@@ -55,20 +51,12 @@ namespace CommonEcs {
             return prefab.ValueOrError();
         }
 
-        protected override void OnUpdate() {
-            if (this.prefabManager.IsSome) {
-                // Value was already resolved
-                return;
-            }
+        public void RegisterPrefabManager(ref EntityPrefabManager prefabManager) {
+            Debug.Log("The EntityPrefabManager is found.");
+            this.prefabManager = Option<EntityPrefabManager>.AsOption(prefabManager);
+        }
 
-            if (this.query.CalculateEntityCount() > 0) {
-                Debug.Log("The EntityPrefabManager is found.");
-            }
-            
-            // Resolve value here using SystemAPI.GetSingleton()
-            if (SystemAPI.TryGetSingleton(out EntityPrefabManager prefabManager)) {
-                this.prefabManager = Option<EntityPrefabManager>.AsOption(prefabManager);
-            }
+        protected override void OnUpdate() {
         }
     }
 }

@@ -15,8 +15,13 @@ namespace CommonEcs {
             }
         }
         
-        class Baker : Baker<EntityPrefabManagerAuthoring> {
+        public class Baker : Baker<EntityPrefabManagerAuthoring> {
             public override void Bake(EntityPrefabManagerAuthoring authoring) {
+                // Prevent null point exception when the component is still being added
+                if (authoring.Items == null) {
+                    return;
+                }
+                
                 EntityPrefabManager prefabManager = new();
          
                 IReadOnlyList<EntityPrefabItem> prefabs = authoring.Items.Prefabs;

@@ -23,8 +23,11 @@ namespace CommonEcs {
             }
         
             public bool MoveNext() {
-                this.m_Index++;
-        
+                // Move until we find an entry that has a value
+                do {
+                    ++this.m_Index;
+                } while (this.m_Index < 128 && !this.Current.hasValue);
+
                 return this.m_Index < 128;
             }
         

@@ -17,5 +17,17 @@ namespace CommonEcs {
         public ValueTypeOption<Entity> GetPrefab(in FixedString64Bytes id) {
             return this.prefabMap.Find(id.GetHashCode());
         }
+
+        public int Count {
+            get {
+                return this.prefabMap.Count;
+            }
+        }
+
+        public LinearHashMapBucket128<int, Entity>.Enumerator Entries {
+            get {
+                return this.prefabMap.Entries;
+            }
+        }
     }
 }

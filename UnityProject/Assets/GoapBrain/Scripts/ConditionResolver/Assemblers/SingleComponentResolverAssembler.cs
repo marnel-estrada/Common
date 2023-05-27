@@ -24,7 +24,7 @@ namespace GoapBrain {
         public override Entity Prepare(ref EntityManager entityManager, in FixedString64Bytes conditionName, in Entity agentEntity, in Entity plannerEntity) {
             Entity resolverEntity = entityManager.CreateEntity(this.archetype);
             
-            ConditionsMap conditionsMap = new ConditionsMap(ref entityManager, plannerEntity);
+            ConditionsMap conditionsMap = new(ref entityManager, plannerEntity);
             int resultIndex = conditionsMap.AddOrSet(conditionName, false);
             entityManager.SetComponentData(resolverEntity, new ConditionResolver(conditionName, 
                 agentEntity, plannerEntity, resultIndex));

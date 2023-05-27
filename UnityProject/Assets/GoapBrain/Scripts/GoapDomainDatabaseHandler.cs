@@ -19,7 +19,7 @@ namespace GoapBrain {
         private BlobAssetReference<GoapDomainDatabase> domainDbReference;
 
         // We temporarily keep the conditions names and action names here 
-        private readonly Dictionary<int, FixedString64Bytes> textMap = new Dictionary<int, FixedString64Bytes>(500);
+        private readonly Dictionary<int, FixedString64Bytes> textMap = new(500);
         
         public GoapDomainDataContainer? Domains => this.domains;
 
@@ -37,7 +37,7 @@ namespace GoapBrain {
 
             Assertion.IsTrue(domainsDataList.Count > 0);
 
-            BlobBuilder builder = new BlobBuilder(Allocator.Temp);
+            BlobBuilder builder = new(Allocator.Temp);
 
             // Prepare DomainDatabase
             ref GoapDomainDatabase db = ref builder.ConstructRoot<GoapDomainDatabase>();
@@ -66,12 +66,12 @@ namespace GoapBrain {
         }
 
         // We need this to have unique action names
-        private readonly HashSet<string> addedActions = new HashSet<string>();
+        private readonly HashSet<string> addedActions = new();
 
         private GoapDomain ParseDomain(GoapDomainData data) {
             this.addedActions.Clear();
 
-            GoapDomain domain = new GoapDomain(data.name);
+            GoapDomain domain = new(data.name);
             AddActions(ref domain, data, this.addedActions);
 
             // Parse each extension domain
@@ -161,10 +161,10 @@ namespace GoapBrain {
         }
 
         // We need this so that we can check that each condition only has one resolver
-        private readonly HashSet<string> conditionsWithResolvers = new HashSet<string>();
+        private readonly HashSet<string> conditionsWithResolvers = new();
 
         private AssemblerSet ParseAssemblerSet(GoapDomainData data, int index) {
-            AssemblerSet set = new AssemblerSet(index);
+            AssemblerSet set = new(index);
 
             this.conditionsWithResolvers.Clear();
 

@@ -45,12 +45,13 @@ namespace CommonEcs {
                 NativeArray<SortedSpriteEntry> entries = new(count, Allocator.TempJob);
                 
                 NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(Allocator.TempJob);
-
+                
                 AddJob addJob = new() {
-                    spriteType = spriteType,
                     chunkBaseEntityIndices = chunkBaseEntityIndices,
+                    spriteType = spriteType,
                     sortList = entries
                 };
+
 
                 lastHandle = addJob.ScheduleParallel(this.query, lastHandle);
                 

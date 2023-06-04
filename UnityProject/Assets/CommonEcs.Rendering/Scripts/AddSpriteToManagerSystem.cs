@@ -30,7 +30,7 @@ namespace CommonEcs {
             
             // Note here that we filter sprites that doesn't have a SpriteManager added to them
             this.query = GetEntityQuery(this.ConstructQuery(null, new ComponentType[] {
-                typeof(Added), typeof(SpriteManager)
+                typeof(Added), typeof(SpriteManager), typeof(AddToSpriteLayer)
             }, new ComponentType[] {
                 typeof(LocalToWorld), typeof(Sprite)
             }));

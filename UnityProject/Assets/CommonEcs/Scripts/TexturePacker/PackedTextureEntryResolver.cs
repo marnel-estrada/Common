@@ -9,6 +9,7 @@ namespace Common {
     public struct PackedTextureEntryResolver {
         // Integer is used as key here to save memory and for requesting code to be able to use
         // integer
+        [ReadOnly]
         private NativeParallelHashMap<int, PackedTextureEntry> entriesMap;
 
         public PackedTextureEntryResolver(NativeParallelHashMap<int, PackedTextureEntry> entriesMap) {

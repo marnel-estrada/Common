@@ -53,8 +53,9 @@ namespace CommonEcs.Goap {
                 inputDeps = chunkBaseEntityIndices.Dispose(inputDeps);
                 
                 return inputDeps;
-            } catch (InvalidOperationException) {
+            } catch (InvalidOperationException e) {
                 Debug.LogError(typeof(TActionFilter));
+                Debug.LogError(e.StackTrace);
                 throw;
             }
         }

@@ -84,7 +84,7 @@ namespace CommonEcs.Goap {
             }
         }
 
-        protected ref readonly EntityQuery Query {
+        protected ref EntityQuery Query {
             get {
                 return ref this.query;
             }

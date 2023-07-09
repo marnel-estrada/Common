@@ -21,6 +21,8 @@ namespace CommonEcs {
                 if (authoring.Items == null) {
                     return;
                 }
+
+                DependsOn(authoring.Items);
                 
                 EntityPrefabManager prefabManager = new();
          

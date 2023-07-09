@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using Unity.Entities;
 
 namespace CommonEcs {
+    /// <summary>
+    /// Note that we removed this from Rendering2dSystemGroup since it is using SignalHandlerComponentSystem.
+    /// The system that handles the destruction of signals is in simulation group. 
+    /// </summary>
     [UpdateBefore(typeof(SpriteManagerRendererSystem))]
-    [UpdateInGroup(typeof(Rendering2dSystemGroup))]
     public partial class SetSpriteLayerVesselsEnabledSystem : SignalHandlerComponentSystem<SetSpriteLayerVesselsEnabled> {
         private SharedComponentQuery<MeshRendererVessel> vesselQuery;
         

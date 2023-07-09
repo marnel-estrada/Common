@@ -1,7 +1,7 @@
 using Unity.Entities;
 
 namespace CommonEcs {
-    [UpdateBefore(typeof(FixedStepSimulationSystemGroup))]
+    [UpdateInGroup(typeof(PresentationSystemGroup))]
     public partial class Rendering2dSystemGroup : ComponentSystemGroup {
     }
 }

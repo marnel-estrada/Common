@@ -29,7 +29,7 @@ namespace CommonEcs {
             this.signalHandler.Update();
             
             EntityCommandBuffer commandBuffer = this.commandBufferSystem.CreateCommandBuffer();
-            commandBuffer.AddComponent<ProcessedBySystem>(this.signalQuery);
+            commandBuffer.AddComponent<ProcessedBySystem>(this.signalQuery, EntityQueryCaptureMode.AtRecord);
         }
     }
 }

@@ -30,7 +30,7 @@ namespace CommonEcs {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            TransformJob transformJob = new TransformJob() {
+            TransformJob transformJob = new() {
                 spriteType = GetComponentTypeHandle<Sprite>(), 
                 matrixType = GetComponentTypeHandle<LocalToWorld>(true)
             };

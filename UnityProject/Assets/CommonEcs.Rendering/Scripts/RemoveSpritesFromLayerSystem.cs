@@ -20,7 +20,7 @@ namespace CommonEcs {
         private SpriteManagerInstancesSystem managers;
 
         protected override void OnCreate() {
-            this.commandBufferSystem = this.GetOrCreateSystemManaged<BeginPresentationEntityCommandBufferSystem>();
+            this.commandBufferSystem = this.GetOrCreateSystemManaged<EndSimulationEntityCommandBufferSystem>();
             this.managers = this.GetOrCreateSystemManaged<SpriteManagerInstancesSystem>();
 
             this.query = GetEntityQuery(ComponentType.ReadOnly<AddSpritesToLayerSystem.Added>(),

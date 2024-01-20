@@ -25,7 +25,7 @@ namespace CommonEcs {
         }
 
         protected override void OnCreate() {
-            this.commandBufferSystem = this.GetOrCreateSystemManaged<BeginPresentationEntityCommandBufferSystem>();
+            this.commandBufferSystem = this.GetOrCreateSystemManaged<EndSimulationEntityCommandBufferSystem>();
             
             // We added sprite for subtractive here because we only want to process those manager entities
             // and not the sprite entities where the SpriteManager is added as shared component

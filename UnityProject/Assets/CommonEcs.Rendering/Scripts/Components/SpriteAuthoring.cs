@@ -6,7 +6,6 @@ using Unity.Mathematics;
 using UnityEngine;
 
 namespace CommonEcs {
-    //[GenerateAuthoringComponent]
     public struct Sprite : IComponentData {
         // Note here that we rearrange the variables from high number of bytes to low
         // This is so that memory is properly compacted

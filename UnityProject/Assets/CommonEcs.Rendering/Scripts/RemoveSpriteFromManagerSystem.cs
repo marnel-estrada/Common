@@ -18,7 +18,7 @@ namespace CommonEcs {
         private SpriteManagerInstancesSystem spriteManagers;
 
         protected override void OnCreate() {
-            this.commandBufferSystem = this.GetOrCreateSystemManaged<BeginPresentationEntityCommandBufferSystem>();
+            this.commandBufferSystem = this.GetOrCreateSystemManaged<EndSimulationEntityCommandBufferSystem>();
             
             this.query = GetEntityQuery(typeof(Sprite), typeof(ForRemoval));
             this.spriteManagers = this.GetOrCreateSystemManaged<SpriteManagerInstancesSystem>();

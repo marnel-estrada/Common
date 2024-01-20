@@ -14,7 +14,7 @@ namespace CommonEcs {
         private SpriteLayerInstancesSystem layers;
 
         protected override void OnCreate() {
-            this.commandBufferSystem = this.GetOrCreateSystemManaged<BeginPresentationEntityCommandBufferSystem>();
+            this.commandBufferSystem = this.GetOrCreateSystemManaged<EndSimulationEntityCommandBufferSystem>();
             
             this.query = GetEntityQuery(typeof(SpriteManager), ComponentType.Exclude<Processed>(), 
                 ComponentType.Exclude<Sprite>());

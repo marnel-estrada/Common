@@ -26,7 +26,7 @@ namespace CommonEcs {
         private SpriteManagerInstancesSystem spriteManagers;
 
         protected override void OnCreate() {
-            this.commandBufferSystem = this.GetOrCreateSystemManaged<BeginPresentationEntityCommandBufferSystem>();
+            this.commandBufferSystem = this.GetOrCreateSystemManaged<EndSimulationEntityCommandBufferSystem>();
             
             // Note here that we filter sprites that doesn't have a SpriteManager added to them
             this.query = GetEntityQuery(this.ConstructQuery(null, new ComponentType[] {

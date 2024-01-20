@@ -10,15 +10,17 @@ namespace CommonEcs {
     [UpdateInGroup(typeof(Rendering2dSystemGroup))]
     public partial class UpdateChangedVerticesSystem : UpdateVerticesSystem {
         protected override EntityQuery ResolveQuery() {
-            return GetEntityQuery(ComponentType.ReadOnly<Sprite>(), 
-                //ComponentType.ReadOnly<Changed>(), 
+            return GetEntityQuery(ComponentType.ReadOnly<Sprite>(),
                 ComponentType.ReadOnly<SpriteManager>());
         }
 
         protected override bool ShouldProcess(in SpriteManager manager) {
             // We skip SpriteManagers which are AlwaysUpdateMesh
             // Their vertices will be updated by another system
-            return !manager.AlwaysUpdateMesh && (manager.VerticesChanged || manager.UvChanged || manager.ColorsChanged);
+            bool somethingChanged = manager.VerticesChanged || manager.UvChanged || manager.ColorsChanged ||
+                                    manager.RenderOrderChanged;
+            
+            return !manager.AlwaysUpdateMesh && somethingChanged;
         }
     }
 }

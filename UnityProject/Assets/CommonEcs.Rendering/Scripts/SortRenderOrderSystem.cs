@@ -5,6 +5,7 @@ using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using UnityEngine;
 
 namespace CommonEcs {
     [UpdateBefore(typeof(UpdateChangedVerticesSystem))]

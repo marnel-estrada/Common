@@ -39,14 +39,14 @@ namespace CommonEcs {
             // so that we can run the job in parallel. This is the safest way to do it.
             int entityCount = this.query.CalculateEntityCount();
             NativeParallelHashSet<Entity> verticesChangedMap = new(entityCount, Allocator.TempJob);
-            NativeParallelHashSet<Entity> trianglesChangedMap = new(entityCount, Allocator.TempJob);
+            NativeParallelHashSet<Entity> renderOrderChangedMap = new(entityCount, Allocator.TempJob);
             NativeParallelHashSet<Entity> uvChangedMap = new(entityCount, Allocator.TempJob);
             NativeParallelHashSet<Entity> colorChangedMap = new(entityCount, Allocator.TempJob);
 
             PopulateUpdatedSpritesJob job = new() {
                 spriteType = this.spriteType,
                 verticesChangedMap = verticesChangedMap.AsParallelWriter(),
-                trianglesChangedMap = trianglesChangedMap.AsParallelWriter(),
+                renderOrderChangedMap = renderOrderChangedMap.AsParallelWriter(),
                 uvChangedMap = uvChangedMap.AsParallelWriter(),
                 colorChangedMap = colorChangedMap.AsParallelWriter(),
                 lastSystemVersion = this.LastSystemVersion
@@ -65,14 +65,14 @@ namespace CommonEcs {
                 }
 
                 manager.VerticesChanged = verticesChangedMap.Contains(owner);
-                manager.RenderOrderChanged = trianglesChangedMap.Contains(owner);
+                manager.RenderOrderChanged = renderOrderChangedMap.Contains(owner);
                 manager.UvChanged = uvChangedMap.Contains(owner);
                 manager.ColorsChanged = colorChangedMap.Contains(owner);
             }
 
             // Dispose
             verticesChangedMap.Dispose();
-            trianglesChangedMap.Dispose();
+            renderOrderChangedMap.Dispose();
             uvChangedMap.Dispose();
             colorChangedMap.Dispose();
 
@@ -85,7 +85,7 @@ namespace CommonEcs {
             public ComponentTypeHandle<Sprite> spriteType;
 
             public NativeParallelHashSet<Entity>.ParallelWriter verticesChangedMap;
-            public NativeParallelHashSet<Entity>.ParallelWriter trianglesChangedMap;
+            public NativeParallelHashSet<Entity>.ParallelWriter renderOrderChangedMap;
             public NativeParallelHashSet<Entity>.ParallelWriter uvChangedMap;
             public NativeParallelHashSet<Entity>.ParallelWriter colorChangedMap;
 
@@ -110,7 +110,7 @@ namespace CommonEcs {
                     }
 
                     if (sprite.RenderOrderChanged) {
-                        this.trianglesChangedMap.Add(spriteManagerEntity);
+                        this.renderOrderChangedMap.Add(spriteManagerEntity);
                     }
     
                     if (sprite.UvChanged) {

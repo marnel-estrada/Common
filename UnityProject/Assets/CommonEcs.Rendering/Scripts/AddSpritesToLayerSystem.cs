@@ -28,7 +28,7 @@ namespace CommonEcs {
         private SpriteManagerInstancesSystem managersSystem;
 
         protected override void OnCreate() {
-            this.commandBufferSystem = this.GetOrCreateSystemManaged<BeginPresentationEntityCommandBufferSystem>();
+            this.commandBufferSystem = this.GetOrCreateSystemManaged<EndSimulationEntityCommandBufferSystem>();
             this.layersSystem = this.GetOrCreateSystemManaged<SpriteLayerInstancesSystem>();
             this.managersSystem = this.GetOrCreateSystemManaged<SpriteManagerInstancesSystem>();
             

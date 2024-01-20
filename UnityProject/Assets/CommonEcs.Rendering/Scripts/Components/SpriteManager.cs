@@ -442,12 +442,9 @@ namespace CommonEcs {
                 // like for example, the system that would set the mesh to MeshRenderers
             }
 
-            public bool MeshChanged {
-                get {
-                    return this.vertexCountChanged || this.alwaysUpdateMesh || this.verticesChanged ||
-                        this.renderOrderChanged || this.uvChanged || this.colorsChanged;
-                }
-            }
+            public bool MeshChanged =>
+                this.vertexCountChanged || this.alwaysUpdateMesh || this.verticesChanged ||
+                this.renderOrderChanged || this.uvChanged || this.colorsChanged;
 
             public void ResetFlags() {
                 this.verticesChanged = false;
@@ -659,9 +656,9 @@ namespace CommonEcs {
             private static NativeArray<T> CopyAndExpand<T>(NativeArray<T> original, int newLength) where T : struct {
                 Assertion.IsTrue(newLength > original.Length);
 
-                NativeArray<T> newArray = new NativeArray<T>(newLength, Allocator.Persistent);
-                NativeSlice<T> newArraySlice = new NativeSlice<T>(newArray, 0, original.Length);
-                NativeSlice<T> originalSlice = new NativeSlice<T>(original);
+                NativeArray<T> newArray = new(newLength, Allocator.Persistent);
+                NativeSlice<T> newArraySlice = new(newArray, 0, original.Length);
+                NativeSlice<T> originalSlice = new(original);
                 newArraySlice.CopyFrom(originalSlice);
 
                 return newArray;

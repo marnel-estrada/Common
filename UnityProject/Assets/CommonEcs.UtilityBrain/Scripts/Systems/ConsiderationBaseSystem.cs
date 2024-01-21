@@ -19,9 +19,7 @@ namespace CommonEcs.UtilityBrain {
             this.isFilterZeroSized = TypeManager.GetTypeInfo(TypeManager.GetTypeIndex<TFilter>()).IsZeroSized;
         }
 
-        protected virtual bool CanExecute {
-            get;
-        }
+        protected virtual bool CanExecute => true;
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             if (!this.CanExecute) {
@@ -52,12 +50,8 @@ namespace CommonEcs.UtilityBrain {
         /// There may be times that the action system might not want to schedule in parallel
         /// Like for cases when they write using ComponentLookup
         /// </summary>
-        protected virtual bool ShouldScheduleParallel {
-            get {
-                return true;
-            }
-        }
-        
+        protected virtual bool ShouldScheduleParallel => true;
+
         protected abstract TProcessor PrepareProcessor();
         
         [BurstCompile]

@@ -270,6 +270,8 @@ namespace CommonEcs {
 
     public class SpriteAuthoring : MonoBehaviour {
         public Color color = Color.white;
+
+        public float2 pivot = new(0.5f, 0);
         
         public float renderOrder;
         public int layerOrder;
@@ -277,8 +279,9 @@ namespace CommonEcs {
         internal class Baker : Baker<SpriteAuthoring> {
             public override void Bake(SpriteAuthoring authoring) {
                 Entity entity = GetEntity(TransformUsageFlags.Renderable);
-                Sprite sprite = new Sprite() {
+                Sprite sprite = new() {
                     color = authoring.color,
+                    pivot = authoring.pivot,
                     renderOrder = authoring.renderOrder,
                     layerOrder = authoring.layerOrder
                 };

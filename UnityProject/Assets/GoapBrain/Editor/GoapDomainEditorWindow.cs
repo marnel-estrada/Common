@@ -18,7 +18,7 @@ namespace GoapBrain {
         
         private readonly ActionsView actionsView;
         private readonly ConditionResolversView conditionResolversView;
-        private readonly ConditionsView conditionsView = new ConditionsView();
+        private readonly ConditionsView conditionsView = new();
         private readonly ExtensionsView extensions;
 
         private readonly string[] tabs = {
@@ -27,8 +27,8 @@ namespace GoapBrain {
 
         private int tabSelected;
 
-        private GoapDomainData target;
-        private readonly VariablesView variablesView = new VariablesView();
+        private GoapDomainData? target;
+        private readonly VariablesView variablesView = new();
 
         /// <summary>
         ///     Constructor
@@ -51,6 +51,9 @@ namespace GoapBrain {
         }
 
         private void OnEnable() {
+            // A Unity error told us to do this
+            this.actionsView.OnEnable();
+            
             GoapEditorSignals.REPAINT.AddListener(Repaint);
         }
 

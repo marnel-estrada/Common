@@ -22,7 +22,9 @@ namespace GoapBrain {
         public AtomActionsView(EditorWindow parent) {
             this.parent = parent;
             this.propertiesRenderer = new ClassPropertiesRenderer(300);
+        }
 
+        public void OnEnable() {
             // We did it this way so we can search for the skin even when the asset is in the package
             string[] foundResults = AssetDatabase.FindAssets("GoapEditorSkin");
             foreach (string guid in foundResults) {
@@ -32,7 +34,6 @@ namespace GoapBrain {
                     break;
                 }
             }
-
             Assertion.NotNull(this.skin);
         }
 

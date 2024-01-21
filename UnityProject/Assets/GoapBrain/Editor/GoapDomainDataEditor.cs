@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 
 namespace GoapBrain {
+    [CustomEditor(typeof(GoapDomainData))]
     class GoapDomainDataEditor : Editor {
 
         private GoapDomainData domainData;

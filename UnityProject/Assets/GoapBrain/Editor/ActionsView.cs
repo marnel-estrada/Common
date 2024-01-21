@@ -3,7 +3,7 @@ using UnityEditor;
 
 namespace GoapBrain {
     public class ActionsView {
-        private readonly ActionsSidebarView sidebar = new ActionsSidebarView();
+        private readonly ActionsSidebarView sidebar = new();
         private readonly ActionInspectorView inspector;
 
         /// <summary>
@@ -11,6 +11,10 @@ namespace GoapBrain {
         /// </summary>
         public ActionsView(EditorWindow parent) {
             this.inspector = new ActionInspectorView(parent);
+        }
+
+        public void OnEnable() {
+            this.inspector.OnEnable();
         }
 
         /// <summary>

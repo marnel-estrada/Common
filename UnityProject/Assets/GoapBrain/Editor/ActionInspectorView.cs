@@ -23,6 +23,10 @@ namespace GoapBrain {
             this.atomActionsView = new AtomActionsView(parent);
         }
 
+        public void OnEnable() {
+            this.atomActionsView.OnEnable();
+        }
+
         /// <summary>
         ///     Renders the view
         /// </summary>

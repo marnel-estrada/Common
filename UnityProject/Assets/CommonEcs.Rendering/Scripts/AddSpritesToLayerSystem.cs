@@ -33,16 +33,22 @@ namespace CommonEcs {
             this.managersSystem = this.GetOrCreateSystemManaged<SpriteManagerInstancesSystem>();
             
             this.query = GetEntityQuery(this.ConstructQuery(new ComponentType[] {
-                typeof(AddToSpriteLayer), typeof(Sprite), typeof(LocalToWorld)
+                ComponentType.ReadOnly<AddToSpriteLayer>(), typeof(Sprite), ComponentType.ReadOnly<LocalToWorld>(), 
             }, new ComponentType[] {
                 typeof(Added)
             }));
         }
 
         protected override void OnUpdate() {
+            // We have to complete here since this system does not use jobs due to usage of reference
+            // types like SpriteManager (has Mesh and Material).
+            // It will cause a "must call Complete()" error if there are other jobs referencing a component 
+            // handle to the Sprite component.
+            this.Dependency.Complete();
+            
             this.addToLayerType = GetComponentTypeHandle<AddToSpriteLayer>();
             this.spriteType = GetComponentTypeHandle<Sprite>();
-            this.matrixType = GetComponentTypeHandle<LocalToWorld>();
+            this.matrixType = GetComponentTypeHandle<LocalToWorld>(true);
             this.entityType = GetEntityTypeHandle();
 
             NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);

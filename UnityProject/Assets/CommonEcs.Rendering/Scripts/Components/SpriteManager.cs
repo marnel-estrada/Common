@@ -14,7 +14,7 @@ namespace CommonEcs {
         private readonly Internal internalInstance;
         
         private readonly int id;
-        private static readonly IdGenerator ID_GENERATOR = new IdGenerator(1);
+        private static readonly IdGenerator ID_GENERATOR = new(1);
 
         /// <summary>
         /// Initializes the sprite manager
@@ -333,7 +333,7 @@ namespace CommonEcs {
             public int layer;
 
             // We're only managing the removed manager indeces here instead of the whole Sprite values
-            private readonly SimpleList<int> inactiveList = new SimpleList<int>(100);
+            private readonly SimpleList<int> inactiveList = new(100);
 
             // Note that this is the layer value and not the ID
             public int sortingLayer;

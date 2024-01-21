@@ -8,7 +8,7 @@ namespace Common {
     [InitializeOnLoad]
     public static class RunUtils {
         static RunUtils() {
-            EditorApplication.playmodeStateChanged += LoadLastOpenedScene;
+            EditorApplication.playModeStateChanged += LoadLastOpenedScene;
         }
 
         // pref IDs
@@ -16,7 +16,7 @@ namespace Common {
         private const string PLAYED_USING_RUN_UTILS = "Game.PlayedUsingRunUtils";
 
         // bool states
-        private static bool aboutToRun;
+        private static bool AboutToRun;
 
         [MenuItem("Game/Run Game #&z")]
         public static void Run() {
@@ -26,7 +26,7 @@ namespace Common {
             }
 
             EditorPrefs.SetBool(PLAYED_USING_RUN_UTILS, true);
-            aboutToRun = true;
+            AboutToRun = true;
 
             // Refresh first to cause compilation and include new assets
             AssetDatabase.Refresh();
@@ -36,7 +36,14 @@ namespace Common {
             EditorApplication.isPlaying = true;
         }
 
-        private static void LoadLastOpenedScene() {
+        // We provided this since the German keyboard is different. The one at the lower left corner
+        // is the Y key
+        [MenuItem("Game/Run Game #&y")]
+        public static void RunAlt() {
+            Run();
+        }
+        
+        private static void LoadLastOpenedScene(PlayModeStateChange stateChange) {
             if (EditorApplication.isPlaying || EditorApplication.isCompiling) {
                 // changed to playing or compiling
                 // no need to do anything
@@ -50,8 +57,8 @@ namespace Common {
 
             // We added this check because this method is still invoked while EditorApplication.isPlaying is false
             // We only load the last opened scene when the aboutToRun flag is "consumed"
-            if (aboutToRun) {
-                aboutToRun = false;
+            if (AboutToRun) {
+                AboutToRun = false;
                 return;
             }
 

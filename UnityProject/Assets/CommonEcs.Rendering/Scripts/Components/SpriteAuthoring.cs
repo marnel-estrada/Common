@@ -204,59 +204,32 @@ namespace CommonEcs {
         }
 
         public bool Active {
-            get {
-                return this.flags[SpriteFlags.ACTIVE];
-            }
-
-            set {
-                this.flags[SpriteFlags.ACTIVE] = value;
-            }
+            get => this.flags[SpriteFlags.ACTIVE];
+            set => this.flags[SpriteFlags.ACTIVE] = value;
         }
 
         public bool VerticesChanged {
-            get {
-                return this.flags[SpriteFlags.VERTICES_CHANGED];
-            }
-
-            set {
-                this.flags[SpriteFlags.VERTICES_CHANGED] = value;
-            }
+            get => this.flags[SpriteFlags.VERTICES_CHANGED];
+            set => this.flags[SpriteFlags.VERTICES_CHANGED] = value;
         }
 
         public bool UvChanged {
-            get {
-                return this.flags[SpriteFlags.UV_CHANGED];
-            }
-
-            set {
-                this.flags[SpriteFlags.UV_CHANGED] = value;
-            }
+            get => this.flags[SpriteFlags.UV_CHANGED];
+            set => this.flags[SpriteFlags.UV_CHANGED] = value;
         }
 
         public bool ColorChanged {
-            get {
-                return this.flags[SpriteFlags.COLOR_CHANGED];
-            }
-
-            set {
-                this.flags[SpriteFlags.COLOR_CHANGED] = value;
-            }
+            get => this.flags[SpriteFlags.COLOR_CHANGED];
+            set => this.flags[SpriteFlags.COLOR_CHANGED] = value;
         }
 
         public bool RenderOrderChanged {
-            get {
-                return this.flags[SpriteFlags.RENDER_ORDER_CHANGED];
-            }
-
-            set {
-                this.flags[SpriteFlags.RENDER_ORDER_CHANGED] = value;
-            }
+            get => this.flags[SpriteFlags.RENDER_ORDER_CHANGED];
+            set => this.flags[SpriteFlags.RENDER_ORDER_CHANGED] = value;
         }
 
         public bool Hidden {
-            get {
-                return this.flags[SpriteFlags.HIDDEN];
-            }
+            get => this.flags[SpriteFlags.HIDDEN];
 
             set {
                 this.flags[SpriteFlags.HIDDEN] = value;
@@ -275,6 +248,8 @@ namespace CommonEcs {
         
         public float renderOrder;
         public int layerOrder;
+
+        public bool hidden;
         
         internal class Baker : Baker<SpriteAuthoring> {
             public override void Bake(SpriteAuthoring authoring) {
@@ -283,7 +258,8 @@ namespace CommonEcs {
                     color = authoring.color,
                     pivot = authoring.pivot,
                     renderOrder = authoring.renderOrder,
-                    layerOrder = authoring.layerOrder
+                    layerOrder = authoring.layerOrder,
+                    Hidden = authoring.hidden
                 };
                 AddComponent(entity, sprite);
             }

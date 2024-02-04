@@ -125,9 +125,10 @@ namespace Common {
         /// </summary>
         /// <param name="item"></param>
         public T AddNew(string id) {
-            T data = new T();
-            data.IntId = this.idGenerator.Generate();
-            data.Id = id;
+            T data = new() {
+                IntId = this.idGenerator.Generate(),
+                Id = id
+            };
 
             this.dataList.Add(data);
             this.map[data.Id] = data;

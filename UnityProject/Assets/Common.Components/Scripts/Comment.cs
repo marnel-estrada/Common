@@ -8,19 +8,14 @@ namespace Common {
 		[SerializeField]
 		private string text;
 
-		void Awake() {
+		private void Awake() {
 			DestroyImmediate(this); // auto destroy to save memory
 		}
 
 		public string Text {
-			get {
-				return this.text;
-			}
+			get => this.text;
 
-			set {
-				this.text = value;
-			}
+			set => this.text = value;
 		}
 	}
 }
-

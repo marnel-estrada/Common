@@ -88,25 +88,13 @@ namespace CommonEcs {
             return this.gridWrapper.IsInside(coordinate);
         }
         
-        public ref readonly GridWrapper GridWrapper {
-            get {
-                return ref this.gridWrapper;
-            }
-        }
+        public ref readonly GridWrapper GridWrapper => ref this.gridWrapper;
 
-        public ref readonly Grid2D Grid2D {
-            get {
-                return ref this.grid;
-            }
-        }
+        public ref readonly Grid2D Grid2D => ref this.grid;
 
         /// <summary>
         /// Returns whether or not the grid is resolved
         /// </summary>
-        public bool Resolved {
-            get {
-                return this.resolved;
-            }
-        }
+        public bool Resolved => this.resolved;
     }
 }

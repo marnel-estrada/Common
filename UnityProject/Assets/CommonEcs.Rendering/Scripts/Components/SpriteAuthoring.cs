@@ -94,9 +94,7 @@ namespace CommonEcs {
         }
 
         public float RenderOrderDueToPosition {
-            get {
-                return this.renderOrderDueToPosition;
-            }
+            get => this.renderOrderDueToPosition;
 
             set {
                 // Render order changed if the new render order is not the same as the previous one

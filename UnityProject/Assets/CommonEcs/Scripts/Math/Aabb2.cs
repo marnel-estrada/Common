@@ -33,6 +33,27 @@ namespace Common {
             AddToContain(new float2(rect.xMax, rect.yMax));
         }
 
+        /// <summary>
+        /// Copy constructor
+        /// </summary>
+        public Aabb2(Aabb2 source) {
+            this.min = source.min;
+            this.max = source.max;
+        }
+
+        /// <summary>
+        /// Creates an AABB from the specified width and height 
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns></returns>
+        public static Aabb2 FromSize(float width, float height) {
+            float halfWidth = width * 0.5f;
+            float halfHeight = height * 0.5f;
+
+            return new Aabb2(new float2(-halfWidth, -halfHeight), new float2(halfWidth, halfHeight));
+        } 
+
         public void Empty() {
             this.min.x = BIG_NUMBER;
             this.min.y = BIG_NUMBER;
@@ -41,47 +62,19 @@ namespace Common {
             this.max.y = -BIG_NUMBER;
         }
 
-        public readonly bool IsEmpty {
-            get {
-                return this.min.x > this.max.x && this.min.y > this.max.y;
-            }
-        }
+        public readonly bool IsEmpty => this.min.x > this.max.x && this.min.y > this.max.y;
 
-        public readonly float2 Min {
-            get {
-                return this.min;
-            }
-        }
+        public readonly float2 Min => this.min;
 
-        public readonly float2 Max {
-            get {
-                return this.max;
-            }
-        }
+        public readonly float2 Max => this.max;
 
-        public readonly float2 Center {
-            get {
-                return (this.min + this.max) * 0.5f;
-            }
-        }
+        public readonly float2 Center => (this.min + this.max) * 0.5f;
 
-        public readonly float2 Size {
-            get {
-                return this.max - this.min;   
-            }
-        }
+        public readonly float2 Size => this.max - this.min;
 
-        public readonly float2 RadiusVector {
-            get {
-                return this.Size * 0.5f;
-            }
-        }
+        public readonly float2 RadiusVector => this.Size * 0.5f;
 
-        public readonly float Radius {
-            get {
-                return math.length(this.RadiusVector);
-            }
-        }
+        public readonly float Radius => math.length(this.RadiusVector);
 
         /// <summary>
         /// Adds the specified vector to the bounding box to contain it.

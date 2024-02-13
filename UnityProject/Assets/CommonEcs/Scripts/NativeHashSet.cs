@@ -8,6 +8,7 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Jobs.LowLevel.Unsafe;
+using Unity.Mathematics;
 
 namespace CommonEcs {
     /// <summary>
@@ -208,7 +209,7 @@ namespace CommonEcs {
                     }
                 }
 
-                return Math.Min(state->ItemCapacity, state->AllocatedIndexLength) - freeListSize;
+                return math.min(state->ItemCapacity, state->AllocatedIndexLength) - freeListSize;
             }
         }
 
@@ -555,7 +556,7 @@ namespace CommonEcs {
                     if (state->AllocatedIndexLength < state->ItemCapacity) {
                         idx = Interlocked.Add(ref state->AllocatedIndexLength, 16) - 16;
                         if (idx < state->ItemCapacity - 1) {
-                            int count = Math.Min(16, state->ItemCapacity - idx);
+                            int count = math.min(16, state->ItemCapacity - idx);
                             for (int i = 1; i < count; ++i) {
                                 nextPtrs[idx + i] = idx + i + 1;
                             }

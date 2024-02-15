@@ -1,6 +1,8 @@
-﻿using CommonEcs;
+﻿using System.Collections.Generic;
+using CommonEcs;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 
 namespace Common {
     /// <summary>
@@ -8,41 +10,54 @@ namespace Common {
     /// data containers when we schedule jobs.
     /// </summary>
     public struct SweepPruneContainer {
-        private NativeHashMap<Entity, SweepPruneItem> entryMap;
+        private NativeHashMap<Entity, SweepPruneItem> itemMap;
 
-        // We add all endpoints here. Each entry occupies two slots, the min and max.
-        // The list does not resize when an entry is removed. The slot position would be reused.
-        // We don't sort this. We use another list for sorting.
-        private NativeList<EndPoint> endPoints;
+        // Maintains items in a list so we can index them.
+        // The entries in sortedIndices then are just integers that indexes here
+        private NativeList<SweepPruneItem> masterList;
 
-        // The integer content here are indices that points to an entry in endPoints
-        private NativeList<int> sortedEndPoints;
+        private NativeList<int> sortedIndices;
 
         // We store inactive positions here so we can reuse them
-        private NativeStack<int> inactivePositions;
+        private NativeStack<int> inactiveMasterIndices;
 
         public SweepPruneContainer(int initialCapacity, Allocator allocator) {
-            this.entryMap = new NativeHashMap<Entity, SweepPruneItem>(initialCapacity, allocator);
-            this.endPoints = new NativeList<EndPoint>(initialCapacity * 2, allocator);
-            this.sortedEndPoints = new NativeList<int>(initialCapacity * 2, allocator);
-            this.inactivePositions = new NativeStack<int>(initialCapacity, allocator);
+            this.itemMap = new NativeHashMap<Entity, SweepPruneItem>(initialCapacity, allocator);
+            this.masterList = new NativeList<SweepPruneItem>(initialCapacity, allocator);
+            this.sortedIndices = new NativeList<int>(initialCapacity, allocator);
+            this.inactiveMasterIndices = new NativeStack<int>(initialCapacity, allocator);
         }
 
         public void Dispose() {
-            this.entryMap.Dispose();
-            this.endPoints.Dispose();
-            this.sortedEndPoints.Dispose();
-            this.inactivePositions.Dispose();
+            this.itemMap.Dispose();
+            this.masterList.Dispose();
+            this.sortedIndices.Dispose();
+            this.inactiveMasterIndices.Dispose();
         }
 
         /// <summary>
         /// Adds an item
         /// </summary>
         /// <param name="entity"></param>
-        /// <param name="min"></param>
-        /// <param name="max"></param>
-        public void Add(Entity entity, float min, float max) {
-            
+        /// <param name="box"></param>
+        public void Add(Entity entity, Aabb2 box) {
+            if (this.inactiveMasterIndices.Count > 0) {
+                // There are inactive master indices. We reuse one.
+                int masterIndex = this.inactiveMasterIndices.Pop();
+                SweepPruneItem item = new(entity, box, masterIndex);
+                this.itemMap[entity] = item;
+                this.masterList[masterIndex] = item;
+            }
+            else {
+                // There are no inactive master indices. We add to the masterList.
+                int masterIndex = this.masterList.Length;
+                SweepPruneItem item = new(entity, box, masterIndex);
+                this.itemMap[entity] = item;
+                this.masterList.Add(item);
+                
+                // We also add to the sorted list since its a new entry
+                this.sortedIndices.Add(masterIndex);
+            }
         }
 
         /// <summary>
@@ -50,24 +65,37 @@ namespace Common {
         /// </summary>
         /// <param name="entity"></param>
         public void Remove(Entity entity) {
+            if (!this.itemMap.TryGetValue(entity, out SweepPruneItem item)) {
+                // Entity was not added in sweep and prune
+                return;
+            }
+
+            // Note here that we don't remove entries from the masterList
+            // We are just setting them to none
+            this.masterList[item.masterListIndex] = SweepPruneItem.NoneItem(item.masterListIndex);
+            this.inactiveMasterIndices.Push(item.masterListIndex);
             
+            this.itemMap.Remove(entity);
         }
 
         /// <summary>
-        /// Updates the extents of the item
+        /// Updates the extents of the item. Note here that the box is assumed to be in world space.
         /// </summary>
         /// <param name="entity"></param>
-        /// <param name="min"></param>
-        /// <param name="max"></param>
-        public void Update(Entity entity, float min, float max) {
-            
+        /// <param name="box"></param>
+        public void Update(Entity entity, Aabb2 box) {
+            SweepPruneItem item = this.itemMap[entity];
+            item.box = box;
+            this.itemMap[entity] = item; // Modify the one in the map
+            this.masterList[item.masterListIndex] = item; // Modify the one in master list
         }
 
         /// <summary>
         /// Sorts the end points
         /// </summary>
         public void Sort() {
-            
+            SweepPruneComparer comparer = new(this.masterList);
+            NativeContainerUtils.InsertionSort(ref this.sortedIndices, comparer);
         }
 
         /// <summary>
@@ -75,44 +103,61 @@ namespace Common {
         /// </summary>
         /// <param name="position"></param>
         /// <param name="resultList"></param>
-        public void Contains(float position, ref NativeList<Entity> resultList) {
+        public void Contains(float2 position, ref NativeList<Entity> resultList) {
             
         }
 
         /// <summary>
-        /// Queries for items that overlaps the specified min and max extents
+        /// Queries for items that overlaps the specified box
         /// </summary>
-        /// <param name="min"></param>
-        /// <param name="max"></param>
+        /// <param name="box"></param>
         /// <param name="resultList"></param>
-        public void Overlaps(float min, float max, ref NativeList<Entity> resultList) {
+        public void Overlaps(Aabb2 box, ref NativeList<Entity> resultList) {
             
         }
         
         private struct SweepPruneItem {
+            public Aabb2 box;
             public readonly Entity entity;
-            public readonly int listPosition;
+            public readonly int masterListIndex;
 
-            public SweepPruneItem(Entity entity, int listPosition) {
+            public SweepPruneItem(Entity entity, Aabb2 box, int masterListIndex) {
                 this.entity = entity;
-                this.listPosition = listPosition;
+                this.box = box;
+                this.masterListIndex = masterListIndex;
+            }
+
+            public bool IsNone => this.entity == Entity.Null;
+
+            // Needs the masterListIndex so it retains its position
+            public static SweepPruneItem NoneItem(int masterListIndex) {
+                return new SweepPruneItem(Entity.Null, Aabb2.EmptyBounds(), masterListIndex);
             }
         }
 
-        private struct EndPoint {
-            public readonly Entity entity;
-            public float position; // Not readonly since we update this every frame
+        // Note here that we are only comparing indices to the masterList
+        private readonly struct SweepPruneComparer : IComparer<int> {
+            private readonly NativeList<SweepPruneItem> masterList;
+
+            public SweepPruneComparer(NativeList<SweepPruneItem> masterList) {
+                this.masterList = masterList;
+            }
             
-            // If it's not minimum, then it can only be maximum
-            public readonly bool isMin;
+            public int Compare(int x, int y) {
+                // We compare by min X
+                SweepPruneItem xItem = this.masterList[x];
+                SweepPruneItem yItem = this.masterList[y];
 
-            // We set this to false when an entity is removed
-            public bool active;
-
-            public EndPoint(Entity entity, float position, bool isMin) : this() {
-                this.entity = entity;
-                this.position = position;
-                this.isMin = isMin;
+                if (xItem.box.Min.x < yItem.box.Min.x) {
+                    return -1;
+                }
+                
+                if (xItem.box.Min.x > yItem.box.Min.x) {
+                    return 1;
+                }
+                
+                // Equal
+                return 0;
             }
         }
     }

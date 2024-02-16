@@ -10,11 +10,13 @@ namespace Common {
     /// data containers when we schedule jobs.
     /// </summary>
     public struct SweepPruneContainer {
-        private NativeHashMap<Entity, SweepPruneItem> itemMap;
+        // Made this public so the items can be updated in a parallel job
+        public NativeParallelHashMap<Entity, SweepPruneItem> itemMap;
 
         // Maintains items in a list so we can index them.
         // The entries in sortedIndices then are just integers that indexes here
-        private NativeList<SweepPruneItem> masterList;
+        // Made this public so the items can be updated in a parallel job
+        public NativeList<SweepPruneItem> masterList;
 
         private NativeList<int> sortedIndices;
 
@@ -22,7 +24,7 @@ namespace Common {
         private NativeStack<int> inactiveMasterIndices;
 
         public SweepPruneContainer(int initialCapacity, Allocator allocator) {
-            this.itemMap = new NativeHashMap<Entity, SweepPruneItem>(initialCapacity, allocator);
+            this.itemMap = new NativeParallelHashMap<Entity, SweepPruneItem>(initialCapacity, allocator);
             this.masterList = new NativeList<SweepPruneItem>(initialCapacity, allocator);
             this.sortedIndices = new NativeList<int>(initialCapacity, allocator);
             this.inactiveMasterIndices = new NativeStack<int>(initialCapacity, allocator);
@@ -47,8 +49,7 @@ namespace Common {
                 SweepPruneItem item = new(entity, box, masterIndex);
                 this.itemMap[entity] = item;
                 this.masterList[masterIndex] = item;
-            }
-            else {
+            } else {
                 // There are no inactive master indices. We add to the masterList.
                 int masterIndex = this.masterList.Length;
                 SweepPruneItem item = new(entity, box, masterIndex);
@@ -104,7 +105,75 @@ namespace Common {
         /// <param name="position"></param>
         /// <param name="resultList"></param>
         public void Contains(float2 position, ref NativeList<Entity> resultList) {
+            resultList.Clear();
             
+            ValueTypeOption<int> startingIndex = ResolveStartingIndex(position);
+            if (startingIndex.IsNone) {
+                // No entry contains the position
+                return;
+            }
+
+            // Check for each box from the starting index until we find the disjoint
+            int start = startingIndex.ValueOrError();
+            for (int i = start; i < this.sortedIndices.Length; i++) {
+                int masterIndex = this.sortedIndices[i];
+                SweepPruneItem item = this.masterList[masterIndex];
+                if (position.x < item.box.Min.x) {
+                    // Found the disjoint
+                    return;
+                }
+
+                if (item.box.Contains(position)) {
+                    // Found an item that contains the position
+                    resultList.Add(item.entity);
+                }
+            }
+        }
+        
+        private ValueTypeOption<int> ResolveStartingIndex(float2 position) {
+            int left = 0;
+            int right = this.sortedIndices.Length - 1;
+
+            while (left <= right) {
+                int mid = left + (right - left) / 2;
+                int midMasterIndex = this.sortedIndices[mid];
+
+                Aabb2 midBox = this.masterList[midMasterIndex].box;
+                if (midBox.Max.x < position.x) {
+                    // Disjoint at right side of the item. Move to right.
+                    left = mid + 1;
+                    continue;
+                }
+
+                if (midBox.Min.x > position.x) {
+                    // Disjoint at left side of the item. Move to left.
+                    right = mid - 1;
+                    continue;
+                }
+                
+                // At this point, midItem overlaps with the position
+                // But we check if the previous items still overlaps. If it does, we continue moving left.
+                int previous = mid - 1;
+                if (previous < 0) {
+                    // We are already at the first of the array. We found our answer
+                    return ValueTypeOption<int>.Some(mid);
+                }
+
+                int previousMasterIndex = this.sortedIndices[previous];
+                Aabb2 previousBox = this.masterList[previousMasterIndex].box;
+                if (previousBox.Max.x < position.x) {
+                    // Disjoint at previous item. The current mid item is already the starting point.
+                    return ValueTypeOption<int>.Some(mid);
+                }
+                
+                // This means that previous item still overlaps with query box. We haven't found
+                // the starting index yet.
+                // Let's continue moving to the left
+                right = mid - 1;
+            }
+            
+            // No entry overlaps with the specified position
+            return ValueTypeOption<int>.None;
         }
 
         /// <summary>
@@ -113,26 +182,7 @@ namespace Common {
         /// <param name="box"></param>
         /// <param name="resultList"></param>
         public void Overlaps(Aabb2 box, ref NativeList<Entity> resultList) {
-            
-        }
-        
-        private struct SweepPruneItem {
-            public Aabb2 box;
-            public readonly Entity entity;
-            public readonly int masterListIndex;
-
-            public SweepPruneItem(Entity entity, Aabb2 box, int masterListIndex) {
-                this.entity = entity;
-                this.box = box;
-                this.masterListIndex = masterListIndex;
-            }
-
-            public bool IsNone => this.entity == Entity.Null;
-
-            // Needs the masterListIndex so it retains its position
-            public static SweepPruneItem NoneItem(int masterListIndex) {
-                return new SweepPruneItem(Entity.Null, Aabb2.EmptyBounds(), masterListIndex);
-            }
+            // TODO Implement
         }
 
         // Note here that we are only comparing indices to the masterList

@@ -52,7 +52,13 @@ namespace Common {
             float halfHeight = height * 0.5f;
 
             return new Aabb2(new float2(-halfWidth, -halfHeight), new float2(halfWidth, halfHeight));
-        } 
+        }
+
+        public static Aabb2 EmptyBounds() {
+            Aabb2 bounds = new();
+            bounds.Empty();
+            return bounds;
+        }
 
         public void Empty() {
             this.min.x = BIG_NUMBER;

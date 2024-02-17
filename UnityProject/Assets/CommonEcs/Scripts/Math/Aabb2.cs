@@ -1,4 +1,5 @@
-﻿using Unity.Mathematics;
+﻿using CommonEcs;
+using Unity.Mathematics;
 
 using UnityEngine;
 
@@ -20,7 +21,7 @@ namespace Common {
 
             AddToContain(v1);
             AddToContain(v2);
-            Assertion.IsTrue(!this.IsEmpty, "AABB should not be empty when using this constructor.");
+            DotsAssert.IsTrue(!this.IsEmpty, "AABB should not be empty when using this constructor.");
         }
 
         public Aabb2(Rect rect) {
@@ -164,29 +165,13 @@ namespace Common {
             return localAabb;
         }
 
-        public readonly float2 TopLeft {
-            get {
-                return new float2(this.min.x, this.max.y);
-            }
-        }
+        public readonly float2 TopLeft => new(this.min.x, this.max.y);
 
-        public readonly float2 BottomLeft {
-            get {
-                return this.min;
-            }
-        }
+        public readonly float2 BottomLeft => this.min;
 
-        public readonly float2 TopRight {
-            get {
-                return this.max;
-            }
-        }
+        public readonly float2 TopRight => this.max;
 
-        public readonly float2 BottomRight {
-            get {
-                return new float2(this.max.x, this.min.y);
-            }
-        }
+        public readonly float2 BottomRight => new(this.max.x, this.min.y);
 
         public override string ToString() {
             return "min: " + this.min + "; max: " + this.max;

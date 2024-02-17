@@ -18,7 +18,7 @@ namespace Common {
         // Made this public so the items can be updated in a parallel job
         public NativeList<SweepPruneItem> masterList;
 
-        private NativeList<int> sortedIndices;
+        public NativeList<int> sortedIndices;
 
         // We store inactive positions here so we can reuse them
         private NativeStack<int> inactiveMasterIndices;
@@ -77,18 +77,6 @@ namespace Common {
             this.inactiveMasterIndices.Push(item.masterListIndex);
             
             this.itemMap.Remove(entity);
-        }
-
-        /// <summary>
-        /// Updates the extents of the item. Note here that the box is assumed to be in world space.
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="box"></param>
-        public void Update(Entity entity, Aabb2 box) {
-            SweepPruneItem item = this.itemMap[entity];
-            item.box = box;
-            this.itemMap[entity] = item; // Modify the one in the map
-            this.masterList[item.masterListIndex] = item; // Modify the one in master list
         }
 
         /// <summary>
@@ -183,32 +171,6 @@ namespace Common {
         /// <param name="resultList"></param>
         public void Overlaps(Aabb2 box, ref NativeList<Entity> resultList) {
             // TODO Implement
-        }
-
-        // Note here that we are only comparing indices to the masterList
-        private readonly struct SweepPruneComparer : IComparer<int> {
-            private readonly NativeList<SweepPruneItem> masterList;
-
-            public SweepPruneComparer(NativeList<SweepPruneItem> masterList) {
-                this.masterList = masterList;
-            }
-            
-            public int Compare(int x, int y) {
-                // We compare by min X
-                SweepPruneItem xItem = this.masterList[x];
-                SweepPruneItem yItem = this.masterList[y];
-
-                if (xItem.box.Min.x < yItem.box.Min.x) {
-                    return -1;
-                }
-                
-                if (xItem.box.Min.x > yItem.box.Min.x) {
-                    return 1;
-                }
-                
-                // Equal
-                return 0;
-            }
         }
     }
 }

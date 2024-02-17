@@ -45,6 +45,8 @@ namespace Common {
             this.container.Dispose();
         }
 
+        public ref readonly SweepPruneContainer Container => ref this.container;
+
         protected override void OnUpdate() {
             if (this.commandBufferSystem == null) {
                 throw new CantBeNullException(nameof(this.commandBufferSystem));
@@ -95,7 +97,8 @@ namespace Common {
             this.Dependency = updateJob.ScheduleParallel(this.updateQuery, this.Dependency);
 
             SortJob sortJob = new() {
-                sweepPruneContainer = this.container
+                masterList = this.container.masterList,
+                sortedIndices = this.container.sortedIndices
             };
             this.Dependency = sortJob.Schedule(this.Dependency);
             
@@ -225,10 +228,14 @@ namespace Common {
         
         [BurstCompile]
         private struct SortJob : IJob {
-            public SweepPruneContainer sweepPruneContainer;
+            [ReadOnly]
+            public NativeList<SweepPruneItem> masterList;
+
+            public NativeList<int> sortedIndices;
             
             public void Execute() {
-                this.sweepPruneContainer.Sort();
+                SweepPruneComparer comparer = new(this.masterList);
+                NativeContainerUtils.InsertionSort(ref this.sortedIndices, comparer);
             }
         }
 

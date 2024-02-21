@@ -75,25 +75,13 @@ namespace CommonEcs {
             return this.gridWrapper.GetCellEntity(gridCoordinate.x, gridCoordinate.y, gridCoordinate.z);
         }
         
-        public ref readonly MultipleGrid2dWrapper GridWrapper {
-            get {
-                return ref this.gridWrapper;
-            }
-        }
+        public ref readonly MultipleGrid2dWrapper GridWrapper => ref this.gridWrapper;
 
-        public ref readonly MultipleGrid2D Grid2D {
-            get {
-                return ref this.grid;
-            }
-        }
+        public ref readonly MultipleGrid2D Grid2D => ref this.grid;
 
         /// <summary>
         /// Returns whether or not the grid is resolved
         /// </summary>
-        public bool Resolved {
-            get {
-                return this.resolved;
-            }
-        }
+        public bool Resolved => this.resolved;
     }
 }

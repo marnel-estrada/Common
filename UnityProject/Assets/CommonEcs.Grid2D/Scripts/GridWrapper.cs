@@ -1,5 +1,3 @@
-using Common;
-
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -8,7 +6,7 @@ namespace CommonEcs {
     /// <summary>
     /// A struct wrapper to a 2D grid so we can pass it to jobs
     /// </summary>
-    public struct GridWrapper {
+    public readonly struct GridWrapper {
         public readonly Grid2D grid;
         public readonly NativeArray<EntityBufferElement> cellEntities;
 

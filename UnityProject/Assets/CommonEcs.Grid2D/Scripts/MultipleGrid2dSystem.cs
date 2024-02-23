@@ -30,7 +30,7 @@ namespace CommonEcs {
 
                 int cellCount = this.cellEntities.Value.Length;
                 float2 max = allCells[this.cellEntities.Value[cellCount - 1].entity].TopRight;
-                Aabb2 worldBoundingBox = new Aabb2(min, max);
+                Aabb2 worldBoundingBox = new(min, max);
                 
                 this.gridWrapper = new MultipleGrid2dWrapper(this.grid, this.cellEntities.Value, worldBoundingBox);
 

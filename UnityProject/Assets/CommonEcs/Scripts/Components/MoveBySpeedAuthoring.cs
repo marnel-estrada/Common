@@ -1,6 +1,7 @@
 ﻿using CommonEcs;
 using Unity.Entities;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace Components {
     /// <summary>
@@ -13,6 +14,10 @@ namespace Components {
 
         public Timer timer;
 
+        public MoveBySpeed(float3 startPos, float3 destinationPos, float speed) : this() {
+            StartMove(startPos, destinationPos, speed);
+        }
+
         public void StartMove(float3 startPos, float3 destinationPos, float speed) {
             this.startPos = startPos;
             this.destinationPos = destinationPos;
@@ -23,5 +28,15 @@ namespace Components {
         }
 
         public bool IsDone => this.timer.HasElapsed;
+    }
+
+    public class MoveBySpeedAuthoring : MonoBehaviour {
+        private class Baker : Baker<MoveBySpeedAuthoring> {
+            public override void Bake(MoveBySpeedAuthoring authoring) {
+                Entity primaryEntity = this.GetPrimaryEntity();
+                AddComponent<MoveBySpeed>(primaryEntity);
+                SetComponentEnabled<MoveBySpeed>(primaryEntity, false);
+            }
+        }
     }
 }

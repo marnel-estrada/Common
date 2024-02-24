@@ -1,6 +1,5 @@
 ﻿using Unity.Collections;
 using Unity.Entities;
-using UnityEngine;
 
 namespace CommonEcs {
     [UpdateAfter(typeof(SpriteManagerRendererSystem))]

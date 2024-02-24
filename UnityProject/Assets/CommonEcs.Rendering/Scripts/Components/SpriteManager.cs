@@ -43,6 +43,7 @@ namespace CommonEcs {
         /// Adds the specified sprite into the manager (into the big mesh)
         /// </summary>
         /// <param name="sprite"></param>
+        /// <param name="matrix"></param>
         public void Add(ref Sprite sprite, float4x4 matrix) {
             this.internalInstance.Add(ref sprite, matrix);
         }

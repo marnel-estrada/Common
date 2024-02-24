@@ -71,7 +71,7 @@ namespace CommonEcs {
                     
                     // Lerp position using the ratio on the timer
                     float3 newPosition = math.lerp(moveBySpeed.startPos, moveBySpeed.destinationPos,
-                        moveBySpeed.timer.duration);
+                        moveBySpeed.timer.Ratio);
                     transforms[i] = transform.WithPosition(newPosition); // Modify
                 }
             }

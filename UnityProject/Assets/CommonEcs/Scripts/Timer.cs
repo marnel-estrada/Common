@@ -26,11 +26,7 @@ namespace CommonEcs {
             this.duration = duration;
         }
 
-        public bool HasElapsed {
-            get {
-                return this.polledTime.TolerantGreaterThanOrEquals(this.duration);
-            }
-        }
+        public bool HasElapsed => this.polledTime.TolerantGreaterThanOrEquals(this.duration);
 
         public float Ratio {
             get {
@@ -39,11 +35,7 @@ namespace CommonEcs {
             }
         }
 
-        public float Duration {
-            get {
-                return this.duration;
-            }
-        }
+        public float Duration => this.duration;
 
         /// <summary>
         /// Forces the timer to end

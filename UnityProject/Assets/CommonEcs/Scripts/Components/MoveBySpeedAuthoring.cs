@@ -9,22 +9,18 @@ namespace Components {
     /// destination by calling StartMove() and enabling the component.
     /// </summary>
     public struct MoveBySpeed : IComponentData, IEnableableComponent {
-        public float3 startPos;
-        public float3 destinationPos;
+        public readonly float3 startPos;
+        public readonly float3 destinationPos;
 
         public Timer timer;
 
         public MoveBySpeed(float3 startPos, float3 destinationPos, float speed) : this() {
-            StartMove(startPos, destinationPos, speed);
-        }
-
-        public void StartMove(float3 startPos, float3 destinationPos, float speed) {
             this.startPos = startPos;
             this.destinationPos = destinationPos;
 
             DotsAssert.IsTrue(speed > 0); // Prevent divide by zero
             float duration = math.distance(this.destinationPos, this.startPos) / speed;
-            this.timer.Reset(duration);
+            this.timer = new Timer(duration);
         }
 
         public bool IsDone => this.timer.HasElapsed;

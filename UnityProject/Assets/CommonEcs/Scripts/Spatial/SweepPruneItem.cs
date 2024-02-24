@@ -13,10 +13,7 @@ namespace Common {
         }
 
         public bool IsNone => this.entity == Entity.Null;
-
-        // Needs the masterListIndex so it retains its position
-        public static SweepPruneItem NoneItem(int masterListIndex) {
-            return new SweepPruneItem(Entity.Null, Aabb2.EmptyBounds(), masterListIndex);
-        }
+        
+        public SweepPruneItem AsNone => new(Entity.Null, this.box, this.masterListIndex);
     }
 }

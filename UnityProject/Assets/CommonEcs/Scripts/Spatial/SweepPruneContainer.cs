@@ -73,18 +73,12 @@ namespace Common {
 
             // Note here that we don't remove entries from the masterList
             // We are just setting them to none
-            this.masterList[item.masterListIndex] = SweepPruneItem.NoneItem(item.masterListIndex);
+            // Note here that we don't empty the box of the removed item. We just keep it as is
+            // but the entity is null.
+            this.masterList[item.masterListIndex] = item.AsNone; // This retains the box but the entity is null
             this.inactiveMasterIndices.Push(item.masterListIndex);
             
             this.itemMap.Remove(entity);
-        }
-
-        /// <summary>
-        /// Sorts the end points
-        /// </summary>
-        public void Sort() {
-            SweepPruneComparer comparer = new(this.masterList);
-            NativeContainerUtils.InsertionSort(ref this.sortedIndices, comparer);
         }
 
         /// <summary>
@@ -106,6 +100,11 @@ namespace Common {
             for (int i = start; i < this.sortedIndices.Length; i++) {
                 int masterIndex = this.sortedIndices[i];
                 SweepPruneItem item = this.masterList[masterIndex];
+                if (item.IsNone) {
+                    // Skip none items
+                    continue;
+                }
+                
                 if (position.x < item.box.Min.x) {
                     // Found the disjoint
                     return;

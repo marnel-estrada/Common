@@ -9,7 +9,7 @@
     public class TypedSignal<T> where T : struct {
         public delegate void SignalListener(T parameter);
         
-        private readonly SimpleList<SignalListener> listeners = new SimpleList<SignalListener>(1);
+        private readonly SimpleList<SignalListener> listeners = new(1);
 
         public void AddListener(SignalListener listener) {
             Assertion.IsTrue(!this.listeners.Contains(listener)); // Prevent duplicate listeners

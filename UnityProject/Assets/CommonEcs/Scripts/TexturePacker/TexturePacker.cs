@@ -10,13 +10,13 @@ namespace Common {
         private const int BUFFER_SIZE = 100;
 
         // Contains the associated names of the added texture so we can easily query its entry after packing
-        private readonly SimpleList<string> names = new SimpleList<string>(BUFFER_SIZE);
+        private readonly SimpleList<string> names = new(BUFFER_SIZE);
 
         // This contains the textures to pack
         // Used a list here so we could easily convert to array during packing
-        private readonly List<Texture2D> textures = new List<Texture2D>(BUFFER_SIZE);
+        private readonly List<Texture2D> textures = new(BUFFER_SIZE);
 
-        private readonly SimpleList<Vector2Int> originalDimensions = new SimpleList<Vector2Int>(BUFFER_SIZE);
+        private readonly SimpleList<Vector2Int> originalDimensions = new(BUFFER_SIZE);
 
         // Keeps track of the packed entries
         private NativeParallelHashMap<int, PackedTextureEntry> entriesMap;
@@ -54,8 +54,10 @@ namespace Common {
         /// Packs the added texture
         /// </summary>
         public void Pack() {
-            this.atlas = new Texture2D(2, 2, TextureFormat.ARGB32, false); // Will expand on packing
-            this.atlas.filterMode = FilterMode.Point; // Very important to avoid seams
+            // Will expand on packing
+            this.atlas = new Texture2D(2, 2, TextureFormat.ARGB32, false) {
+                filterMode = FilterMode.Point // Very important to avoid seams
+            };
             Rect[] rects = this.atlas.PackTextures(this.textures.ToArray(), 0, 8192, false);
 
             // Populate entries

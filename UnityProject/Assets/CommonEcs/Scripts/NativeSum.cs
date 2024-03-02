@@ -92,11 +92,7 @@ namespace CommonEcs {
             }
         }
 
-        public bool IsCreated {
-            get {
-                return this.sumIntegers != null;
-            }
-        }
+        public bool IsCreated => this.sumIntegers != null;
 
         public void Dispose() {
             // Let the dispose sentinel know that the data has been freed so it does not report any memory leaks

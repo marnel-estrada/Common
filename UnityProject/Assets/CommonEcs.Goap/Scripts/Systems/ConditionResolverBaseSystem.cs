@@ -78,17 +78,9 @@ namespace CommonEcs.Goap {
         /// There may be times that the action system might not want to schedule in parallel
         /// Like for cases when they write using ComponentLookup
         /// </summary>
-        protected virtual bool ShouldScheduleParallel {
-            get {
-                return true;
-            }
-        }
+        protected virtual bool ShouldScheduleParallel => true;
 
-        protected ref EntityQuery Query {
-            get {
-                return ref this.query;
-            }
-        }
+        protected ref EntityQuery Query => ref this.query;
 
         protected abstract TResolverProcessor PrepareProcessor();
         

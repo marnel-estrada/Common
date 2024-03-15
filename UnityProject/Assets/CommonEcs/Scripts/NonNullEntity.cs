@@ -8,11 +8,12 @@ namespace CommonEcs {
     /// </summary>
     public struct NonNullEntity : IEquatable<NonNullEntity> {
         private Entity value;
-        
-        public NonNullEntity(in Entity entity) {
+
+        private NonNullEntity(in Entity entity) {
             if (entity == Entity.Null) {
                 throw new Exception("Passed entity can't be null");
             }
+            
             this.value = entity;
         }
 

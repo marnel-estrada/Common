@@ -43,5 +43,21 @@ namespace CommonEcs {
         public static bool operator !=(NonNullEntity left, NonNullEntity right) {
             return !left.Equals(right);
         }
+        
+        public static bool operator ==(NonNullEntity left, Entity right) {
+            return left.value.Equals(right);
+        }
+
+        public static bool operator !=(NonNullEntity left, Entity right) {
+            return !left.value.Equals(right);
+        }
+        
+        public static bool operator ==(Entity left, NonNullEntity right) {
+            return left.Equals(right.value);
+        }
+
+        public static bool operator !=(Entity left, NonNullEntity right) {
+            return !left.Equals(right.value);
+        }
     }
 }

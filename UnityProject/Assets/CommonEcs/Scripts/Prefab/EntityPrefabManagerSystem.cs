@@ -19,11 +19,7 @@ namespace CommonEcs {
         }
 
         // It is only prepared when the prefabManager has been resolved
-        public bool IsPrepared {
-            get {
-                return this.prefabManager.IsSome;
-            }
-        }
+        public bool IsPrepared => this.prefabManager.IsSome;
 
         /// <summary>
         /// This is used when the map is required inside a job

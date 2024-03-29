@@ -103,18 +103,10 @@ namespace CommonEcs {
             return true;
         }
 
-        public int TotalCellCount {
-            get {
-                return this.rows * this.columns * this.levels;
-            }
-        }
+        public int TotalCellCount => this.rows * this.columns * this.levels;
 
-        public int CellCountPerLevel {
-            get {
-                return this.rows * this.columns;
-            }
-        }
-        
+        public int CellCountPerLevel => this.rows * this.columns;
+
         public WorldCoord3 ToWorldCoordinate(in GridCoord3 gridCoordinate) {
             return new WorldCoord3(new int3(gridCoordinate.value.xy + this.minWorldCoordinate.value.xy, gridCoordinate.value.z));
         }

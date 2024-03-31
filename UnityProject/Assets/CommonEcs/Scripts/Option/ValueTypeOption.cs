@@ -72,6 +72,7 @@ namespace CommonEcs {
         /// <typeparam name="TMatcher"></typeparam>
         /// <typeparam name="TReturnType"></typeparam>
         /// <returns></returns>
+        [Pure]
         public TReturnType Match<TMatcher, TReturnType>(TMatcher matcher)
             where TMatcher : struct, IFuncOptionMatcher<T, TReturnType> {
             return this.IsSome ? matcher.OnSome(this.value) : matcher.OnNone();

@@ -39,7 +39,7 @@ namespace Common {
             this.properties = this.type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
         }
 
-        private readonly List<PropertyInfo> ungroupedList = new List<PropertyInfo>();
+        private readonly List<PropertyInfo> ungroupedList = new();
 
         /// <summary>
         /// Renders an instance of the type
@@ -114,10 +114,12 @@ namespace Common {
                 entry.Value.Clear();
             }
         }
+        
+        private static readonly GenericObjectPropertyInfoComparer PROPERTY_INFO_COMPARER = new();
 
         private void RenderProperties(List<PropertyInfo> propertyList, object instance) {
             // Sort
-            propertyList.Sort(AscendingNameComparison);
+            propertyList.Sort(PROPERTY_INFO_COMPARER);
 
             // Render each property
             for(int i = 0; i < propertyList.Count; ++i) {

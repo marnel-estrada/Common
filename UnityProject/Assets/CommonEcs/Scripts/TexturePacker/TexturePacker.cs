@@ -112,10 +112,6 @@ namespace Common {
             }
         }
 
-        public PackedTextureEntryResolver Resolver {
-            get {
-                return new PackedTextureEntryResolver(this.entriesMap);
-            }
-        }
+        public PackedTextureEntryResolver Resolver => new(this.entriesMap);
     }
 }

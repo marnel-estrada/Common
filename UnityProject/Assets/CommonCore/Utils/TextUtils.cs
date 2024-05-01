@@ -54,10 +54,10 @@ namespace Common {
         /// <param name="str"></param>
         /// <returns></returns>
         public static string Trim(string str) {
-            return str?.Trim();
+            return str?.Trim() ?? string.Empty;
         }
 
-        private static readonly StringBuilder builder = new StringBuilder();
+        private static readonly StringBuilder BUILDER = new StringBuilder();
 
         /// <summary>
         /// Returns another version of the text that changed the first letter to upper case
@@ -65,11 +65,11 @@ namespace Common {
         /// <param name="text"></param>
         /// <returns></returns>
         public static string UpperCaseFirstLetter(string text) {
-            builder.Remove(0, builder.Length);
-            builder.Append(text.Substring(0, 1).ToUpperInvariant());
-            builder.Append(text.Substring(1));
+            BUILDER.Remove(0, BUILDER.Length);
+            BUILDER.Append(text.Substring(0, 1).ToUpperInvariant());
+            BUILDER.Append(text.Substring(1));
 
-            return builder.ToString();
+            return BUILDER.ToString();
         }
 
         /// <summary>
@@ -124,22 +124,22 @@ namespace Common {
         /// <param name="separator"></param>
         /// <returns></returns>
         public static string ComposeSeparatedString(string[] strings, char separator) {
-            builder.Remove(0, builder.Length); // Clear
+            BUILDER.Remove(0, BUILDER.Length); // Clear
 
             for(int i = 0; i < strings.Length; ++i) {
                 if(string.IsNullOrEmpty(strings[i])) {
                     continue;
                 }
 
-                builder.Append(strings[i]);
+                BUILDER.Append(strings[i]);
 
                 // Append separator only if not yet the last string
                 if(i + 1 < strings.Length) {
-                    builder.Append(separator);
+                    BUILDER.Append(separator);
                 }
             }
 
-            return builder.ToString();
+            return BUILDER.ToString();
         }
 
         /// <summary>

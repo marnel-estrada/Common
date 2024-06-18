@@ -10,7 +10,7 @@ using UnityEngine;
 using Common;
 
 namespace CommonEcs {
-    public struct SpriteManager : ISharedComponentData, IEquatable<SpriteManager> {
+    public readonly struct SpriteManager : ISharedComponentData, IEquatable<SpriteManager> {
         private readonly Internal internalInstance;
         
         private readonly int id;
@@ -33,11 +33,7 @@ namespace CommonEcs {
             this.internalInstance.UpdateMesh();
         }
 
-        public bool MeshChanged {
-            get {
-                return this.internalInstance.MeshChanged;
-            }
-        }
+        public bool MeshChanged => this.internalInstance.MeshChanged;
 
         /// <summary>
         /// Adds the specified sprite into the manager (into the big mesh)
@@ -78,126 +74,59 @@ namespace CommonEcs {
             this.internalInstance.colorsChanged = true;
         }
 
-        public Mesh Mesh {
-            get {
-                return this.internalInstance.mesh;
-            }
-        }
+        public Mesh Mesh => this.internalInstance.mesh;
 
-        public Material Material {
-            get {
-                return this.internalInstance.material;
-            }
-        }
+        public Material Material => this.internalInstance.material;
 
-        public NativeArray<Vector3> NativeVertices {
-            get {
-                return this.internalInstance.nativeVertices;
-            }
-        }
+        public NativeArray<Vector3> NativeVertices => this.internalInstance.nativeVertices;
 
-        public NativeArray<int> NativeTriangles {
-            get {
-                return this.internalInstance.nativeTriangles;
-            }
-        }
+        public NativeArray<int> NativeTriangles => this.internalInstance.nativeTriangles;
 
-        public NativeArray<Vector2> NativeUv {
-            get {
-                return this.internalInstance.nativeUv;
-            }
-        }
+        public NativeArray<Vector2> NativeUv => this.internalInstance.nativeUv;
 
-        public NativeArray<Vector2> NativeUv2 {
-            get {
-                return this.internalInstance.nativeUv2;
-            }
-        }
+        public NativeArray<Vector2> NativeUv2 => this.internalInstance.nativeUv2;
 
-        public NativeArray<Color> NativeColors {
-            get {
-                return this.internalInstance.nativeColors;
-            }
-        }
+        public NativeArray<Color> NativeColors => this.internalInstance.nativeColors;
 
         public int Layer {
-            get {
-                return this.internalInstance.layer;
-            }
-
-            set {
-                this.internalInstance.layer = value;
-            }
+            get => this.internalInstance.layer;
+            set => this.internalInstance.layer = value;
         }
 
         public int SortingLayer {
-            get {
-                return this.internalInstance.sortingLayer;
-            }
-
-            set {
-                this.internalInstance.sortingLayer = value;
-            }
+            get => this.internalInstance.sortingLayer;
+            set => this.internalInstance.sortingLayer = value;
         }
         
         public int SortingLayerId {
-            get {
-                return this.internalInstance.sortingLayerId;
-            }
-
-            set {
-                this.internalInstance.sortingLayerId = value;
-            }
+            get => this.internalInstance.sortingLayerId;
+            set => this.internalInstance.sortingLayerId = value;
         }
 
         public bool VerticesChanged {
-            get {
-                return this.internalInstance.verticesChanged;
-            }
-
-            set {
-                this.internalInstance.verticesChanged = value;
-            }
+            get => this.internalInstance.verticesChanged;
+            set => this.internalInstance.verticesChanged = value;
         }
 
         public bool RenderOrderChanged {
-            get {
-                return this.internalInstance.renderOrderChanged;
-            }
-
-            set {
-                this.internalInstance.renderOrderChanged = value;
-            }
+            get => this.internalInstance.renderOrderChanged;
+            set => this.internalInstance.renderOrderChanged = value;
         }
 
         public bool UvChanged {
-            get {
-                return this.internalInstance.uvChanged;
-            }
-
-            set {
-                this.internalInstance.uvChanged = value;
-            }
+            get => this.internalInstance.uvChanged;
+            set => this.internalInstance.uvChanged = value;
         }
 
         public bool ColorsChanged {
-            get {
-                return this.internalInstance.colorsChanged;
-            }
-
-            set {
-                this.internalInstance.colorsChanged = value;
-            }
+            get => this.internalInstance.colorsChanged;
+            set => this.internalInstance.colorsChanged = value;
         }
 
         /// <summary>
         /// Returns the number of sprites added in this manager
         /// </summary>
-        public int Count {
-            get {
-                return this.internalInstance.spriteCount;
-            }
-        }
+        public int Count => this.internalInstance.spriteCount;
 
         /// <summary>
         /// Sets whether or not to always update mesh
@@ -207,36 +136,19 @@ namespace CommonEcs {
         /// new entity with a Changed tag component.
         /// </summary>
         public bool AlwaysUpdateMesh {
-            get {
-                return this.internalInstance.alwaysUpdateMesh;
-            }
-
-            set {
-                this.internalInstance.alwaysUpdateMesh = value;
-            }
+            get => this.internalInstance.alwaysUpdateMesh;
+            set => this.internalInstance.alwaysUpdateMesh = value;
         }
 
         public bool UseMeshRenderer {
-            get {
-                return this.internalInstance.useMeshRenderer;
-            }
-
-            set {
-                this.internalInstance.useMeshRenderer = value;
-            }
+            get => this.internalInstance.useMeshRenderer;
+            set => this.internalInstance.useMeshRenderer = value;
         }
         
-        public bool HasAvailableSpace {
-            get {
-                return this.internalInstance.HasAvailableSpace;
-            }
-        }
+        public bool HasAvailableSpace => this.internalInstance.HasAvailableSpace;
 
         public Entity Owner {
-            get {
-                return this.internalInstance.owner;
-            }
-
+            get => this.internalInstance.owner;
             set {
                 // Prevent overwriting of owner entity
                 Assertion.IsTrue(this.internalInstance.owner == Entity.Null);
@@ -246,50 +158,27 @@ namespace CommonEcs {
         }
 
         public Entity SpriteLayerEntity {
-            get {
-                return this.internalInstance.spriteLayerEntity;
-            }
-
-            set {
-                this.internalInstance.spriteLayerEntity = value;
-            }
+            get => this.internalInstance.spriteLayerEntity;
+            set => this.internalInstance.spriteLayerEntity = value;
         }
 
         public string Name {
-            get {
-                return this.internalInstance.name;
-            }
-
-            set {
-                this.internalInstance.name = value;
-            }
+            get => this.internalInstance.name;
+            set => this.internalInstance.name = value;
         }
 
         public bool Enabled {
-            get {
-                return this.internalInstance.enabled;
-            }
-
-            set {
-                this.internalInstance.enabled = value;
-            }
+            get => this.internalInstance.enabled;
+            set => this.internalInstance.enabled = value;
         }
 
         public void ResetFlags() {
             this.internalInstance.ResetFlags();
         }
 
-        public bool Prepared {
-            get {
-                return this.internalInstance != null && this.internalInstance.owner != Entity.Null;
-            }
-        }
+        public bool Prepared => this.internalInstance != null && this.internalInstance.owner != Entity.Null;
 
-        public bool HasInternalInstance {
-            get {
-                return this.internalInstance != null;
-            }
-        }
+        public bool HasInternalInstance => this.internalInstance != null;
 
         /// <summary>
         /// Disposes the SpriteManager
@@ -333,7 +222,7 @@ namespace CommonEcs {
 
             public int layer;
 
-            // We're only managing the removed manager indeces here instead of the whole Sprite values
+            // We're only managing the removed manager indices here instead of the whole Sprite values
             private readonly SimpleList<int> inactiveList = new(100);
 
             // Note that this is the layer value and not the ID
@@ -489,11 +378,7 @@ namespace CommonEcs {
                 InternalAdd(ref sprite, ref matrix);
             }
 
-            public bool HasAvailableSpace {
-                get {
-                    return this.spriteCount + 1 <= MAX_SPRITE_COUNT;
-                }
-            }
+            public bool HasAvailableSpace => this.spriteCount + 1 <= MAX_SPRITE_COUNT;
 
             // Adds a new sprite by reusing an existing sprite
             private void AddByReusingInactive(ref Sprite newSprite, float4x4 matrix) {

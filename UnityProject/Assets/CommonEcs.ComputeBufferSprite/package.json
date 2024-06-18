@@ -1,0 +1,17 @@
+{
+    "name": "com.coffeebrain.common.ecs.computebuffersprite",
+    "displayName": "Common.ECS.ComputeBufferSprite",
+    "version": "0.0.1",
+    "unity": "2022.3",
+    "description": "Common.ECS.ComputeBufferSprite",
+    "dependencies": {
+        "com.unity.entities": "0.0.12",
+        "com.unity.burst": "1.0.1",
+        "com.squeakywheel.common.core": "1.0.0",
+        "com.squeakywheel.common.ecs": "1.0.0"
+    },
+    "keywords": [
+        "unity", "common"
+    ],
+    "category": "Unity"
+}

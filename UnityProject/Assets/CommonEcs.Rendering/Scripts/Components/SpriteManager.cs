@@ -511,43 +511,32 @@ namespace CommonEcs {
                 int vertexCount = this.capacity * 4;
 
                 // Copy existing to the new one
-                NativeArray<Vector3> newVertices = CopyAndExpand(this.nativeVertices, vertexCount);
+                NativeArray<Vector3> newVertices = NativeArrayExtensions.CopyAndExpand(this.nativeVertices, vertexCount);
                 this.nativeVertices.Dispose();
                 this.nativeVertices = newVertices;
 
                 // We wrap in a block so we don't do a mistake of assigning the wrong NativeArray
                 // for a certain UV
                 {
-                    NativeArray<Vector2> newUv = CopyAndExpand(this.nativeUv, vertexCount);
+                    NativeArray<Vector2> newUv = NativeArrayExtensions.CopyAndExpand(this.nativeUv, vertexCount);
                     this.nativeUv.Dispose();
                     this.nativeUv = newUv;
                 }
 
                 {
-                    NativeArray<Vector2> newUv2 = CopyAndExpand(this.nativeUv2, vertexCount);
+                    NativeArray<Vector2> newUv2 = NativeArrayExtensions.CopyAndExpand(this.nativeUv2, vertexCount);
                     this.nativeUv2.Dispose();
                     this.nativeUv2 = newUv2;
                 }
 
-                NativeArray<Color> newColors = CopyAndExpand(this.nativeColors, vertexCount);
+                NativeArray<Color> newColors = NativeArrayExtensions.CopyAndExpand(this.nativeColors, vertexCount);
                 this.nativeColors.Dispose();
                 this.nativeColors = newColors;
 
                 // Multiply by 6 because there are 6 indeces per quad (2 triangles)
-                NativeArray<int> newTriangles = CopyAndExpand(this.nativeTriangles, this.capacity * 6);
+                NativeArray<int> newTriangles = NativeArrayExtensions.CopyAndExpand(this.nativeTriangles, this.capacity * 6);
                 this.nativeTriangles.Dispose();
                 this.nativeTriangles = newTriangles;
-            }
-
-            private static NativeArray<T> CopyAndExpand<T>(NativeArray<T> original, int newLength) where T : struct {
-                Assertion.IsTrue(newLength > original.Length);
-
-                NativeArray<T> newArray = new(newLength, Allocator.Persistent);
-                NativeSlice<T> newArraySlice = new(newArray, 0, original.Length);
-                NativeSlice<T> originalSlice = new(original);
-                newArraySlice.CopyFrom(originalSlice);
-
-                return newArray;
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using Unity.Collections;
+﻿using Unity.Assertions;
+using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 
 namespace CommonEcs {
@@ -21,6 +22,17 @@ namespace CommonEcs {
             void* managedBuffer = UnsafeUtility.AddressOf(ref array[0]);
             void* nativeBuffer = self.GetUnsafePtr();
             UnsafeUtility.MemCpy(nativeBuffer, managedBuffer, byteLength);
+        }
+        
+        public static NativeArray<T> CopyAndExpand<T>(NativeArray<T> original, int newLength) where T : struct {
+            Assert.IsTrue(newLength > original.Length);
+
+            NativeArray<T> newArray = new(newLength, Allocator.Persistent);
+            NativeSlice<T> newArraySlice = new(newArray, 0, original.Length);
+            NativeSlice<T> originalSlice = new(original);
+            newArraySlice.CopyFrom(originalSlice);
+
+            return newArray;
         }
     }
 }

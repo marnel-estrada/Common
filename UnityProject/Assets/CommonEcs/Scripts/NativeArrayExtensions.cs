@@ -24,12 +24,12 @@ namespace CommonEcs {
             UnsafeUtility.MemCpy(nativeBuffer, managedBuffer, byteLength);
         }
         
-        public static NativeArray<T> CopyAndExpand<T>(NativeArray<T> original, int newLength) where T : struct {
-            Assert.IsTrue(newLength > original.Length);
+        public static NativeArray<T> CopyAndExpand<T>(this NativeArray<T> source, int newLength) where T : struct {
+            Assert.IsTrue(newLength > source.Length);
 
             NativeArray<T> newArray = new(newLength, Allocator.Persistent);
-            NativeSlice<T> newArraySlice = new(newArray, 0, original.Length);
-            NativeSlice<T> originalSlice = new(original);
+            NativeSlice<T> newArraySlice = new(newArray, 0, source.Length);
+            NativeSlice<T> originalSlice = new(source);
             newArraySlice.CopyFrom(originalSlice);
 
             return newArray;

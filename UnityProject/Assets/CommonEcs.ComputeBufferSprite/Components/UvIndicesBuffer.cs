@@ -9,7 +9,7 @@ namespace CommonEcs {
     public class UvIndicesBuffer {
         private ComputeBuffer buffer;
         private NativeArray<int> indices;
-        private int propertyId;
+        private readonly int propertyId;
 
         public UvIndicesBuffer(string shaderPropertyId, int initialCapacity) {
             this.buffer = new ComputeBuffer(initialCapacity, sizeof(int));
@@ -19,12 +19,27 @@ namespace CommonEcs {
             this.propertyId = Shader.PropertyToID(shaderPropertyId);
         }
 
+        public void Dispose() {
+            this.buffer.Release();
+            this.indices.Dispose();
+        }
+
         /// <summary>
         /// Sets the buffer to the specified material
         /// </summary>
         /// <param name="material"></param>
         public void SetBuffer(Material material) {
             material.SetBuffer(this.propertyId, this.buffer);
+        }
+
+        public void Expand(int newCapacity) {
+            NativeArray<int> newIndices = this.indices.CopyAndExpand(newCapacity);
+            this.indices.Dispose();
+            this.indices = newIndices;
+            
+            this.buffer.Release();
+            this.buffer = new ComputeBuffer(newCapacity, sizeof(int));
+            this.buffer.SetData(this.indices);
         }
     }
 }

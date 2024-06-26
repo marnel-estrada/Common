@@ -511,30 +511,30 @@ namespace CommonEcs {
                 int vertexCount = this.capacity * 4;
 
                 // Copy existing to the new one
-                NativeArray<Vector3> newVertices = NativeArrayExtensions.CopyAndExpand(this.nativeVertices, vertexCount);
+                NativeArray<Vector3> newVertices = this.nativeVertices.CopyAndExpand(vertexCount);
                 this.nativeVertices.Dispose();
                 this.nativeVertices = newVertices;
 
                 // We wrap in a block so we don't do a mistake of assigning the wrong NativeArray
                 // for a certain UV
                 {
-                    NativeArray<Vector2> newUv = NativeArrayExtensions.CopyAndExpand(this.nativeUv, vertexCount);
+                    NativeArray<Vector2> newUv = this.nativeUv.CopyAndExpand(vertexCount);
                     this.nativeUv.Dispose();
                     this.nativeUv = newUv;
                 }
 
                 {
-                    NativeArray<Vector2> newUv2 = NativeArrayExtensions.CopyAndExpand(this.nativeUv2, vertexCount);
+                    NativeArray<Vector2> newUv2 = this.nativeUv2.CopyAndExpand(vertexCount);
                     this.nativeUv2.Dispose();
                     this.nativeUv2 = newUv2;
                 }
 
-                NativeArray<Color> newColors = NativeArrayExtensions.CopyAndExpand(this.nativeColors, vertexCount);
+                NativeArray<Color> newColors = this.nativeColors.CopyAndExpand(vertexCount);
                 this.nativeColors.Dispose();
                 this.nativeColors = newColors;
 
-                // Multiply by 6 because there are 6 indeces per quad (2 triangles)
-                NativeArray<int> newTriangles = NativeArrayExtensions.CopyAndExpand(this.nativeTriangles, this.capacity * 6);
+                // Multiply by 6 because there are 6 indices per quad (2 triangles)
+                NativeArray<int> newTriangles = this.nativeTriangles.CopyAndExpand(this.capacity * 6);
                 this.nativeTriangles.Dispose();
                 this.nativeTriangles = newTriangles;
             }

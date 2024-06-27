@@ -361,7 +361,6 @@ namespace CommonEcs {
                 // Check if there are inactive Sprites and use those instances first
                 if (this.inactiveList.Count > 0) {
                     AddByReusingInactive(ref sprite, matrix);
-
                     return;
                 }
 

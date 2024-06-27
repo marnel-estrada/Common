@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Common;
+using Unity.Assertions;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -22,8 +23,50 @@ namespace CommonEcs {
             this.internalInstance.Dispose();
         }
 
+        public void AddUvIndicesBuffer(string shaderPropertyId) {
+            this.internalInstance.AddUvIndicesBuffer(shaderPropertyId);
+        }
+
+        public void Add(ref ComputeBufferSprite sprite, float3 position) {
+            Add(ref sprite, position, 0, 1.0f);
+        }
+        
+        public void Add(ref ComputeBufferSprite sprite, float3 position, float rotation) {
+            Add(ref sprite, position, rotation, 1.0f);
+        }
+
+        /// <summary>
+        /// Adds a sprite.
+        /// </summary>
+        /// <param name="sprite"></param>
+        /// <param name="uvIndex"></param>
+        /// <param name="position"></param>
+        /// <param name="rotation"></param>
+        /// <param name="scale"></param>
+        public void Add(ref ComputeBufferSprite sprite, float3 position, float rotation, float scale) {
+            this.internalInstance.Add(ref sprite, position, rotation, scale);
+        }
+
+        /// <summary>
+        /// Sets the uvIndex of the sprite.
+        /// </summary>
+        /// <param name="sprite"></param>
+        /// <param name="uvBufferIndex">Which UV buffer is it. Is it the first or the second?</param>
+        /// <param name="uvIndex"></param>
+        public void SetUvIndex(ref ComputeBufferSprite sprite, int uvBufferIndex, int uvIndex) {
+            this.internalInstance.SetUvIndex(ref sprite, uvBufferIndex, uvIndex);
+        }
+
         public void Draw(Bounds bounds) {
             this.internalInstance.Draw(bounds);
+        }
+
+        /// <summary>
+        /// Removes the specified sprite
+        /// </summary>
+        /// <param name="sprite"></param>
+        public void Remove(ref ComputeBufferSprite sprite) {
+            this.internalInstance.Remove(ref sprite);
         }
         
         private class Internal {
@@ -138,12 +181,76 @@ namespace CommonEcs {
             }
 
             /// <summary>
-            /// Adds a sprite with a single uv index.
+            /// Adds a sprite.
             /// </summary>
             /// <param name="sprite"></param>
             /// <param name="uvIndex"></param>
-            public void Add(ref ComputeBufferSprite sprite, int uvIndex) {
-                // TODO Check if there are inactive sprite index
+            /// <param name="position"></param>
+            /// <param name="rotation"></param>
+            /// <param name="scale"></param>
+            public void Add(ref ComputeBufferSprite sprite, float3 position, float rotation, float scale) {
+                // Check if there are inactive sprite slots and use those first
+                if (this.inactiveList.Length > 0) {
+                    AddByReusingInactive(ref sprite, position, rotation, scale);
+                    return;
+                }
+
+                // Expand if we're out of space
+                while (this.spriteCount >= this.capacity) {
+                    Expand();
+                }
+
+                sprite.managerIndex = this.spriteCount;
+                InternalAdd(ref sprite, position, rotation, scale);
+            }
+
+            private void AddByReusingInactive(ref ComputeBufferSprite sprite, float3 position, float rotation, float scale) {
+                Assertion.IsTrue(this.inactiveList.Length > 0);
+                
+                int lastIndex = this.inactiveList.Length - 1;
+                int reusedIndex = this.inactiveList[lastIndex];
+                this.inactiveList.RemoveAt(lastIndex);
+                sprite.managerIndex = reusedIndex;
+
+                InternalAdd(ref sprite, position, rotation, scale);
+            }
+
+            private void InternalAdd(ref ComputeBufferSprite sprite, float3 position, float rotation, float scale) {
+                this.translationAndRotations[sprite.managerIndex] = new float4(position, rotation);
+                this.scales[sprite.managerIndex] = scale;
+                this.colors[sprite.managerIndex] = sprite.color;
+
+                ++this.spriteCount;
+            }
+
+            /// <summary>
+            /// Sets the uvIndex of the sprite.
+            /// </summary>
+            /// <param name="sprite"></param>
+            /// <param name="uvBufferIndex">Which UV buffer is it. Is it the first or the second?</param>
+            /// <param name="uvIndex"></param>
+            public void SetUvIndex(ref ComputeBufferSprite sprite, int uvBufferIndex, int uvIndex) {
+                this.uvIndicesBuffers[uvBufferIndex].SetUvIndex(sprite.managerIndex, uvIndex);
+            } 
+
+            /// <summary>
+            /// Removes the specified sprite
+            /// </summary>
+            /// <param name="sprite"></param>
+            public void Remove(ref ComputeBufferSprite sprite) {
+                // We don't really remove. We just keep it in a temporary list of inactive sprite
+                // When a sprite is added, we check if there are sprites in inactive list and we use that instead
+                
+                // The inactive list should not have this index yet
+                Assert.IsFalse(this.inactiveList.Contains(sprite.managerIndex));
+                
+                this.translationAndRotations[sprite.managerIndex] = new float4(10000, 10000, 10000, 10000);
+                this.scales[sprite.managerIndex] = 0;
+                this.colors[sprite.managerIndex] = new Color(0, 0, 0, 0);
+                
+                this.inactiveList.Add(sprite.managerIndex);
+
+                --this.spriteCount;
             }
 
             public void AddUvIndicesBuffer(string shaderPropertyId) {

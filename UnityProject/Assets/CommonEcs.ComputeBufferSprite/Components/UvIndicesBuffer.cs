@@ -41,5 +41,9 @@ namespace CommonEcs {
             this.buffer = new ComputeBuffer(newCapacity, sizeof(int));
             this.buffer.SetData(this.indices);
         }
+
+        public void SetUvIndex(int spriteIndex, int uvIndex) {
+            this.indices[spriteIndex] = uvIndex;
+        }
     }
 }

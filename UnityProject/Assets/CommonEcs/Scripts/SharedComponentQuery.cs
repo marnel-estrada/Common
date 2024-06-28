@@ -48,16 +48,8 @@ namespace CommonEcs {
             return this.sharedComponents[uniqueIndex];
         }
         
-        public IReadOnlyList<T> SharedComponents {
-            get {
-                return this.sharedComponents;
-            }
-        }
-    
-        public IReadOnlyList<int> Indices {
-            get {
-                return this.indices;
-            }
-        }
+        public IReadOnlyList<T> SharedComponents => this.sharedComponents;
+
+        public IReadOnlyList<int> Indices => this.indices;
     }
 }

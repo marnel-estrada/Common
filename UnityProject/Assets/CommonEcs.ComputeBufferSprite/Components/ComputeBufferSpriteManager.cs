@@ -61,6 +61,10 @@ namespace CommonEcs {
             this.internalInstance.Draw(bounds);
         }
 
+        public NativeArray<float4> TranslationAndRotations => this.internalInstance.translationAndRotations;
+        public NativeArray<float> Scales => this.internalInstance.scales;
+        public NativeArray<Color> Colors => this.internalInstance.colors;
+
         /// <summary>
         /// Removes the specified sprite
         /// </summary>
@@ -81,13 +85,13 @@ namespace CommonEcs {
             // Matrix here is a compressed transform information
             // xy is the position, z is rotation, w is the scale
             private ComputeBuffer translationAndRotationBuffer;
-            private NativeArray<float4> translationAndRotations; 
+            public NativeArray<float4> translationAndRotations; 
             
             private ComputeBuffer scaleBuffer;
-            private NativeArray<float> scales;
+            public NativeArray<float> scales;
         
             private ComputeBuffer colorBuffer;
-            private NativeArray<Color> colors;
+            public NativeArray<Color> colors;
             
             private readonly uint[] args;
             private readonly ComputeBuffer argsBuffer;

@@ -81,7 +81,7 @@ namespace CommonEcs {
         
         // Note here that we're not using a common Added component so that each manager knows what 
         // sprite to remove
-        public struct Added : ICleanupComponentData {
+        public readonly struct Added : ICleanupComponentData {
             // The entity of the sprite manager to where the sprite is added
             public readonly Entity spriteManagerEntity;
         

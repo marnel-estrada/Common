@@ -16,8 +16,8 @@ namespace CommonEcs {
         [ReadOnly]
         private SharedComponentTypeHandle<T> sharedComponentType;
     
-        private readonly List<T> sharedComponents = new List<T>();
-        private readonly List<int> indices = new List<int>();
+        private readonly List<T> sharedComponents = new();
+        private readonly List<int> indices = new();
     
         public SharedComponentQuery(ComponentSystemBase system, EntityManager entityManager) {
             this.system = system;

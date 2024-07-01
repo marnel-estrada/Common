@@ -52,9 +52,9 @@ namespace CommonEcs {
         /// </summary>
         /// <param name="sprite"></param>
         /// <param name="uvBufferIndex">Which UV buffer is it. Is it the first or the second?</param>
-        /// <param name="uvIndex"></param>
-        public void SetUvIndex(ref ComputeBufferSprite sprite, int uvBufferIndex, int uvIndex) {
-            this.internalInstance.SetUvIndex(ref sprite, uvBufferIndex, uvIndex);
+        /// <param name="value"></param>
+        public void SetUvIndex(ref ComputeBufferSprite sprite, int uvBufferIndex, int value) {
+            this.internalInstance.SetUvIndex(ref sprite, uvBufferIndex, value);
         }
 
         public void Draw(Bounds bounds) {
@@ -65,12 +65,8 @@ namespace CommonEcs {
         public NativeArray<float> Scales => this.internalInstance.scales;
         public NativeArray<Color> Colors => this.internalInstance.colors;
 
-        /// <summary>
-        /// Removes the specified sprite
-        /// </summary>
-        /// <param name="sprite"></param>
-        public void Remove(ref ComputeBufferSprite sprite) {
-            this.internalInstance.Remove(ref sprite);
+        public void Remove(int managerIndex) {
+            this.internalInstance.Remove(managerIndex);
         }
         
         private class Internal {
@@ -204,7 +200,7 @@ namespace CommonEcs {
                     Expand();
                 }
 
-                sprite.managerIndex = this.spriteCount;
+                sprite.managerIndex = ValueTypeOption<int>.Some(this.spriteCount);
                 InternalAdd(ref sprite, position, rotation, scale);
             }
 
@@ -214,15 +210,16 @@ namespace CommonEcs {
                 int lastIndex = this.inactiveList.Length - 1;
                 int reusedIndex = this.inactiveList[lastIndex];
                 this.inactiveList.RemoveAt(lastIndex);
-                sprite.managerIndex = reusedIndex;
+                sprite.managerIndex = ValueTypeOption<int>.Some(reusedIndex);
 
                 InternalAdd(ref sprite, position, rotation, scale);
             }
 
             private void InternalAdd(ref ComputeBufferSprite sprite, float3 position, float rotation, float scale) {
-                this.translationAndRotations[sprite.managerIndex] = new float4(position, rotation);
-                this.scales[sprite.managerIndex] = scale;
-                this.colors[sprite.managerIndex] = sprite.color;
+                int managerIndex = sprite.managerIndex.ValueOrError();
+                this.translationAndRotations[managerIndex] = new float4(position, rotation);
+                this.scales[managerIndex] = scale;
+                this.colors[managerIndex] = sprite.color;
 
                 ++this.spriteCount;
             }
@@ -232,27 +229,26 @@ namespace CommonEcs {
             /// </summary>
             /// <param name="sprite"></param>
             /// <param name="uvBufferIndex">Which UV buffer is it. Is it the first or the second?</param>
-            /// <param name="uvIndex"></param>
-            public void SetUvIndex(ref ComputeBufferSprite sprite, int uvBufferIndex, int uvIndex) {
-                this.uvIndicesBuffers[uvBufferIndex].SetUvIndex(sprite.managerIndex, uvIndex);
+            /// <param name="value"></param>
+            public void SetUvIndex(ref ComputeBufferSprite sprite, int uvBufferIndex, int value) {
+                this.uvIndicesBuffers[uvBufferIndex].SetUvIndex(sprite.managerIndex.ValueOrError(), value);
             } 
 
             /// <summary>
-            /// Removes the specified sprite
+            /// Removes the sprite at the specified manager index.
+            /// We provide this method since the cleanup component of removed sprites
+            /// would only have this index
             /// </summary>
-            /// <param name="sprite"></param>
-            public void Remove(ref ComputeBufferSprite sprite) {
-                // We don't really remove. We just keep it in a temporary list of inactive sprite
-                // When a sprite is added, we check if there are sprites in inactive list and we use that instead
-                
+            /// <param name="managerIndex"></param>
+            public void Remove(int managerIndex) {
                 // The inactive list should not have this index yet
-                Assert.IsFalse(this.inactiveList.Contains(sprite.managerIndex));
+                Assert.IsFalse(this.inactiveList.Contains(managerIndex));
                 
-                this.translationAndRotations[sprite.managerIndex] = new float4(10000, 10000, 10000, 10000);
-                this.scales[sprite.managerIndex] = 0;
-                this.colors[sprite.managerIndex] = new Color(0, 0, 0, 0);
+                this.translationAndRotations[managerIndex] = new float4(10000, 10000, 10000, 10000);
+                this.scales[managerIndex] = 0;
+                this.colors[managerIndex] = new Color(0, 0, 0, 0);
                 
-                this.inactiveList.Add(sprite.managerIndex);
+                this.inactiveList.Add(managerIndex);
 
                 --this.spriteCount;
             }

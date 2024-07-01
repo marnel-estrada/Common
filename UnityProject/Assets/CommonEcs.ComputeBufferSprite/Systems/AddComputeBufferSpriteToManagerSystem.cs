@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
-using CommonEcs;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
-namespace Systems {
+namespace CommonEcs {
     [UpdateInGroup(typeof(ComputeBufferSpriteSystemGroup))]
     public partial class AddComputeBufferSpriteToManagerSystem : SystemBase {
         private EntityCommandBufferSystem commandBufferSystem;
@@ -20,12 +19,15 @@ namespace Systems {
             
             this.spritesQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<ComputeBufferSprite>()
+                .WithAll<UvIndex>()
                 .WithNone<ManagerAdded>()
                 .Build(this);
+            RequireForUpdate(this.spritesQuery);
         }
 
         private EntityTypeHandle entityType;
         private ComponentTypeHandle<ComputeBufferSprite> spriteType;
+        private BufferTypeHandle<UvIndex> uvIndexType;
         private ComponentTypeHandle<LocalTransform> localTransformType;
         private ComponentTypeHandle<LocalToWorld> worldTransformType;
 
@@ -40,11 +42,12 @@ namespace Systems {
 
             this.entityType = GetEntityTypeHandle();
             this.spriteType = GetComponentTypeHandle<ComputeBufferSprite>();
+            this.uvIndexType = GetBufferTypeHandle<UvIndex>();
             this.localTransformType = GetComponentTypeHandle<LocalTransform>(true);
             this.worldTransformType = GetComponentTypeHandle<LocalToWorld>(true);
 
-            // We can't use Burst compiled jobs here since the sprite manager have managed types
-            // like ComputeBuffer
+            // We can't use Burst compiled jobs here since the Internal class of the sprite
+            // manager is a class
             NativeArray<ArchetypeChunk> chunks = this.spritesQuery.ToArchetypeChunkArray(Allocator.TempJob);
             EntityCommandBuffer commandBuffer = this.commandBufferSystem.CreateCommandBuffer();
 
@@ -59,11 +62,13 @@ namespace Systems {
             ref EntityCommandBuffer commandBuffer) {
             NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
             NativeArray<ComputeBufferSprite> sprites = chunk.GetNativeArray(ref this.spriteType);
+            BufferAccessor<UvIndex> uvIndicesAccessor = chunk.GetBufferAccessor(ref this.uvIndexType);
             NativeArray<LocalTransform> localTransforms = chunk.GetNativeArray(ref this.localTransformType);
             NativeArray<LocalToWorld> worldTransforms = chunk.GetNativeArray(ref this.worldTransformType);
 
             for (int i = 0; i < chunk.Count; i++) {
                 ComputeBufferSprite sprite = sprites[i];
+                DynamicBuffer<UvIndex> uvIndexBuffer = uvIndicesAccessor[i];
                 LocalTransform localTransform = localTransforms[i];
                 LocalToWorld worldTransform = worldTransforms[i];
 
@@ -71,8 +76,13 @@ namespace Systems {
                 spriteManager.Add(ref sprite, worldTransform.Position, rotation, localTransform.Scale);
                 sprites[i] = sprite; // We modify since the managerIndex would be assigned on add
                 
+                // Set the uvIndex
+                for (int j = 0; j < uvIndexBuffer.Length; j++) {
+                    spriteManager.SetUvIndex(ref sprite, i, uvIndexBuffer[i].value);
+                }
+                
                 // Add this component so it will no longer be processed by this system
-                commandBuffer.AddComponent(entities[i], new ManagerAdded(sprite.managerIndex));
+                commandBuffer.AddComponent(entities[i], new ManagerAdded(sprite.managerIndex.ValueOrError()));
             }
         }
     }

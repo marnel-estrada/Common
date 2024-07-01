@@ -1,6 +1,6 @@
 ﻿using Unity.Entities;
 
-namespace Systems {
+namespace CommonEcs {
     /// <summary>
     /// The SystemGroup for compute buffer sprite related systems
     /// </summary>

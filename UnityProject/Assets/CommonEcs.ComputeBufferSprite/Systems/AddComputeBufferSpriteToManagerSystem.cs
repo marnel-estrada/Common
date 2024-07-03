@@ -27,6 +27,7 @@ namespace CommonEcs {
 
         private EntityTypeHandle entityType;
         private ComponentTypeHandle<ComputeBufferSprite> spriteType;
+        private ComponentTypeHandle<ComputeBufferSprite.Changed> changedType;
         private BufferTypeHandle<UvIndex> uvIndexType;
         private ComponentTypeHandle<LocalTransform> localTransformType;
         private ComponentTypeHandle<LocalToWorld> worldTransformType;
@@ -42,6 +43,7 @@ namespace CommonEcs {
 
             this.entityType = GetEntityTypeHandle();
             this.spriteType = GetComponentTypeHandle<ComputeBufferSprite>();
+            this.changedType = GetComponentTypeHandle<ComputeBufferSprite.Changed>();
             this.uvIndexType = GetBufferTypeHandle<UvIndex>();
             this.localTransformType = GetComponentTypeHandle<LocalTransform>(true);
             this.worldTransformType = GetComponentTypeHandle<LocalToWorld>(true);
@@ -77,12 +79,15 @@ namespace CommonEcs {
                 sprites[i] = sprite; // We modify since the managerIndex would be assigned on add
                 
                 // Set the uvIndex
-                for (int j = 0; j < uvIndexBuffer.Length; j++) {
-                    spriteManager.SetUvIndex(ref sprite, i, uvIndexBuffer[i].value);
+                for (int uvIndex = 0; uvIndex < uvIndexBuffer.Length; uvIndex++) {
+                    spriteManager.SetUvIndex(ref sprite, uvIndex, uvIndexBuffer[uvIndex].value);
                 }
                 
                 // Add this component so it will no longer be processed by this system
                 commandBuffer.AddComponent(entities[i], new ManagerAdded(sprite.managerIndex.ValueOrError()));
+                
+                // Set as changed so that its transform would be updated
+                chunk.SetComponentEnabled(ref this.changedType, i, true);
             }
         }
     }

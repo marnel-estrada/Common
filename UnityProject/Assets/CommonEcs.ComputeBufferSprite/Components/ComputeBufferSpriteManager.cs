@@ -305,6 +305,10 @@ namespace CommonEcs {
             }
 
             public void Draw(Bounds bounds) {
+                this.translationAndRotationBuffer.SetData(this.translationAndRotations);
+                this.scaleBuffer.SetData(this.scales);
+                this.colorBuffer.SetData(this.colors);
+                
                 Graphics.DrawMeshInstancedIndirect(this.quad, 0, this.material, bounds, this.argsBuffer);
             }
         }

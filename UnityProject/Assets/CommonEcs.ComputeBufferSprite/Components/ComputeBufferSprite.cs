@@ -13,5 +13,12 @@ namespace CommonEcs {
         public ComputeBufferSprite(Color color) : this() {
             this.color = color;
         }
+
+        /// <summary>
+        /// An IEnableableComponent that we use to mark a sprite as changed. Systems can
+        /// then filter for this.
+        /// </summary>
+        public readonly struct Changed : IComponentData, IEnableableComponent {
+        }
     }
 }

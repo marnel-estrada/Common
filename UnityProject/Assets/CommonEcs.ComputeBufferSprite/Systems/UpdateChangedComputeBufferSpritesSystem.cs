@@ -4,6 +4,7 @@ using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 
 namespace CommonEcs {
@@ -21,6 +22,8 @@ namespace CommonEcs {
             this.spritesQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<ComputeBufferSprite>()
                 .WithAll<ComputeBufferSprite.Changed>()
+                .WithAll<LocalTransform>()
+                .WithAll<LocalToWorld>()
                 .WithAll<UvIndex>()
                 .WithAll<ManagerAdded>()
                 .Build(this);
@@ -35,6 +38,17 @@ namespace CommonEcs {
             // In this case, SpriteManager.internal has not been allocated. So we get a NullPointerException
             // if we try to access the default entry at 0.
             ComputeBufferSpriteManager spriteManager = spriteManagers[1];
+
+            UpdateSpritesJob updateSpritesJob = new() {
+                spriteType = GetComponentTypeHandle<ComputeBufferSprite>(),
+                localTransformType = GetComponentTypeHandle<LocalTransform>(),
+                worldTransformType = GetComponentTypeHandle<LocalToWorld>(),
+                changedType = GetComponentTypeHandle<ComputeBufferSprite.Changed>(),
+                translationAndRotations = spriteManager.TranslationAndRotations,
+                scales = spriteManager.Scales,
+                colors = spriteManager.Colors
+            };
+            this.Dependency = updateSpritesJob.ScheduleParallel(this.spritesQuery, this.Dependency);
         }
         
         [BurstCompile]
@@ -42,10 +56,13 @@ namespace CommonEcs {
             [ReadOnly]
             public ComponentTypeHandle<ComputeBufferSprite> spriteType;
 
-            public ComponentTypeHandle<ComputeBufferSprite.Changed> changedType;
-
             [ReadOnly]
-            public BufferTypeHandle<UvIndex> uvIndexType;
+            public ComponentTypeHandle<LocalTransform> localTransformType;
+            
+            [ReadOnly]
+            public ComponentTypeHandle<LocalToWorld> worldTransformType;
+
+            public ComponentTypeHandle<ComputeBufferSprite.Changed> changedType;
             
             [NativeDisableParallelForRestriction]
             public NativeArray<float4> translationAndRotations;
@@ -55,14 +72,41 @@ namespace CommonEcs {
             
             [NativeDisableParallelForRestriction]
             public NativeArray<Color> colors;
+
+            private const int SPRITE_COUNT_PER_LAYER = 20000;
             
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
                 NativeArray<ComputeBufferSprite> sprites = chunk.GetNativeArray(ref this.spriteType);
-                BufferAccessor<UvIndex> uvIndexBuffers = chunk.GetBufferAccessor(ref this.uvIndexType);
+                NativeArray<LocalTransform> localTransforms = chunk.GetNativeArray(ref this.localTransformType);
+                NativeArray<LocalToWorld> worldTransforms = chunk.GetNativeArray(ref this.worldTransformType);
 
                 ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
                 while (enumerator.NextEntityIndex(out int i)) {
-                    // TODO Continue here
+                    ComputeBufferSprite sprite = sprites[i];
+                    if (sprite.managerIndex.IsNone) {
+                        // Not added to the sprite manager yet
+                        continue;
+                    }
+                    
+                    LocalToWorld worldTransform = worldTransforms[i];
+                    
+                    int spriteManagerIndex = sprite.managerIndex.ValueOrError();
+                    
+                    // Position and rotation
+                    float3 position = worldTransform.Position;
+                    position.z = position.y + SPRITE_COUNT_PER_LAYER * sprite.layerOrder;
+                    float rotation = worldTransform.Rotation.ToEuler().z;
+                    this.translationAndRotations[spriteManagerIndex] = new float4(position, rotation);
+                    
+                    // Scale
+                    LocalTransform localTransform = localTransforms[i];
+                    this.scales[spriteManagerIndex] = localTransform.Scale;
+                    
+                    // Color
+                    this.colors[spriteManagerIndex] = sprite.color;
+                    
+                    // Disable Changed so it will no longer be processed by this system
+                    chunk.SetComponentEnabled(ref this.changedType, i, false);
                 }
             }
         }

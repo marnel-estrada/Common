@@ -48,5 +48,12 @@ namespace Common {
         public static Color WithAlpha(this Color self, float alpha) {
 	        return new Color(self.r, self.g, self.b, alpha);
         }
+
+        public static bool TolerantEquals(this Color self, Color other) {
+	        return self.r.TolerantEquals(other.r) &&
+	               self.g.TolerantEquals(other.g) &&
+	               self.b.TolerantEquals(other.b) &&
+	               self.a.TolerantEquals(other.a);
+        }
 	}
 }

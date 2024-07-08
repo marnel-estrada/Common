@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Common;
+using CommonEcs.Scripts.Math;
 using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
@@ -9,9 +11,12 @@ using UnityEngine;
 
 namespace CommonEcs {
     /// <summary>
-    /// Filters sprites that changed and updates its values in the sprite manager.
+    /// Determines if a sprite has different values from the values in the main array and
+    /// sets ComputeBufferSprite.Changed to enabled so that UpdateChangedComputeBufferSpritesSystem
+    /// can pick it up. We did it this way so that systems that alter transform, for example, don't need
+    /// to know about setting ComputeBufferSprite.Changed to enabled.  
     /// </summary>
-    public partial class UpdateChangedComputeBufferSpritesSystem : SystemBase {
+    public partial class ComputeBufferSpriteChangedTrackerSystem : SystemBase {
         private EntityQuery spritesQuery;
         
         private SharedComponentQuery<ComputeBufferSpriteManager> spriteManagerQuery;
@@ -19,17 +24,17 @@ namespace CommonEcs {
         protected override void OnCreate() {
             this.spriteManagerQuery = new SharedComponentQuery<ComputeBufferSpriteManager>(this, this.EntityManager);
             
+            // Note here that we only consider sprites where Changed was not enabled yet
             this.spritesQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<ComputeBufferSprite>()
-                .WithAll<ComputeBufferSprite.Changed>()
                 .WithAll<LocalTransform>()
                 .WithAll<LocalToWorld>()
-                .WithAll<UvIndex>()
                 .WithAll<ManagerAdded>()
+                .WithNone<ComputeBufferSprite.Changed>()
                 .Build(this);
             RequireForUpdate(this.spritesQuery);
         }
-
+        
         protected override void OnUpdate() {
             this.spriteManagerQuery.Update();
             IReadOnlyList<ComputeBufferSpriteManager> spriteManagers = this.spriteManagerQuery.SharedComponents;
@@ -38,44 +43,45 @@ namespace CommonEcs {
             // In this case, SpriteManager.internal has not been allocated. So we get a NullPointerException
             // if we try to access the default entry at 0.
             ComputeBufferSpriteManager spriteManager = spriteManagers[1];
-
-            UpdateSpritesJob updateSpritesJob = new() {
-                spriteType = GetComponentTypeHandle<ComputeBufferSprite>(),
-                localTransformType = GetComponentTypeHandle<LocalTransform>(),
-                worldTransformType = GetComponentTypeHandle<LocalToWorld>(),
-                changedType = GetComponentTypeHandle<ComputeBufferSprite.Changed>(),
-                translationAndRotations = spriteManager.TranslationAndRotations,
-                scales = spriteManager.Scales,
-                colors = spriteManager.Colors
+            
+            // TODO Schedule job
+            TrackChangedJob trackChangedJob = new() {
+                lastSystemVersion = this.LastSystemVersion
             };
-            this.Dependency = updateSpritesJob.ScheduleParallel(this.spritesQuery, this.Dependency);
         }
         
         [BurstCompile]
-        private struct UpdateSpritesJob : IJobChunk {
+        private struct TrackChangedJob : IJobChunk {
             [ReadOnly]
             public ComponentTypeHandle<ComputeBufferSprite> spriteType;
 
             [ReadOnly]
             public ComponentTypeHandle<LocalTransform> localTransformType;
-            
+
             [ReadOnly]
             public ComponentTypeHandle<LocalToWorld> worldTransformType;
 
             public ComponentTypeHandle<ComputeBufferSprite.Changed> changedType;
             
-            [NativeDisableParallelForRestriction]
+            [ReadOnly]
             public NativeArray<float4> translationAndRotations;
             
-            [NativeDisableParallelForRestriction]
+            [ReadOnly]
             public NativeArray<float> scales;
             
-            [NativeDisableParallelForRestriction]
+            [ReadOnly]
             public NativeArray<Color> colors;
-
-            private const int SPRITE_COUNT_PER_LAYER = 20000;
+            
+            public uint lastSystemVersion;
             
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                // Check if there were changes before continuing
+                if (!(chunk.DidChange(ref this.spriteType, this.lastSystemVersion) 
+                      || chunk.DidChange(ref this.localTransformType, this.lastSystemVersion)
+                      || chunk.DidChange(ref this.worldTransformType, this.lastSystemVersion))) {
+                    return;
+                }
+
                 NativeArray<ComputeBufferSprite> sprites = chunk.GetNativeArray(ref this.spriteType);
                 NativeArray<LocalTransform> localTransforms = chunk.GetNativeArray(ref this.localTransformType);
                 NativeArray<LocalToWorld> worldTransforms = chunk.GetNativeArray(ref this.worldTransformType);
@@ -83,25 +89,42 @@ namespace CommonEcs {
                 ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
                 while (enumerator.NextEntityIndex(out int i)) {
                     ComputeBufferSprite sprite = sprites[i];
-                    LocalToWorld worldTransform = worldTransforms[i];
-                    
-                    int spriteManagerIndex = sprite.managerIndex.ValueOrError();
-                    
-                    // Position and rotation
-                    float3 position = worldTransform.Position;
-                    position.z = position.y + SPRITE_COUNT_PER_LAYER * sprite.layerOrder;
-                    float rotation = worldTransform.Rotation.ToEuler().z;
-                    this.translationAndRotations[spriteManagerIndex] = new float4(position, rotation);
-                    
-                    // Scale
                     LocalTransform localTransform = localTransforms[i];
-                    this.scales[spriteManagerIndex] = localTransform.Scale;
+                    LocalToWorld worldTransform = worldTransforms[i];
+
+                    int managerIndex = sprite.managerIndex.ValueOrError();
                     
-                    // Color
-                    this.colors[spriteManagerIndex] = sprite.color;
+                    // Check position and rotation
+                    float4 positionAndRot = this.translationAndRotations[managerIndex];
+                    float3 position = worldTransform.Position;
+                    if (!position.TolerantEquals(positionAndRot.xyz)) {
+                        // Changed position
+                        chunk.SetComponentEnabled(ref this.changedType, i, true);
+                        continue;
+                    }
                     
-                    // Disable Changed so it will no longer be processed by this system
-                    chunk.SetComponentEnabled(ref this.changedType, i, false);
+                    float rotation = worldTransform.Rotation.ToEuler().z;
+                    if (!rotation.TolerantEquals(positionAndRot.w)) {
+                        // Changed rotation
+                        chunk.SetComponentEnabled(ref this.changedType, i, true);
+                        continue;
+                    }
+                    
+                    // Check scale
+                    float scaleInManager = this.scales[managerIndex];
+                    float scale = localTransform.Scale;
+                    if (!scale.TolerantEquals(scaleInManager)) {
+                        // Changed scale
+                        chunk.SetComponentEnabled(ref this.changedType, i, true);
+                        continue;
+                    }
+                    
+                    // Check color
+                    Color colorInManager = this.colors[managerIndex];
+                    if (!sprite.color.TolerantEquals(colorInManager)) {
+                        // Changed scale
+                        chunk.SetComponentEnabled(ref this.changedType, i, true);
+                    }
                 }
             }
         }

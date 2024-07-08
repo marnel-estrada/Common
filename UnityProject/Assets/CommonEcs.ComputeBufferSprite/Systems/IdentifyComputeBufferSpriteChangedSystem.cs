@@ -16,7 +16,9 @@ namespace CommonEcs {
     /// can pick it up. We did it this way so that systems that alter transform, for example, don't need
     /// to know about setting ComputeBufferSprite.Changed to enabled.  
     /// </summary>
-    public partial class ComputeBufferSpriteChangedTrackerSystem : SystemBase {
+    [UpdateInGroup(typeof(ComputeBufferSpriteSystemGroup))]
+    [UpdateBefore(typeof(UpdateChangedComputeBufferSpritesSystem))]
+    public partial class IdentifyComputeBufferSpriteChangedSystem : SystemBase {
         private EntityQuery spritesQuery;
         
         private SharedComponentQuery<ComputeBufferSpriteManager> spriteManagerQuery;
@@ -44,12 +46,23 @@ namespace CommonEcs {
             // if we try to access the default entry at 0.
             ComputeBufferSpriteManager spriteManager = spriteManagers[1];
             
-            // TODO Schedule job
+            // Schedule job
             TrackChangedJob trackChangedJob = new() {
+                spriteType = GetComponentTypeHandle<ComputeBufferSprite>(),
+                localTransformType = GetComponentTypeHandle<LocalTransform>(),
+                worldTransformType = GetComponentTypeHandle<LocalToWorld>(),
+                changedType = GetComponentTypeHandle<ComputeBufferSprite.Changed>(),
+                translationAndRotations = spriteManager.TranslationAndRotations,
+                scales = spriteManager.Scales,
+                colors = spriteManager.Colors,
                 lastSystemVersion = this.LastSystemVersion
             };
+            this.Dependency = trackChangedJob.ScheduleParallel(this.spritesQuery, this.Dependency);
         }
         
+        /// <summary>
+        /// This is faster than scheduling jobs for different changes (position and rotation, scale, color)
+        /// </summary>
         [BurstCompile]
         private struct TrackChangedJob : IJobChunk {
             [ReadOnly]

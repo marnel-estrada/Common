@@ -11,6 +11,7 @@ namespace CommonEcs {
     /// <summary>
     /// Filters sprites that changed and updates its values in the sprite manager.
     /// </summary>
+    [UpdateInGroup(typeof(ComputeBufferSpriteSystemGroup))]
     public partial class UpdateChangedComputeBufferSpritesSystem : SystemBase {
         private EntityQuery spritesQuery;
         
@@ -51,6 +52,9 @@ namespace CommonEcs {
             this.Dependency = updateSpritesJob.ScheduleParallel(this.spritesQuery, this.Dependency);
         }
         
+        /// <summary>
+        /// This is faster than scheduling jobs for different changes
+        /// </summary>
         [BurstCompile]
         private struct UpdateSpritesJob : IJobChunk {
             [ReadOnly]

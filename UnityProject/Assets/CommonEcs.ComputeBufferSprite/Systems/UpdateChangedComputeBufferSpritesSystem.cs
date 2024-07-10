@@ -103,10 +103,10 @@ namespace CommonEcs {
                     
                     // Color
                     this.colors[spriteManagerIndex] = sprite.color;
-                    
-                    // Disable Changed so it will no longer be processed by this system
-                    chunk.SetComponentEnabled(ref this.changedType, i, false);
                 }
+                
+                // Disable Changed so it will no longer be processed by this system
+                chunk.SetComponentEnabledForAll(ref this.changedType, false);
             }
         }
     }

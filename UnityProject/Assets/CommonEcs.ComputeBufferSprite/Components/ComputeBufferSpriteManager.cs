@@ -109,7 +109,7 @@ namespace CommonEcs {
 
             public Internal(Material material, NativeArray<float4> uvValues, int initialCapacity) {
                 this.material = material;
-                this.capacity = initialCapacity;
+                this.capacity = math.max(initialCapacity, 2); // Prevents error when initialCapacity is zero
                 this.quad = MeshUtils.Quad(1.0f);
 
                 const int floatSize = sizeof(float);

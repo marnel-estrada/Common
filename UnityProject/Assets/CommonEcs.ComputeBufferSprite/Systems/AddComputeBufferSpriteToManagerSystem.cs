@@ -44,7 +44,7 @@ namespace CommonEcs {
             this.entityType = GetEntityTypeHandle();
             this.spriteType = GetComponentTypeHandle<ComputeBufferSprite>();
             this.changedType = GetComponentTypeHandle<ComputeBufferSprite.Changed>();
-            this.uvIndexType = GetBufferTypeHandle<UvIndex>();
+            this.uvIndexType = GetBufferTypeHandle<UvIndex>(true);
             this.localTransformType = GetComponentTypeHandle<LocalTransform>(true);
             this.worldTransformType = GetComponentTypeHandle<LocalToWorld>(true);
 

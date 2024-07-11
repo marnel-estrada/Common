@@ -40,17 +40,9 @@ namespace CommonEcs {
             this.hasValue = 1;
         }
 
-        public bool IsSome {
-            get {
-                return this.hasValue > 0;
-            }
-        }
+        public bool IsSome => this.hasValue > 0;
 
-        public bool IsNone {
-            get {
-                return this.hasValue <= 0;
-            }
-        }
+        public bool IsNone => this.hasValue <= 0;
 
         /// <summary>
         /// This is used for matching using a struct without incurring garbage

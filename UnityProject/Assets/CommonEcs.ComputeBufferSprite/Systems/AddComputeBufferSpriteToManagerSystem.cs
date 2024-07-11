@@ -5,7 +5,11 @@ using Unity.Mathematics;
 using Unity.Transforms;
 
 namespace CommonEcs {
-    [UpdateInGroup(typeof(ComputeBufferSpriteSystemGroup))]
+    /// <summary>
+    /// We update this in PresentationSystemGroup since it doesn't use jobs. It will get in the way with
+    /// job read/write rules if we update this in simulation group.
+    /// </summary>
+    [UpdateInGroup(typeof(PresentationSystemGroup))]
     public partial class AddComputeBufferSpriteToManagerSystem : SystemBase {
         private EntityCommandBufferSystem commandBufferSystem;
         
@@ -85,10 +89,9 @@ namespace CommonEcs {
                 
                 // Add this component so it will no longer be processed by this system
                 commandBuffer.AddComponent(entities[i], new ManagerAdded(sprite.managerIndex.ValueOrError()));
-                
-                // Set as changed so that its transform would be updated
-                chunk.SetComponentEnabled(ref this.changedType, i, true);
             }
+            
+            chunk.SetComponentEnabledForAll(ref this.changedType, true);
         }
     }
 }

@@ -3,7 +3,11 @@ using Unity.Collections;
 using Unity.Entities;
 
 namespace CommonEcs {
-    [UpdateInGroup(typeof(ComputeBufferSpriteSystemGroup))]
+    /// <summary>
+    /// We update this in PresentationSystemGroup since it doesn't use jobs. It will get in the way with
+    /// job read/write rules if we update this in simulation group.
+    /// </summary>
+    [UpdateInGroup(typeof(PresentationSystemGroup))]
     public partial class RemoveComputeBufferSpriteFromManagerSystem : SystemBase {
         private EntityCommandBufferSystem commandBufferSystem;
         

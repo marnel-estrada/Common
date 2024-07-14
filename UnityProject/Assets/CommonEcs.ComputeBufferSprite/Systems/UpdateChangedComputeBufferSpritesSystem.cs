@@ -12,6 +12,7 @@ namespace CommonEcs {
     /// Filters sprites that changed and updates its values in the sprite manager.
     /// </summary>
     [UpdateInGroup(typeof(ComputeBufferSpriteSystemGroup))]
+    [UpdateBefore(typeof(ResetComputeBufferSpriteChangedSystem))]
     public partial class UpdateChangedComputeBufferSpritesSystem : SystemBase {
         private EntityQuery spritesQuery;
         
@@ -44,7 +45,6 @@ namespace CommonEcs {
                 spriteType = GetComponentTypeHandle<ComputeBufferSprite>(),
                 localTransformType = GetComponentTypeHandle<LocalTransform>(),
                 worldTransformType = GetComponentTypeHandle<LocalToWorld>(),
-                changedType = GetComponentTypeHandle<ComputeBufferSprite.Changed>(),
                 translationAndRotations = spriteManager.TranslationAndRotations,
                 scales = spriteManager.Scales,
                 colors = spriteManager.Colors
@@ -65,8 +65,6 @@ namespace CommonEcs {
             
             [ReadOnly]
             public ComponentTypeHandle<LocalToWorld> worldTransformType;
-
-            public ComponentTypeHandle<ComputeBufferSprite.Changed> changedType;
             
             [NativeDisableParallelForRestriction]
             public NativeArray<float4> translationAndRotations;
@@ -104,9 +102,6 @@ namespace CommonEcs {
                     // Color
                     this.colors[spriteManagerIndex] = sprite.color;
                 }
-                
-                // Disable Changed so it will no longer be processed by this system
-                chunk.SetComponentEnabledForAll(ref this.changedType, false);
             }
         }
     }

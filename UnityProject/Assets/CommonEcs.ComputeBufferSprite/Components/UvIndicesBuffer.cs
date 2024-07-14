@@ -14,7 +14,7 @@ namespace CommonEcs {
         public UvIndicesBuffer(string shaderPropertyId, int initialCapacity) {
             this.buffer = new ComputeBuffer(initialCapacity, sizeof(int));
             this.indices = new NativeArray<int>(initialCapacity, Allocator.Persistent);
-            this.buffer.SetData(this.indices);
+            SetBufferData();
 
             this.propertyId = Shader.PropertyToID(shaderPropertyId);
         }
@@ -32,6 +32,10 @@ namespace CommonEcs {
             material.SetBuffer(this.propertyId, this.buffer);
         }
 
+        public void SetBufferData() {
+            this.buffer.SetData(this.indices);
+        }
+
         public void Expand(int newCapacity) {
             NativeArray<int> newIndices = this.indices.CopyAndExpand(newCapacity);
             this.indices.Dispose();
@@ -45,5 +49,8 @@ namespace CommonEcs {
         public void SetUvIndex(int spriteIndex, int uvIndex) {
             this.indices[spriteIndex] = uvIndex;
         }
+
+        // This is exposed so that it can be passed to jobs
+        public NativeArray<int> Indices => this.indices;
     }
 }

@@ -26,7 +26,6 @@ namespace CommonEcs {
                 .WithAll<ComputeBufferSprite.Changed>()
                 .WithAll<LocalTransform>()
                 .WithAll<LocalToWorld>()
-                .WithAll<UvIndex>()
                 .WithAll<ManagerAdded>()
                 .Build(this);
             RequireForUpdate(this.spritesQuery);

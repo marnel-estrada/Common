@@ -57,6 +57,12 @@ namespace CommonEcs {
             this.internalInstance.SetUvIndex(ref sprite, uvBufferIndex, value);
         }
 
+        public int UvIndicesBufferCount => this.internalInstance.UvIndicesBufferCount;
+
+        public NativeArray<int> GetUvBufferIndices(int uvBufferIndex) {
+            return this.internalInstance.GetUvBufferIndices(uvBufferIndex);
+        }
+
         public void Draw(Bounds bounds) {
             this.internalInstance.Draw(bounds);
         }
@@ -304,10 +310,21 @@ namespace CommonEcs {
                 this.argsBuffer.SetData(this.args);
             }
 
+            public int UvIndicesBufferCount => this.uvIndicesBuffers.Count;
+            
+            public NativeArray<int> GetUvBufferIndices(int uvBufferIndex) {
+                return this.uvIndicesBuffers[uvBufferIndex].Indices;
+            }
+
             public void Draw(Bounds bounds) {
                 this.translationAndRotationBuffer.SetData(this.translationAndRotations);
                 this.scaleBuffer.SetData(this.scales);
                 this.colorBuffer.SetData(this.colors);
+
+                // Update the data of indices as well
+                for (int i = 0; i < this.uvIndicesBuffers.Count; i++) {
+                    this.uvIndicesBuffers[i].SetBufferData();
+                }
                 
                 Graphics.DrawMeshInstancedIndirect(this.quad, 0, this.material, bounds, this.argsBuffer);
             }

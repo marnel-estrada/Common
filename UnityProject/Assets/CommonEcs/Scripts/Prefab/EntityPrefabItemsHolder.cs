@@ -7,10 +7,6 @@ namespace CommonEcs {
         [SerializeField]
         private List<EntityPrefabItem> prefabs;
 
-        public IReadOnlyList<EntityPrefabItem> Prefabs {
-            get {
-                return this.prefabs;
-            }
-        }
+        public IReadOnlyList<EntityPrefabItem> Prefabs => this.prefabs;
     }
 }

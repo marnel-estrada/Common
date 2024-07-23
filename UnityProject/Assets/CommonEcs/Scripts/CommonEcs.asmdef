@@ -1,5 +1,6 @@
 {
     "name": "CommonEcs",
+    "rootNamespace": "",
     "references": [
         "Unity.Entities",
         "Unity.Entities.Hybrid",
@@ -8,10 +9,10 @@
         "Unity.Transforms.Hybrid",
         "Unity.Mathematics",
         "Unity.Collections",
-        "Unity.Rendering.Hybrid",
-        "CommonCore"
+        "CommonCore",
+        "Unity.Addressables",
+        "Unity.ResourceManager"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": true,
@@ -19,5 +20,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }

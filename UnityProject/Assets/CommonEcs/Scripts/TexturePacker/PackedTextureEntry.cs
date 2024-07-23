@@ -15,6 +15,9 @@ namespace Common {
         public readonly int originalWidth;
         public readonly int originalHeight;
 
+        // The index into the array of UVs maintained in TexturePacker
+        public readonly int uvIndex;
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -23,8 +26,8 @@ namespace Common {
         /// <param name="atlasHeight"></param>
         /// <param name="originalWidth"></param>
         /// <param name="originalHeight"></param>
-        public PackedTextureEntry(Rect uvRect, int atlasWidth, int atlasHeight,
-                                  int originalWidth, int originalHeight) {
+        public PackedTextureEntry(Rect uvRect, int atlasWidth, int atlasHeight, int originalWidth, int originalHeight,
+            int uvIndex) {
             this.uvRect = uvRect;
 
             this.atlasWidth = atlasWidth;
@@ -35,21 +38,15 @@ namespace Common {
 
             this.originalWidth = originalWidth;
             this.originalHeight = originalHeight;
+
+            this.uvIndex = uvIndex;
         }
 
-        public float2 LowerLeftUv {
-            get {
-                return this.uvRect.min;
-            }
-        }
+        public float2 LowerLeftUv => this.uvRect.min;
 
-        public float2 UvSize {
-            get {
-                return this.uvRect.size;
-            }
-        }
+        public float2 UvSize => this.uvRect.size;
 
-        public bool Equals(PackedTextureEntry other) {
+        private bool Equals(PackedTextureEntry other) {
             return this.uvRect.Equals(other.uvRect) &&
                    this.spriteRect.Equals(other.spriteRect) &&
                    this.atlasWidth == other.atlasWidth &&

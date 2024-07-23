@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 using Unity.Collections;
-
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Common {
@@ -21,6 +21,9 @@ namespace Common {
         // Keeps track of the packed entries
         private NativeParallelHashMap<int, PackedTextureEntry> entriesMap;
 
+        // The UV array that can be used into a ComputeBufferSpriteManager
+        private NativeArray<float4> uvs; 
+
         private Texture2D? atlas;
 
         /// <summary>
@@ -33,6 +36,10 @@ namespace Common {
         public void Dispose() {
             if (this.entriesMap.IsCreated) {
                 this.entriesMap.Dispose();
+            }
+
+            if (this.uvs.IsCreated) {
+                this.uvs.Dispose();
             }
         }
 
@@ -63,12 +70,19 @@ namespace Common {
             // Populate entries
             this.entriesMap.Clear();
             Assertion.IsTrue(this.names.Count == this.textures.Count);
+            
+            // Prepare the UVs as well. We only prepare it here so we know the length.
+            this.uvs = new NativeArray<float4>(rects.Length, Allocator.Persistent);
+            
             for (int i = 0; i < this.names.Count; ++i) {
                 int originalWidth = this.originalDimensions[i].x;
                 int originalHeight = this.originalDimensions[i].y;
+                Rect uvRect = rects[i];
+                this.uvs[i] = new float4(uvRect.width, uvRect.height, uvRect.x, uvRect.y);
                 int hashcode = new FixedString64Bytes(this.names[i]).GetHashCode();
                 this.entriesMap[hashcode] =
-                    new PackedTextureEntry(rects[i], this.atlas.width, this.atlas.height, originalWidth, originalHeight);
+                    new PackedTextureEntry(uvRect, this.atlas.width, this.atlas.height, 
+                        originalWidth, originalHeight, i);
             }
 
             // Clear the memory held by the individual textures
@@ -113,5 +127,7 @@ namespace Common {
         }
 
         public PackedTextureEntryResolver Resolver => new(this.entriesMap);
+
+        public NativeArray<float4> Uvs => this.uvs;
     }
 }

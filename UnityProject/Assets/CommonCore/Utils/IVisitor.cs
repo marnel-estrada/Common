@@ -14,11 +14,6 @@ namespace Common {
 	 * A common visitor pattern interface. This was made so we don't have to pass around delegates which produces garbage when it is used.
 	 */
 	public interface IVisitor<T> {
-
-		/**
-		 * Visits an item
-		 */
 		void Visit(T item);
-
 	}
 }

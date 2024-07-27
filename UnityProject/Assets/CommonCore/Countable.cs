@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Common {
+﻿namespace Common {
     /// <summary>
     /// Common interfaces for classes that can be counted
     /// </summary>

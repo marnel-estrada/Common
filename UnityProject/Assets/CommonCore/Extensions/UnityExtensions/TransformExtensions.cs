@@ -106,5 +106,19 @@ namespace Common {
             self.localEulerAngles = euler;
         }
 
+        /// <summary>
+        /// Traverses the tranform tree using the specified visitor
+        /// </summary>
+        /// <param name="transform"></param>
+        /// <param name="visitor"></param>
+        /// <typeparam name="T"></typeparam>
+        public static void Traverse<T>(this Transform transform, T visitor) where T : struct, IVisitor<Transform> {
+	        visitor.Visit(transform);
+
+	        for (int i = 0; i < transform.childCount; ++i) {
+		        Transform child = transform.GetChild(i);
+		        Traverse<T>(child, visitor);
+	        }
+        }
 	}
 }

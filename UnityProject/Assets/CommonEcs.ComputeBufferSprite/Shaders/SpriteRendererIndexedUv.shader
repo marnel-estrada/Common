@@ -32,6 +32,9 @@
             // xyz is the position, w is the rotation
             StructuredBuffer<float4> translationAndRotationBuffer;
             StructuredBuffer<float> scaleBuffer;
+
+            StructuredBuffer<float2> sizeBuffer; // Size of each sprite
+            StructuredBuffer<float2> pivotBuffer; // Pivot of each sprite
             
 			StructuredBuffer<float4> colorsBuffer;
 
@@ -63,10 +66,15 @@
                 int uvIndex = uvIndexBuffer[instanceID];
                 float4 uv = uvBuffer[uvIndex];
                 
-                //rotate the vertex
-                v.vertex = mul(v.vertex - float4(0.5, 0.5, 0,0), rotationZMatrix(translationAndRot.w));
+                // rotate the vertex
+                v.vertex = mul(v.vertex - float4(0.5, 0.5, 0, 0), rotationZMatrix(translationAndRot.w));
+
+                // size
+                float2 size = sizeBuffer[instanceID];
+                v.vertex.x = v.vertex.x * size.x;
+                v.vertex.y = v.vertex.y * size.y;
                 
-                //scale it
+                // scale it
                 float scale = scaleBuffer[instanceID];
                 float3 worldPosition = translationAndRot.xyz + (v.vertex.xyz * scale);
                 

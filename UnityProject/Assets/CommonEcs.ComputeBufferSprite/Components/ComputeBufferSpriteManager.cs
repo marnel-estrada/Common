@@ -91,6 +91,9 @@ namespace CommonEcs {
             
             private ComputeBuffer scaleBuffer;
             public NativeArray<float> scales;
+
+            private ComputeBuffer sizeBuffer;
+            public NativeArray<float2> sizes;
         
             private ComputeBuffer colorBuffer;
             public NativeArray<Color> colors;
@@ -111,6 +114,7 @@ namespace CommonEcs {
             private readonly int uvBufferId;
             private readonly int translationAndRotationsBufferId;
             private readonly int scalesBufferId;
+            private readonly int sizeBufferId;
             private readonly int colorsBufferId;
 
             public Internal(Material material, NativeArray<float4> uvValues, int initialCapacity) {
@@ -119,7 +123,8 @@ namespace CommonEcs {
                 this.quad = MeshUtils.Quad(1.0f);
 
                 const int floatSize = sizeof(float);
-                const int float4Size = sizeof(float) * 4;
+                const int float2Size = floatSize * 2; 
+                const int float4Size = floatSize * 4;
                 
                 this.uvBuffer = new ComputeBuffer(uvValues.Length, float4Size);
                 this.uvValues = new NativeArray<float4>(uvValues.Length, Allocator.Persistent);
@@ -134,6 +139,10 @@ namespace CommonEcs {
                 this.scales = new NativeArray<float>(this.capacity, Allocator.Persistent);
                 this.scaleBuffer.SetData(this.scales);
 
+                this.sizeBuffer = new ComputeBuffer(this.capacity, float2Size);
+                this.sizes = new NativeArray<float2>(this.capacity, Allocator.Persistent);
+                this.sizeBuffer.SetData(this.sizes);
+
                 this.colorBuffer = new ComputeBuffer(this.capacity, float4Size);
                 this.colors = new NativeArray<Color>(this.capacity, Allocator.Persistent);
                 this.colorBuffer.SetData(this.colors);
@@ -142,6 +151,7 @@ namespace CommonEcs {
                 this.uvBufferId = Shader.PropertyToID("uvBuffer");
                 this.translationAndRotationsBufferId = Shader.PropertyToID("translationAndRotationBuffer");
                 this.scalesBufferId = Shader.PropertyToID("scaleBuffer");
+                this.sizeBufferId = Shader.PropertyToID("sizeBuffer");
                 this.colorsBufferId = Shader.PropertyToID("colorsBuffer");
 
                 SetMaterialBuffers();
@@ -160,6 +170,7 @@ namespace CommonEcs {
                 this.material.SetBuffer(this.uvBufferId, this.uvBuffer);
                 this.material.SetBuffer(this.translationAndRotationsBufferId, this.translationAndRotationBuffer);
                 this.material.SetBuffer(this.scalesBufferId, this.scaleBuffer);
+                this.material.SetBuffer(this.sizeBufferId, this.sizeBuffer);
                 this.material.SetBuffer(this.colorsBufferId, this.colorBuffer);
 
                 for (int i = 0; i < this.uvIndicesBuffers.Count; i++) {
@@ -171,12 +182,14 @@ namespace CommonEcs {
                 this.uvBuffer.Release();
                 this.translationAndRotationBuffer.Release();
                 this.scaleBuffer.Release();
+                this.sizeBuffer.Release();
                 this.colorBuffer.Release();
                 this.argsBuffer.Release();
                 
                 this.uvValues.Dispose();
                 this.translationAndRotations.Dispose();
                 this.scales.Dispose();
+                this.sizes.Dispose();
                 this.colors.Dispose();
                 this.inactiveList.Dispose();
                 
@@ -225,6 +238,7 @@ namespace CommonEcs {
                 int managerIndex = sprite.managerIndex.ValueOrError();
                 this.translationAndRotations[managerIndex] = new float4(position, rotation);
                 this.scales[managerIndex] = scale;
+                this.sizes[managerIndex] = sprite.size;
                 this.colors[managerIndex] = sprite.color;
 
                 ++this.spriteCount;
@@ -252,6 +266,7 @@ namespace CommonEcs {
                 
                 this.translationAndRotations[managerIndex] = new float4(10000, 10000, 10000, 10000);
                 this.scales[managerIndex] = 0;
+                this.sizes[managerIndex] = 0;
                 this.colors[managerIndex] = new Color(0, 0, 0, 0);
                 
                 this.inactiveList.Add(managerIndex);
@@ -270,7 +285,8 @@ namespace CommonEcs {
                 this.capacity <<= 1; // Multiply by 2
                 
                 const int floatSize = sizeof(float);
-                const int float4Size = sizeof(float) * 4;
+                const int float2Size = floatSize * 2;
+                const int float4Size = floatSize * 4;
                 
                 // Copy existing arrays to the new one
                 NativeArray<float4> newTranslationAndRotations =
@@ -289,6 +305,14 @@ namespace CommonEcs {
                 this.scaleBuffer.Release();
                 this.scaleBuffer = new ComputeBuffer(this.capacity, floatSize);
                 this.scaleBuffer.SetData(this.scales);
+
+                NativeArray<float2> newSizes = this.sizes.CopyAndExpand(this.capacity);
+                this.sizes.Dispose();
+                this.sizes = newSizes;
+                
+                this.sizeBuffer.Release();
+                this.sizeBuffer = new ComputeBuffer(this.capacity, float2Size);
+                this.sizeBuffer.SetData(this.sizes);
 
                 NativeArray<Color> newColors = this.colors.CopyAndExpand(this.capacity);
                 this.colors.Dispose();
@@ -319,6 +343,7 @@ namespace CommonEcs {
             public void Draw(Bounds bounds) {
                 this.translationAndRotationBuffer.SetData(this.translationAndRotations);
                 this.scaleBuffer.SetData(this.scales);
+                this.sizeBuffer.SetData(this.sizes);
                 this.colorBuffer.SetData(this.colors);
 
                 // Update the data of indices as well

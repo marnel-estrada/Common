@@ -1,9 +1,11 @@
 ﻿using Unity.Assertions;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace CommonEcs {
     public class ComputeBufferSpriteAuthoring : MonoBehaviour {
+        public float2 size;
         public Color color = Color.white;
         public int layerOrder;
 
@@ -13,7 +15,7 @@ namespace CommonEcs {
             public override void Bake(ComputeBufferSpriteAuthoring authoring) {
                 Entity entity = GetEntity(TransformUsageFlags.Dynamic);
                 
-                AddComponent(entity, new ComputeBufferSprite(authoring.color) {
+                AddComponent(entity, new ComputeBufferSprite(authoring.size, authoring.color) {
                     layerOrder = authoring.layerOrder
                 });
 

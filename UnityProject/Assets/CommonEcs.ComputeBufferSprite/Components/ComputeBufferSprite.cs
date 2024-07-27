@@ -1,16 +1,19 @@
 ﻿using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace CommonEcs {
     public struct ComputeBufferSprite : IComponentData {
         public Color color;
+        public float2 size;
 
         public ValueTypeOption<int> managerIndex;
 
         // Higher order means rendered later. Value can be negative.
         public int layerOrder;
 
-        public ComputeBufferSprite(Color color) : this() {
+        public ComputeBufferSprite(float2 size, Color color) : this() {
+            this.size = size;
             this.color = color;
         }
 

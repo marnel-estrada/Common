@@ -6,14 +6,19 @@ namespace CommonEcs {
     public struct ComputeBufferSprite : IComponentData {
         public Color color;
         public float2 size;
+        public float2 pivot;
 
         public ValueTypeOption<int> managerIndex;
 
         // Higher order means rendered later. Value can be negative.
         public int layerOrder;
 
-        public ComputeBufferSprite(float2 size, Color color) : this() {
+        public ComputeBufferSprite(float2 size, Color color) : this(size, new float2(0.5f, 0.5f), color) {
+        }
+
+        public ComputeBufferSprite(float2 size, float2 pivot, Color color) : this() {
             this.size = size;
+            this.pivot = pivot;
             this.color = color;
         }
 

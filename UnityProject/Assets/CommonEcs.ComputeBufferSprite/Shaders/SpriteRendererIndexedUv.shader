@@ -66,8 +66,13 @@
                 int uvIndex = uvIndexBuffer[instanceID];
                 float4 uv = uvBuffer[uvIndex];
                 
-                // rotate the vertex
-                v.vertex = mul(v.vertex - float4(0.5, 0.5, 0, 0), rotationZMatrix(translationAndRot.w));
+                // rotate the vertex (rotate at center)
+                v.vertex = mul(v.vertex - float4(0.5f, 0.5f, 0, 0), rotationZMatrix(translationAndRot.w));
+
+                // pivot
+                v.vertex.xy = v.vertex.xy + float2(0.5f, 0.5f); // Returns the pivot at (0, 0)
+                float2 pivot = pivotBuffer[instanceID];
+                v.vertex.xy = v.vertex.xy + pivot;
 
                 // size
                 float2 size = sizeBuffer[instanceID];

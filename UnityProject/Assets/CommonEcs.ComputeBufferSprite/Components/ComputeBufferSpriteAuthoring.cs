@@ -9,7 +9,7 @@ namespace CommonEcs {
         public Color color = Color.white;
         public int layerOrder;
 
-        public int[] uvIndices;
+        public int[]? uvIndices;
         
         private class Baker : Baker<ComputeBufferSpriteAuthoring> {
             public override void Bake(ComputeBufferSpriteAuthoring authoring) {

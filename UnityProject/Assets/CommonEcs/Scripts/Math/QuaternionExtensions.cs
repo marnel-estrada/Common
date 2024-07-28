@@ -1,4 +1,4 @@
-using CommonEcs.Scripts.Math;
+using CommonEcs.Math;
 using Unity.Mathematics;
 
 namespace CommonEcs {

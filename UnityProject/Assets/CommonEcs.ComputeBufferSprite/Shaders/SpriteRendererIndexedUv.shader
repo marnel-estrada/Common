@@ -72,7 +72,7 @@
                 // pivot
                 v.vertex.xy = v.vertex.xy + float2(0.5f, 0.5f); // Returns the pivot at (0, 0)
                 float2 pivot = pivotBuffer[instanceID];
-                v.vertex.xy = v.vertex.xy + pivot;
+                v.vertex.xy = v.vertex.xy - pivot;
 
                 // size
                 float2 size = sizeBuffer[instanceID];

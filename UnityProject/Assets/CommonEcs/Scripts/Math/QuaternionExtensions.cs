@@ -31,7 +31,7 @@ namespace CommonEcs {
             return result;
         }
 
-        public static float3 ToEuler(this quaternion quat) {
+        public static float3 ToEulerDegrees(this quaternion quat) {
             ref float4 quatValue = ref quat.value;
             
             float sqw = quatValue.w * quatValue.w;
@@ -57,12 +57,46 @@ namespace CommonEcs {
                 return NormalizeAngles(math.degrees(v));
             }
             
-            quaternion q = new quaternion(quatValue.w, quatValue.z, quatValue.x, quatValue.y);
+            quaternion q = new(quatValue.w, quatValue.z, quatValue.x, quatValue.y);
             ref float4 qValue = ref q.value;
-            v.y = (float)math.atan2(2f * qValue.x * qValue.w + 2f * qValue.y * qValue.z, 1 - 2f * (qValue.z * qValue.z + qValue.w * qValue.w));     // Yaw
-            v.x = (float)math.asin(2f * (qValue.x * qValue.z - qValue.w * qValue.y));                             // Pitch
-            v.z = (float)math.atan2(2f * qValue.x * qValue.y + 2f * qValue.z * qValue.w, 1 - 2f * (qValue.y * qValue.y + qValue.z * qValue.z));      // Roll
+            v.y = math.atan2(2f * qValue.x * qValue.w + 2f * qValue.y * qValue.z, 1 - 2f * (qValue.z * qValue.z + qValue.w * qValue.w));     // Yaw
+            v.x = math.asin(2f * (qValue.x * qValue.z - qValue.w * qValue.y));                             // Pitch
+            v.z = math.atan2(2f * qValue.x * qValue.y + 2f * qValue.z * qValue.w, 1 - 2f * (qValue.y * qValue.y + qValue.z * qValue.z));      // Roll
             return NormalizeAngles(math.degrees(v));
+        }
+        
+        public static float3 ToEulerRadians(this quaternion quat) {
+            ref float4 quatValue = ref quat.value;
+            
+            float sqw = quatValue.w * quatValue.w;
+            float sqx = quatValue.x * quatValue.x;
+            float sqy = quatValue.y * quatValue.y;
+            float sqz = quatValue.z * quatValue.z;
+            float unit = sqx + sqy + sqz + sqw; // if normalised is one, otherwise is correction factor
+            float test = quatValue.x * quatValue.w - quatValue.y * quatValue.z;
+            
+            float3 v;
+
+            if (test > 0.4995f*unit) { // singularity at north pole
+                v.y = 2f * math.atan2(quatValue.y, quatValue.x);
+                v.x = math.PI / 2;
+                v.z = 0;
+                return v;
+            }
+            
+            if (test<-0.4995f*unit) { // singularity at south pole
+                v.y = -2f * math.atan2(quatValue.y, quatValue.x);
+                v.x = -math.PI / 2;
+                v.z = 0;
+                return v;
+            }
+            
+            quaternion q = new(quatValue.w, quatValue.z, quatValue.x, quatValue.y);
+            ref float4 qValue = ref q.value;
+            v.y = math.atan2(2f * qValue.x * qValue.w + 2f * qValue.y * qValue.z, 1 - 2f * (qValue.z * qValue.z + qValue.w * qValue.w));     // Yaw
+            v.x = math.asin(2f * (qValue.x * qValue.z - qValue.w * qValue.y));                             // Pitch
+            v.z = math.atan2(2f * qValue.x * qValue.y + 2f * qValue.z * qValue.w, 1 - 2f * (qValue.y * qValue.y + qValue.z * qValue.z));      // Roll
+            return v;
         }
         
         private static float3 NormalizeAngles(float3 angles) {

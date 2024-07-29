@@ -124,7 +124,7 @@ namespace CommonEcs {
                         continue;
                     }
                     
-                    float rotation = worldTransform.Rotation.ToEuler().z;
+                    float rotation = worldTransform.Rotation.ToEulerDegrees().z;
                     if (!rotation.TolerantEquals(positionAndRot.w)) {
                         // Changed rotation
                         chunk.SetComponentEnabled(ref this.changedType, i, true);

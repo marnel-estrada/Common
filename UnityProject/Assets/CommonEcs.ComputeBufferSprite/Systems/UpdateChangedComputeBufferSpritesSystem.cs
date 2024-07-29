@@ -91,7 +91,7 @@ namespace CommonEcs {
                     // Position and rotation
                     float3 position = worldTransform.Position;
                     position.z = position.y + SPRITE_COUNT_PER_LAYER * sprite.layerOrder;
-                    float rotation = worldTransform.Rotation.ToEuler().z;
+                    float rotation = worldTransform.Rotation.ToEulerRadians().z;
                     this.translationAndRotations[spriteManagerIndex] = new float4(position, rotation);
                     
                     // Scale

@@ -64,15 +64,16 @@
             v2f vert(appdata_full v, uint instanceID : SV_InstanceID) {
                 // pivot
                 float2 pivot = pivotBuffer[instanceID];
+                v.vertex = v.vertex - float4(pivot, 0, 0);
                 
-                // rotate the vertex (rotate at center)
-                float4 translationAndRot = translationAndRotationBuffer[instanceID];
-                v.vertex = mul(v.vertex - pivot, rotationZMatrix(translationAndRot.w));
-
                 // size
                 float2 size = sizeBuffer[instanceID];
                 v.vertex.x = v.vertex.x * size.x;
                 v.vertex.y = v.vertex.y * size.y;
+                
+                // rotate the vertex (rotate at center)
+                float4 translationAndRot = translationAndRotationBuffer[instanceID];
+                v.vertex = mul(v.vertex, rotationZMatrix(translationAndRot.w));
                 
                 // scale it
                 float scale = scaleBuffer[instanceID];

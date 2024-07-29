@@ -62,17 +62,12 @@
             }
 
             v2f vert(appdata_full v, uint instanceID : SV_InstanceID) {
-                float4 translationAndRot = translationAndRotationBuffer[instanceID];
-                int uvIndex = uvIndexBuffer[instanceID];
-                float4 uv = uvBuffer[uvIndex];
+                // pivot
+                float2 pivot = pivotBuffer[instanceID];
                 
                 // rotate the vertex (rotate at center)
-                v.vertex = mul(v.vertex - float4(0.5f, 0.5f, 0, 0), rotationZMatrix(translationAndRot.w));
-
-                // pivot
-                v.vertex.xy = v.vertex.xy + float2(0.5f, 0.5f); // Returns the pivot at (0, 0)
-                float2 pivot = pivotBuffer[instanceID];
-                v.vertex.xy = v.vertex.xy - pivot;
+                float4 translationAndRot = translationAndRotationBuffer[instanceID];
+                v.vertex = mul(v.vertex - pivot, rotationZMatrix(translationAndRot.w));
 
                 // size
                 float2 size = sizeBuffer[instanceID];
@@ -88,6 +83,8 @@
                 
                 // XY here is the dimension (width, height). 
                 // ZW is the offset in the texture (the actual UV coordinates)
+                int uvIndex = uvIndexBuffer[instanceID];
+                float4 uv = uvBuffer[uvIndex];
                 o.uv =  v.texcoord * uv.xy + uv.zw;
                 
 				o.color = colorsBuffer[instanceID];

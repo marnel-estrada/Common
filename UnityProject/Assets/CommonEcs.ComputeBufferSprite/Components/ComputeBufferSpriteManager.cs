@@ -304,43 +304,14 @@ namespace CommonEcs {
                 
                 // Copy existing arrays to the new one
                 Expand(ref this.translationAndRotations, ref this.translationAndRotationBuffer, float4Size);
-                // NativeArray<float4> newTranslationAndRotations =
-                //     this.translationAndRotations.CopyAndExpand(this.capacity);
-                // this.translationAndRotations.Dispose();
-                // this.translationAndRotations = newTranslationAndRotations;
-                //
-                // this.translationAndRotationBuffer.Release();
-                // this.translationAndRotationBuffer = new ComputeBuffer(this.capacity, float4Size);
-                // this.translationAndRotationBuffer.SetData(this.translationAndRotations);
 
                 Expand(ref this.scales, ref this.scaleBuffer, floatSize);
-                // NativeArray<float> newScales = this.scales.CopyAndExpand(this.capacity);
-                // this.scales.Dispose();
-                // this.scales = newScales;
-                //
-                // this.scaleBuffer.Release();
-                // this.scaleBuffer = new ComputeBuffer(this.capacity, floatSize);
-                // this.scaleBuffer.SetData(this.scales);
 
                 Expand(ref this.sizes, ref this.sizeBuffer, float2Size);
-                // NativeArray<float2> newSizes = this.sizes.CopyAndExpand(this.capacity);
-                // this.sizes.Dispose();
-                // this.sizes = newSizes;
-                //
-                // this.sizeBuffer.Release();
-                // this.sizeBuffer = new ComputeBuffer(this.capacity, float2Size);
-                // this.sizeBuffer.SetData(this.sizes);
                 
                 Expand(ref this.pivots, ref this.pivotBuffer, float2Size);
 
                 Expand(ref this.colors, ref this.colorBuffer, float4Size);
-                // NativeArray<Color> newColors = this.colors.CopyAndExpand(this.capacity);
-                // this.colors.Dispose();
-                // this.colors = newColors;
-                //
-                // this.colorBuffer.Release();
-                // this.colorBuffer = new ComputeBuffer(this.capacity, float4Size);
-                // this.colorBuffer.SetData(this.colors);
                 
                 // Expand UV indices as well
                 for (int i = 0; i < this.uvIndicesBuffers.Count; i++) {

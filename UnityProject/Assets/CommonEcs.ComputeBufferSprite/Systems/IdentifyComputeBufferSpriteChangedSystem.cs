@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Common;
-using CommonEcs.Scripts.Math;
+using CommonEcs.Math;
 using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
@@ -54,6 +54,8 @@ namespace CommonEcs {
                 changedType = GetComponentTypeHandle<ComputeBufferSprite.Changed>(),
                 translationAndRotations = spriteManager.TranslationAndRotations,
                 scales = spriteManager.Scales,
+                sizes = spriteManager.Sizes,
+                pivots = spriteManager.Pivots,
                 colors = spriteManager.Colors,
                 lastSystemVersion = this.LastSystemVersion
             };
@@ -81,6 +83,12 @@ namespace CommonEcs {
             
             [ReadOnly]
             public NativeArray<float> scales;
+
+            [ReadOnly]
+            public NativeArray<float2> sizes;
+
+            [ReadOnly]
+            public NativeArray<float2> pivots;
             
             [ReadOnly]
             public NativeArray<Color> colors;
@@ -128,6 +136,24 @@ namespace CommonEcs {
                     float scale = localTransform.Scale;
                     if (!scale.TolerantEquals(scaleInManager)) {
                         // Changed scale
+                        chunk.SetComponentEnabled(ref this.changedType, i, true);
+                        continue;
+                    }
+                    
+                    // Check size
+                    float2 sizeInManager = this.sizes[managerIndex];
+                    float2 size = sprite.size;
+                    if (!size.TolerantEquals(sizeInManager)) {
+                        // Changed size
+                        chunk.SetComponentEnabled(ref this.changedType, i, true);
+                        continue;
+                    }
+                    
+                    // Check pivot
+                    float2 pivotInManager = this.pivots[managerIndex];
+                    float2 pivot = sprite.pivot;
+                    if (!pivot.TolerantEquals(pivotInManager)) {
+                        // Changed pivot
                         chunk.SetComponentEnabled(ref this.changedType, i, true);
                         continue;
                     }

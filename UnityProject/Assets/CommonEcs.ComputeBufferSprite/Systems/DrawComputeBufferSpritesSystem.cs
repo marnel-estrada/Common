@@ -13,7 +13,7 @@ namespace CommonEcs {
                 .Build(this);
         }
         
-        private static readonly Bounds BOUNDS = new(Vector2.zero, Vector3.one * 10);
+        private static readonly Bounds BOUNDS = new(Vector2.zero, Vector3.one * 100);
 
         protected override void OnUpdate() {
             NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);

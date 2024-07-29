@@ -69,6 +69,8 @@ namespace CommonEcs {
 
         public NativeArray<float4> TranslationAndRotations => this.internalInstance.translationAndRotations;
         public NativeArray<float> Scales => this.internalInstance.scales;
+        public NativeArray<float2> Sizes => this.internalInstance.sizes;
+        public NativeArray<float2> Pivots => this.internalInstance.pivots;
         public NativeArray<Color> Colors => this.internalInstance.colors;
 
         public void Remove(int managerIndex) {

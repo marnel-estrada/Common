@@ -52,7 +52,8 @@ namespace CommonEcs {
                 localTransformType = GetComponentTypeHandle<LocalTransform>(),
                 worldTransformType = GetComponentTypeHandle<LocalToWorld>(),
                 changedType = GetComponentTypeHandle<ComputeBufferSprite.Changed>(),
-                translationAndRotations = spriteManager.TranslationAndRotations,
+                translations = spriteManager.Translations,
+                rotations = spriteManager.Rotations,
                 scales = spriteManager.Scales,
                 sizes = spriteManager.Sizes,
                 pivots = spriteManager.Pivots,
@@ -79,7 +80,10 @@ namespace CommonEcs {
             public ComponentTypeHandle<ComputeBufferSprite.Changed> changedType;
             
             [ReadOnly]
-            public NativeArray<float4> translationAndRotations;
+            public NativeArray<float4> translations;
+            
+            [ReadOnly]
+            public NativeArray<float4> rotations;
             
             [ReadOnly]
             public NativeArray<float> scales;
@@ -116,16 +120,17 @@ namespace CommonEcs {
                     int managerIndex = sprite.managerIndex.ValueOrError();
                     
                     // Check position and rotation
-                    float4 positionAndRot = this.translationAndRotations[managerIndex];
+                    float4 positionInManager = this.translations[managerIndex];
                     float3 position = worldTransform.Position;
-                    if (!position.TolerantEquals(positionAndRot.xyz)) {
+                    if (!position.TolerantEquals(positionInManager.xyz)) {
                         // Changed position
                         chunk.SetComponentEnabled(ref this.changedType, i, true);
                         continue;
                     }
-                    
-                    float rotation = worldTransform.Rotation.ToEulerDegrees().z;
-                    if (!rotation.TolerantEquals(positionAndRot.w)) {
+
+                    float4 rotationInManager = this.rotations[managerIndex];
+                    quaternion rotation = worldTransform.Rotation;
+                    if (!rotation.value.TolerantEquals(rotationInManager)) {
                         // Changed rotation
                         chunk.SetComponentEnabled(ref this.changedType, i, true);
                         continue;

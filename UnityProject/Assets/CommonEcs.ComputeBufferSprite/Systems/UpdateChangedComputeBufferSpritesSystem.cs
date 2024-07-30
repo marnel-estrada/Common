@@ -44,7 +44,8 @@ namespace CommonEcs {
                 spriteType = GetComponentTypeHandle<ComputeBufferSprite>(),
                 localTransformType = GetComponentTypeHandle<LocalTransform>(),
                 worldTransformType = GetComponentTypeHandle<LocalToWorld>(),
-                translationAndRotations = spriteManager.TranslationAndRotations,
+                translations = spriteManager.Translations,
+                rotations = spriteManager.Rotations,
                 scales = spriteManager.Scales,
                 colors = spriteManager.Colors
             };
@@ -66,7 +67,10 @@ namespace CommonEcs {
             public ComponentTypeHandle<LocalToWorld> worldTransformType;
             
             [NativeDisableParallelForRestriction]
-            public NativeArray<float4> translationAndRotations;
+            public NativeArray<float4> translations;
+
+            [NativeDisableParallelForRestriction]
+            public NativeArray<float4> rotations;
             
             [NativeDisableParallelForRestriction]
             public NativeArray<float> scales;
@@ -88,11 +92,13 @@ namespace CommonEcs {
                     
                     int spriteManagerIndex = sprite.managerIndex.ValueOrError();
                     
-                    // Position and rotation
+                    // Position
                     float3 position = worldTransform.Position;
                     position.z = position.y + SPRITE_COUNT_PER_LAYER * sprite.layerOrder;
-                    float rotation = worldTransform.Rotation.ToEulerRadians().z;
-                    this.translationAndRotations[spriteManagerIndex] = new float4(position, rotation);
+                    this.translations[spriteManagerIndex] = new float4(position, 0);
+                    
+                    // Rotation
+                    this.rotations[spriteManagerIndex] = worldTransform.Rotation.value;
                     
                     // Scale
                     LocalTransform localTransform = localTransforms[i];

@@ -78,8 +78,7 @@ namespace CommonEcs {
                 LocalTransform localTransform = localTransforms[i];
                 LocalToWorld worldTransform = worldTransforms[i];
 
-                float rotation = math.Euler(worldTransform.Rotation).z;
-                spriteManager.Add(ref sprite, worldTransform.Position, rotation, localTransform.Scale);
+                spriteManager.Add(ref sprite, worldTransform.Position, worldTransform.Rotation, localTransform.Scale);
                 sprites[i] = sprite; // We modify since the managerIndex would be assigned on add
                 
                 // Set the uvIndex

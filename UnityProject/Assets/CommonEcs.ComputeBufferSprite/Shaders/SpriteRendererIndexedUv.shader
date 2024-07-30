@@ -31,6 +31,7 @@
 
             // xyz is the position, w is the rotation
             StructuredBuffer<float4> translationAndRotationBuffer;
+            StructuredBuffer<float4> rotationBuffer;
             StructuredBuffer<float> scaleBuffer;
 
             StructuredBuffer<float2> sizeBuffer; // Size of each sprite
@@ -61,6 +62,33 @@
                 return ZMatrix;
             }
 
+            float4x4 quaternionToMatrix(float4 quat)
+            {
+                float4x4 m = float4x4(float4(0, 0, 0, 0), float4(0, 0, 0, 0), float4(0, 0, 0, 0), float4(0, 0, 0, 0));
+
+                float x = quat.x, y = quat.y, z = quat.z, w = quat.w;
+                float x2 = x + x, y2 = y + y, z2 = z + z;
+                float xx = x * x2, xy = x * y2, xz = x * z2;
+                float yy = y * y2, yz = y * z2, zz = z * z2;
+                float wx = w * x2, wy = w * y2, wz = w * z2;
+
+                m[0][0] = 1.0 - (yy + zz);
+                m[0][1] = xy - wz;
+                m[0][2] = xz + wy;
+
+                m[1][0] = xy + wz;
+                m[1][1] = 1.0 - (xx + zz);
+                m[1][2] = yz - wx;
+
+                m[2][0] = xz - wy;
+                m[2][1] = yz + wx;
+                m[2][2] = 1.0 - (xx + yy);
+
+                m[3][3] = 1.0;
+
+                return m;
+            }
+
             v2f vert(appdata_full v, uint instanceID : SV_InstanceID) {
                 // pivot
                 float2 pivot = pivotBuffer[instanceID];
@@ -72,11 +100,12 @@
                 v.vertex.y = v.vertex.y * size.y;
                 
                 // rotate the vertex (rotate at center)
-                float4 translationAndRot = translationAndRotationBuffer[instanceID];
-                v.vertex = mul(v.vertex, rotationZMatrix(translationAndRot.w));
+                float4 quaternion = rotationBuffer[instanceID];
+                v.vertex = mul(v.vertex, quaternionToMatrix(quaternion));
                 
                 // scale it
                 float scale = scaleBuffer[instanceID];
+                float4 translationAndRot = translationAndRotationBuffer[instanceID];
                 float3 worldPosition = translationAndRot.xyz + (v.vertex.xyz * scale);
                 
                 v2f o;

@@ -28,10 +28,10 @@ namespace CommonEcs {
         }
 
         public void Add(ref ComputeBufferSprite sprite, float3 position) {
-            Add(ref sprite, position, 0, 1.0f);
+            Add(ref sprite, position, quaternion.identity, 1.0f);
         }
         
-        public void Add(ref ComputeBufferSprite sprite, float3 position, float rotation) {
+        public void Add(ref ComputeBufferSprite sprite, float3 position, quaternion rotation) {
             Add(ref sprite, position, rotation, 1.0f);
         }
 
@@ -43,7 +43,7 @@ namespace CommonEcs {
         /// <param name="position"></param>
         /// <param name="rotation"></param>
         /// <param name="scale"></param>
-        public void Add(ref ComputeBufferSprite sprite, float3 position, float rotation, float scale) {
+        public void Add(ref ComputeBufferSprite sprite, float3 position, quaternion rotation, float scale) {
             this.internalInstance.Add(ref sprite, position, rotation, scale);
         }
 
@@ -67,7 +67,8 @@ namespace CommonEcs {
             this.internalInstance.Draw(bounds);
         }
 
-        public NativeArray<float4> TranslationAndRotations => this.internalInstance.translationAndRotations;
+        public NativeArray<float4> Translations => this.internalInstance.translations;
+        public NativeArray<float4> Rotations => this.internalInstance.rotations;
         public NativeArray<float> Scales => this.internalInstance.scales;
         public NativeArray<float2> Sizes => this.internalInstance.sizes;
         public NativeArray<float2> Pivots => this.internalInstance.pivots;
@@ -88,8 +89,11 @@ namespace CommonEcs {
             
             // Matrix here is a compressed transform information
             // xy is the position, z is rotation, w is the scale
-            private ComputeBuffer translationAndRotationBuffer;
-            public NativeArray<float4> translationAndRotations; 
+            private ComputeBuffer translationBuffer;
+            public NativeArray<float4> translations;
+
+            public ComputeBuffer rotationBuffer;
+            public NativeArray<float4> rotations;
             
             private ComputeBuffer scaleBuffer;
             public NativeArray<float> scales;
@@ -117,7 +121,8 @@ namespace CommonEcs {
 
             // Buffer IDs
             private readonly int uvBufferId;
-            private readonly int translationAndRotationsBufferId;
+            private readonly int translationBufferId;
+            private readonly int rotationBufferId;
             private readonly int scalesBufferId;
             private readonly int sizeBufferId;
             private readonly int pivotBufferId;
@@ -137,9 +142,13 @@ namespace CommonEcs {
                 this.uvValues.CopyFrom(uvValues);
                 this.uvBuffer.SetData(this.uvValues);
                 
-                this.translationAndRotationBuffer = new ComputeBuffer(this.capacity, float4Size);
-                this.translationAndRotations = new NativeArray<float4>(this.capacity, Allocator.Persistent);
-                this.translationAndRotationBuffer.SetData(this.translationAndRotations);
+                this.translationBuffer = new ComputeBuffer(this.capacity, float4Size);
+                this.translations = new NativeArray<float4>(this.capacity, Allocator.Persistent);
+                this.translationBuffer.SetData(this.translations);
+
+                this.rotationBuffer = new ComputeBuffer(this.capacity, float4Size);
+                this.rotations = new NativeArray<float4>(this.capacity, Allocator.Persistent);
+                this.rotationBuffer.SetData(this.rotations);
 
                 this.scaleBuffer = new ComputeBuffer(this.capacity, floatSize);
                 this.scales = new NativeArray<float>(this.capacity, Allocator.Persistent);
@@ -159,7 +168,8 @@ namespace CommonEcs {
                 
                 // Prepare the shader IDs
                 this.uvBufferId = Shader.PropertyToID("uvBuffer");
-                this.translationAndRotationsBufferId = Shader.PropertyToID("translationAndRotationBuffer");
+                this.translationBufferId = Shader.PropertyToID("translationAndRotationBuffer");
+                this.rotationBufferId = Shader.PropertyToID("rotationBuffer");
                 this.scalesBufferId = Shader.PropertyToID("scaleBuffer");
                 this.sizeBufferId = Shader.PropertyToID("sizeBuffer");
                 this.pivotBufferId = Shader.PropertyToID("pivotBuffer");
@@ -179,7 +189,8 @@ namespace CommonEcs {
 
             private void SetMaterialBuffers() {
                 this.material.SetBuffer(this.uvBufferId, this.uvBuffer);
-                this.material.SetBuffer(this.translationAndRotationsBufferId, this.translationAndRotationBuffer);
+                this.material.SetBuffer(this.translationBufferId, this.translationBuffer);
+                this.material.SetBuffer(this.rotationBufferId, this.rotationBuffer);
                 this.material.SetBuffer(this.scalesBufferId, this.scaleBuffer);
                 this.material.SetBuffer(this.sizeBufferId, this.sizeBuffer);
                 this.material.SetBuffer(this.pivotBufferId, this.pivotBuffer);
@@ -192,7 +203,8 @@ namespace CommonEcs {
 
             public void Dispose() {
                 this.uvBuffer.Release();
-                this.translationAndRotationBuffer.Release();
+                this.translationBuffer.Release();
+                this.rotationBuffer.Release();
                 this.scaleBuffer.Release();
                 this.sizeBuffer.Release();
                 this.pivotBuffer.Release();
@@ -200,7 +212,8 @@ namespace CommonEcs {
                 this.argsBuffer.Release();
                 
                 this.uvValues.Dispose();
-                this.translationAndRotations.Dispose();
+                this.translations.Dispose();
+                this.rotations.Dispose();
                 this.scales.Dispose();
                 this.sizes.Dispose();
                 this.pivots.Dispose();
@@ -217,11 +230,10 @@ namespace CommonEcs {
             /// Adds a sprite.
             /// </summary>
             /// <param name="sprite"></param>
-            /// <param name="uvIndex"></param>
             /// <param name="position"></param>
             /// <param name="rotation"></param>
             /// <param name="scale"></param>
-            public void Add(ref ComputeBufferSprite sprite, float3 position, float rotation, float scale) {
+            public void Add(ref ComputeBufferSprite sprite, float3 position, quaternion rotation, float scale) {
                 // Check if there are inactive sprite slots and use those first
                 if (this.inactiveList.Length > 0) {
                     AddByReusingInactive(ref sprite, position, rotation, scale);
@@ -237,7 +249,7 @@ namespace CommonEcs {
                 InternalAdd(ref sprite, position, rotation, scale);
             }
 
-            private void AddByReusingInactive(ref ComputeBufferSprite sprite, float3 position, float rotation, float scale) {
+            private void AddByReusingInactive(ref ComputeBufferSprite sprite, float3 position, quaternion rotation, float scale) {
                 Assertion.IsTrue(this.inactiveList.Length > 0);
                 
                 int lastIndex = this.inactiveList.Length - 1;
@@ -248,9 +260,10 @@ namespace CommonEcs {
                 InternalAdd(ref sprite, position, rotation, scale);
             }
 
-            private void InternalAdd(ref ComputeBufferSprite sprite, float3 position, float rotation, float scale) {
+            private void InternalAdd(ref ComputeBufferSprite sprite, float3 position, quaternion rotation, float scale) {
                 int managerIndex = sprite.managerIndex.ValueOrError();
-                this.translationAndRotations[managerIndex] = new float4(position, rotation);
+                this.translations[managerIndex] = new float4(position, 0);
+                this.rotations[managerIndex] = rotation.value;
                 this.scales[managerIndex] = scale;
                 this.sizes[managerIndex] = sprite.size;
                 this.pivots[managerIndex] = sprite.pivot;
@@ -279,7 +292,8 @@ namespace CommonEcs {
                 // The inactive list should not have this index yet
                 Assert.IsFalse(this.inactiveList.Contains(managerIndex));
                 
-                this.translationAndRotations[managerIndex] = new float4(10000, 10000, 10000, 10000);
+                this.translations[managerIndex] = new float4(10000, 10000, 10000, 10000);
+                this.rotations[managerIndex] = quaternion.identity.value;
                 this.scales[managerIndex] = 0;
                 this.sizes[managerIndex] = new float2();
                 this.pivots[managerIndex] = new float2();
@@ -305,7 +319,9 @@ namespace CommonEcs {
                 const int float4Size = floatSize * 4;
                 
                 // Copy existing arrays to the new one
-                Expand(ref this.translationAndRotations, ref this.translationAndRotationBuffer, float4Size);
+                Expand(ref this.translations, ref this.translationBuffer, float4Size);
+                
+                Expand(ref this.rotations, ref this.rotationBuffer, float4Size);
 
                 Expand(ref this.scales, ref this.scaleBuffer, floatSize);
 
@@ -344,7 +360,8 @@ namespace CommonEcs {
             }
 
             public void Draw(Bounds bounds) {
-                this.translationAndRotationBuffer.SetData(this.translationAndRotations);
+                this.translationBuffer.SetData(this.translations);
+                this.rotationBuffer.SetData(this.rotations);
                 this.scaleBuffer.SetData(this.scales);
                 this.sizeBuffer.SetData(this.sizes);
                 this.pivotBuffer.SetData(this.pivots);

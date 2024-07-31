@@ -67,9 +67,8 @@ namespace CommonEcs {
             this.internalInstance.Draw(bounds);
         }
 
-        public NativeArray<float4> Translations => this.internalInstance.translations;
+        public NativeArray<float4> TranslationsAndScales => this.internalInstance.translationsAndScales;
         public NativeArray<float4> Rotations => this.internalInstance.rotations;
-        public NativeArray<float> Scales => this.internalInstance.scales;
         public NativeArray<float2> Sizes => this.internalInstance.sizes;
         public NativeArray<float2> Pivots => this.internalInstance.pivots;
         public NativeArray<Color> Colors => this.internalInstance.colors;
@@ -89,14 +88,11 @@ namespace CommonEcs {
             
             // Matrix here is a compressed transform information
             // xy is the position, z is rotation, w is the scale
-            private ComputeBuffer translationBuffer;
-            public NativeArray<float4> translations;
+            private ComputeBuffer translationAndScaleBuffer;
+            public NativeArray<float4> translationsAndScales;
 
             public ComputeBuffer rotationBuffer;
             public NativeArray<float4> rotations;
-            
-            private ComputeBuffer scaleBuffer;
-            public NativeArray<float> scales;
 
             private ComputeBuffer sizeBuffer;
             public NativeArray<float2> sizes;
@@ -121,9 +117,8 @@ namespace CommonEcs {
 
             // Buffer IDs
             private readonly int uvBufferId;
-            private readonly int translationBufferId;
+            private readonly int translationAndScaleBufferId;
             private readonly int rotationBufferId;
-            private readonly int scalesBufferId;
             private readonly int sizeBufferId;
             private readonly int pivotBufferId;
             private readonly int colorsBufferId;
@@ -142,17 +137,13 @@ namespace CommonEcs {
                 this.uvValues.CopyFrom(uvValues);
                 this.uvBuffer.SetData(this.uvValues);
                 
-                this.translationBuffer = new ComputeBuffer(this.capacity, float4Size);
-                this.translations = new NativeArray<float4>(this.capacity, Allocator.Persistent);
-                this.translationBuffer.SetData(this.translations);
+                this.translationAndScaleBuffer = new ComputeBuffer(this.capacity, float4Size);
+                this.translationsAndScales = new NativeArray<float4>(this.capacity, Allocator.Persistent);
+                this.translationAndScaleBuffer.SetData(this.translationsAndScales);
 
                 this.rotationBuffer = new ComputeBuffer(this.capacity, float4Size);
                 this.rotations = new NativeArray<float4>(this.capacity, Allocator.Persistent);
                 this.rotationBuffer.SetData(this.rotations);
-
-                this.scaleBuffer = new ComputeBuffer(this.capacity, floatSize);
-                this.scales = new NativeArray<float>(this.capacity, Allocator.Persistent);
-                this.scaleBuffer.SetData(this.scales);
 
                 this.sizeBuffer = new ComputeBuffer(this.capacity, float2Size);
                 this.sizes = new NativeArray<float2>(this.capacity, Allocator.Persistent);
@@ -168,9 +159,8 @@ namespace CommonEcs {
                 
                 // Prepare the shader IDs
                 this.uvBufferId = Shader.PropertyToID("uvBuffer");
-                this.translationBufferId = Shader.PropertyToID("translationAndRotationBuffer");
+                this.translationAndScaleBufferId = Shader.PropertyToID("translationAndScaleBuffer");
                 this.rotationBufferId = Shader.PropertyToID("rotationBuffer");
-                this.scalesBufferId = Shader.PropertyToID("scaleBuffer");
                 this.sizeBufferId = Shader.PropertyToID("sizeBuffer");
                 this.pivotBufferId = Shader.PropertyToID("pivotBuffer");
                 this.colorsBufferId = Shader.PropertyToID("colorsBuffer");
@@ -189,9 +179,8 @@ namespace CommonEcs {
 
             private void SetMaterialBuffers() {
                 this.material.SetBuffer(this.uvBufferId, this.uvBuffer);
-                this.material.SetBuffer(this.translationBufferId, this.translationBuffer);
+                this.material.SetBuffer(this.translationAndScaleBufferId, this.translationAndScaleBuffer);
                 this.material.SetBuffer(this.rotationBufferId, this.rotationBuffer);
-                this.material.SetBuffer(this.scalesBufferId, this.scaleBuffer);
                 this.material.SetBuffer(this.sizeBufferId, this.sizeBuffer);
                 this.material.SetBuffer(this.pivotBufferId, this.pivotBuffer);
                 this.material.SetBuffer(this.colorsBufferId, this.colorBuffer);
@@ -203,18 +192,16 @@ namespace CommonEcs {
 
             public void Dispose() {
                 this.uvBuffer.Release();
-                this.translationBuffer.Release();
+                this.translationAndScaleBuffer.Release();
                 this.rotationBuffer.Release();
-                this.scaleBuffer.Release();
                 this.sizeBuffer.Release();
                 this.pivotBuffer.Release();
                 this.colorBuffer.Release();
                 this.argsBuffer.Release();
                 
                 this.uvValues.Dispose();
-                this.translations.Dispose();
+                this.translationsAndScales.Dispose();
                 this.rotations.Dispose();
-                this.scales.Dispose();
                 this.sizes.Dispose();
                 this.pivots.Dispose();
                 this.colors.Dispose();
@@ -262,9 +249,8 @@ namespace CommonEcs {
 
             private void InternalAdd(ref ComputeBufferSprite sprite, float3 position, quaternion rotation, float scale) {
                 int managerIndex = sprite.managerIndex.ValueOrError();
-                this.translations[managerIndex] = new float4(position, 0);
+                this.translationsAndScales[managerIndex] = new float4(position, scale);
                 this.rotations[managerIndex] = rotation.value;
-                this.scales[managerIndex] = scale;
                 this.sizes[managerIndex] = sprite.size;
                 this.pivots[managerIndex] = sprite.pivot;
                 this.colors[managerIndex] = sprite.color;
@@ -292,9 +278,8 @@ namespace CommonEcs {
                 // The inactive list should not have this index yet
                 Assert.IsFalse(this.inactiveList.Contains(managerIndex));
                 
-                this.translations[managerIndex] = new float4(10000, 10000, 10000, 10000);
+                this.translationsAndScales[managerIndex] = new float4(10000, 10000, 10000, 0);
                 this.rotations[managerIndex] = quaternion.identity.value;
-                this.scales[managerIndex] = 0;
                 this.sizes[managerIndex] = new float2();
                 this.pivots[managerIndex] = new float2();
                 this.colors[managerIndex] = new Color(0, 0, 0, 0);
@@ -319,11 +304,9 @@ namespace CommonEcs {
                 const int float4Size = floatSize * 4;
                 
                 // Copy existing arrays to the new one
-                Expand(ref this.translations, ref this.translationBuffer, float4Size);
+                Expand(ref this.translationsAndScales, ref this.translationAndScaleBuffer, float4Size);
                 
                 Expand(ref this.rotations, ref this.rotationBuffer, float4Size);
-
-                Expand(ref this.scales, ref this.scaleBuffer, floatSize);
 
                 Expand(ref this.sizes, ref this.sizeBuffer, float2Size);
                 
@@ -360,9 +343,8 @@ namespace CommonEcs {
             }
 
             public void Draw(Bounds bounds) {
-                this.translationBuffer.SetData(this.translations);
+                this.translationAndScaleBuffer.SetData(this.translationsAndScales);
                 this.rotationBuffer.SetData(this.rotations);
-                this.scaleBuffer.SetData(this.scales);
                 this.sizeBuffer.SetData(this.sizes);
                 this.pivotBuffer.SetData(this.pivots);
                 this.colorBuffer.SetData(this.colors);

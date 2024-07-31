@@ -52,9 +52,8 @@ namespace CommonEcs {
                 localTransformType = GetComponentTypeHandle<LocalTransform>(),
                 worldTransformType = GetComponentTypeHandle<LocalToWorld>(),
                 changedType = GetComponentTypeHandle<ComputeBufferSprite.Changed>(),
-                translations = spriteManager.Translations,
+                translationsAndScales = spriteManager.TranslationsAndScales,
                 rotations = spriteManager.Rotations,
-                scales = spriteManager.Scales,
                 sizes = spriteManager.Sizes,
                 pivots = spriteManager.Pivots,
                 colors = spriteManager.Colors,
@@ -80,13 +79,10 @@ namespace CommonEcs {
             public ComponentTypeHandle<ComputeBufferSprite.Changed> changedType;
             
             [ReadOnly]
-            public NativeArray<float4> translations;
+            public NativeArray<float4> translationsAndScales;
             
             [ReadOnly]
             public NativeArray<float4> rotations;
-            
-            [ReadOnly]
-            public NativeArray<float> scales;
 
             [ReadOnly]
             public NativeArray<float2> sizes;
@@ -120,9 +116,9 @@ namespace CommonEcs {
                     int managerIndex = sprite.managerIndex.ValueOrError();
                     
                     // Check position and rotation
-                    float4 positionInManager = this.translations[managerIndex];
+                    float4 translationAndScaleInManager = this.translationsAndScales[managerIndex];
                     float3 position = worldTransform.Position;
-                    if (!position.TolerantEquals(positionInManager.xyz)) {
+                    if (!position.TolerantEquals(translationAndScaleInManager.xyz)) {
                         // Changed position
                         chunk.SetComponentEnabled(ref this.changedType, i, true);
                         continue;
@@ -137,7 +133,7 @@ namespace CommonEcs {
                     }
                     
                     // Check scale
-                    float scaleInManager = this.scales[managerIndex];
+                    float scaleInManager = translationAndScaleInManager.w;
                     float scale = localTransform.Scale;
                     if (!scale.TolerantEquals(scaleInManager)) {
                         // Changed scale

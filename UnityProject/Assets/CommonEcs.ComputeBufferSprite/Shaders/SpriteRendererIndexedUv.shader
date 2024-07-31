@@ -29,10 +29,9 @@
             sampler2D _MainTex;
             fixed _Cutoff;
 
-            // xyz is the position, w is the rotation
-            StructuredBuffer<float4> translationAndRotationBuffer;
+            // xyz is the position, w is the scale
+            StructuredBuffer<float4> translationAndScaleBuffer;
             StructuredBuffer<float4> rotationBuffer;
-            StructuredBuffer<float> scaleBuffer;
 
             StructuredBuffer<float2> sizeBuffer; // Size of each sprite
             StructuredBuffer<float2> pivotBuffer; // Pivot of each sprite
@@ -104,9 +103,9 @@
                 v.vertex = mul(v.vertex, quaternionToMatrix(quaternion));
                 
                 // scale it
-                float scale = scaleBuffer[instanceID];
-                float4 translationAndRot = translationAndRotationBuffer[instanceID];
-                float3 worldPosition = translationAndRot.xyz + (v.vertex.xyz * scale);
+                float4 translationAndScale = translationAndScaleBuffer[instanceID];
+                float scale = translationAndScale.w;
+                float3 worldPosition = translationAndScale.xyz + (v.vertex.xyz * scale);
                 
                 v2f o;
                 o.pos = UnityObjectToClipPos(float4(worldPosition, 1.0f));

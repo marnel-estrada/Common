@@ -44,9 +44,8 @@ namespace CommonEcs {
                 spriteType = GetComponentTypeHandle<ComputeBufferSprite>(),
                 localTransformType = GetComponentTypeHandle<LocalTransform>(),
                 worldTransformType = GetComponentTypeHandle<LocalToWorld>(),
-                translations = spriteManager.Translations,
+                translationsAndScales = spriteManager.TranslationsAndScales,
                 rotations = spriteManager.Rotations,
-                scales = spriteManager.Scales,
                 colors = spriteManager.Colors
             };
             this.Dependency = updateSpritesJob.ScheduleParallel(this.spritesQuery, this.Dependency);
@@ -67,13 +66,10 @@ namespace CommonEcs {
             public ComponentTypeHandle<LocalToWorld> worldTransformType;
             
             [NativeDisableParallelForRestriction]
-            public NativeArray<float4> translations;
+            public NativeArray<float4> translationsAndScales;
 
             [NativeDisableParallelForRestriction]
             public NativeArray<float4> rotations;
-            
-            [NativeDisableParallelForRestriction]
-            public NativeArray<float> scales;
             
             [NativeDisableParallelForRestriction]
             public NativeArray<Color> colors;
@@ -95,14 +91,11 @@ namespace CommonEcs {
                     // Position
                     float3 position = worldTransform.Position;
                     position.z = position.y + SPRITE_COUNT_PER_LAYER * sprite.layerOrder;
-                    this.translations[spriteManagerIndex] = new float4(position, 0);
+                    LocalTransform localTransform = localTransforms[i];
+                    this.translationsAndScales[spriteManagerIndex] = new float4(position, localTransform.Scale);
                     
                     // Rotation
                     this.rotations[spriteManagerIndex] = worldTransform.Rotation.value;
-                    
-                    // Scale
-                    LocalTransform localTransform = localTransforms[i];
-                    this.scales[spriteManagerIndex] = localTransform.Scale;
                     
                     // Color
                     this.colors[spriteManagerIndex] = sprite.color;

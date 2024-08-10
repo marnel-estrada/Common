@@ -25,39 +25,23 @@ namespace CommonEcs {
         }
         
         public Mesh Mesh {
-            get {
-                return this.internalInstance.Mesh;
-            }
+            get => this.internalInstance.Mesh;
 
-            set {
-                this.internalInstance.Mesh = value;
-            }
+            set => this.internalInstance.Mesh = value;
         }
 
-        public Entity SpriteLayerEntity {
-            get {
-                return this.internalInstance.SpriteLayerEntity;
-            }
-        }
+        public Entity SpriteLayerEntity => this.internalInstance.SpriteLayerEntity;
 
         public Material Material {
-            get {
-                return this.internalInstance.Material;
-            }
+            get => this.internalInstance.Material;
 
-            set {
-                this.internalInstance.Material = value;
-            }
+            set => this.internalInstance.Material = value;
         }
         
         public bool Enabled {
-            get {
-                return this.internalInstance.Enabled;
-            }
+            get => this.internalInstance.Enabled;
 
-            set {
-                this.internalInstance.Enabled = value;
-            }
+            set => this.internalInstance.Enabled = value;
         }
         
         private class Internal {
@@ -94,39 +78,23 @@ namespace CommonEcs {
             }
 
             public Mesh Mesh {
-                get {
-                    return this.meshFilter.mesh;
-                }
+                get => this.meshFilter.mesh;
 
-                set {
-                    this.meshFilter.mesh = value;
-                }
+                set => this.meshFilter.mesh = value;
             }
 
-            public Entity SpriteLayerEntity {
-                get {
-                    return this.spriteLayerEntity;
-                }
-            }
+            public Entity SpriteLayerEntity => this.spriteLayerEntity;
 
             public Material Material {
-                get {
-                    return this.meshRenderer.material;
-                }
+                get => this.meshRenderer.material;
 
-                set {
-                    this.meshRenderer.material = value;
-                }
+                set => this.meshRenderer.material = value;
             }
 
             public bool Enabled {
-                get {
-                    return this.gameObject.activeSelf;
-                }
+                get => this.gameObject.activeSelf;
 
-                set {
-                    this.gameObject.SetActive(value);
-                }
+                set => this.gameObject.SetActive(value);
             }
         }
 

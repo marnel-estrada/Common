@@ -15,9 +15,8 @@ namespace CommonEcs {
             public override void Bake(ComputeBufferSpriteAuthoring authoring) {
                 Entity entity = GetEntity(TransformUsageFlags.Dynamic);
                 
-                AddComponent(entity, new ComputeBufferSprite(authoring.size, authoring.color) {
-                    layerOrder = authoring.layerOrder
-                });
+                AddComponent(entity, new ComputeBufferSprite(authoring.size, authoring.color));
+                AddSharedComponent(entity, new ComputeBufferSpriteLayer(authoring.layerOrder));
 
                 DynamicBuffer<UvIndex> uvIndexBuffer = AddBuffer<UvIndex>(entity);
                 Assert.IsFalse(authoring.uvIndices == null);

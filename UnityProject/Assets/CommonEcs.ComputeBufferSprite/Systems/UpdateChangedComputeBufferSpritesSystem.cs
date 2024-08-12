@@ -24,6 +24,7 @@ namespace CommonEcs {
             this.spritesQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<ComputeBufferSprite>()
                 .WithAll<ComputeBufferSprite.Changed>()
+                .WithAll<ComputeBufferSpriteLayer>()
                 .WithAll<LocalTransform>()
                 .WithAll<LocalToWorld>()
                 .WithAll<ManagerAdded>()
@@ -42,6 +43,7 @@ namespace CommonEcs {
 
             UpdateSpritesJob updateSpritesJob = new() {
                 spriteType = GetComponentTypeHandle<ComputeBufferSprite>(),
+                layerType = GetSharedComponentTypeHandle<ComputeBufferSpriteLayer>(),
                 localTransformType = GetComponentTypeHandle<LocalTransform>(),
                 worldTransformType = GetComponentTypeHandle<LocalToWorld>(),
                 translationsAndScales = spriteManager.TranslationsAndScales,
@@ -58,6 +60,9 @@ namespace CommonEcs {
         private struct UpdateSpritesJob : IJobChunk {
             [ReadOnly]
             public ComponentTypeHandle<ComputeBufferSprite> spriteType;
+
+            [ReadOnly]
+            public SharedComponentTypeHandle<ComputeBufferSpriteLayer> layerType;
 
             [ReadOnly]
             public ComponentTypeHandle<LocalTransform> localTransformType;
@@ -80,6 +85,7 @@ namespace CommonEcs {
                 NativeArray<ComputeBufferSprite> sprites = chunk.GetNativeArray(ref this.spriteType);
                 NativeArray<LocalTransform> localTransforms = chunk.GetNativeArray(ref this.localTransformType);
                 NativeArray<LocalToWorld> worldTransforms = chunk.GetNativeArray(ref this.worldTransformType);
+                ComputeBufferSpriteLayer layer = chunk.GetSharedComponent(this.layerType);
 
                 ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
                 while (enumerator.NextEntityIndex(out int i)) {
@@ -90,7 +96,7 @@ namespace CommonEcs {
                     
                     // Position
                     float3 position = worldTransform.Position;
-                    position.z = position.y + SPRITE_COUNT_PER_LAYER * sprite.layerOrder;
+                    position.z = layer.value + (position.y / SPRITE_COUNT_PER_LAYER);
                     LocalTransform localTransform = localTransforms[i];
                     this.translationsAndScales[spriteManagerIndex] = new float4(position, localTransform.Scale);
                     

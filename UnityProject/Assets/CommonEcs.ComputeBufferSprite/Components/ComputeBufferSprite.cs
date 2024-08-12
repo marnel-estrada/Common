@@ -10,9 +10,6 @@ namespace CommonEcs {
 
         public ValueTypeOption<int> managerIndex;
 
-        // Higher order means rendered later. Value can be negative.
-        public int layerOrder;
-
         public ComputeBufferSprite(float2 size, Color color) : this(size, new float2(0.5f, 0.5f), color) {
         }
 

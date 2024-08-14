@@ -95,8 +95,9 @@ namespace CommonEcs {
                     int spriteManagerIndex = sprite.managerIndex.ValueOrError();
                     
                     // Position
+                    // We negate the layer value since sprites at a higher layer should be at the front more
                     float3 position = worldTransform.Position;
-                    position.z = layer.value + (position.y / SPRITE_COUNT_PER_LAYER);
+                    position.z = (-layer.value * 5) + (position.y / SPRITE_COUNT_PER_LAYER);
                     LocalTransform localTransform = localTransforms[i];
                     this.translationsAndScales[spriteManagerIndex] = new float4(position, localTransform.Scale);
                     

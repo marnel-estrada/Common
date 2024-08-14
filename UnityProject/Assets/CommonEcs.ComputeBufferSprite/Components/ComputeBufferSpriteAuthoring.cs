@@ -16,6 +16,7 @@ namespace CommonEcs {
                 Entity entity = GetEntity(TransformUsageFlags.Dynamic);
                 
                 AddComponent(entity, new ComputeBufferSprite(authoring.size, authoring.color));
+                AddComponent<ComputeBufferSprite.Changed>(entity);
                 AddSharedComponent(entity, new ComputeBufferSpriteLayer(authoring.layerOrder));
 
                 DynamicBuffer<UvIndex> uvIndexBuffer = AddBuffer<UvIndex>(entity);

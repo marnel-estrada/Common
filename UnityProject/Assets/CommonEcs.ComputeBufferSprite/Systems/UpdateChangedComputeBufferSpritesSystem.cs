@@ -48,6 +48,8 @@ namespace CommonEcs {
                 worldTransformType = GetComponentTypeHandle<LocalToWorld>(),
                 translationsAndScales = spriteManager.TranslationsAndScales,
                 rotations = spriteManager.Rotations,
+                sizes = spriteManager.Sizes,
+                pivots = spriteManager.Pivots,
                 colors = spriteManager.Colors
             };
             this.Dependency = updateSpritesJob.ScheduleParallel(this.spritesQuery, this.Dependency);
@@ -75,6 +77,12 @@ namespace CommonEcs {
 
             [NativeDisableParallelForRestriction]
             public NativeArray<float4> rotations;
+
+            [NativeDisableParallelForRestriction]
+            public NativeArray<float2> sizes;
+
+            [NativeDisableParallelForRestriction]
+            public NativeArray<float2> pivots;
             
             [NativeDisableParallelForRestriction]
             public NativeArray<Color> colors;
@@ -103,6 +111,12 @@ namespace CommonEcs {
                     
                     // Rotation
                     this.rotations[spriteManagerIndex] = worldTransform.Rotation.value;
+                    
+                    // Size
+                    this.sizes[spriteManagerIndex] = sprite.size;
+                    
+                    // Pivot
+                    this.pivots[spriteManagerIndex] = sprite.pivot;
                     
                     // Color
                     this.colors[spriteManagerIndex] = sprite.color;

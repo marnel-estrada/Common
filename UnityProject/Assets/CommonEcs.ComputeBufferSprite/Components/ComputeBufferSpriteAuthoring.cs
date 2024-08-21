@@ -25,7 +25,6 @@ namespace CommonEcs {
                     return;
                 }
                 
-                Assert.IsTrue(authoring.uvIndices.Length > 0);
                 for (int i = 0; i < authoring.uvIndices.Length; i++) {
                     uvIndexBuffer.Add(new UvIndex(authoring.uvIndices[i]));
                 }

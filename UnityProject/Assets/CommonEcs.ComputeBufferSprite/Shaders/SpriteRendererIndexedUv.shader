@@ -1,7 +1,7 @@
  Shader "Instanced/SpriteRendererIndexedUv" {
     Properties {
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
-        _Cutoff ("Alpha cutoff", Range(0,1)) = 0.5
+        _Cutoff ("Alpha cutoff", Range(0,1)) = 0.2
     }
     
     SubShader {
@@ -111,7 +111,7 @@
             fixed4 frag(v2f i, out float depth : SV_Depth) : SV_Target {
                 fixed4 col = tex2D(_MainTex, i.uv) * i.color;
                 clip(col.a - _Cutoff);
-                col.rgb *= col.a;
+                col.a = i.color.a;
 
 				return col;
             }

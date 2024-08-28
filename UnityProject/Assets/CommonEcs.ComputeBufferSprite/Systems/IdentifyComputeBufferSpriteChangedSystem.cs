@@ -48,6 +48,7 @@ namespace CommonEcs {
             
             // Schedule job
             TrackChangedJob trackChangedJob = new() {
+                entityType = GetEntityTypeHandle(),
                 spriteType = GetComponentTypeHandle<ComputeBufferSprite>(),
                 localTransformType = GetComponentTypeHandle<LocalTransform>(),
                 worldTransformType = GetComponentTypeHandle<LocalToWorld>(),
@@ -67,6 +68,9 @@ namespace CommonEcs {
         /// </summary>
         [BurstCompile]
         private struct TrackChangedJob : IJobChunk {
+            [ReadOnly]
+            public EntityTypeHandle entityType; // Used for debugging
+            
             [ReadOnly]
             public ComponentTypeHandle<ComputeBufferSprite> spriteType;
 
@@ -103,6 +107,7 @@ namespace CommonEcs {
                     return;
                 }
 
+                NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
                 NativeArray<ComputeBufferSprite> sprites = chunk.GetNativeArray(ref this.spriteType);
                 NativeArray<LocalTransform> localTransforms = chunk.GetNativeArray(ref this.localTransformType);
                 NativeArray<LocalToWorld> worldTransforms = chunk.GetNativeArray(ref this.worldTransformType);
@@ -116,9 +121,12 @@ namespace CommonEcs {
                     int managerIndex = sprite.managerIndex.ValueOrError();
                     
                     // Check position and rotation
+                    // Note here that we zero out z because it will always be set with another
+                    // value depending on the sprite's layer.
                     float4 translationAndScaleInManager = this.translationsAndScales[managerIndex];
+                    float3 positionInManager = new(translationAndScaleInManager.xy, 0);
                     float3 position = worldTransform.Position;
-                    if (!position.TolerantEquals(translationAndScaleInManager.xyz)) {
+                    if (!position.TolerantEquals(positionInManager)) {
                         // Changed position
                         chunk.SetComponentEnabled(ref this.changedType, i, true);
                         continue;

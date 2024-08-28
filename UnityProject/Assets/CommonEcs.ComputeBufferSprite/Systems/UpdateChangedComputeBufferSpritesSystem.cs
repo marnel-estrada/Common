@@ -86,8 +86,6 @@ namespace CommonEcs {
             
             [NativeDisableParallelForRestriction]
             public NativeArray<Color> colors;
-
-            private const int SPRITE_COUNT_PER_LAYER = 20000;
             
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
                 NativeArray<ComputeBufferSprite> sprites = chunk.GetNativeArray(ref this.spriteType);
@@ -105,7 +103,7 @@ namespace CommonEcs {
                     // Position
                     // We negate the layer value since sprites at a higher layer should be at the front more
                     float3 position = worldTransform.Position;
-                    position.z = (-layer.value * 5) + (position.y / SPRITE_COUNT_PER_LAYER);
+                    position.z += ComputeBufferSpriteUtils.ComputeZPos(layer.value, position.y);
                     LocalTransform localTransform = localTransforms[i];
                     this.translationsAndScales[spriteManagerIndex] = new float4(position, localTransform.Scale);
                     

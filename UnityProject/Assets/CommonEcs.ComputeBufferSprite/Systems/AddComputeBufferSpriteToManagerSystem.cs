@@ -3,6 +3,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEngine;
 
 namespace CommonEcs {
     /// <summary>
@@ -23,6 +24,7 @@ namespace CommonEcs {
             
             this.spritesQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<ComputeBufferSprite>()
+                .WithAll<ComputeBufferSpriteLayer>()
                 .WithAll<UvIndex>()
                 .WithNone<ManagerAdded>()
                 .Build(this);
@@ -30,6 +32,7 @@ namespace CommonEcs {
         }
 
         private EntityTypeHandle entityType;
+        private SharedComponentTypeHandle<ComputeBufferSpriteLayer> layerType;
         private ComponentTypeHandle<ComputeBufferSprite> spriteType;
         private ComponentTypeHandle<ComputeBufferSprite.Changed> changedType;
         private BufferTypeHandle<UvIndex> uvIndexType;
@@ -46,6 +49,7 @@ namespace CommonEcs {
             ComputeBufferSpriteManager spriteManager = spriteManagers[1];
 
             this.entityType = GetEntityTypeHandle();
+            this.layerType = GetSharedComponentTypeHandle<ComputeBufferSpriteLayer>();
             this.spriteType = GetComponentTypeHandle<ComputeBufferSprite>();
             this.changedType = GetComponentTypeHandle<ComputeBufferSprite.Changed>();
             this.uvIndexType = GetBufferTypeHandle<UvIndex>(true);
@@ -71,6 +75,7 @@ namespace CommonEcs {
             BufferAccessor<UvIndex> uvIndicesAccessor = chunk.GetBufferAccessor(ref this.uvIndexType);
             NativeArray<LocalTransform> localTransforms = chunk.GetNativeArray(ref this.localTransformType);
             NativeArray<LocalToWorld> worldTransforms = chunk.GetNativeArray(ref this.worldTransformType);
+            ComputeBufferSpriteLayer layer = chunk.GetSharedComponent(this.layerType);
 
             for (int i = 0; i < chunk.Count; i++) {
                 ComputeBufferSprite sprite = sprites[i];
@@ -78,7 +83,9 @@ namespace CommonEcs {
                 LocalTransform localTransform = localTransforms[i];
                 LocalToWorld worldTransform = worldTransforms[i];
 
-                spriteManager.Add(ref sprite, worldTransform.Position, worldTransform.Rotation, localTransform.Scale);
+                float3 position = worldTransform.Position;
+                position.z += ComputeBufferSpriteUtils.ComputeZPos(layer.value, position.y);
+                spriteManager.Add(ref sprite, position, worldTransform.Rotation, localTransform.Scale);
                 sprites[i] = sprite; // We modify since the managerIndex would be assigned on add
                 
                 // Set the uvIndex

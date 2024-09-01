@@ -10,7 +10,7 @@
             "IgnoreProjector"="True"
             "RenderType"="TransparentCutout"
         }
-        Cull Back
+        Cull Off
         Lighting Off
         ZWrite On
         AlphaTest Greater 0

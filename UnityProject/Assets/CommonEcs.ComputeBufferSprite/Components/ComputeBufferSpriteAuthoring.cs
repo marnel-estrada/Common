@@ -6,6 +6,7 @@ using UnityEngine;
 namespace CommonEcs {
     public class ComputeBufferSpriteAuthoring : MonoBehaviour {
         public float2 size;
+        public float2 pivot = new(0.5f, 0.5f);
         public Color color = Color.white;
         public int layerOrder;
 
@@ -15,7 +16,7 @@ namespace CommonEcs {
             public override void Bake(ComputeBufferSpriteAuthoring authoring) {
                 Entity entity = GetEntity(TransformUsageFlags.Dynamic);
                 
-                AddComponent(entity, new ComputeBufferSprite(authoring.size, authoring.color));
+                AddComponent(entity, new ComputeBufferSprite(authoring.size, authoring.pivot, authoring.color));
                 AddComponent<ComputeBufferSprite.Changed>(entity);
                 AddSharedComponent(entity, new ComputeBufferSpriteLayer(authoring.layerOrder));
 

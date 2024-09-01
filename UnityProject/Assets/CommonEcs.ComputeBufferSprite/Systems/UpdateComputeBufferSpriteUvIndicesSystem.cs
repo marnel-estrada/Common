@@ -31,6 +31,10 @@ namespace CommonEcs {
         protected override void OnUpdate() {
             this.spriteManagerQuery.Update();
             IReadOnlyList<ComputeBufferSpriteManager> spriteManagers = this.spriteManagerQuery.SharedComponents;
+            if (spriteManagers.Count <= 1) {
+                // No SpriteManagers where created yet
+                return;
+            }
             
             // Note here that we start counting from 1 since the first entry is always a default one
             // In this case, SpriteManager.internal has not been allocated. So we get a NullPointerException

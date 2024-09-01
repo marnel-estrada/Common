@@ -18,6 +18,7 @@ namespace CommonEcs {
     /// </summary>
     [UpdateInGroup(typeof(ComputeBufferSpriteSystemGroup))]
     [UpdateBefore(typeof(UpdateChangedComputeBufferSpritesSystem))]
+    [UpdateBefore(typeof(UpdateComputeBufferSpriteUvIndicesSystem))]
     public partial class IdentifyComputeBufferSpriteChangedSystem : SystemBase {
         private EntityQuery spritesQuery;
         

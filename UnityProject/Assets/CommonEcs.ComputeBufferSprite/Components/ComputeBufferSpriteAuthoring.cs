@@ -2,13 +2,14 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace CommonEcs {
     public class ComputeBufferSpriteAuthoring : MonoBehaviour {
         public float2 size;
         public float2 pivot = new(0.5f, 0.5f);
         public Color color = Color.white;
-        public int layerOrder;
+        public string? sortingLayer;
 
         public int[]? uvIndices;
         
@@ -18,7 +19,11 @@ namespace CommonEcs {
                 
                 AddComponent(entity, new ComputeBufferSprite(authoring.size, authoring.pivot, authoring.color));
                 AddComponent<ComputeBufferSprite.Changed>(entity);
-                AddSharedComponent(entity, new ComputeBufferSpriteLayer(authoring.layerOrder));
+
+                int sortingLayer = string.IsNullOrWhiteSpace(authoring.sortingLayer)
+                    ? 0
+                    : SortingLayer.GetLayerValueFromName(authoring.sortingLayer);
+                AddSharedComponent(entity, new ComputeBufferSpriteLayer(sortingLayer));
 
                 DynamicBuffer<UvIndex> uvIndexBuffer = AddBuffer<UvIndex>(entity);
                 Assert.IsFalse(authoring.uvIndices == null);

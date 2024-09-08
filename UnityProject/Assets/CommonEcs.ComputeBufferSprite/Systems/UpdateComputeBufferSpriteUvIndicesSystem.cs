@@ -3,6 +3,7 @@ using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
+using UnityEngine.Serialization;
 
 namespace CommonEcs {
     /// <summary>
@@ -45,7 +46,7 @@ namespace CommonEcs {
                 case 1: {
                     // Schedule single UV buffer
                     UpdateSingleUvIndicesJob updateUvIndicesJob = new() {
-                        spriteType = GetComponentTypeHandle<ComputeBufferSprite>(),
+                        managerAddedType = GetComponentTypeHandle<ManagerAdded>(),
                         uvIndexType = GetBufferTypeHandle<UvIndex>(),
                         uvBufferIndices = spriteManager.GetUvBufferIndices(0)
                     };
@@ -56,7 +57,7 @@ namespace CommonEcs {
                 case 2: {
                     // Schedule double UV buffer
                     UpdateDoubleUvIndicesJob updateUvIndicesJob = new() {
-                        spriteType = GetComponentTypeHandle<ComputeBufferSprite>(),
+                        managerAddedType = GetComponentTypeHandle<ManagerAdded>(),
                         uvIndexType = GetBufferTypeHandle<UvIndex>(),
                         firstUvBufferIndices = spriteManager.GetUvBufferIndices(0),
                         secondUvBufferIndices = spriteManager.GetUvBufferIndices(1)
@@ -71,7 +72,7 @@ namespace CommonEcs {
         [BurstCompile]
         private struct UpdateSingleUvIndicesJob : IJobChunk {
             [ReadOnly]
-            public ComponentTypeHandle<ComputeBufferSprite> spriteType;
+            public ComponentTypeHandle<ManagerAdded> managerAddedType;
 
             [ReadOnly]
             public BufferTypeHandle<UvIndex> uvIndexType;
@@ -80,16 +81,16 @@ namespace CommonEcs {
             public NativeArray<int> uvBufferIndices;
             
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
-                NativeArray<ComputeBufferSprite> sprites = chunk.GetNativeArray(ref this.spriteType);
+                NativeArray<ManagerAdded> managerAddedComponents = chunk.GetNativeArray(ref this.managerAddedType);
                 BufferAccessor<UvIndex> uvIndicesBuffers = chunk.GetBufferAccessor(ref this.uvIndexType);
 
                 ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
                 while (enumerator.NextEntityIndex(out int i)) {
-                    ComputeBufferSprite sprite = sprites[i];
                     DynamicBuffer<UvIndex> uvIndices = uvIndicesBuffers[i];
                     
                     // Set only the first uv index
-                    this.uvBufferIndices[sprite.managerIndex.ValueOrError()] = uvIndices[0].value;
+                    int managerIndex = managerAddedComponents[i].managerIndex;
+                    this.uvBufferIndices[managerIndex] = uvIndices[0].value;
                 }
             }
         }
@@ -98,7 +99,7 @@ namespace CommonEcs {
         [BurstCompile]
         private struct UpdateDoubleUvIndicesJob : IJobChunk {
             [ReadOnly]
-            public ComponentTypeHandle<ComputeBufferSprite> spriteType;
+            public ComponentTypeHandle<ManagerAdded> managerAddedType;
 
             [ReadOnly]
             public BufferTypeHandle<UvIndex> uvIndexType;
@@ -110,15 +111,14 @@ namespace CommonEcs {
             public NativeArray<int> secondUvBufferIndices;
             
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
-                NativeArray<ComputeBufferSprite> sprites = chunk.GetNativeArray(ref this.spriteType);
+                NativeArray<ManagerAdded> managerAddedComponents = chunk.GetNativeArray(ref this.managerAddedType);
                 BufferAccessor<UvIndex> uvIndicesBuffers = chunk.GetBufferAccessor(ref this.uvIndexType);
 
                 ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
                 while (enumerator.NextEntityIndex(out int i)) {
-                    ComputeBufferSprite sprite = sprites[i];
                     DynamicBuffer<UvIndex> uvIndices = uvIndicesBuffers[i];
 
-                    int managerIndex = sprite.managerIndex.ValueOrError();
+                    int managerIndex = managerAddedComponents[i].managerIndex;
                     this.firstUvBufferIndices[managerIndex] = uvIndices[0].value;
                     this.secondUvBufferIndices[managerIndex] = uvIndices[1].value;
                 }

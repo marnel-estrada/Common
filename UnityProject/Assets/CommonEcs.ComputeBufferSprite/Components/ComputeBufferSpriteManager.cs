@@ -27,34 +27,27 @@ namespace CommonEcs {
             this.internalInstance.AddUvIndicesBuffer(shaderPropertyId);
         }
 
-        public void Add(ref ComputeBufferSprite sprite, float3 position) {
-            Add(ref sprite, position, quaternion.identity, 1.0f);
-        }
-        
-        public void Add(ref ComputeBufferSprite sprite, float3 position, quaternion rotation) {
-            Add(ref sprite, position, rotation, 1.0f);
-        }
-
         /// <summary>
-        /// Adds a sprite.
+        /// Adds a sprite. Returns the manager index of the sprite after adding.
         /// </summary>
         /// <param name="sprite"></param>
         /// <param name="uvIndex"></param>
         /// <param name="position"></param>
         /// <param name="rotation"></param>
         /// <param name="scale"></param>
-        public void Add(ref ComputeBufferSprite sprite, float3 position, quaternion rotation, float scale) {
-            this.internalInstance.Add(ref sprite, position, rotation, scale);
+        public int Add(ref ComputeBufferSprite sprite, float3 position, quaternion rotation, float scale) {
+            return this.internalInstance.Add(ref sprite, position, rotation, scale);
         }
 
         /// <summary>
         /// Sets the uvIndex of the sprite.
         /// </summary>
         /// <param name="sprite"></param>
+        /// <param name="managerIndex"></param>
         /// <param name="uvBufferIndex">Which UV buffer is it. Is it the first or the second?</param>
         /// <param name="value"></param>
-        public void SetUvIndex(ref ComputeBufferSprite sprite, int uvBufferIndex, int value) {
-            this.internalInstance.SetUvIndex(ref sprite, uvBufferIndex, value);
+        public void SetUvIndex(int managerIndex, int uvBufferIndex, int value) {
+            this.internalInstance.SetUvIndex(managerIndex, uvBufferIndex, value);
         }
 
         public int UvIndicesBufferCount => this.internalInstance.UvIndicesBufferCount;
@@ -214,17 +207,16 @@ namespace CommonEcs {
             }
 
             /// <summary>
-            /// Adds a sprite.
+            /// Adds a sprite. Returns the manager index of the sprite.
             /// </summary>
             /// <param name="sprite"></param>
             /// <param name="position"></param>
             /// <param name="rotation"></param>
             /// <param name="scale"></param>
-            public void Add(ref ComputeBufferSprite sprite, float3 position, quaternion rotation, float scale) {
+            public int Add(ref ComputeBufferSprite sprite, float3 position, quaternion rotation, float scale) {
                 // Check if there are inactive sprite slots and use those first
                 if (this.inactiveList.Length > 0) {
-                    AddByReusingInactive(ref sprite, position, rotation, scale);
-                    return;
+                    return AddByReusingInactive(ref sprite, position, rotation, scale);
                 }
 
                 // Expand if we're out of space
@@ -232,23 +224,24 @@ namespace CommonEcs {
                     Expand();
                 }
 
-                sprite.managerIndex = ValueTypeOption<int>.Some(this.spriteCount);
-                InternalAdd(ref sprite, position, rotation, scale);
+                int managerIndex = this.spriteCount;
+                InternalAdd(ref sprite, managerIndex, position, rotation, scale);
+                return managerIndex;
             }
 
-            private void AddByReusingInactive(ref ComputeBufferSprite sprite, float3 position, quaternion rotation, float scale) {
+            private int AddByReusingInactive(ref ComputeBufferSprite sprite, float3 position, quaternion rotation, float scale) {
                 Assertion.IsTrue(this.inactiveList.Length > 0);
                 
                 int lastIndex = this.inactiveList.Length - 1;
-                int reusedIndex = this.inactiveList[lastIndex];
+                int reusedManagerIndex = this.inactiveList[lastIndex];
                 this.inactiveList.RemoveAt(lastIndex);
-                sprite.managerIndex = ValueTypeOption<int>.Some(reusedIndex);
 
-                InternalAdd(ref sprite, position, rotation, scale);
+                InternalAdd(ref sprite, reusedManagerIndex, position, rotation, scale);
+
+                return reusedManagerIndex;
             }
 
-            private void InternalAdd(ref ComputeBufferSprite sprite, float3 position, quaternion rotation, float scale) {
-                int managerIndex = sprite.managerIndex.ValueOrError();
+            private void InternalAdd(ref ComputeBufferSprite sprite, int managerIndex, float3 position, quaternion rotation, float scale) {
                 this.translationsAndScales[managerIndex] = new float4(position, scale);
                 this.rotations[managerIndex] = rotation.value;
                 this.sizes[managerIndex] = sprite.size;
@@ -261,11 +254,11 @@ namespace CommonEcs {
             /// <summary>
             /// Sets the uvIndex of the sprite.
             /// </summary>
-            /// <param name="sprite"></param>
+            /// <param name="managerIndex"></param>
             /// <param name="uvBufferIndex">Which UV buffer is it. Is it the first or the second?</param>
             /// <param name="value"></param>
-            public void SetUvIndex(ref ComputeBufferSprite sprite, int uvBufferIndex, int value) {
-                this.uvIndicesBuffers[uvBufferIndex].SetUvIndex(sprite.managerIndex.ValueOrError(), value);
+            public void SetUvIndex(int managerIndex, int uvBufferIndex, int value) {
+                this.uvIndicesBuffers[uvBufferIndex].SetUvIndex(managerIndex, value);
             } 
 
             /// <summary>

@@ -43,6 +43,7 @@ namespace CommonEcs {
 
             UpdateSpritesJob updateSpritesJob = new() {
                 spriteType = GetComponentTypeHandle<ComputeBufferSprite>(),
+                managerAddedType = GetComponentTypeHandle<ManagerAdded>(),
                 layerType = GetSharedComponentTypeHandle<ComputeBufferSpriteLayer>(),
                 localTransformType = GetComponentTypeHandle<LocalTransform>(),
                 worldTransformType = GetComponentTypeHandle<LocalToWorld>(),
@@ -62,6 +63,9 @@ namespace CommonEcs {
         private struct UpdateSpritesJob : IJobChunk {
             [ReadOnly]
             public ComponentTypeHandle<ComputeBufferSprite> spriteType;
+
+            [ReadOnly]
+            public ComponentTypeHandle<ManagerAdded> managerAddedType;
 
             [ReadOnly]
             public SharedComponentTypeHandle<ComputeBufferSpriteLayer> layerType;
@@ -89,6 +93,7 @@ namespace CommonEcs {
             
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
                 NativeArray<ComputeBufferSprite> sprites = chunk.GetNativeArray(ref this.spriteType);
+                NativeArray<ManagerAdded> managerAddedComponents = chunk.GetNativeArray(ref this.managerAddedType);
                 NativeArray<LocalTransform> localTransforms = chunk.GetNativeArray(ref this.localTransformType);
                 NativeArray<LocalToWorld> worldTransforms = chunk.GetNativeArray(ref this.worldTransformType);
                 ComputeBufferSpriteLayer layer = chunk.GetSharedComponent(this.layerType);
@@ -98,7 +103,7 @@ namespace CommonEcs {
                     ComputeBufferSprite sprite = sprites[i];
                     LocalToWorld worldTransform = worldTransforms[i];
                     
-                    int spriteManagerIndex = sprite.managerIndex.ValueOrError();
+                    int spriteManagerIndex = managerAddedComponents[i].managerIndex;
                     
                     // Position
                     // We negate the layer value since sprites at a higher layer should be at the front more

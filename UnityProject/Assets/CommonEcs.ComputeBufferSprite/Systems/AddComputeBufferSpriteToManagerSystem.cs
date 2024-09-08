@@ -3,7 +3,6 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
 
 namespace CommonEcs {
     /// <summary>
@@ -59,13 +58,15 @@ namespace CommonEcs {
             // We can't use Burst compiled jobs here since the Internal class of the sprite
             // manager is a class
             NativeArray<ArchetypeChunk> chunks = this.spritesQuery.ToArchetypeChunkArray(Allocator.TempJob);
-            EntityCommandBuffer commandBuffer = this.commandBufferSystem.CreateCommandBuffer();
+            EntityCommandBuffer commandBuffer = new(Allocator.TempJob);
 
             for (int i = 0; i < chunks.Length; i++) {
                 ProcessChunk(chunks[i], ref spriteManager, ref commandBuffer);
             }
             
             chunks.Dispose();
+            
+            commandBuffer.Playback(this.EntityManager);
         }
 
         private void ProcessChunk(ArchetypeChunk chunk, ref ComputeBufferSpriteManager spriteManager,
@@ -85,16 +86,15 @@ namespace CommonEcs {
 
                 float3 position = worldTransform.Position;
                 position.z += ComputeBufferSpriteUtils.ComputeZPos(layer.value, position.y);
-                spriteManager.Add(ref sprite, position, worldTransform.Rotation, localTransform.Scale);
-                sprites[i] = sprite; // We modify since the managerIndex would be assigned on add
+                int managerIndex = spriteManager.Add(ref sprite, position, worldTransform.Rotation, localTransform.Scale);
                 
                 // Set the uvIndex
                 for (int uvIndex = 0; uvIndex < uvIndexBuffer.Length; uvIndex++) {
-                    spriteManager.SetUvIndex(ref sprite, uvIndex, uvIndexBuffer[uvIndex].value);
+                    spriteManager.SetUvIndex(managerIndex, uvIndex, uvIndexBuffer[uvIndex].value);
                 }
                 
                 // Add this component so it will no longer be processed by this system
-                commandBuffer.AddComponent(entities[i], new ManagerAdded(sprite.managerIndex.ValueOrError()));
+                commandBuffer.AddComponent(entities[i], new ManagerAdded(managerIndex));
             }
             
             chunk.SetComponentEnabledForAll(ref this.changedType, true);

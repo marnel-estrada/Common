@@ -43,6 +43,7 @@ namespace CommonEcs {
 
             TrackUvIndexChangesJob trackUvIndexChangesJob = new() {
                 spriteType = GetComponentTypeHandle<ComputeBufferSprite>(),
+                managerAddedType = GetComponentTypeHandle<ManagerAdded>(),
                 uvIndexType = GetBufferTypeHandle<UvIndex>(),
                 changedType = GetComponentTypeHandle<ComputeBufferSprite.Changed>(),
                 uvBufferIndices = spriteManager.GetUvBufferIndices(0),
@@ -55,6 +56,9 @@ namespace CommonEcs {
         private struct TrackUvIndexChangesJob : IJobChunk {
             [ReadOnly]
             public ComponentTypeHandle<ComputeBufferSprite> spriteType;
+
+            [ReadOnly]
+            public ComponentTypeHandle<ManagerAdded> managerAddedType;
 
             [ReadOnly]
             public BufferTypeHandle<UvIndex> uvIndexType;
@@ -73,14 +77,16 @@ namespace CommonEcs {
                 }
                 
                 NativeArray<ComputeBufferSprite> sprites = chunk.GetNativeArray(ref this.spriteType);
+                NativeArray<ManagerAdded> managerAddedComponents = chunk.GetNativeArray(ref this.managerAddedType);
                 BufferAccessor<UvIndex> uvIndexBuffers = chunk.GetBufferAccessor(ref this.uvIndexType);
 
                 ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
                 while (enumerator.NextEntityIndex(out int i)) {
                     ComputeBufferSprite sprite = sprites[i];
+                    ManagerAdded managerAdded = managerAddedComponents[i];
                     DynamicBuffer<UvIndex> uvIndices = uvIndexBuffers[i];
 
-                    if (this.uvBufferIndices[sprite.managerIndex.ValueOrError()] == uvIndices[0].value) {
+                    if (this.uvBufferIndices[managerAdded.managerIndex] == uvIndices[0].value) {
                         // No changes
                         continue;
                     }

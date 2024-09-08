@@ -51,6 +51,7 @@ namespace CommonEcs {
             TrackChangedJob trackChangedJob = new() {
                 entityType = GetEntityTypeHandle(),
                 spriteType = GetComponentTypeHandle<ComputeBufferSprite>(),
+                managerAddedType = GetComponentTypeHandle<ManagerAdded>(),
                 localTransformType = GetComponentTypeHandle<LocalTransform>(),
                 worldTransformType = GetComponentTypeHandle<LocalToWorld>(),
                 changedType = GetComponentTypeHandle<ComputeBufferSprite.Changed>(),
@@ -74,6 +75,9 @@ namespace CommonEcs {
             
             [ReadOnly]
             public ComponentTypeHandle<ComputeBufferSprite> spriteType;
+            
+            [ReadOnly]
+            public ComponentTypeHandle<ManagerAdded> managerAddedType;
 
             [ReadOnly]
             public ComponentTypeHandle<LocalTransform> localTransformType;
@@ -110,6 +114,7 @@ namespace CommonEcs {
 
                 NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
                 NativeArray<ComputeBufferSprite> sprites = chunk.GetNativeArray(ref this.spriteType);
+                NativeArray<ManagerAdded> managerAddedComponents = chunk.GetNativeArray(ref this.managerAddedType);
                 NativeArray<LocalTransform> localTransforms = chunk.GetNativeArray(ref this.localTransformType);
                 NativeArray<LocalToWorld> worldTransforms = chunk.GetNativeArray(ref this.worldTransformType);
 
@@ -119,7 +124,7 @@ namespace CommonEcs {
                     LocalTransform localTransform = localTransforms[i];
                     LocalToWorld worldTransform = worldTransforms[i];
 
-                    int managerIndex = sprite.managerIndex.ValueOrError();
+                    int managerIndex = managerAddedComponents[i].managerIndex;
                     
                     // Check position and rotation
                     // Note here that we zero out z because it will always be set with another

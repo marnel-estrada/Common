@@ -87,6 +87,10 @@ namespace CommonEcs {
                 ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
                 while (enumerator.NextEntityIndex(out int i)) {
                     DynamicBuffer<UvIndex> uvIndices = uvIndicesBuffers[i];
+                    if (uvIndices.Length == 0) {
+                        // No uv index to set
+                        continue;
+                    }
                     
                     // Set only the first uv index
                     int managerIndex = managerAddedComponents[i].managerIndex;

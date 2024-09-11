@@ -13,6 +13,7 @@
         Cull Off
         Lighting Off
         ZWrite On
+        Fog{ Mode Off }
         AlphaTest Greater 0
         Blend SrcAlpha OneMinusSrcAlpha
         Pass {
@@ -97,6 +98,7 @@
                 
                 v2f o;
                 o.pos = UnityObjectToClipPos(float4(worldPosition, 1.0f));
+                o.pos = UnityPixelSnap(o.pos);
                 
                 // XY here is the dimension (width, height). 
                 // ZW is the offset in the texture (the actual UV coordinates)

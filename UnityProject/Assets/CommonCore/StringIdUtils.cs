@@ -2,7 +2,7 @@ using Common;
 using Unity.Collections;
 
 namespace CommonEcs {
-    public static class CommonEcsUtils {
+    public static class StringIdUtils {
         /// <summary>
         /// Common way to convert a string id into an integer id.
         /// </summary>

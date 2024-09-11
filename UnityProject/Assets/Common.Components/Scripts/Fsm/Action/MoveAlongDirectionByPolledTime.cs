@@ -10,6 +10,7 @@
 using UnityEngine;
 
 using Common.Time;
+using CommonEcs;
 
 namespace Common.Fsm.Action {
 	/**
@@ -30,7 +31,7 @@ namespace Common.Fsm.Action {
 		 * Constructor
 		 */
 		public MoveAlongDirectionByPolledTime(FsmState owner, string timeReferenceName) : base(owner) {
-			this.timeReference = TimeReferencePool.GetInstance().Get(timeReferenceName);
+			this.timeReference = TimeReferencePool.GetInstance().Get(timeReferenceName.AsIntId());
 		}
 		
 		/**

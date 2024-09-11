@@ -6,14 +6,11 @@ namespace Common.Time {
 	 * Class that manages multiple TimeReference instances.
 	 */
 	public class TimeReferencePool {
-		private readonly Dictionary<string, TimeReference> instanceMap;
+		// Note here that we use int for the key so that we can query by integer when the TimeReference
+		// is from ECS which uses int as ID.
+		private readonly Dictionary<int, TimeReference> instanceMap = new(2);
 		
-		private TimeReferencePool() {
-			// can't be instantiated, this is a singleton
-			this.instanceMap = new Dictionary<string, TimeReference>();
-		}
-		
-		private static readonly TimeReferencePool ONLY_INSTANCE = new TimeReferencePool();
+		private static readonly TimeReferencePool ONLY_INSTANCE = new();
 		
 		/**
 		 * Returns the only TimeReferencePool instance.
@@ -25,17 +22,16 @@ namespace Common.Time {
 		/**
 		 * Adds a TimeReference instance for the specified name.
 		 */
-		public TimeReference Add(string name) {
-			TimeReference newTimeReference = new TimeReference(name);
-			this.instanceMap[name] = newTimeReference;
-			return newTimeReference;
+		public void Add(int id) {
+			TimeReference newTimeReference = new(id);
+			this.instanceMap[id] = newTimeReference;
 		}
 		
 		/**
 		 * Retrieves the TimeReference instance for this specified name.
 		 */
-		public TimeReference Get(string name) {
-			if (this.instanceMap.TryGetValue(name, out TimeReference timeReference)) {
+		public TimeReference Get(int id) {
+			if (this.instanceMap.TryGetValue(id, out TimeReference timeReference)) {
 				return timeReference;
 			}
 			

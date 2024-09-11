@@ -4,9 +4,10 @@
     "references": [
         "Swarm",
         "UnityThreading",
-        "LeanTween",
         "Unity.Mathematics",
-        "CommonCore"
+        "CommonCore",
+        "Unity.Entities",
+        "Unity.Collections"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

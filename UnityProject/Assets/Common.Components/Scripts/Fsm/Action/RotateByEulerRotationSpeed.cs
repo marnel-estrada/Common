@@ -1,5 +1,5 @@
 using Common.Time;
-
+using CommonEcs;
 using UnityEngine;
 
 namespace Common.Fsm.Action {
@@ -9,7 +9,7 @@ namespace Common.Fsm.Action {
         private readonly TimeReference timeReference;
         
         public RotateByEulerRotationSpeed(FsmState owner, string timeReferenceName) : base(owner) {
-            this.timeReference = TimeReferencePool.GetInstance().Get(timeReferenceName);
+            this.timeReference = TimeReferencePool.GetInstance().Get(timeReferenceName.AsIntId());
         }
 
         public void Init(Transform transform, Vector3 eulerRotationVelocity) {

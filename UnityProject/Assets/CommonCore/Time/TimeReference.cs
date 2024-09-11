@@ -7,58 +7,39 @@ namespace Common.Time {
 	 * For example, in a speed up tower defense game.
 	 */
 	public class TimeReference {		
-		private readonly string name;
+		private readonly int id;
 		private float timeScale = 1.0f;
 		
 		/**
 		 * Constructor
 		 */
-		public TimeReference(string name) {
-			this.name = name;
-		}
-		
-		/**
-		 * Returns the name.
-		 */
-		public String Name {
-			get {
-				return this.name;
-			}
+		public TimeReference(int id) {
+			this.id = id;
 		}
 		
 		/**
 		 * Time scale property.
 		 */
 		public float TimeScale {
-			get {
-                return this.timeScale;
-			}
-			
-			set {
-                this.timeScale = value;
-			}
+			get => this.timeScale;
+
+			set => this.timeScale = value;
 		}
 		
 		/**
 		 * Returns the delta time for this time reference.
 		 */
-		public float DeltaTime {
-			get {
-                return UnityEngine.Time.deltaTime * this.timeScale;
-			}
-		}
-		
-		private static TimeReference DEFAULT_INSTANCE;
+		public float DeltaTime => UnityEngine.Time.deltaTime * this.timeScale;
+
+		public int Id => this.id;
+
+		private static TimeReference? DEFAULT_INSTANCE;
 		
 		/**
 		 * Returns a default instance that can be used by any class.
 		 */
 		public static TimeReference GetDefaultInstance() {
-			if(DEFAULT_INSTANCE == null) {
-				DEFAULT_INSTANCE = new TimeReference("RootTimeline");
-			}
-			
-			return DEFAULT_INSTANCE;
+			return DEFAULT_INSTANCE ??= new TimeReference(0);
 		}
 	}
 }

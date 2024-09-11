@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-
+using Common.Time;
 using Unity.Entities;
 using Unity.Burst;
 using Unity.Burst.Intrinsics;
@@ -46,11 +46,12 @@ namespace CommonEcs {
             for (int i = 1; i < timeReferences.Count; ++i) {
                 TimeReference timeReference = timeReferences[i];
                 
-                this.scaledQuery.SetSharedComponentFilter(timeReference);
+                this.scaledQuery.SetSharedComponentFilterManaged(timeReference);
+                float timeScale = TimeReferencePool.GetInstance().Get(timeReference.id).TimeScale;
 
-                ScaledJob job = new ScaledJob() {
+                ScaledJob job = new() {
                     timerType = timerType,
-                    scaledDeltaTime = UnityEngine.Time.deltaTime * timeReference.TimeScale
+                    scaledDeltaTime = UnityEngine.Time.deltaTime * timeScale
                 };
 
                 lastHandle = job.Schedule(this.scaledQuery, lastHandle);
@@ -70,10 +71,13 @@ namespace CommonEcs {
                 ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
                 while (enumerator.NextEntityIndex(out int i)) {
                     DurationTimer timer = timers[i];
-                    if (timer.polledTime < timer.durationTime) {
-                        timer.polledTime += this.scaledDeltaTime;
-                        timers[i] = timer; // Modify
+                    if (!(timer.polledTime < timer.durationTime)) {
+                        // polledTime has reached the durationTime
+                        continue;
                     }
+
+                    timer.polledTime += this.scaledDeltaTime;
+                    timers[i] = timer; // Modify
                 }
             }
         }
@@ -89,10 +93,13 @@ namespace CommonEcs {
                 ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
                 while (enumerator.NextEntityIndex(out int i)) {
                     DurationTimer timer = timers[i];
-                    if (timer.polledTime < timer.durationTime) {
-                        timer.polledTime += this.deltaTime;
-                        timers[i] = timer; // Modify
+                    if (!(timer.polledTime < timer.durationTime)) {
+                        // polledTime has reached the durationTime
+                        continue;
                     }
+
+                    timer.polledTime += this.deltaTime;
+                    timers[i] = timer; // Modify
                 }
             }
         }

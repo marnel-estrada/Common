@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using Common.Time;
+using CommonEcs;
 
 namespace Common {
     /**
@@ -27,7 +28,7 @@ namespace Common {
          * Constructor with a specified time reference name.
          */
         public CountdownTimer(float countdownTime, string timeReferenceName) : this(countdownTime,
-            TimeReferencePool.GetInstance().Get(timeReferenceName)) {
+            TimeReferencePool.GetInstance().Get(timeReferenceName.AsIntId())) {
         }
 
         /**

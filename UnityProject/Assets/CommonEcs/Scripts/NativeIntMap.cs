@@ -64,11 +64,7 @@ namespace CommonEcs {
             this.unusedKeys.Push(index);
         }
 
-        public readonly T this[int index] {
-            get {
-                return this.itemList[index];
-            }
-        }
+        public readonly T this[int index] => this.itemList[index];
 
         public readonly bool TryGetValue(int index, out T value) {
             if (0 <= index && index < this.itemList.Length) {

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Common;
 using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
@@ -14,7 +15,7 @@ namespace CommonEcs {
     public partial class IdentifyComputeBufferSpriteUvIndexChangedSystem : SystemBase {
         private EntityQuery spritesQuery;
         
-        private SharedComponentQuery<ComputeBufferSpriteManager> spriteManagerQuery;
+        private SharedComponentQuery<ComputeBufferSpriteManager>? spriteManagerQuery;
 
         protected override void OnCreate() {
             this.spriteManagerQuery = new SharedComponentQuery<ComputeBufferSpriteManager>(this, this.EntityManager);
@@ -29,6 +30,10 @@ namespace CommonEcs {
         }
 
         protected override void OnUpdate() {
+            if (this.spriteManagerQuery == null) {
+                throw new CantBeNullException(nameof(this.spriteManagerQuery));
+            }
+            
             this.spriteManagerQuery.Update();
             IReadOnlyList<ComputeBufferSpriteManager> spriteManagers = this.spriteManagerQuery.SharedComponents;
             if (spriteManagers.Count <= 1) {
@@ -42,7 +47,6 @@ namespace CommonEcs {
             ComputeBufferSpriteManager spriteManager = spriteManagers[1];
 
             TrackUvIndexChangesJob trackUvIndexChangesJob = new() {
-                spriteType = GetComponentTypeHandle<ComputeBufferSprite>(),
                 managerAddedType = GetComponentTypeHandle<ManagerAdded>(),
                 uvIndexType = GetBufferTypeHandle<UvIndex>(),
                 changedType = GetComponentTypeHandle<ComputeBufferSprite.Changed>(),
@@ -54,9 +58,6 @@ namespace CommonEcs {
         
         [BurstCompile]
         private struct TrackUvIndexChangesJob : IJobChunk {
-            [ReadOnly]
-            public ComponentTypeHandle<ComputeBufferSprite> spriteType;
-
             [ReadOnly]
             public ComponentTypeHandle<ManagerAdded> managerAddedType;
 
@@ -76,15 +77,17 @@ namespace CommonEcs {
                     return;
                 }
                 
-                NativeArray<ComputeBufferSprite> sprites = chunk.GetNativeArray(ref this.spriteType);
                 NativeArray<ManagerAdded> managerAddedComponents = chunk.GetNativeArray(ref this.managerAddedType);
                 BufferAccessor<UvIndex> uvIndexBuffers = chunk.GetBufferAccessor(ref this.uvIndexType);
 
                 ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
                 while (enumerator.NextEntityIndex(out int i)) {
-                    ComputeBufferSprite sprite = sprites[i];
                     ManagerAdded managerAdded = managerAddedComponents[i];
                     DynamicBuffer<UvIndex> uvIndices = uvIndexBuffers[i];
+                    if (uvIndices.Length == 0) {
+                        // No UV indices specified yet
+                        continue;
+                    }
 
                     if (this.uvBufferIndices[managerAdded.managerIndex] == uvIndices[0].value) {
                         // No changes

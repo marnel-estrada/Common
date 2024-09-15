@@ -17,6 +17,9 @@ namespace CommonEcs {
             this.color = color;
         }
 
+        public float Width => this.size.x;
+        public float Height => this.size.y;
+
         /// <summary>
         /// An IEnableableComponent that we use to mark a sprite as changed. Systems can
         /// then filter for this.

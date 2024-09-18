@@ -24,6 +24,10 @@ namespace CommonEcs {
                     ? 0
                     : SortingLayer.GetLayerValueFromName(authoring.sortingLayer);
                 AddSharedComponent(entity, new ComputeBufferSpriteLayer(sortingLayer));
+                
+                // We add this since this is used to hide a sprite
+                AddComponent<Active>(entity);
+                SetComponentEnabled<Active>(entity, true);
 
                 DynamicBuffer<UvIndex> uvIndexBuffer = AddBuffer<UvIndex>(entity);
                 Assert.IsFalse(authoring.uvIndices == null);

@@ -7,9 +7,6 @@ namespace CommonEcs {
         public Color color;
         public float2 size;
         public float2 pivot;
-        
-        // Flag constants
-        private const int ACTIVE = 0;
 
         public ComputeBufferSprite(float2 size, Color color) : this(size, new float2(0.5f, 0.5f), color) {
         }

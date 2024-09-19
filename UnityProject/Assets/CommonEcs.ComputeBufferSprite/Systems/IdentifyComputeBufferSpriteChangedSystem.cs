@@ -49,7 +49,6 @@ namespace CommonEcs {
             
             // Schedule job
             TrackChangedJob trackChangedJob = new() {
-                entityType = GetEntityTypeHandle(),
                 spriteType = GetComponentTypeHandle<ComputeBufferSprite>(),
                 managerAddedType = GetComponentTypeHandle<ManagerAdded>(),
                 localTransformType = GetComponentTypeHandle<LocalTransform>(),
@@ -70,9 +69,6 @@ namespace CommonEcs {
         /// </summary>
         [BurstCompile]
         private struct TrackChangedJob : IJobChunk {
-            [ReadOnly]
-            public EntityTypeHandle entityType; // Used for debugging
-            
             [ReadOnly]
             public ComponentTypeHandle<ComputeBufferSprite> spriteType;
             
@@ -112,7 +108,6 @@ namespace CommonEcs {
                     return;
                 }
 
-                NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
                 NativeArray<ComputeBufferSprite> sprites = chunk.GetNativeArray(ref this.spriteType);
                 NativeArray<ManagerAdded> managerAddedComponents = chunk.GetNativeArray(ref this.managerAddedType);
                 NativeArray<LocalTransform> localTransforms = chunk.GetNativeArray(ref this.localTransformType);

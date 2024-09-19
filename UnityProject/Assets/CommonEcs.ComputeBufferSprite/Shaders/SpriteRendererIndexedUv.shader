@@ -44,6 +44,9 @@
             StructuredBuffer<float4> uvBuffer;
             StructuredBuffer<int> uvIndexBuffer;
 
+            // 1 means active zero is inactive
+            StructuredBuffer<int> activeBuffer;
+
             struct v2f {
                 float4 pos : SV_POSITION;
                 float2 uv: TEXCOORD0;
@@ -107,6 +110,7 @@
                 o.uv =  v.texcoord * uv.xy + uv.zw;
                 
 				o.color = colorsBuffer[instanceID];
+                o.color.a = activeBuffer[instanceID];
                 return o;
             }
 

@@ -25,6 +25,7 @@ namespace CommonEcs {
                 .WithAll<ComputeBufferSprite>()
                 .WithAll<ComputeBufferSprite.Changed>()
                 .WithAll<ComputeBufferSpriteLayer>()
+                .WithPresent<Active>()
                 .WithAll<LocalTransform>()
                 .WithAll<LocalToWorld>()
                 .WithAll<ManagerAdded>()
@@ -47,11 +48,13 @@ namespace CommonEcs {
                 layerType = GetSharedComponentTypeHandle<ComputeBufferSpriteLayer>(),
                 localTransformType = GetComponentTypeHandle<LocalTransform>(),
                 worldTransformType = GetComponentTypeHandle<LocalToWorld>(),
+                activeType = GetComponentTypeHandle<Active>(),
                 translationsAndScales = spriteManager.TranslationsAndScales,
                 rotations = spriteManager.Rotations,
                 sizes = spriteManager.Sizes,
                 pivots = spriteManager.Pivots,
-                colors = spriteManager.Colors
+                colors = spriteManager.Colors,
+                activeArray = spriteManager.ActiveArray
             };
             this.Dependency = updateSpritesJob.ScheduleParallel(this.spritesQuery, this.Dependency);
         }
@@ -75,6 +78,9 @@ namespace CommonEcs {
             
             [ReadOnly]
             public ComponentTypeHandle<LocalToWorld> worldTransformType;
+
+            [ReadOnly]
+            public ComponentTypeHandle<Active> activeType;
             
             [NativeDisableParallelForRestriction]
             public NativeArray<float4> translationsAndScales;
@@ -90,6 +96,9 @@ namespace CommonEcs {
             
             [NativeDisableParallelForRestriction]
             public NativeArray<Color> colors;
+            
+            [NativeDisableParallelForRestriction]
+            public NativeArray<int> activeArray;
             
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
                 NativeArray<ComputeBufferSprite> sprites = chunk.GetNativeArray(ref this.spriteType);
@@ -123,6 +132,10 @@ namespace CommonEcs {
                     
                     // Color
                     this.colors[spriteManagerIndex] = sprite.color;
+                    
+                    // Active
+                    bool isActive = chunk.IsComponentEnabled(ref this.activeType, i);
+                    this.activeArray[spriteManagerIndex] = isActive ? 1 : 0;
                 }
             }
         }

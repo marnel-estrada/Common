@@ -49,8 +49,15 @@ namespace CommonEcs {
                 lastSystemVersion = this.LastSystemVersion
             };
             this.Dependency = trackDeactivatedJob.ScheduleParallel(this.inactiveQuery, this.Dependency);
-            
-            // TODO Schedule tracking of activated sprites
+
+            TrackActivatedJob trackActivatedJob = new() {
+                managerAddedType = GetComponentTypeHandle<ManagerAdded>(),
+                activeType = GetComponentTypeHandle<Active>(),
+                activeArray = spriteManager.ActiveArray,
+                changedType = GetComponentTypeHandle<ComputeBufferSprite.Changed>(),
+                lastSystemVersion = this.LastSystemVersion
+            };
+            this.Dependency = trackActivatedJob.ScheduleParallel(this.activeQuery, this.Dependency);
         }
         
         // Checks sprites that were active but turned inactive
@@ -85,7 +92,48 @@ namespace CommonEcs {
                     // We set to changed if activeInArray is true. Note that the query
                     // already queries inactive sprites. So this means that if activeInArray
                     // is true, then it changed to inactive.
-                    chunk.SetComponentEnabled(ref this.changedType, i, activeInArray);
+                    if (activeInArray) {
+                        chunk.SetComponentEnabled(ref this.changedType, i, true);
+                    }
+                }
+            }
+        }
+        
+        // Checks sprites that were inactive but turned active
+        [BurstCompile]
+        private struct TrackActivatedJob : IJobChunk {
+            [ReadOnly]
+            public ComponentTypeHandle<ManagerAdded> managerAddedType;
+
+            [ReadOnly]
+            public ComponentTypeHandle<Active> activeType;
+
+            [ReadOnly]
+            public NativeArray<int> activeArray;
+            
+            public ComponentTypeHandle<ComputeBufferSprite.Changed> changedType;
+            
+            public uint lastSystemVersion;
+            
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                // Check if there were changes before continuing
+                if (!chunk.DidChange(ref this.activeType, this.lastSystemVersion)) {
+                    return;
+                }
+                
+                NativeArray<ManagerAdded> managerAddedComponents = chunk.GetNativeArray(ref this.managerAddedType);
+                
+                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (enumerator.NextEntityIndex(out int i)) {
+                    int managerIndex = managerAddedComponents[i].managerIndex;
+                    bool activeInArray = this.activeArray[managerIndex] > 0;
+                    
+                    // We set changed to true when sprite is inactive from the manager array
+                    // Note that we run this job on a query for active sprites only
+                    // So when it is inactive in manager, this means that it became active
+                    if (!activeInArray) {
+                        chunk.SetComponentEnabled(ref this.changedType, i, true);
+                    }
                 }
             }
         }

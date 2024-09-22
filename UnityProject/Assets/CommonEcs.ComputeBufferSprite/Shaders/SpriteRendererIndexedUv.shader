@@ -110,7 +110,7 @@
                 o.uv =  v.texcoord * uv.xy + uv.zw;
                 
 				o.color = colorsBuffer[instanceID];
-                o.color.a = activeBuffer[instanceID];
+                o.color.a = o.color.a * activeBuffer[instanceID];
                 return o;
             }
 

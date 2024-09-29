@@ -43,13 +43,8 @@ namespace Common {
         }
 
         public string TermId {
-            get {
-                return this.termId;
-            }
-
-            set {
-                this.termId = value;
-            }
+            get => this.termId;
+            set => this.termId = value;
         }
 
         /// <summary>

@@ -47,8 +47,8 @@ namespace CommonEcs.UtilityBrain {
         protected virtual void PrepareComponent(ref EntityManager entityManager, in Entity agentEntity,
             in Entity considerationEntity) {
             // Prepare BooleanConsiderationValues
-            UtilityValue trueValue = new UtilityValue(this.rankIfTrue.Value, this.bonusIfTrue.Value, this.multiplierIfTrue.Value);
-            UtilityValue falseValue = new UtilityValue(this.rankIfFalse.Value, this.bonusIfFalse.Value, this.multiplierIfFalse.Value);
+            UtilityValue trueValue = new(this.rankIfTrue.Value, this.bonusIfTrue.Value, this.multiplierIfTrue.Value);
+            UtilityValue falseValue = new(this.rankIfFalse.Value, this.bonusIfFalse.Value, this.multiplierIfFalse.Value);
             entityManager.SetComponentData(considerationEntity, 
                 new BooleanConsiderationValues(trueValue, falseValue));
         }

@@ -32,7 +32,7 @@ namespace GoapBrain {
         /// </summary>
         /// <param name="domainData"></param>
         public void Render(GoapDomainData domainData) {
-            EditorGUILayout.BeginVertical(GUILayout.Width(250));
+            EditorGUILayout.BeginVertical(GUILayout.Width(350));
 
             this.scrollPos = EditorGUILayout.BeginScrollView(this.scrollPos);
 

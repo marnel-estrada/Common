@@ -33,6 +33,11 @@ namespace CommonEcs.Goap {
             if (this.textDbSystem == null) {
                 throw new CantBeNullException(nameof(this.textDbSystem));
             }
+
+            if (!this.CanExecute) {
+                // Can't execute due to some logic
+                return inputDeps;
+            }
             
             NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(Allocator.TempJob);
             ExecuteResolversJob job = new() {
@@ -73,6 +78,8 @@ namespace CommonEcs.Goap {
         protected virtual void AfterJobScheduling(in JobHandle handle) {
             // Routines like calling AddJobHandleForProducer() may be placed here
         }
+
+        protected virtual bool CanExecute => true;
         
         /// <summary>
         /// There may be times that the action system might not want to schedule in parallel

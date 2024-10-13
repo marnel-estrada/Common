@@ -55,10 +55,18 @@ namespace CommonEcs {
 #endif
         }
 
-        public static void IsSome<T>(in ValueTypeOption<T> option, FixedString128Bytes message = new FixedString128Bytes()) where T : struct, IEquatable<T> {
+        public static void IsSome<T>(in ValueTypeOption<T> option, FixedString128Bytes message = new()) 
+            where T : struct, IEquatable<T> {
 #if UNITY_EDITOR
             IsTrue(option.IsSome, message);
 #endif
+        }
+
+        public static void IsNone<T>(in ValueTypeOption<T> option, FixedString128Bytes message = new()) 
+            where T : struct, IEquatable<T> {
+#if UNITY_EDITOR
+            IsTrue(option.IsNone, message);
+#endif      
         }
     }
 }

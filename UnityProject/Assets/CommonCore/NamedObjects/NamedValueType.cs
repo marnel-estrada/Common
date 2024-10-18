@@ -10,12 +10,13 @@ namespace Common {
     /// This is an immutable class
     /// </summary>
     public class NamedValueType {
-        public static readonly NamedValueType STRING = new NamedValueType(typeof(NamedString), typeof(string), "NamedString", "String");
-        public static readonly NamedValueType INT = new NamedValueType(typeof(NamedInt), typeof(int), "NamedInt", "int");
-        public static readonly NamedValueType FLOAT = new NamedValueType(typeof(NamedFloat), typeof(float), "NamedFloat", "float");
-        public static readonly NamedValueType BOOL = new NamedValueType(typeof(NamedBool), typeof(bool), "NamedBool", "bool");
-        public static readonly NamedValueType VECTOR3 = new NamedValueType(typeof(NamedVector3), typeof(Vector3), "NamedVector3", "Vector3");
-        public static readonly NamedValueType INT2 = new NamedValueType(typeof(NamedInt2), typeof(int2), "NamedInt2", "int2");
+        public static readonly NamedValueType STRING = new(typeof(NamedString), typeof(string), "NamedString", "String");
+        public static readonly NamedValueType INT = new(typeof(NamedInt), typeof(int), "NamedInt", "int");
+        public static readonly NamedValueType FLOAT = new(typeof(NamedFloat), typeof(float), "NamedFloat", "float");
+        public static readonly NamedValueType BOOL = new(typeof(NamedBool), typeof(bool), "NamedBool", "bool");
+        public static readonly NamedValueType VECTOR3 = new(typeof(NamedVector3), typeof(Vector3), "NamedVector3", "Vector3");
+        public static readonly NamedValueType INT2 = new(typeof(NamedInt2), typeof(int2), "NamedInt2", "int2");
+        public static readonly NamedValueType INT3 = new(typeof(NamedInt3), typeof(int3), "NamedInt3", "int3");
 
         public static readonly NamedValueType[] ALL_TYPES = new NamedValueType[] {
             STRING,
@@ -23,7 +24,8 @@ namespace Common {
             FLOAT,
             VECTOR3,
             BOOL,
-            INT2
+            INT2,
+            INT3
         };
 
         /**

@@ -35,52 +35,28 @@ namespace Common {
 		}
 		
 		public string Name {
-			get {
-				return this.name;
-			}
-			set {
-				this.name = value;
-			}
+			get => this.name;
+			set => this.name = value;
 		}
 
         public bool UseOtherHolder {
-            get {
-                return this.useOtherHolder;
-            }
-
-            set {
-                this.useOtherHolder = value;
-            }
+            get => this.useOtherHolder;
+            set => this.useOtherHolder = value;
         }
 
         public string OtherHolderName {
-            get {
-                return this.otherHolderName;
-            }
-
-            set {
-                this.otherHolderName = value;
-            }
+            get => this.otherHolderName;
+            set => this.otherHolderName = value;
         }
 
         public virtual T Value {
-			get {
-				return this.varValue;
-			}
-			
-			set {
-				this.varValue = value;
-			}
-		}
+			get => this.varValue;
+			set => this.varValue = value;
+        }
 
         protected T VariableInstance {
-            get {
-                return this.varValue;
-            }
-
-            set {
-                this.varValue = value;
-            }
+            get => this.varValue;
+            set => this.varValue = value;
         }
 
         public void ClearName() {

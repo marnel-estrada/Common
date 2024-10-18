@@ -76,6 +76,25 @@ namespace Common {
 
                 return value;
             });
+            
+            AddFieldRenderer(NamedValueType.INT3, delegate(ValueHolder holder) {
+                int3 value = (int3) holder.Get();
+
+                EditorGUILayout.BeginHorizontal(GUILayout.Width(110));
+
+                EditorGUILayout.LabelField("x:", GUILayout.Width(15));
+                value.x = EditorGUILayout.IntField(value.x, GUILayout.Width(40));
+
+                EditorGUILayout.LabelField("y:", GUILayout.Width(15));
+                value.y = EditorGUILayout.IntField(value.y, GUILayout.Width(40));
+                
+                EditorGUILayout.LabelField("z:", GUILayout.Width(15));
+                value.z = EditorGUILayout.IntField(value.z, GUILayout.Width(40));
+
+                EditorGUILayout.EndHorizontal();
+
+                return value;
+            });
         }
 
         private void AddFieldRenderer(NamedValueType type, FieldRenderer renderer) {

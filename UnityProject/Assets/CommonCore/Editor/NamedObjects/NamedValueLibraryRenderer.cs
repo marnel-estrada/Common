@@ -13,8 +13,7 @@ namespace Common {
         private const int LABEL_WIDTH = 200;
         private const int VALUE_WIDTH = 200;
 
-        private readonly Dictionary<NamedValueType, VariableEntryRenderer> entryRendererMap =
-            new Dictionary<NamedValueType, VariableEntryRenderer>();
+        private readonly Dictionary<NamedValueType, VariableEntryRenderer> entryRendererMap = new();
 
         private readonly VariableFieldRenderer fieldRenderer;
 
@@ -22,8 +21,7 @@ namespace Common {
         private string newVariableName = "";
         private string newVariableType = "";
 
-        private readonly Dictionary<NamedValueType, SimpleList<string>> removalMap =
-            new Dictionary<NamedValueType, SimpleList<string>>();
+        private readonly Dictionary<NamedValueType, SimpleList<string>> removalMap = new();
 
         private PopupValueSet variableTypeValues;
 
@@ -46,11 +44,10 @@ namespace Common {
         private void PreparePopupValues() {
             // Prepare popup values
             // Note here that we need an array for the display and value
-            List<string> popupTypeDisplay = new List<string>();
-            popupTypeDisplay.Add("(empty)");
+            List<string> popupTypeDisplay = new() { "(empty)" };
             AddTypeNames(popupTypeDisplay);
 
-            List<string> popupTypeValues = new List<string>();
+            List<string> popupTypeValues = new();
             popupTypeValues.Add(""); // The empty value
             AddTypeNames(popupTypeValues);
 

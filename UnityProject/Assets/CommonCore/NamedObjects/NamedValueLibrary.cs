@@ -10,22 +10,25 @@ namespace Common {
     [Serializable]
     public class NamedValueLibrary {
         [SerializeField]
-        private NamedStringMap stringMap = new NamedStringMap();
+        private NamedStringMap stringMap = new();
 
         [SerializeField]
-        private NamedIntMap intMap = new NamedIntMap();
+        private NamedIntMap intMap = new();
 
         [SerializeField]
-        private NamedFloatMap floatMap = new NamedFloatMap();
+        private NamedFloatMap floatMap = new();
 
         [SerializeField]
-        private NamedBoolMap boolMap = new NamedBoolMap();
+        private NamedBoolMap boolMap = new();
 
         [SerializeField]
-        private NamedVector3Map vector3Map = new NamedVector3Map();
+        private NamedVector3Map vector3Map = new();
 
         [SerializeField]
-        private NamedIntVector2Map intVector2Map = new NamedIntVector2Map();
+        private NamedIntVector2Map intVector2Map = new();
+
+        [SerializeField]
+        private NamedIntVector3Map intVector3Map = new();
 
         private Dictionary<NamedValueType, NamedValueContainer> containerMap;
 
@@ -59,6 +62,10 @@ namespace Common {
             AddContainerMapping(NamedValueType.INT2, new NamedMapContainerWrapper<NamedInt2>(delegate() {
                 return this.intVector2Map;
             }));
+            
+            AddContainerMapping(NamedValueType.INT3, new NamedMapContainerWrapper<NamedInt3>(delegate() {
+                return this.intVector3Map;
+            }));
         }
 
         private void AddContainerMapping(NamedValueType type, NamedValueContainer container) {
@@ -75,35 +82,15 @@ namespace Common {
             return NamedValueType.IsSupportedNamedType(namedType);
         }
 
-        public NamedStringMap Strings {
-            get {
-                return this.stringMap;
-            }
-        }
+        public NamedStringMap Strings => this.stringMap;
 
-        public NamedIntMap Integers {
-            get {
-                return this.intMap;
-            }
-        }
+        public NamedIntMap Integers => this.intMap;
 
-        public NamedFloatMap Floats {
-            get {
-                return this.floatMap;
-            }
-        }
+        public NamedFloatMap Floats => this.floatMap;
 
-        public NamedBoolMap Booleans {
-            get {
-                return this.boolMap;
-            }
-        }
+        public NamedBoolMap Booleans => this.boolMap;
 
-        public NamedVector3Map Vector3s {
-            get {
-                return this.vector3Map;
-            }
-        }
+        public NamedVector3Map Vector3s => this.vector3Map;
 
         /// <summary>
         /// Returns the Named* instance with the specified name
@@ -123,8 +110,7 @@ namespace Common {
         /// <param name="name"></param>
         /// <param name="type"></param>
         public void Add(string name, NamedValueType type) {
-            NamedValueContainer container = null;
-            Assertion.IsTrue(this.containerMap.TryGetValue(type, out container), type.Label);
+            Assertion.IsTrue(this.containerMap.TryGetValue(type, out NamedValueContainer container), type.Label);
 
             container.Add(name);
         }

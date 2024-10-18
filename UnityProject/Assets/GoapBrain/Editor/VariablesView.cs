@@ -8,7 +8,7 @@ namespace GoapBrain {
     /// Renders the variables part of the GOAP editor
     /// </summary>
     public class VariablesView {
-        private readonly NamedValueLibraryRenderer variablesRenderer = new NamedValueLibraryRenderer();
+        private readonly NamedValueLibraryRenderer variablesRenderer = new();
 
         private Vector2 scrollPosition;
 

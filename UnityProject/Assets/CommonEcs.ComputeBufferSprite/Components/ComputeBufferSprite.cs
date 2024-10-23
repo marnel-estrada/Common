@@ -8,6 +8,9 @@ namespace CommonEcs {
         public float2 size;
         public float2 pivot;
 
+        // This is the ordering of the sprite within its layer
+        public int layerOrder;
+
         public ComputeBufferSprite(float2 size, Color color) : this(size, new float2(0.5f, 0.5f), color) {
         }
 

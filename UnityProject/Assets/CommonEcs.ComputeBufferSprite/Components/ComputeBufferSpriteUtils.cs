@@ -13,8 +13,8 @@
         /// <returns></returns>
         public static float ComputeZPos(int layer, float yPos) {
             // The multiplication by 5 here is the scale per z position such that we can
-            // add layers on them.
-            return ((-layer * 5) + (yPos / SPRITE_COUNT_PER_LAYER)) * 5;
+            // add layer order on them.
+            return (-layer * 5) + (yPos * 5 / SPRITE_COUNT_PER_LAYER);
         }
     }
 }

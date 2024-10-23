@@ -2,7 +2,6 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace CommonEcs {
     public class ComputeBufferSpriteAuthoring : MonoBehaviour {
@@ -10,14 +9,18 @@ namespace CommonEcs {
         public float2 pivot = new(0.5f, 0.5f);
         public Color color = Color.white;
         public string? sortingLayer;
+        public int layerOrder;
 
         public int[]? uvIndices;
         
         private class Baker : Baker<ComputeBufferSpriteAuthoring> {
             public override void Bake(ComputeBufferSpriteAuthoring authoring) {
                 Entity entity = GetEntity(TransformUsageFlags.Dynamic);
-                
-                AddComponent(entity, new ComputeBufferSprite(authoring.size, authoring.pivot, authoring.color));
+
+                ComputeBufferSprite sprite = new(authoring.size, authoring.pivot, authoring.color) {
+                    layerOrder = authoring.layerOrder
+                };
+                AddComponent(entity, sprite);
                 AddComponent<ComputeBufferSprite.Changed>(entity);
 
                 int sortingLayer = string.IsNullOrWhiteSpace(authoring.sortingLayer)

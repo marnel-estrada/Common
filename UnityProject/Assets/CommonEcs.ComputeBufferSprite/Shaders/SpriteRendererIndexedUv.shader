@@ -47,6 +47,8 @@
             // 1 means active zero is inactive
             StructuredBuffer<int> activeBuffer;
 
+            StructuredBuffer<int> layerOrderBuffer;
+
             struct v2f {
                 float4 pos : SV_POSITION;
                 float2 uv: TEXCOORD0;
@@ -98,6 +100,10 @@
                 float4 translationAndScale = translationAndScaleBuffer[instanceID];
                 float scale = translationAndScale.w;
                 float3 worldPosition = translationAndScale.xyz + (v.vertex.xyz * scale);
+
+                // layer order
+                int layerOrder = layerOrderBuffer[instanceID];
+                worldPosition.z = worldPosition.z + (0.00005 * layerOrder);
                 
                 v2f o;
                 o.pos = UnityObjectToClipPos(float4(worldPosition, 1.0f));

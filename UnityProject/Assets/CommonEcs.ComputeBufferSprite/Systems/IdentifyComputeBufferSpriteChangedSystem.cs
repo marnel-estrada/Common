@@ -59,6 +59,7 @@ namespace CommonEcs {
                 sizes = spriteManager.Sizes,
                 pivots = spriteManager.Pivots,
                 colors = spriteManager.Colors,
+                layerOrderArray = spriteManager.LayerOrderArray,
                 lastSystemVersion = this.LastSystemVersion
             };
             this.Dependency = trackChangedJob.ScheduleParallel(this.spritesQuery, this.Dependency);
@@ -97,6 +98,9 @@ namespace CommonEcs {
             
             [ReadOnly]
             public NativeArray<Color> colors;
+
+            [ReadOnly]
+            public NativeArray<int> layerOrderArray;
             
             public uint lastSystemVersion;
             
@@ -172,6 +176,14 @@ namespace CommonEcs {
                     Color colorInManager = this.colors[managerIndex];
                     if (!sprite.color.TolerantEquals(colorInManager)) {
                         // Changed scale
+                        chunk.SetComponentEnabled(ref this.changedType, i, true);
+                        continue;
+                    }
+                    
+                    // Check layer order
+                    int layerOrderInManager = this.layerOrderArray[managerIndex];
+                    if (sprite.layerOrder != layerOrderInManager) {
+                        // Change layer in order
                         chunk.SetComponentEnabled(ref this.changedType, i, true);
                     }
                 }

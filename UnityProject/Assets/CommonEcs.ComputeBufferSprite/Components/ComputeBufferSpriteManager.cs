@@ -66,6 +66,7 @@ namespace CommonEcs {
         public NativeArray<float2> Pivots => this.internalInstance.pivots;
         public NativeArray<Color> Colors => this.internalInstance.colors;
         public NativeArray<int> ActiveArray => this.internalInstance.activeArray;
+        public NativeArray<int> LayerOrderArray => this.internalInstance.layerOrderArray;
 
         public void Remove(int managerIndex) {
             this.internalInstance.Remove(managerIndex);
@@ -99,6 +100,9 @@ namespace CommonEcs {
 
             private ComputeBuffer activeBuffer;
             public NativeArray<int> activeArray;
+
+            private ComputeBuffer layerOrderBuffer;
+            public NativeArray<int> layerOrderArray;
             
             private readonly uint[] args;
             private readonly ComputeBuffer argsBuffer;
@@ -120,6 +124,7 @@ namespace CommonEcs {
             private readonly int pivotBufferId;
             private readonly int colorsBufferId;
             private readonly int activeBufferId;
+            private readonly int layerOrderBufferId;
 
             public Internal(Material material, NativeArray<float4> uvValues, int initialCapacity) {
                 this.material = material;
@@ -158,6 +163,10 @@ namespace CommonEcs {
                 this.activeBuffer = new ComputeBuffer(this.capacity, sizeof(int));
                 this.activeArray = new NativeArray<int>(this.capacity, Allocator.Persistent);
                 this.activeBuffer.SetData(this.activeArray);
+
+                this.layerOrderBuffer = new ComputeBuffer(this.capacity, sizeof(int));
+                this.layerOrderArray = new NativeArray<int>(this.capacity, Allocator.Persistent);
+                this.layerOrderBuffer.SetData(this.layerOrderArray);
                 
                 // Prepare the shader IDs
                 this.uvBufferId = Shader.PropertyToID("uvBuffer");
@@ -167,6 +176,7 @@ namespace CommonEcs {
                 this.pivotBufferId = Shader.PropertyToID("pivotBuffer");
                 this.colorsBufferId = Shader.PropertyToID("colorsBuffer");
                 this.activeBufferId = Shader.PropertyToID("activeBuffer");
+                this.layerOrderBufferId = Shader.PropertyToID("layerOrderBuffer");
 
                 SetMaterialBuffers();
 
@@ -188,6 +198,7 @@ namespace CommonEcs {
                 this.material.SetBuffer(this.pivotBufferId, this.pivotBuffer);
                 this.material.SetBuffer(this.colorsBufferId, this.colorBuffer);
                 this.material.SetBuffer(this.activeBufferId, this.activeBuffer);
+                this.material.SetBuffer(this.layerOrderBufferId, this.layerOrderBuffer);
 
                 for (int i = 0; i < this.uvIndicesBuffers.Count; i++) {
                     this.uvIndicesBuffers[i].SetBuffer(this.material);
@@ -211,6 +222,7 @@ namespace CommonEcs {
                 this.pivots.Dispose();
                 this.colors.Dispose();
                 this.activeArray.Dispose();
+                this.layerOrderArray.Dispose();
                 this.inactiveList.Dispose();
                 
                 // Dispose UV indices
@@ -311,16 +323,12 @@ namespace CommonEcs {
                 
                 // Copy existing arrays to the new one
                 Expand(ref this.translationsAndScales, ref this.translationAndScaleBuffer, float4Size);
-                
                 Expand(ref this.rotations, ref this.rotationBuffer, float4Size);
-
                 Expand(ref this.sizes, ref this.sizeBuffer, float2Size);
-                
                 Expand(ref this.pivots, ref this.pivotBuffer, float2Size);
-
                 Expand(ref this.colors, ref this.colorBuffer, float4Size);
-                
                 Expand(ref this.activeArray, ref this.activeBuffer, sizeof(int));
+                Expand(ref this.layerOrderArray, ref this.layerOrderBuffer, sizeof(int));
                 
                 // Expand UV indices as well
                 for (int i = 0; i < this.uvIndicesBuffers.Count; i++) {
@@ -357,6 +365,7 @@ namespace CommonEcs {
                 this.pivotBuffer.SetData(this.pivots);
                 this.colorBuffer.SetData(this.colors);
                 this.activeBuffer.SetData(this.activeArray);
+                this.layerOrderBuffer.SetData(this.layerOrderArray);
 
                 // Update the data of indices as well
                 for (int i = 0; i < this.uvIndicesBuffers.Count; i++) {

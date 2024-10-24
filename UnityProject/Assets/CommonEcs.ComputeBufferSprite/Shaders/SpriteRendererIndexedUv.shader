@@ -103,7 +103,7 @@
 
                 // layer order
                 int layerOrder = layerOrderBuffer[instanceID];
-                worldPosition.z = worldPosition.z + (0.00005 * layerOrder);
+                worldPosition.z = worldPosition.z + (layerOrder * -0.00001);
                 
                 v2f o;
                 o.pos = UnityObjectToClipPos(float4(worldPosition, 1.0f));

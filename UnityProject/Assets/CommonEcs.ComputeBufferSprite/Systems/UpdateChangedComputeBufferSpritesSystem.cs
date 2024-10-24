@@ -6,6 +6,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace CommonEcs {
     /// <summary>
@@ -54,6 +55,7 @@ namespace CommonEcs {
                 sizes = spriteManager.Sizes,
                 pivots = spriteManager.Pivots,
                 colors = spriteManager.Colors,
+                layerOrderArray = spriteManager.LayerOrderArray,
                 activeArray = spriteManager.ActiveArray
             };
             this.Dependency = updateSpritesJob.ScheduleParallel(this.spritesQuery, this.Dependency);
@@ -96,6 +98,9 @@ namespace CommonEcs {
             
             [NativeDisableParallelForRestriction]
             public NativeArray<Color> colors;
+
+            [NativeDisableParallelForRestriction]
+            public NativeArray<int> layerOrderArray;
             
             [NativeDisableParallelForRestriction]
             public NativeArray<int> activeArray;
@@ -132,6 +137,9 @@ namespace CommonEcs {
                     
                     // Color
                     this.colors[spriteManagerIndex] = sprite.color;
+                    
+                    // LayerOrder
+                    this.layerOrderArray[spriteManagerIndex] = sprite.layerOrder;
                     
                     // Active
                     bool isActive = chunk.IsComponentEnabled(ref this.activeType, i);

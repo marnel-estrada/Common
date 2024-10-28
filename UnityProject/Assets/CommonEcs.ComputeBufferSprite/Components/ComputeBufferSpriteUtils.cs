@@ -10,8 +10,6 @@
         /// <param name="yPos"></param>
         /// <returns></returns>
         public static float ComputeZPos(int layer, float yPos) {
-            // The multiplication by 5 here is the scale per z position such that we can
-            // add layer order on them.
             return (-layer * 5) + yPos;
         }
     }

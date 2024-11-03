@@ -19,7 +19,7 @@ namespace Common {
         private Object dataSource;
         private GUISkin skin;
         
-        private readonly ClassPropertiesRenderer propertiesRenderer = new ClassPropertiesRenderer(200);
+        private readonly ClassPropertiesRenderer propertiesRenderer = new(200);
 
         private List<ClassData> dataList;
 

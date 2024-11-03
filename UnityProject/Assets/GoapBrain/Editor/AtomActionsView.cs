@@ -127,8 +127,9 @@ namespace GoapBrain {
         }
 
         private void OnAdd(Type type) {
-            ClassData classData = new ClassData();
-            classData.ClassName = type.FullName ?? string.Empty;
+            ClassData classData = new() {
+                ClassName = type.FullName ?? string.Empty
+            };
 
             this.action?.AtomActions.Add(classData);
 

@@ -14,8 +14,8 @@ namespace Common {
 
         private readonly VariableFieldRenderer variableFieldRenderer;
 
-        private readonly VariableNamesAggregator aggregator = new VariableNamesAggregator();
-        private readonly PopupValueSet variablesValueSet = new PopupValueSet();
+        private readonly VariableNamesAggregator aggregator = new();
+        private readonly PopupValueSet variablesValueSet = new();
 
         /// <summary>
         ///     Constructor

@@ -83,5 +83,10 @@ namespace Common {
         public IReadOnlyList<DataComponent> Components => this.components;
 
         public bool HasComponents => this.components.Count > 0;
+
+        public void RemoveComponent(DataComponent component) {
+            this.components.Remove(component);
+            this.componentMap.Remove(component.GetType().FullName.GetHashCode());
+        }
     }
 }

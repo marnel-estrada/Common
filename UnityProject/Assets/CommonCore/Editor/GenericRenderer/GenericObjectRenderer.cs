@@ -16,7 +16,7 @@ namespace Common {
         private readonly PropertyInfo[] properties;
 
         private delegate void PropertyRenderer(PropertyInfo property, object instance);
-        private static readonly Dictionary<Type, PropertyRenderer> RENDERER_MAP = new Dictionary<Type, PropertyRenderer>() {
+        private static readonly Dictionary<Type, PropertyRenderer> RENDERER_MAP = new() {
             { typeof(string), RenderString },
             { typeof(byte), RenderByte },
             { typeof(int), RenderInt },
@@ -24,12 +24,13 @@ namespace Common {
             { typeof(bool), RenderBool },
             { typeof(Vector2), RenderVector2 },
             { typeof(float2), RenderFloat2 },
-            { typeof(Color), RenderColor }
+            { typeof(Color), RenderColor },
+            { typeof(List<string>), RenderStringList }
         };
 
-        private readonly Dictionary<string, List<PropertyInfo>> groupMap = new Dictionary<string, List<PropertyInfo>>();
+        private readonly Dictionary<string, List<PropertyInfo>> groupMap = new();
         
-        private readonly Dictionary<string, EditorPropertyRenderer> customRenderers = new Dictionary<string, EditorPropertyRenderer>(1);
+        private readonly Dictionary<string, EditorPropertyRenderer> customRenderers = new(1);
 
         /// <summary>
         /// Constructor
@@ -335,6 +336,18 @@ namespace Common {
 
             // Set the value back
             property.GetSetMethod().Invoke(instance, new object[] { value });
+        }
+
+        private static void RenderStringList(PropertyInfo property, object instance) {
+            GUILayout.Label(property.Name);
+            
+            List<string> list = (List<string>)property.GetGetMethod().Invoke(instance, null);
+            if (list == null) {
+                GUILayout.Label("(list is null)");
+                return;
+            }
+
+            EditorRenderUtils.Render(property.Name, list);
         }
     }
 }

@@ -78,11 +78,7 @@ namespace Common {
             }
 
             MethodInfo setMethod = property.GetSetMethod(false);
-            if(setMethod == null) {
-                return false;
-            }
-
-            return true;
+            return setMethod != null;
         }
 
         public static void CopyProperties<T>(T source, T destination) {

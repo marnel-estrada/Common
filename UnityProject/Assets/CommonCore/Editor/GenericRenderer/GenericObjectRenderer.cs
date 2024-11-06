@@ -241,14 +241,30 @@ namespace Common {
             GUILayout.EndHorizontal();
         }
 
+        private static GUIStyle? TextAreaStyle;
+
         private static void RenderString(PropertyInfo property, object instance) {
             string? value = property.GetGetMethod().Invoke(instance, null) as string;
             value = string.IsNullOrEmpty(value) ? "" : value; // Prevent null
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(property.Name + ":", GUILayout.Width(150));
-            value = EditorGUILayout.TextField(value, GUILayout.Width(300)).Trim();
-            GUILayout.EndHorizontal();
+            TextAreaAttribute? textAreaAttribute = property.GetCustomAttribute<TextAreaAttribute>();
+            if (textAreaAttribute == null) {
+                // No text area. Render as text field.
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(property.Name + ":", GUILayout.Width(150));
+                value = EditorGUILayout.TextField(value, GUILayout.Width(300)).Trim();
+                GUILayout.EndHorizontal();
+            } else {
+                // There's TextArea attribute. Render as such.
+                TextAreaStyle ??= new GUIStyle(EditorStyles.textArea) {
+                    wordWrap = true,
+                    fixedWidth = 400,
+                    fixedHeight = 100
+                };
+                
+                GUILayout.Label($"{property.Name}:");
+                value = EditorGUILayout.TextArea(value, TextAreaStyle);
+            }
 
             // Set the value back
             property.GetSetMethod().Invoke(instance, new object[] { value });

@@ -23,6 +23,7 @@ namespace CommonEcs.Goap {
 
         protected override void OnCreate() {
             this.query = PrepareQuery();
+            RequireForUpdate(this.query);
 
             // Action has array if it's not zero sized
             this.isActionFilterHasArray = !TypeManager.GetTypeInfo(TypeManager.GetTypeIndex<TActionFilter>()).IsZeroSized;

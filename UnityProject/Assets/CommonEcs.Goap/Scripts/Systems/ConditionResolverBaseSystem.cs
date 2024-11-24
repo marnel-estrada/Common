@@ -26,6 +26,7 @@ namespace CommonEcs.Goap {
             this.textDbSystem = GetOrCreateSystemManaged<GoapTextDbSystem>();
             
             this.query = GetEntityQuery(typeof(ConditionResolver), typeof(TResolverFilter));
+            RequireForUpdate(this.query);
             this.isFilterZeroSized = TypeManager.GetTypeInfo(TypeManager.GetTypeIndex<TResolverFilter>()).IsZeroSized;
         }
 

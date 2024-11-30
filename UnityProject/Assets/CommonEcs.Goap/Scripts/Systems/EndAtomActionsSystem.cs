@@ -51,6 +51,7 @@ namespace CommonEcs.Goap {
             handle = resetGoalIndexJob.ScheduleParallel(this.plannersQuery, handle);
 
             MoveToNextActionJob moveToNextActionJob = new() {
+                entityType = GetEntityTypeHandle(),
                 agentType = agentType, 
                 debugEntityType = GetComponentTypeHandle<DebugEntity>(),
                 allActionSets = GetBufferLookup<ResolvedAction>()
@@ -165,6 +166,9 @@ namespace CommonEcs.Goap {
         
         [BurstCompile]
         private struct MoveToNextActionJob : IJobChunk {
+            [ReadOnly]
+            public EntityTypeHandle entityType;
+            
             public ComponentTypeHandle<GoapAgent> agentType;
 
             public ComponentTypeHandle<DebugEntity> debugEntityType;
@@ -173,6 +177,7 @@ namespace CommonEcs.Goap {
             public BufferLookup<ResolvedAction> allActionSets;
             
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
                 NativeArray<GoapAgent> agents = chunk.GetNativeArray(ref this.agentType);
                 NativeArray<DebugEntity> debugEntities = chunk.GetNativeArray(ref this.debugEntityType);
 
@@ -204,7 +209,7 @@ namespace CommonEcs.Goap {
                     }
 
                     if (agent.lastResult == GoapResult.SUCCESS) {
-                        MoveToNextAction(ref agent, debug);
+                        MoveToNextAction(entities[i], ref agent, debug);
                     }
                     
                     // Modify
@@ -212,7 +217,7 @@ namespace CommonEcs.Goap {
                 }
             }
 
-            private void MoveToNextAction(ref GoapAgent agent, in DebugEntity debugEntity) {
+            private void MoveToNextAction(Entity agentEntity, ref GoapAgent agent, in DebugEntity debugEntity) {
                 DynamicBuffer<ResolvedAction> actionSet = this.allActionSets[agent.plannerEntity];
                 ResolvedAction currentAction = actionSet[agent.currentActionIndex];
                 
@@ -225,7 +230,7 @@ namespace CommonEcs.Goap {
                 
                 if (debugEntity.enabled) {
                     // ReSharper disable once UseStringInterpolation (due to Burst)
-                    Debug.Log(string.Format("Moved atom action index: {0}", agent.currentAtomActionIndex));
+                    Debug.Log(string.Format($"Agent {agentEntity.Index} moved atom action index: {agent.currentAtomActionIndex}"));
                 }
                 
                 if (agent.currentAtomActionIndex < currentAction.atomActionCount) {
@@ -240,7 +245,7 @@ namespace CommonEcs.Goap {
                 
                 if (debugEntity.enabled) {
                     // ReSharper disable once UseStringInterpolation (due to Burst)
-                    Debug.Log(string.Format("Moved action index: {0}", agent.currentActionIndex));
+                    Debug.Log(string.Format($"Agent {agentEntity.Index} moved action index: {agent.currentActionIndex}"));
                 }
                 
                 if (agent.currentActionIndex >= actionSet.Length) {

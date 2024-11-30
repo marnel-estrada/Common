@@ -111,7 +111,6 @@ namespace CommonEcs.Goap {
                 ChunkEntityEnumeratorWithQueryIndex enumerator = new(
                     useEnabledMask, chunkEnabledMask, chunk.Count, ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
                 while (enumerator.NextEntity(out int i, out int queryIndex)) {
-                    
                     AtomAction atomAction = atomActions[i];
                     GoapAgent agent = this.allAgents[atomAction.agentEntity];
                     DebugEntity debug = this.allDebugEntities[atomAction.agentEntity];

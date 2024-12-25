@@ -203,8 +203,7 @@ namespace CommonEcs.Goap {
 
                         if (debug.enabled) {
                             // ReSharper disable once UseStringInterpolation (due to Burst)
-                            Debug.Log(string.Format("Failed at action: {0}, atomAction: {1}", agent.currentActionIndex, 
-                                agent.currentAtomActionIndex));
+                            Debug.Log($"Failed at action: {agent.currentActionIndex}, atomAction: {agent.currentAtomActionIndex}");
                         }
                     }
 
@@ -229,8 +228,7 @@ namespace CommonEcs.Goap {
                 ++agent.currentAtomActionIndex;
                 
                 if (debugEntity.enabled) {
-                    // ReSharper disable once UseStringInterpolation (due to Burst)
-                    Debug.Log(string.Format($"Agent {agentEntity.Index} moved atom action index: {agent.currentAtomActionIndex}"));
+                    Debug.Log($"Agent {agentEntity.Index} moved atom action index: {agent.currentAtomActionIndex}");
                 }
                 
                 if (agent.currentAtomActionIndex < currentAction.atomActionCount) {
@@ -245,7 +243,7 @@ namespace CommonEcs.Goap {
                 
                 if (debugEntity.enabled) {
                     // ReSharper disable once UseStringInterpolation (due to Burst)
-                    Debug.Log(string.Format($"Agent {agentEntity.Index} moved action index: {agent.currentActionIndex}"));
+                    Debug.Log($"Agent {agentEntity.Index} moved action index: {agent.currentActionIndex}");
                 }
                 
                 if (agent.currentActionIndex >= actionSet.Length) {

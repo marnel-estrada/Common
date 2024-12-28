@@ -85,10 +85,8 @@ namespace Common {
          * Requests for a prefab instance.
          */
         public GameObject Request(string prefabName) {
-            Assertion.IsTrue(this.nameToIndexMap.ContainsKey(prefabName),
-                prefabName); // "nameToIndexMapping should contain the specified prefab name: " + prefabName
-            int prefabIndex = this.nameToIndexMap[prefabName];
-
+            // "nameToIndexMapping should contain the specified prefab name: " + prefabName
+            Assertion.IsTrue(this.nameToIndexMap.TryGetValue(prefabName, out int prefabIndex), prefabName);
             return Request(prefabIndex);
         }
 
@@ -106,7 +104,7 @@ namespace Common {
         /**
          * Requests for a prefab instance using the specified index
          */
-        public GameObject Request(int prefabIndex) {
+        private GameObject Request(int prefabIndex) {
             SwarmItem item = this.itemManager.ActivateItem(prefabIndex);
 
             return item.gameObject;
@@ -115,7 +113,7 @@ namespace Common {
         /**
          * Preloads the specified prefab for a certain amount
          */
-        public void Preload(string prefabName, int count) {
+        private void Preload(string prefabName, int count) {
             Assertion.IsTrue(
                 this.nameToIndexMap.
                     ContainsKey(

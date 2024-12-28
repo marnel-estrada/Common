@@ -12,7 +12,7 @@ namespace Common {
         [SerializeField]
         private SelfManagingSwarmItemManager itemManager;
 
-        private IDictionary<string, int> nameToIndexMapping;
+        private readonly Dictionary<string, int> nameToIndexMap = new();
 
         [SerializeField]
         private PreloadData[] preloadDataList;
@@ -23,29 +23,20 @@ namespace Common {
         [SerializeField]
         private float pruneIntervalTime = 1.0f;
 
-        public SelfManagingSwarmItemManager ItemManager {
-            get {
-                return this.itemManager;
-            }
-        }
+        public SelfManagingSwarmItemManager ItemManager => this.itemManager;
 
         /**
          * Returns the number of prefabs that the manager can instantiate
          */
-        public int PrefabCount {
-            get {
-                return this.itemManager.itemPrefabs.Length;
-            }
-        }
+        public int PrefabCount => this.itemManager.itemPrefabs.Length;
 
         private void Awake() {
             Assertion.NotNull(this.itemManager);
 
             // populate moduleMapping
-            this.nameToIndexMapping = new Dictionary<string, int>();
             for (int i = 0; i < this.itemManager.itemPrefabs.Length; ++i) {
                 SwarmItemManager.PrefabItem current = this.itemManager.itemPrefabs[i];
-                this.nameToIndexMapping[current.prefab.name] = i;
+                this.nameToIndexMap[current.prefab.name] = i;
             }
 
             StartCoroutine(Preload());
@@ -76,7 +67,7 @@ namespace Common {
 
         private IEnumerator PruneItems() {
             foreach (PruneData data in this.pruneDataList) {
-                int itemPrefabIndex = this.nameToIndexMapping[data.PrefabName];
+                int itemPrefabIndex = this.nameToIndexMap[data.PrefabName];
                 this.itemManager.PruneInactiveList(itemPrefabIndex, data.MaxInactiveCount);
 
                 yield return 0; // distribute pruning in different frames so that it won't hog down runtime
@@ -87,16 +78,16 @@ namespace Common {
          * Return whether or not the PrefabManager contains the specified prefab
          */
         public bool ContainsPrefab(string prefabName) {
-            return this.nameToIndexMapping.ContainsKey(prefabName);
+            return this.nameToIndexMap.ContainsKey(prefabName);
         }
 
         /**
          * Requests for a prefab instance.
          */
         public GameObject Request(string prefabName) {
-            Assertion.IsTrue(this.nameToIndexMapping.ContainsKey(prefabName),
+            Assertion.IsTrue(this.nameToIndexMap.ContainsKey(prefabName),
                 prefabName); // "nameToIndexMapping should contain the specified prefab name: " + prefabName
-            int prefabIndex = this.nameToIndexMapping[prefabName];
+            int prefabIndex = this.nameToIndexMap[prefabName];
 
             return Request(prefabIndex);
         }
@@ -126,10 +117,10 @@ namespace Common {
          */
         public void Preload(string prefabName, int count) {
             Assertion.IsTrue(
-                this.nameToIndexMapping.
+                this.nameToIndexMap.
                     ContainsKey(
                         prefabName)); // "nameToIndexMapping should contain the specified prefab name: " + prefabName
-            int prefabIndex = this.nameToIndexMapping[prefabName];
+            int prefabIndex = this.nameToIndexMap[prefabName];
             this.itemManager.Preload(prefabIndex, count);
         }
 
@@ -140,10 +131,10 @@ namespace Common {
         /// <returns></returns>
         public int GetInactiveCount(string prefabName) {
             Assertion.IsTrue(
-                this.nameToIndexMapping.
+                this.nameToIndexMap.
                     ContainsKey(
                         prefabName)); // "nameToIndexMapping should contain the specified prefab name: " + prefabName
-            int prefabIndex = this.nameToIndexMapping[prefabName];
+            int prefabIndex = this.nameToIndexMap[prefabName];
 
             return this.itemManager.GetInactiveCount(prefabIndex);
         }
@@ -159,10 +150,10 @@ namespace Common {
         /// <param name="count"></param>
         public void Reserve(string prefabName, int count) {
             Assertion.IsTrue(
-                this.nameToIndexMapping.
+                this.nameToIndexMap.
                     ContainsKey(
                         prefabName)); // "nameToIndexMapping should contain the specified prefab name: " + prefabName
-            int prefabIndex = this.nameToIndexMapping[prefabName];
+            int prefabIndex = this.nameToIndexMap[prefabName];
             this.itemManager.Reserve(prefabIndex, count);
         }
 

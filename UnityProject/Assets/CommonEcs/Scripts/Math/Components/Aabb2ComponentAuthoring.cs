@@ -39,9 +39,13 @@ namespace Common {
     }
 
     public class Aabb2ComponentAuthoring : MonoBehaviour {
+        public float2 size = new(0.2f, 0.2f);
+        public float2 pivot;
+        
         private class Baker : Baker<Aabb2ComponentAuthoring> {
             public override void Bake(Aabb2ComponentAuthoring authoring) {
-                AddComponent(this.GetPrimaryEntity(), new Aabb2Component());
+                Aabb2Component box = new(authoring.size.x, authoring.size.y, authoring.pivot);
+                AddComponent(this.GetPrimaryEntity(), box);
             }
         }
     }

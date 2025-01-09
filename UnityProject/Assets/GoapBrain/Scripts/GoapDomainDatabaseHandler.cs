@@ -106,10 +106,14 @@ namespace GoapBrain {
                     throw new Exception($"Action {actionData.Name} does not have an effect.");
                 }
 
-                Condition effect = new Condition(effectData.Name, effectData.Value);
+                if (string.IsNullOrEmpty(effectData.Name?.Trim())) {
+                    throw new Exception($"Action {actionData.Name} does not have an effect name.");
+                }
+
+                Condition effect = new(effectData.Name, effectData.Value);
                 AddToTextMap(effectData.Name);
                 
-                GoapAction action = new GoapAction(actionData.Name, actionData.Cost, actionData.AtomActions.Count,
+                GoapAction action = new(actionData.Name, actionData.Cost, actionData.AtomActions.Count,
                     effect);
                 AddToTextMap(actionData.Name);
 

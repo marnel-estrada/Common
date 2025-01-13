@@ -47,6 +47,19 @@ namespace CommonEcs {
             return prefab.ValueOrError();
         }
 
+        public Entity GetEntityPrefab(int idHashCode) {
+            if (this.prefabManager.IsNone) {
+                throw new Exception("The prefab manager is not resolved yet.");
+            }
+
+            ValueTypeOption<Entity> prefab = this.prefabManager.ValueOrError().GetPrefab(idHashCode);
+            if (prefab.IsNone) {
+                throw new Exception($"The prefab pool does not contain an entry for {idHashCode}");
+            }
+
+            return prefab.ValueOrError();
+        }
+
         public void RegisterPrefabManager(ref EntityPrefabManager prefabManager) {
             Debug.Log("The EntityPrefabManager is found.");
             this.prefabManager = Option<EntityPrefabManager>.AsOption(prefabManager);

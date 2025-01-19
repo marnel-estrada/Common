@@ -100,5 +100,8 @@ namespace Common {
             return builder;
         }
 
+        public static bool IsNullOrWhitespace(this string? s) {
+            return string.IsNullOrEmpty(s?.Trim());
+        }
     }
 }

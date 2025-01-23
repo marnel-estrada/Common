@@ -102,8 +102,9 @@
                 float3 worldPosition = translationAndScale.xyz + (v.vertex.xyz * scale);
 
                 // layer order
+                // We multiply by negative value here because higher order means to be rendered later
                 int layerOrder = layerOrderBuffer[instanceID];
-                worldPosition.z = worldPosition.z + (layerOrder * -0.00001);
+                worldPosition.z = worldPosition.z + (layerOrder * -0.001);
                 
                 v2f o;
                 o.pos = UnityObjectToClipPos(float4(worldPosition, 1.0f));

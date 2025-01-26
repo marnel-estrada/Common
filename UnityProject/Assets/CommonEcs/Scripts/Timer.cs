@@ -13,6 +13,11 @@ namespace CommonEcs {
             this.duration = duration;
         }
 
+        public Timer(float polledTime, float duration) {
+            this.polledTime = polledTime;
+            this.duration = duration;
+        }
+
         public void Update(float deltaTime) {
             this.polledTime += deltaTime;
         }

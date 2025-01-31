@@ -8,7 +8,7 @@ namespace Common {
         // we need this to store activated SwarmItem temporarily
         // they will be killed right after
         // we can't Activate() then Kill() because it will only reuse the killed item
-        private readonly SimpleList<SwarmItem> preloadList = new SimpleList<SwarmItem>();
+        private readonly SimpleList<SwarmItem> preloadList = new();
 
         private void Awake() {
             Initialize();

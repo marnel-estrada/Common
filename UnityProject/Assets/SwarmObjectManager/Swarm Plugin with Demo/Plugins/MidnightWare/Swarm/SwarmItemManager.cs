@@ -76,17 +76,27 @@ public class SwarmItemManager : MonoBehaviour {
                 this.gameObject);
         }
 
-        // make sure all the thresholds and percentages are clamped between 0 and 1.0f
-        foreach (PrefabItem itemPrefab in this.itemPrefabs) {
-            itemPrefab.inactiveThreshold = Mathf.Clamp01(itemPrefab.inactiveThreshold);
-            itemPrefab.inactivePrunePercentage = Mathf.Clamp01(itemPrefab.inactivePrunePercentage);
+        for (int i = 0; i < this.itemPrefabs.Length; i++) {
+	        PrefabItem itemPrefab = this.itemPrefabs[i];
+	        
+	        // Ensure that the specified prefabs have the SwarmItem component
+	        Assert.IsTrue(itemPrefab.prefab != null,
+		        $"A prefab in SwamItemManager named {this.gameObject.name} is null at index {i}");
+	        
+	        Assert.IsTrue(itemPrefab.prefab!.TryGetComponent(out SwarmItem _),
+		        $"A prefab in SwamItemManager named {this.gameObject.name} has no SwarmItem component at index {i}");
+
+	        // make sure all the thresholds and percentages are clamped between 0 and 1.0f
+	        itemPrefab.inactiveThreshold = Mathf.Clamp01(itemPrefab.inactiveThreshold);
+	        itemPrefab.inactivePrunePercentage = Mathf.Clamp01(itemPrefab.inactivePrunePercentage);
         }
 
         // initialize the prefab item lists
         this._prefabItemLists = new PrefabItemLists[this.itemPrefabs.Length];
         for (int i = 0; i < this._prefabItemLists.Length; i++) {
-            this._prefabItemLists[i] = new PrefabItemLists();
-            this._prefabItemLists[i].inactivePruneTimeLeft = 0;
+            this._prefabItemLists[i] = new PrefabItemLists {
+	            inactivePruneTimeLeft = 0
+            };
         }
 
         // create the active objects parent transform

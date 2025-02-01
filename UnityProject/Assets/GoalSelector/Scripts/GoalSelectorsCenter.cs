@@ -71,7 +71,7 @@ namespace GoalSelector {
         }
 
         private static GoalSelector Parse(ref EntityManager entityManager, GoalSelectorData data) {
-            GoalSelector goalSelector = new GoalSelector();
+            GoalSelector goalSelector = new();
 
             // Parse each goal
             for (int i = 0; i < data.Count; ++i) {
@@ -83,7 +83,7 @@ namespace GoalSelector {
                 }
 
                 Assertion.NotEmpty(goalData.ConditionName); // Condition name must not be empty
-                Goal goal = new Goal(goalData.Id, goalData.ConditionName, goalData.ConditionValue);
+                Goal goal = new(goalData.Id, goalData.ConditionName, goalData.ConditionValue);
                 ParseConsiderations(goalData, goal);
 
                 goalSelector.Add(goal);

@@ -73,6 +73,7 @@ namespace GoapBrain {
 
             GoapDomain domain = new(data.name);
             AddActions(ref domain, data, this.addedActions);
+            AddConditionNamesText(data);
 
             // Parse each extension domain
             // Note here that we're just adding the actions in the extensions to the main GoapDomain
@@ -82,10 +83,17 @@ namespace GoapBrain {
                 Assertion.NotNull(extensionDomain);
                 if (extensionDomain != null) {
                     AddActions(ref domain, extensionDomain, this.addedActions);
+                    AddConditionNamesText(extensionDomain);
                 }
             }
 
             return domain;
+        }
+
+        private void AddConditionNamesText(GoapDomainData domainData) {
+            for (int i = 0; i < domainData.ConditionNamesCount; i++) {
+                AddToTextMap(domainData.GetConditionNameAt(i).Name);
+            }
         }
 
         private void AddActions(ref GoapDomain domain, GoapDomainData data, HashSet<string> addedActions) {

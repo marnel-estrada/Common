@@ -1,6 +1,7 @@
 using System;
 
 using Unity.Collections;
+using UnityEngine;
 
 namespace CommonEcs.Goap {
     public readonly struct Condition : IEquatable<Condition> {

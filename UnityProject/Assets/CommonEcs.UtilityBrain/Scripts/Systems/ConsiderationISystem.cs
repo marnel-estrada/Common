@@ -1,8 +1,17 @@
 ﻿using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
-using Unity.Entities;
+using Unity.Entities; 
 
 namespace CommonEcs.UtilityBrain {
+    /// <summary>
+    /// Note that this is a composed system that is to be used in an ISystem struct
+    /// So this struct does not implement ISystem so it won't be picked up by the system
+    /// instantiations.
+    /// </summary>
+    /// <typeparam name="TComponent"></typeparam>
+    /// <typeparam name="TProcessor"></typeparam>
+    /// <typeparam name="TStrategy"></typeparam>
     public struct ConsiderationISystem<TComponent, TProcessor, TStrategy> 
         where TComponent : unmanaged, IConsiderationComponent
         where TProcessor : unmanaged, IConsiderationProcess<TComponent> 
@@ -33,7 +42,7 @@ namespace CommonEcs.UtilityBrain {
             
             NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(Allocator.TempJob);
             
-            ComputeConsiderationsJob<TComponent, TProcessor> job = new() {
+            ComputeConsiderationsJob job = new() {
                 chunkBaseEntityIndices = chunkBaseEntityIndices,
                 considerationType = state.GetComponentTypeHandle<Consideration>(),
                 filterType = state.GetComponentTypeHandle<TComponent>(),
@@ -46,6 +55,51 @@ namespace CommonEcs.UtilityBrain {
             
             // Don't forget to dispose
             state.Dependency = chunkBaseEntityIndices.Dispose(state.Dependency);
+        }
+        
+        [BurstCompile]
+        public struct ComputeConsiderationsJob : IJobChunk {
+            [ReadOnly]
+            public NativeArray<int> chunkBaseEntityIndices;
+
+            public ComponentTypeHandle<Consideration> considerationType;
+
+            public ComponentTypeHandle<TComponent> filterType;
+
+            public bool filterHasArray;
+            public TProcessor processor;
+
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<Consideration> considerations = chunk.GetNativeArray(ref this.considerationType);
+                
+                NativeArray<TComponent> filters = this.filterHasArray ? chunk.GetNativeArray(ref this.filterType) : default;
+                TComponent defaultFilter = default; // This will be used if TActionFilter has no chunk (it's a tag component)
+                
+                this.processor.BeforeChunkIteration(chunk);
+
+                ChunkEntityEnumeratorWithQueryIndex enumerator = new(
+                    useEnabledMask, chunkEnabledMask, chunk.Count, ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
+                while (enumerator.NextEntity(out int i, out int queryIndex)) {
+                    Consideration consideration = considerations[i];
+                    if (!consideration.shouldExecute) {
+                        // Not time to execute yet
+                        continue;
+                    }
+
+                    // Compute the utility
+                    if (this.filterHasArray) {
+                        // Use filter component if it has data
+                        TComponent filter = filters[i];
+                        consideration.value = this.processor.ComputeUtility(consideration.agentEntity, filter, i, queryIndex);
+                    } else {
+                        // Filter has no component. Just use default data.
+                        consideration.value = this.processor.ComputeUtility(consideration.agentEntity, defaultFilter, i, queryIndex);
+                    }
+                    
+                    // Modify
+                    considerations[i] = consideration;
+                }
+            }
         }
     }
 }

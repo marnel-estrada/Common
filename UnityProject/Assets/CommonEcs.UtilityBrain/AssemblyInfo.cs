@@ -2,5 +2,5 @@ using CommonEcs.UtilityBrain;
 
 using Unity.Jobs;
 
-[assembly:RegisterGenericJobType(typeof(ComputeConsiderationsJob<BonusTuning, BonusTuningSystem.Processor>))]
-[assembly:RegisterGenericJobType(typeof(ComputeConsiderationsJob<RankTuning, RankTuningSystem.Processor>))]
+[assembly:RegisterGenericJobType(typeof(ConsiderationBaseSystem<BonusTuning, BonusTuningSystem.Processor>.ComputeConsiderationsJob))]
+[assembly:RegisterGenericJobType(typeof(ConsiderationBaseSystem<RankTuning, RankTuningSystem.Processor>.ComputeConsiderationsJob))]

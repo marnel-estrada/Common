@@ -274,11 +274,11 @@ namespace CommonEcs.Goap {
                     conditionsMap = conditionsMapCopy;
 
                     // Add all the actions that were resolved so far
-                    actionList.AddRange(tempActionList);
+                    actionList.AddRange(tempActionList.AsArray());
                     
 #if UNITY_EDITOR
                     if (isDebug) {
-                        Debug.Log(string.Format("Searching for actions for preconditions for {0} succeeded.", actionName));
+                        Debug.Log($"Searching for actions for preconditions for {actionName} succeeded.");
                     }
 #endif
 

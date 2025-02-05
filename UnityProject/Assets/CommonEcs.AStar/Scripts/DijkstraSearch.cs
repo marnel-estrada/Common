@@ -6,17 +6,17 @@ using Unity.Mathematics;
 
 namespace CommonEcs {
     [BurstCompile]
-    public struct DijkstraSearch<GoalIdentifierType, ReachabilityType> : IJob 
-        where GoalIdentifierType : struct, GoalIdentifier<int3> 
-        where ReachabilityType : struct, IReachability<int3> {
+    public struct DijkstraSearch<TGoalIdentifierType, TReachabilityType> : IJob 
+        where TGoalIdentifierType : struct, GoalIdentifier<int3> 
+        where TReachabilityType : struct, IReachability<int3> {
         public Entity owner;
         public int3 startPosition; 
 
         [ReadOnly]
-        public GoalIdentifierType goalIdentifier;
+        public TGoalIdentifierType goalIdentifier;
         
         [ReadOnly]
-        public ReachabilityType reachability;
+        public TReachabilityType reachability;
         
         [ReadOnly]
         public NativeArray<int3> neighborOffsets; // This will be specified by client on whether it wants to include diagonal neighbors

@@ -10,6 +10,7 @@ namespace CommonEcs {
         public Color color = Color.white;
         public string? sortingLayer;
         public int layerOrder;
+        public bool activeByDefault = true; 
 
         public int[]? uvIndices;
         
@@ -30,7 +31,7 @@ namespace CommonEcs {
                 
                 // We add this since this is used to hide a sprite
                 AddComponent<Active>(entity);
-                SetComponentEnabled<Active>(entity, true);
+                SetComponentEnabled<Active>(entity, authoring.activeByDefault);
 
                 DynamicBuffer<UvIndex> uvIndexBuffer = AddBuffer<UvIndex>(entity);
                 Assert.IsFalse(authoring.uvIndices == null);

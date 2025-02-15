@@ -25,6 +25,20 @@ namespace CommonEcs {
         public void Reset() {
             this.polledTime = 0;
         }
+
+        /// <summary>
+        /// Resets the timer but retains the extra polled time.
+        /// </summary>
+        public void ResetRetainRemaining() {
+            // This must be greater than zero or it will cause an infinite loop
+            DotsAssert.IsTrue(this.duration > 0);
+            
+            while (this.polledTime > this.duration) {
+                this.polledTime -= this.duration;
+            }
+
+            this.polledTime = math.clamp(this.polledTime, 0, this.duration);
+        }
         
         public void Reset(float duration) {
             Reset();

@@ -14,6 +14,7 @@ namespace CommonEcs {
         }
 
         public static int AsIntId(this string self) {
+            Assertion.NotEmpty(self);
             return ToIntId(self);
         }
 

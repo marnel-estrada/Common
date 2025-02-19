@@ -15,6 +15,7 @@ namespace CommonEcs {
                 // This means that it's an empty slot. We can place the value here.
                 this.bucket[bucketIndex] = new LinearHashMapEntry<K, V>(key, value);
                 ++this.count;
+                return;
             }
             
             // At this point, there's an existing value at the slot

@@ -13,7 +13,7 @@ namespace CommonEcs {
     /// </summary>
     /// <typeparam name="T"></typeparam>
     #if UNITY_EDITOR
-    public struct ValueTypeOption<T> : IEquatable<ValueTypeOption<T>> where T : struct, IEquatable<T> {
+    public struct ValueTypeOption<T> : IEquatable<ValueTypeOption<T>> where T : struct {
         // Set these values to non-readonly public variables so that we can see and select them in 
         // Unity's Component Inspector
         public T value;

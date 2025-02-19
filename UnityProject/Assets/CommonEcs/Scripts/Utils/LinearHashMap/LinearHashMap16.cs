@@ -3,7 +3,7 @@ using System;
 namespace CommonEcs {
     public struct LinearHashMap16<K, V>
         where K : unmanaged, IEquatable<K>
-        where V : unmanaged, IEquatable<V> {
+        where V : unmanaged {
         private LinearHashMapBucket16<K, V> bucket;
         private int count;
 

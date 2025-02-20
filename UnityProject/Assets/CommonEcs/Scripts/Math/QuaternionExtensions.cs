@@ -3,7 +3,7 @@ using Unity.Mathematics;
 
 namespace CommonEcs {
     public static class QuaternionExtensions {
-        public static quaternion ToQuaternion(float3 euler) {
+        public static quaternion ToQuaternion(this float3 euler) {
             // Note that these are still in degrees
             float yaw = euler.y;
             float pitch = euler.x;

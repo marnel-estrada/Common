@@ -13,7 +13,7 @@ namespace CommonEcs {
     /// </summary>
     /// <typeparam name="T"></typeparam>
     #if UNITY_EDITOR
-    public struct ValueTypeOption<T> : IEquatable<ValueTypeOption<T>> where T : struct {
+    public struct ValueTypeOption<T> where T : struct {
         // Set these values to non-readonly public variables so that we can see and select them in 
         // Unity's Component Inspector
         public T value;
@@ -82,39 +82,6 @@ namespace CommonEcs {
             }
 
             throw new Exception("Trying to access value from a None option.");
-        }
-
-        /// <summary>
-        /// An equality method that compares the value right away. We provided this so that
-        /// client code won't have to convert to ValueTypeOption when checking for equality.
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
-        public bool Equals(in T other) {
-            return this.IsSome && this.value.Equals(other);
-        }
-
-        public bool Equals(ValueTypeOption<T> other) {
-            return this.hasValue == other.hasValue && this.value.Equals(other.value);
-        }
-
-        [BurstDiscard]
-        public override bool Equals(object obj) {
-            return obj is ValueTypeOption<T> other && Equals(other);
-        }
-
-        public override int GetHashCode() {
-            unchecked {
-                return (this.hasValue.GetHashCode() * 397) ^ this.value.GetHashCode();
-            }
-        }
-
-        public static bool operator ==(ValueTypeOption<T> left, ValueTypeOption<T> right) {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ValueTypeOption<T> left, ValueTypeOption<T> right) {
-            return !left.Equals(right);
         }
     }
 }

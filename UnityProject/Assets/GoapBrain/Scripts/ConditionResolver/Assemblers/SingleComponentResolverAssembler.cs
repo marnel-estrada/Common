@@ -9,7 +9,8 @@ namespace GoapBrain {
         private EntityArchetype archetype;
 
         public override void Init(ref EntityManager entityManager) {
-            this.archetype = entityManager.CreateArchetype(typeof(ConditionResolver), 
+            this.archetype = entityManager.CreateArchetype(typeof(ConditionResolver),
+                typeof(ConditionResolver.Resolved),
                 typeof(T));
         }
 
@@ -28,6 +29,7 @@ namespace GoapBrain {
             int resultIndex = conditionsMap.AddOrSet(conditionName, false);
             entityManager.SetComponentData(resolverEntity, new ConditionResolver(conditionName, 
                 agentEntity, plannerEntity, resultIndex));
+            entityManager.SetComponentEnabled<ConditionResolver.Resolved>(resolverEntity, false);
             conditionsMap.Commit(ref entityManager);
             
             PrepareResolverComponent(ref entityManager, agentEntity, resolverEntity);

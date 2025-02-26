@@ -17,6 +17,7 @@ namespace CommonEcs.Goap {
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             IdentifyJob job = new() {
                 resolverHandle = GetComponentTypeHandle<ConditionResolver>(),
+                resolvedEnableableType = GetComponentTypeHandle<ConditionResolver.Resolved>(),
                 allPlanners = GetComponentLookup<GoapPlanner>(),
                 allRequiredConditions = GetBufferLookup<RequiredCondition>()
             };
@@ -27,6 +28,7 @@ namespace CommonEcs.Goap {
         [BurstCompile]
         private struct IdentifyJob : IJobChunk {
             public ComponentTypeHandle<ConditionResolver> resolverHandle;
+            public ComponentTypeHandle<ConditionResolver.Resolved> resolvedEnableableType;
 
             [ReadOnly]
             public ComponentLookup<GoapPlanner> allPlanners;
@@ -41,10 +43,10 @@ namespace CommonEcs.Goap {
                     GoapPlanner planner = this.allPlanners[resolver.plannerEntity];
                     DynamicBuffer<RequiredCondition> requiredConditions = this.allRequiredConditions[resolver.plannerEntity];
                     
-                    // We set resolved to false so that the resolver systems
-                    // will try to resolve the values
-                    resolver.resolved = !(planner.state == PlanningState.RESOLVING_CONDITIONS 
+                    // Set whether the condition is resolved or not
+                    bool isResolved = !(planner.state == PlanningState.RESOLVING_CONDITIONS 
                         && ContainsConditionId(requiredConditions, resolver.conditionId));
+                    chunk.SetComponentEnabled(ref this.resolvedEnableableType, i, isResolved);
                     
                     // Modify
                     resolvers[i] = resolver;
@@ -52,7 +54,7 @@ namespace CommonEcs.Goap {
             }
 
             // TODO Linear search for now. We can optimize this later by using a Bloom Filter.
-            private bool ContainsConditionId(in DynamicBuffer<RequiredCondition> requiredConditions,
+            private static bool ContainsConditionId(in DynamicBuffer<RequiredCondition> requiredConditions,
                 ConditionId conditionId) {
                 for (int i = 0; i < requiredConditions.Length; ++i) {
                     if (requiredConditions[i].conditionId == conditionId) {

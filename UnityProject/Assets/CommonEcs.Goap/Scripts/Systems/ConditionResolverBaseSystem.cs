@@ -24,9 +24,15 @@ namespace CommonEcs.Goap {
 
         protected override void OnCreate() {
             this.textDbSystem = GetOrCreateSystemManaged<GoapTextDbSystem>();
-            
-            this.query = GetEntityQuery(typeof(ConditionResolver), typeof(TResolverFilter));
+
+            // Note here that we query for condition resolvers that are not yet resolved
+            this.query = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<ConditionResolver>()
+                .WithAll<TResolverFilter>()
+                .WithNone<ConditionResolver.Resolved>()
+                .Build(this);
             RequireForUpdate(this.query);
+            
             this.isFilterZeroSized = TypeManager.GetTypeInfo(TypeManager.GetTypeIndex<TResolverFilter>()).IsZeroSized;
         }
 
@@ -44,6 +50,7 @@ namespace CommonEcs.Goap {
             ExecuteResolversJob job = new() {
                 chunkBaseEntityIndices = chunkBaseEntityIndices,
                 resolverType = GetComponentTypeHandle<ConditionResolver>(),
+                resolvedEnableableType = GetComponentTypeHandle<ConditionResolver.Resolved>(),
                 filterType = GetComponentTypeHandle<TResolverFilter>(),
                 allDebugEntity = GetComponentLookup<DebugEntity>(),
                 textResolver = this.textDbSystem.TextResolver,
@@ -98,6 +105,7 @@ namespace CommonEcs.Goap {
             public NativeArray<int> chunkBaseEntityIndices;
             
             public ComponentTypeHandle<ConditionResolver> resolverType;
+            public ComponentTypeHandle<ConditionResolver.Resolved> resolvedEnableableType;
             public ComponentTypeHandle<TResolverFilter> filterType;
 
             [ReadOnly]
@@ -121,14 +129,16 @@ namespace CommonEcs.Goap {
                     useEnabledMask, chunkEnabledMask, chunk.Count, ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
                 while (enumerator.NextEntity(out int i, out int queryIndex)) {
                     ConditionResolver resolver = resolvers[i];
-                    if (resolver.resolved) {
-                        // Already resolved
-                        continue;
-                    }
+                    
+                    // The query already handles that the entities here are not yet resolved
+                    // if (resolver.resolved) {
+                    //     // Already resolved
+                    //     continue;
+                    // }
 
                     if (this.filterHasArray) {
                         TResolverFilter filter = filters[i];
-                        ExecuteResolver(ref resolver, ref filter, i, queryIndex);
+                        ExecuteResolver(chunk, ref resolver, ref filter, i, queryIndex);
                         
                         // Modify
                         resolvers[i] = resolver;
@@ -136,7 +146,7 @@ namespace CommonEcs.Goap {
                     } else {
                         // There's no array for the TResolverFilter. It must be a tag component.
                         // Use a default filter component
-                        ExecuteResolver(ref resolver, ref defaultFilter, i, queryIndex);
+                        ExecuteResolver(chunk, ref resolver, ref defaultFilter, i, queryIndex);
                         
                         // Modify
                         resolvers[i] = resolver;
@@ -144,15 +154,17 @@ namespace CommonEcs.Goap {
                 }
             }
 
-            private void ExecuteResolver(ref ConditionResolver resolver, ref TResolverFilter resolverFilter, int chunkIndex, int queryIndex) {
+            private void ExecuteResolver(in ArchetypeChunk chunk, ref ConditionResolver resolver, ref TResolverFilter resolverFilter, int chunkIndex, int queryIndex) {
                 resolver.result = this.processor.IsMet(resolver.agentEntity, ref resolverFilter, chunkIndex, queryIndex);
-                resolver.resolved = true;
+                
+                // Set as resolved
+                chunk.SetComponentEnabled(ref this.resolvedEnableableType, chunkIndex, true);
 
 #if UNITY_EDITOR
                 if (this.allDebugEntity[resolver.agentEntity].enabled) {
                     // Debugging is enabled
                     FixedString64Bytes conditionName = this.textResolver.GetText(resolver.conditionId.hashCode);
-                    Debug.Log(string.Format("Condition {0}: {1}", conditionName, resolver.result));
+                    Debug.Log($"Condition {conditionName}: {resolver.result}");
                 }
 #endif
             }

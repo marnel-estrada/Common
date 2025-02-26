@@ -19,7 +19,6 @@ namespace CommonEcs.Goap {
         // Note that the conditions map is maintained using DynamicBufferHashMap added to the GoapPlanner entity
         public readonly int resultIndex;
 
-        public bool resolved;
         public bool result;
 
         public ConditionResolver(ConditionId conditionId, Entity agentEntity, Entity plannerEntity, int resultIndex) : this() {
@@ -35,6 +34,10 @@ namespace CommonEcs.Goap {
         
         public ConditionResolver(FixedString64Bytes stringId, Entity agentEntity, Entity plannerEntity, int resultIndex) 
             : this(new ConditionId(stringId), agentEntity, plannerEntity, resultIndex) {
+        }
+
+        // An IEnableableComponent that identifies if a condition resolver was already resolved
+        public readonly struct Resolved : IComponentData, IEnableableComponent {
         }
     }
 }

@@ -27,11 +27,9 @@ namespace CommonEcs.Goap {
             ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
             while (enumerator.NextEntityIndex(out int i)) {
                 AtomAction atomAction = atomActions[i];
-                
-                // Assumes that the query already excludes atom actions that can't execute
-                // if (!atomAction.canExecute) {
-                //     continue;
-                // }
+                if (!atomAction.canExecute) {
+                    continue;
+                }
                 
                 DebugEntity debug = this.allDebugEntities[atomAction.agentEntity];
                 if (debug.enabled) {

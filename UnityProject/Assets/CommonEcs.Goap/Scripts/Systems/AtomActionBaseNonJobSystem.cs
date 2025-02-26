@@ -25,20 +25,16 @@ namespace CommonEcs.Goap {
         }
 
         protected virtual EntityQuery PrepareQuery() {
-            return new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<AtomAction>()
-                .WithAll<AtomAction.CanExecute>()
-                .WithAll<TActionFilter>()
-                .Build(this);
+            return GetEntityQuery(typeof(AtomAction), typeof(TActionFilter));
         }
 
         protected override void OnUpdate() {
             NativeList<Entity> actionsThatCanExecuteList =
-                new(this.query.CalculateEntityCount(), Allocator.TempJob);
+                new NativeList<Entity>(this.query.CalculateEntityCount(), Allocator.TempJob);
 
             // We collect action entities that can execute via a job so that it would be faster
             // compared to using non bursted chunk iteration which will check all actions.
-            CollectActionsThatCanExecuteJob collectJob = new() {
+            CollectActionsThatCanExecuteJob collectJob = new CollectActionsThatCanExecuteJob() {
                 entityType = GetEntityTypeHandle(),
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
                 allDebugEntities = GetComponentLookup<DebugEntity>(),

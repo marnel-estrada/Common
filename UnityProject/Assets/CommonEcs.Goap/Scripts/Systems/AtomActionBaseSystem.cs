@@ -29,12 +29,8 @@ namespace CommonEcs.Goap {
             this.isActionFilterHasArray = !TypeManager.GetTypeInfo(TypeManager.GetTypeIndex<TActionFilter>()).IsZeroSized;
         }
 
-        protected EntityQuery PrepareQuery() {
-            return new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<AtomAction>()
-                .WithAll<AtomAction.CanExecute>()
-                .WithAll<TActionFilter>()
-                .Build(this);
+        protected virtual EntityQuery PrepareQuery() {
+            return GetEntityQuery(typeof(AtomAction), typeof(TActionFilter));
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
@@ -122,12 +118,11 @@ namespace CommonEcs.Goap {
                         continue;
                     }
 
-                    // Note that the query already excludes atom actions that can't execute
-                    // if (!atomAction.canExecute) {
-                    //     // The current atom action cannot execute yet
-                    //     // Or not yet time to execute
-                    //     continue;
-                    // }
+                    if (!atomAction.canExecute) {
+                        // The current atom action cannot execute yet
+                        // Or not yet time to execute
+                        continue;
+                    }
 
                     if (this.isActionFilterHasArray) {
                         TActionFilter actionFilter = filterActions[i];

@@ -22,7 +22,6 @@ namespace CommonEcs.Goap {
             
             ResetAtomActionsJob resetAtomActionsJob = new() {
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
-                canExecuteType = GetComponentTypeHandle<AtomAction.CanExecute>(),
                 allAgents = allAgents
             };
             JobHandle handle = resetAtomActionsJob.ScheduleParallel(this.atomActionsQuery, inputDeps);
@@ -44,7 +43,6 @@ namespace CommonEcs.Goap {
         [BurstCompile]
         private struct ResetAtomActionsJob : IJobChunk {
             public ComponentTypeHandle<AtomAction> atomActionType;
-            public ComponentTypeHandle<AtomAction.CanExecute> canExecuteType;
 
             [ReadOnly]
             public ComponentLookup<GoapAgent> allAgents;
@@ -62,8 +60,7 @@ namespace CommonEcs.Goap {
 
                     // Its agent has replanned
                     // We reset the states such that the action will no longer run
-                    //action.canExecute = false;
-                    chunk.SetComponentEnabled(ref this.canExecuteType, i, false);
+                    action.canExecute = false;
                     action.executing = false;
                     action.started = false;
                     action.result = GoapResult.FAILED;

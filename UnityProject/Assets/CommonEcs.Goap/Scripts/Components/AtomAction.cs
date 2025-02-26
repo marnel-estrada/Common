@@ -17,6 +17,7 @@ namespace CommonEcs.Goap {
         // The result when executing the action
         public GoapResult result;
 
+        public bool canExecute;
         public bool started;
         
         // We need this such that we don't have to call MarkCanExecute() if its currently 
@@ -32,13 +33,9 @@ namespace CommonEcs.Goap {
         }
 
         public void MarkCanExecute() {
-            //this.canExecute = true;
+            this.canExecute = true;
             this.started = false;
             this.result = GoapResult.RUNNING;
-        }
-
-        // The canExecute boolean as an IEnableableComponent
-        public struct CanExecute : IComponentData, IEnableableComponent {
         }
     }
 }

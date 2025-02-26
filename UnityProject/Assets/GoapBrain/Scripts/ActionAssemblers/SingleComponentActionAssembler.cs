@@ -9,8 +9,7 @@ namespace GoapBrain {
 
         public override void Init(ref EntityManager entityManager, int actionId, int order) {
             base.Init(ref entityManager, actionId, order);
-            this.archetype = entityManager.CreateArchetype(
-                typeof(AtomAction), typeof(AtomAction.CanExecute), typeof(T));
+            this.archetype = entityManager.CreateArchetype(typeof(AtomAction), typeof(T));
         }
 
         public override void Prepare(ref EntityManager entityManager, in Entity agentEntity, ref NativeList<Entity> linkedEntities) {

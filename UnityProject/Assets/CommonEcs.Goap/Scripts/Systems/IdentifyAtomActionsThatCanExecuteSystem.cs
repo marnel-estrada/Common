@@ -21,7 +21,6 @@ namespace CommonEcs.Goap {
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             IdentifyJob identifyJob = new() {
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
-                canExecuteType = GetComponentTypeHandle<AtomAction.CanExecute>(),
                 allAgents = GetComponentLookup<GoapAgent>(),
                 allDebugEntities = GetComponentLookup<DebugEntity>(),
                 allActionSets = GetBufferLookup<ResolvedAction>()
@@ -33,7 +32,6 @@ namespace CommonEcs.Goap {
         [BurstCompile]
         private struct IdentifyJob : IJobChunk {
             public ComponentTypeHandle<AtomAction> atomActionType;
-            public ComponentTypeHandle<AtomAction.CanExecute> canExecuteType;
 
             [ReadOnly]
             public ComponentLookup<GoapAgent> allAgents;
@@ -76,14 +74,12 @@ namespace CommonEcs.Goap {
                             ++breakpoint;
                         }
                         
-                        chunk.SetComponentEnabled(ref this.canExecuteType, i, true);
                         atomAction.MarkCanExecute();
                     } else {
                         // Reset this to false so that other systems that are using this will not
                         // mistake that the atom action is still running.
                         // Only one atom action should run per frame per agent.
-                        //atomAction.canExecute = false;
-                        chunk.SetComponentEnabled(ref this.canExecuteType, i, false);
+                        atomAction.canExecute = false;
                         atomAction.executing = false;
                     }
                     

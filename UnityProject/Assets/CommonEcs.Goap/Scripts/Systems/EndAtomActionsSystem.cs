@@ -21,7 +21,11 @@ namespace CommonEcs.Goap {
         private EntityQuery plannersQuery;
 
         protected override void OnCreate() {
-            this.atomActionsQuery = GetEntityQuery(typeof(AtomAction));
+            this.atomActionsQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<AtomAction>()
+                .WithAll<AtomAction.CanExecute>()
+                .Build(this);
+            
             this.agentsQuery = GetEntityQuery(typeof(GoapAgent));
             this.plannersQuery = GetEntityQuery(typeof(GoapPlanner));
         }
@@ -108,10 +112,11 @@ namespace CommonEcs.Goap {
                 while (enumerator.NextEntityIndex(out int i)) {
                     AtomAction atomAction = atomActions[i];
 
-                    // Apply only to atom actions that were executing
-                    if (!atomAction.canExecute) {
-                        continue;
-                    }
+                    // Apply only to atom actions that can execute
+                    // Note that this is already handled by the query
+                    // if (!atomAction.canExecute) {
+                    //     continue;
+                    // }
 
                     GoapAgent agent = this.allAgents[atomAction.agentEntity];
                     agent.lastResult = atomAction.result;

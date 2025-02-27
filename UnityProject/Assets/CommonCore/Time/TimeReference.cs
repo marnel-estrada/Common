@@ -1,5 +1,3 @@
-using System;
-
 namespace Common.Time {
 	/**
 	 * A class representing a single time frame of reference.

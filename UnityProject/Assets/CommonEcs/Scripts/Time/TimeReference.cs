@@ -2,12 +2,6 @@
 
 using Unity.Entities;
 
-using Common;
-
-using UnityEngine;
-
-#nullable enable
-
 namespace CommonEcs {
     public readonly struct TimeReference : ISharedComponentData, IEquatable<TimeReference> {
         public readonly int id;

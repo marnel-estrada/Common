@@ -20,11 +20,7 @@ namespace CommonEcs {
             this.count = 0;
         }
 
-        public bool HasItems {
-            get {
-                return this.head >= 0;
-            }
-        }
+        public bool HasItems => this.head >= 0;
 
         public void Push(AStarNode<T> value) {
             HeapNode<T> node = new HeapNode<T>(value, value.F);

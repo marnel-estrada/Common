@@ -115,7 +115,7 @@ namespace CommonEcs.Goap {
             }
 
             // Adds the preconditions of the specified action
-            private void AddPreconditions(ref DynamicBuffer<RequiredCondition> requiredConditions, ref NativeHashSet<int> addedActions,
+            private static void AddPreconditions(ref DynamicBuffer<RequiredCondition> requiredConditions, ref NativeHashSet<int> addedActions,
                 in GoapAction action) {
                 ConditionList10 preconditions = action.preconditions;
                 for (int i = 0; i < preconditions.Count; ++i) {

@@ -30,11 +30,11 @@ namespace CommonEcs.Goap {
 
         protected override void OnUpdate() {
             NativeList<Entity> actionsThatCanExecuteList =
-                new NativeList<Entity>(this.query.CalculateEntityCount(), Allocator.TempJob);
+                new(this.query.CalculateEntityCount(), Allocator.TempJob);
 
             // We collect action entities that can execute via a job so that it would be faster
             // compared to using non bursted chunk iteration which will check all actions.
-            CollectActionsThatCanExecuteJob collectJob = new CollectActionsThatCanExecuteJob() {
+            CollectActionsThatCanExecuteJob collectJob = new() {
                 entityType = GetEntityTypeHandle(),
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
                 allDebugEntities = GetComponentLookup<DebugEntity>(),

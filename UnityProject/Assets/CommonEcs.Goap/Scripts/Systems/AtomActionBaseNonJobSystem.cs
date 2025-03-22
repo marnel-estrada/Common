@@ -98,7 +98,7 @@ namespace CommonEcs.Goap {
 
         protected abstract GoapResult Update(ref AtomAction atomAction, ref TActionFilter actionComponent);
 
-        // Note that we don't have Cleanup() here yet because it's really needed. Very few actions should
+        // Note that we don't have Cleanup() here yet because it's not really needed. Very few actions should
         // use this and they may not need Cleanup()
     }
 }

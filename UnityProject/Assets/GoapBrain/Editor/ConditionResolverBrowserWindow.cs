@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEditor;
 
 namespace GoapBrain {
-    class ConditionResolverBrowserWindow : EditorWindow {
+    internal class ConditionResolverBrowserWindow : EditorWindow {
         private GUISkin? skin;
 
         private TypeSelectionRenderer typeSelection;
@@ -40,14 +40,19 @@ namespace GoapBrain {
             // Set to selected type
             this.selectedType = type;
         }
+        
+        private string? filterString;
 
         private void OnGUI() {
             EditorGUILayout.BeginVertical();
 
             GUILayout.Label("Condition Resolver Browser", EditorStyles.boldLabel);
+            GUILayout.Label("Search", EditorStyles.boldLabel);
+            this.filterString = GUILayout.TextField(this.filterString);
+            
             GUILayout.Space(10);
 
-            this.typeSelection.Render();
+            this.typeSelection.Render(this.filterString);
 
             GUILayout.FlexibleSpace();
 

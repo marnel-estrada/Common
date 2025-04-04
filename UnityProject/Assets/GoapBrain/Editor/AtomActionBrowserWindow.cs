@@ -56,6 +56,7 @@ namespace GoapBrain {
 
             GUILayout.Label("Search", EditorStyles.boldLabel);
             this.filterString = GUILayout.TextField(this.filterString);
+            
             GUILayout.Space(10);
 
             this.typeSelection.Render(this.filterString);

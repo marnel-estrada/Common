@@ -152,7 +152,7 @@ namespace Common {
         }
         
         private void CustomRender(PropertyInfo property, object instance, Common.PropertyRenderer propRenderer) {
-            Option<EditorPropertyRenderer> resolvedRenderer = ResolveRenderer(propRenderer.RendererType);
+            Option<EditorPropertyRenderer> resolvedRenderer = ResolveRenderer(property, propRenderer.RendererType);
             Assertion.IsSome(resolvedRenderer);
 
             resolvedRenderer.Match(new CustomRenderPropertyMatcher(property, instance));
@@ -175,35 +175,11 @@ namespace Common {
             }
         }
 
-        private readonly struct CreateEditorPropertyRendererMatcher : IFuncOptionMatcher<Type, Option<EditorPropertyRenderer>> {
-            private readonly string rendererTypeName;
-            private readonly Dictionary<string, EditorPropertyRenderer> customRenderers;
-
-            public CreateEditorPropertyRendererMatcher(string rendererTypeName, Dictionary<string, EditorPropertyRenderer> customRenderers) {
-                this.rendererTypeName = rendererTypeName;
-                this.customRenderers = customRenderers;
-            }
-
-            public Option<EditorPropertyRenderer> OnSome(Type rendererType) {
-                ConstructorInfo constructor = TypeUtils.ResolveEmptyConstructor(rendererType);
-                EditorPropertyRenderer renderer = (EditorPropertyRenderer) constructor.Invoke(TypeUtils.EMPTY_PARAMETERS);
-            
-                // Maintain
-                this.customRenderers[this.rendererTypeName] = renderer;
-
-                return Option<EditorPropertyRenderer>.Some(renderer);
-            }
-
-            public Option<EditorPropertyRenderer> OnNone() {
-                return Option<EditorPropertyRenderer>.NONE;
-            }
-        }
-
-        private Option<EditorPropertyRenderer> ResolveRenderer(string rendererTypeName) {
-            Option<EditorPropertyRenderer> renderer = this.customRenderers.Find(rendererTypeName);
-            if (renderer.IsSome) {
+        private Option<EditorPropertyRenderer> ResolveRenderer(PropertyInfo property, string rendererTypeName) {
+            Option<EditorPropertyRenderer> existingRenderer = this.customRenderers.Find(property.Name);
+            if (existingRenderer.IsSome) {
                 // Already exists
-                return renderer;
+                return existingRenderer;
             }
             
             // At this point, renderer does not exist yet
@@ -211,8 +187,18 @@ namespace Common {
             Option<Type> foundType = TypeIdentifier.GetType(rendererTypeName);
             Assertion.IsSome(foundType, rendererTypeName);
 
-            return foundType.MatchExplicit<CreateEditorPropertyRendererMatcher, Option<EditorPropertyRenderer>>(
-                new CreateEditorPropertyRendererMatcher(rendererTypeName, this.customRenderers));
+            if (foundType.IsNone) {
+                // Type wasn't found
+                return Option<EditorPropertyRenderer>.NONE;
+            }
+            
+            ConstructorInfo constructor = TypeUtils.ResolveEmptyConstructor(foundType.ValueOrError());
+            EditorPropertyRenderer renderer = (EditorPropertyRenderer) constructor.Invoke(TypeUtils.EMPTY_PARAMETERS);
+            
+            // Maintain
+            this.customRenderers[property.Name] = renderer;
+            
+            return Option<EditorPropertyRenderer>.AsOption(renderer);
         }
 
         private static int AscendingNameComparison(PropertyInfo a, PropertyInfo b) {

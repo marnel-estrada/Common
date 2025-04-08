@@ -13,23 +13,19 @@ namespace CommonEcs {
     /// </summary>
     /// <typeparam name="T"></typeparam>
     #if UNITY_EDITOR
-    public struct ValueTypeOption<T> where T : struct {
+    public struct ValueTypeOption<T> : IEquatable<ValueTypeOption<T>> where T : struct {
         // Set these values to non-readonly public variables so that we can see and select them in 
         // Unity's Component Inspector
         public T value;
-        public byte hasValue;
+        public bool hasValue;
         #else
     public readonly struct ValueTypeOption<T> : IEquatable<ValueTypeOption<T>> where T : struct, IEquatable<T> {
         private readonly T value;
-        private readonly byte hasValue;
+        private readonly bool hasValue;
         #endif
 
         // We use property here as static member variable doesn't work for Burst
-        public static ValueTypeOption<T> None {
-            get {
-                return new ValueTypeOption<T>();
-            }
-        }
+        public static ValueTypeOption<T> None => new();
 
         public static ValueTypeOption<T> Some(in T value) {
             return new ValueTypeOption<T>(value);
@@ -37,12 +33,12 @@ namespace CommonEcs {
 
         private ValueTypeOption(in T value) {
             this.value = value;
-            this.hasValue = 1;
+            this.hasValue = true;
         }
 
-        public bool IsSome => this.hasValue > 0;
+        public bool IsSome => this.hasValue;
 
-        public bool IsNone => this.hasValue <= 0;
+        public bool IsNone => !this.hasValue;
 
         /// <summary>
         /// This is used for matching using a struct without incurring garbage
@@ -82,6 +78,28 @@ namespace CommonEcs {
             }
 
             throw new Exception("Trying to access value from a None option.");
+        }
+
+        public bool Equals(ValueTypeOption<T> other) {
+            return this.value.Equals(other.value) && this.hasValue == other.hasValue;
+        }
+
+        public override bool Equals(object? obj) {
+            return obj is ValueTypeOption<T> other && Equals(other);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                return (this.value.GetHashCode() * 397) ^ this.hasValue.GetHashCode();
+            }
+        }
+
+        public static bool operator ==(ValueTypeOption<T> left, ValueTypeOption<T> right) {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ValueTypeOption<T> left, ValueTypeOption<T> right) {
+            return !left.Equals(right);
         }
     }
 }

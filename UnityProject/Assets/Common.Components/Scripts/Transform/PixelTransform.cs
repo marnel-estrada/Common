@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Common {
     [ExecuteInEditMode]
     public class PixelTransform : MonoBehaviour {
 
         [SerializeField]
-        private int x = 0;
+        private int x;
 
         [SerializeField]
-        private int y = 0;
+        private int y;
 
         [SerializeField]
         private float orthographicSize = 1.0f;
@@ -23,7 +18,7 @@ namespace Common {
 
         private Transform cachedTransform;
 
-        void Reset() {
+        private void Reset() {
             // set pixel positions to that of current transform
             Vector3 worldPosition = this.transform.position;
             this.x = Mathf.FloorToInt(worldPosition.x / this.UnitsPerPixel);
@@ -32,19 +27,15 @@ namespace Common {
             SnapToPixelPosition();
         }
 
-        void Awake() {
+        private void Awake() {
             this.cachedTransform = this.transform;
         }
-        
-        void Update() {
+
+        private void Update() {
             SnapToPixelPosition();
         }
 
-        private float UnitsPerPixel {
-            get {
-                return this.orthographicSize / (this.targetResolutionHeight >> 1); // divide 2
-            }
-        }
+        private float UnitsPerPixel => this.orthographicSize / (this.targetResolutionHeight >> 1); // divide 2
 
         private void SnapToPixelPosition() {
             Vector3 newPosition = VectorUtils.ZERO;

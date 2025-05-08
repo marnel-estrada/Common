@@ -161,7 +161,7 @@ namespace CommonEcs.Goap {
 
             // Utility method. Do not remove.
             private void PrintActions(in GoapPlanner planner, in DynamicBuffer<ResolvedAction> resolvedActions) {
-                Debug.Log($"Resolved actions for agent {planner.agentEntity}");
+                Debug.Log($"Resolved actions for agent {planner.agentEntity.Index}:{planner.agentEntity.Version}");
                 for (int a = 0; a < resolvedActions.Length; ++a) {
                     ResolvedAction resolvedAction = resolvedActions[a];
                     FixedString64Bytes actionName = this.textResolver.GetText(resolvedAction.actionId);

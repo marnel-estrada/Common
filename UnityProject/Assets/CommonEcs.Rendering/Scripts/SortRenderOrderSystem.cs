@@ -43,9 +43,9 @@ namespace CommonEcs {
                 
                 this.query.SetSharedComponentFilterManaged(spriteManager);
                 int count = this.query.CalculateEntityCount();
-                NativeArray<SortedSpriteEntry> entries = new(count, Allocator.TempJob);
+                NativeArray<SortedSpriteEntry> entries = CollectionHelper.CreateNativeArray<SortedSpriteEntry>(count, WorldUpdateAllocator);
                 
-                NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(Allocator.TempJob);
+                NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(WorldUpdateAllocator);
                 
                 AddJob addJob = new() {
                     chunkBaseEntityIndices = chunkBaseEntityIndices,

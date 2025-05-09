@@ -20,10 +20,10 @@ namespace CommonEcs {
             this.entityType = GetEntityTypeHandle();
             this.referenceType = GetComponentTypeHandle<EntityReference>(true);
     
-            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(WorldUpdateAllocator);
             
             // Collection of referenced entities
-            NativeParallelHashMap<Entity, byte> referencedEntities = new(10, Allocator.TempJob);
+            NativeParallelHashMap<Entity, byte> referencedEntities = new(10, WorldUpdateAllocator);
     
             // Note here that we store the referenced entities here so that we can check if they
             // are still referenced by another entities before destroying them

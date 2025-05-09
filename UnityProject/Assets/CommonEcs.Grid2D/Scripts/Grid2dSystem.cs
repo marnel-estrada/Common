@@ -34,7 +34,7 @@ namespace CommonEcs {
 
             this.gridType = GetComponentTypeHandle<Grid2D>(true);
             this.bufferType = GetBufferTypeHandle<EntityBufferElement>(true);
-            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(WorldUpdateAllocator);
             for (int i = 0; i < chunks.Length; ++i) {
                 Process(chunks[i]);
             }

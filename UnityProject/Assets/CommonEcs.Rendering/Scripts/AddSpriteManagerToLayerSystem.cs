@@ -24,7 +24,7 @@ namespace CommonEcs {
 
         protected override void OnUpdate() {
             this.spriteManagerType = GetSharedComponentTypeHandle<SpriteManager>();
-            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(WorldUpdateAllocator);
 
             EntityCommandBuffer commandBuffer = this.commandBufferSystem.CreateCommandBuffer();
             

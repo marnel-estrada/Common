@@ -51,7 +51,7 @@ namespace CommonEcs {
             this.matrixType = GetComponentTypeHandle<LocalToWorld>(true);
             this.entityType = GetEntityTypeHandle();
 
-            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(WorldUpdateAllocator);
             for (int i = 0; i < chunks.Length; ++i) {
                 if (!Process(chunks[i])) {
                     break;

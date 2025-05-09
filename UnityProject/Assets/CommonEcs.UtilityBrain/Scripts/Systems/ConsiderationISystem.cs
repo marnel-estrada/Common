@@ -40,7 +40,7 @@ namespace CommonEcs.UtilityBrain {
                 return;
             }
             
-            NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(Allocator.TempJob);
+            NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(state.WorldUpdateAllocator);
             
             ComputeConsiderationsJob job = new() {
                 chunkBaseEntityIndices = chunkBaseEntityIndices,

@@ -30,7 +30,7 @@ namespace CommonEcs.Goap {
 
         protected override void OnUpdate() {
             NativeList<Entity> actionsThatCanExecuteList =
-                new(this.query.CalculateEntityCount(), Allocator.TempJob);
+                new(this.query.CalculateEntityCount(), WorldUpdateAllocator);
 
             // We collect action entities that can execute via a job so that it would be faster
             // compared to using non bursted chunk iteration which will check all actions.

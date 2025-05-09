@@ -73,8 +73,9 @@ namespace Common {
             this.Dependency = addJob.Schedule(this.addQuery, this.Dependency);
             
             NativeArray<int> chunkBaseEntityIndices = 
-                this.updateQuery.CalculateBaseEntityIndexArray(Allocator.TempJob);
-            NativeArray<int> masterListIndices = new(this.updateQuery.CalculateEntityCount(), Allocator.TempJob);
+                this.updateQuery.CalculateBaseEntityIndexArray(WorldUpdateAllocator);
+            NativeArray<int> masterListIndices = 
+                CollectionHelper.CreateNativeArray<int>(this.updateQuery.CalculateEntityCount(), WorldUpdateAllocator);
             
             // We collect the master list indices first so we could use it in UpdateJob
             // We can't get SweepPruneItem items from the container map in UpdateJob

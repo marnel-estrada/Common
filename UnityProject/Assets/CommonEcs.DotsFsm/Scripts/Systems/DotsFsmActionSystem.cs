@@ -21,7 +21,7 @@ namespace CommonEcs.DotsFsm {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(Allocator.TempJob);
+            NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(WorldUpdateAllocator);
             ExecuteActionJob job = new() {
                 chunkBaseEntityIndices = chunkBaseEntityIndices,
                 entityHandle = GetEntityTypeHandle(),

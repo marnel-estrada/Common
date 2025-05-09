@@ -42,7 +42,7 @@ namespace CommonEcs {
         protected override void OnUpdate() {
             this.spriteManagerQuery.Update();
             this.entityType = GetEntityTypeHandle();
-            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(WorldUpdateAllocator);
 
             EntityCommandBuffer commandBuffer = this.commandBufferSystem.CreateCommandBuffer();
             

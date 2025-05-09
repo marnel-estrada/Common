@@ -16,7 +16,7 @@ namespace CommonEcs {
         private static readonly Bounds BOUNDS = new(Vector2.zero, Vector3.one * 100);
 
         protected override void OnUpdate() {
-            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(WorldUpdateAllocator);
             SharedComponentTypeHandle<ComputeBufferSpriteManager> spriteManagerType = 
                 GetSharedComponentTypeHandle<ComputeBufferSpriteManager>();
             

@@ -23,7 +23,7 @@ namespace CommonEcs {
 
         protected override void OnUpdate() {
             this.spriteManagerQuery.Update();
-            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(WorldUpdateAllocator);
             AddAndSort(chunks);
             chunks.Dispose();
             

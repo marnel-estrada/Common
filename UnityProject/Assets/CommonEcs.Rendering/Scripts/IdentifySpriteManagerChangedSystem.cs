@@ -38,10 +38,10 @@ namespace CommonEcs {
             // Note here that we used NativeHashSet and pass it as parallel writer to the job
             // so that we can run the job in parallel. This is the safest way to do it.
             int entityCount = this.query.CalculateEntityCount();
-            NativeParallelHashSet<Entity> verticesChangedMap = new(entityCount, Allocator.TempJob);
-            NativeParallelHashSet<Entity> renderOrderChangedMap = new(entityCount, Allocator.TempJob);
-            NativeParallelHashSet<Entity> uvChangedMap = new(entityCount, Allocator.TempJob);
-            NativeParallelHashSet<Entity> colorChangedMap = new(entityCount, Allocator.TempJob);
+            NativeParallelHashSet<Entity> verticesChangedMap = new(entityCount, WorldUpdateAllocator);
+            NativeParallelHashSet<Entity> renderOrderChangedMap = new(entityCount, WorldUpdateAllocator);
+            NativeParallelHashSet<Entity> uvChangedMap = new(entityCount, WorldUpdateAllocator);
+            NativeParallelHashSet<Entity> colorChangedMap = new(entityCount, WorldUpdateAllocator);
 
             PopulateUpdatedSpritesJob job = new() {
                 spriteType = this.spriteType,

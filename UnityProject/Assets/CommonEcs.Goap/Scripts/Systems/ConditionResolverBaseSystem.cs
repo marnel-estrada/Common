@@ -46,7 +46,7 @@ namespace CommonEcs.Goap {
                 return inputDeps;
             }
             
-            NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(Allocator.TempJob);
+            NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(WorldUpdateAllocator);
             ExecuteResolversJob job = new() {
                 chunkBaseEntityIndices = chunkBaseEntityIndices,
                 resolverType = GetComponentTypeHandle<ConditionResolver>(),

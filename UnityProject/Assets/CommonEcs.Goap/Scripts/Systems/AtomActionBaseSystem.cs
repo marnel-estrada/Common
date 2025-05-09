@@ -34,7 +34,7 @@ namespace CommonEcs.Goap {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(Allocator.TempJob);
+            NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(WorldUpdateAllocator);
             ExecuteAtomActionJob job = new() {
                 chunkBaseEntityIndices = chunkBaseEntityIndices,
                 atomActionType = GetComponentTypeHandle<AtomAction>(),

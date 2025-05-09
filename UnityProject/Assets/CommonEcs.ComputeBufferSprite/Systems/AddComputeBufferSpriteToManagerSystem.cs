@@ -57,8 +57,8 @@ namespace CommonEcs {
 
             // We can't use Burst compiled jobs here since the Internal class of the sprite
             // manager is a class
-            NativeArray<ArchetypeChunk> chunks = this.spritesQuery.ToArchetypeChunkArray(Allocator.TempJob);
-            EntityCommandBuffer commandBuffer = new(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.spritesQuery.ToArchetypeChunkArray(WorldUpdateAllocator);
+            EntityCommandBuffer commandBuffer = new(WorldUpdateAllocator);
 
             for (int i = 0; i < chunks.Length; i++) {
                 ProcessChunk(chunks[i], ref spriteManager, ref commandBuffer);

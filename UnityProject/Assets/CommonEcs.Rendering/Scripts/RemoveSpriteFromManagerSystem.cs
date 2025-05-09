@@ -28,7 +28,7 @@ namespace CommonEcs {
             this.spriteType = GetComponentTypeHandle<Sprite>();
             this.entityType = GetEntityTypeHandle();
             
-            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(WorldUpdateAllocator);
             EntityCommandBuffer commandBuffer = this.commandBufferSystem.CreateCommandBuffer();
             for (int i = 0; i < chunks.Length; ++i) {
                 ArchetypeChunk chunk = chunks[i];

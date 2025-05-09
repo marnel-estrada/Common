@@ -42,7 +42,7 @@ namespace CommonEcs {
             this.entityType = GetEntityTypeHandle();
             this.spriteType = GetComponentTypeHandle<Sprite>();
             this.matrixType = GetComponentTypeHandle<LocalToWorld>(true);
-            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(WorldUpdateAllocator);
 
             EntityCommandBuffer commandBuffer = this.commandBufferSystem.CreateCommandBuffer();
             

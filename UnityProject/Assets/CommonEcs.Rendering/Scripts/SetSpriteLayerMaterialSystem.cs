@@ -29,7 +29,7 @@ namespace CommonEcs {
             this.spriteManagerQuery.Update();
             this.vesselQuery.Update();
 
-            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.TempJob);
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(WorldUpdateAllocator);
             for (int i = 0; i < chunks.Length; ++i) {
                 Process(chunks[i]);
             }

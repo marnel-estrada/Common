@@ -72,8 +72,9 @@ namespace Common {
             };
             this.Dependency = addJob.Schedule(this.addQuery, this.Dependency);
             
-            NativeArray<int> chunkBaseEntityIndices = 
-                this.updateQuery.CalculateBaseEntityIndexArray(WorldUpdateAllocator);
+            NativeArray<int> chunkBaseEntityIndices = this.updateQuery.CalculateBaseEntityIndexArrayAsync(
+                WorldUpdateAllocator, this.Dependency, out JobHandle chunkBaseIndicesHandle);
+            this.Dependency = JobHandle.CombineDependencies(this.Dependency, chunkBaseIndicesHandle);
             NativeArray<int> masterListIndices = 
                 CollectionHelper.CreateNativeArray<int>(this.updateQuery.CalculateEntityCount(), WorldUpdateAllocator);
             

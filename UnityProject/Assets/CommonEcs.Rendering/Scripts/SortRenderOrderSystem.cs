@@ -45,7 +45,9 @@ namespace CommonEcs {
                 int count = this.query.CalculateEntityCount();
                 NativeArray<SortedSpriteEntry> entries = CollectionHelper.CreateNativeArray<SortedSpriteEntry>(count, WorldUpdateAllocator);
                 
-                NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(WorldUpdateAllocator);
+                NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArrayAsync(
+                    WorldUpdateAllocator, inputDeps, out JobHandle chunkBaseIndicesHandle);
+                inputDeps = JobHandle.CombineDependencies(inputDeps, chunkBaseIndicesHandle);
                 
                 AddJob addJob = new() {
                     chunkBaseEntityIndices = chunkBaseEntityIndices,

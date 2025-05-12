@@ -18,7 +18,7 @@ namespace CommonEcs.Goap {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            ComponentLookup<GoapAgent> allAgents = GetComponentLookup<GoapAgent>();
+            ComponentLookup<GoapAgent> allAgents = GetComponentLookup<GoapAgent>(true);
             
             ResetAtomActionsJob resetAtomActionsJob = new() {
                 atomActionType = GetComponentTypeHandle<AtomAction>(),

@@ -46,13 +46,15 @@ namespace CommonEcs.Goap {
                 return inputDeps;
             }
             
-            NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(WorldUpdateAllocator);
+            NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArrayAsync(
+                WorldUpdateAllocator, inputDeps, out JobHandle chunkBaseIndicesHandle);
+            inputDeps = JobHandle.CombineDependencies(inputDeps, chunkBaseIndicesHandle);
             ExecuteResolversJob job = new() {
                 chunkBaseEntityIndices = chunkBaseEntityIndices,
                 resolverType = GetComponentTypeHandle<ConditionResolver>(),
                 resolvedEnableableType = GetComponentTypeHandle<ConditionResolver.Resolved>(),
                 filterType = GetComponentTypeHandle<TResolverFilter>(),
-                allDebugEntity = GetComponentLookup<DebugEntity>(),
+                allDebugEntity = GetComponentLookup<DebugEntity>(true),
                 textResolver = this.textDbSystem.TextResolver,
                 filterHasArray = !this.isFilterZeroSized, // Filter has array if it's not zero sized
                 processor = PrepareProcessor()

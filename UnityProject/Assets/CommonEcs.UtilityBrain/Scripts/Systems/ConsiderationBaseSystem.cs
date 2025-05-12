@@ -27,7 +27,9 @@ namespace CommonEcs.UtilityBrain {
                 return inputDeps;
             }
             
-            NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(WorldUpdateAllocator);
+            NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArrayAsync(
+                WorldUpdateAllocator, inputDeps, out JobHandle chunkBaseIndicesHandle);
+            inputDeps = JobHandle.CombineDependencies(inputDeps, chunkBaseIndicesHandle);
             
             ComputeConsiderationsJob job = new() {
                 chunkBaseEntityIndices = chunkBaseEntityIndices,

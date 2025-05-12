@@ -1,7 +1,8 @@
 ﻿using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
-using Unity.Entities; 
+using Unity.Entities;
+using Unity.Jobs;
 
 namespace CommonEcs.UtilityBrain {
     /// <summary>
@@ -40,7 +41,9 @@ namespace CommonEcs.UtilityBrain {
                 return;
             }
             
-            NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(state.WorldUpdateAllocator);
+            NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArrayAsync(
+                state.WorldUpdateAllocator, state.Dependency, out JobHandle chunkBaseIndicesHandle);
+            state.Dependency = JobHandle.CombineDependencies(state.Dependency, chunkBaseIndicesHandle);
             
             ComputeConsiderationsJob job = new() {
                 chunkBaseEntityIndices = chunkBaseEntityIndices,

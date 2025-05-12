@@ -34,20 +34,22 @@ namespace CommonEcs.Goap {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArray(WorldUpdateAllocator);
-            ExecuteAtomActionJob job = new() {
+            NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArrayAsync(
+                WorldUpdateAllocator, inputDeps, out JobHandle chunkBaseIndicesHandle);
+            inputDeps = JobHandle.CombineDependencies(inputDeps, chunkBaseIndicesHandle);
+            ExecuteAtomActionJob executeAtomActionJob = new() {
                 chunkBaseEntityIndices = chunkBaseEntityIndices,
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
                 actionFilterType = GetComponentTypeHandle<TActionFilter>(),
                 isActionFilterHasArray = this.isActionFilterHasArray, // Action filter has array if it's not zero sized
                 processor = PrepareProcessor(),
-                allAgents = GetComponentLookup<GoapAgent>(),
-                allDebugEntities = GetComponentLookup<DebugEntity>()
+                allAgents = GetComponentLookup<GoapAgent>(true),
+                allDebugEntities = GetComponentLookup<DebugEntity>(true)
             };
 
             try {
                 inputDeps = this.ShouldScheduleParallel ?
-                    job.ScheduleParallel(this.query, inputDeps) : job.Schedule(this.query, inputDeps);
+                    executeAtomActionJob.ScheduleParallel(this.query, inputDeps) : executeAtomActionJob.Schedule(this.query, inputDeps);
                 AfterJobScheduling(inputDeps);
                 
                 // Don't forget to dispose

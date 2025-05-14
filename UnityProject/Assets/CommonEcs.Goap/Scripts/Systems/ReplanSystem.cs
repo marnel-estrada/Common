@@ -21,19 +21,19 @@ namespace CommonEcs.Goap {
             ComponentLookup<GoapAgent> allAgents = GetComponentLookup<GoapAgent>(true);
             
             ResetAtomActionsJob resetAtomActionsJob = new() {
-                atomActionType = GetComponentTypeHandle<AtomAction>(),
+                atomActionType = SystemAPI.GetComponentTypeHandle<AtomAction>(),
                 allAgents = allAgents
             };
             JobHandle handle = resetAtomActionsJob.ScheduleParallel(this.atomActionsQuery, inputDeps);
 
             ResetGoalIndexJob resetGoalIndexJob = new() {
-                plannerType = GetComponentTypeHandle<GoapPlanner>(), 
+                plannerType = SystemAPI.GetComponentTypeHandle<GoapPlanner>(), 
                 allAgents = allAgents
             };
             handle = resetGoalIndexJob.ScheduleParallel(this.plannersQuery, handle);
 
             SetCleanupStateJob setCleanupStateJob = new() {
-                agentType = GetComponentTypeHandle<GoapAgent>()
+                agentType = SystemAPI.GetComponentTypeHandle<GoapAgent>()
             };
             handle = setCleanupStateJob.ScheduleParallel(this.agentsQuery, handle);
             

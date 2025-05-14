@@ -49,11 +49,11 @@ namespace CommonEcs {
             
             // Schedule job
             TrackChangedJob trackChangedJob = new() {
-                spriteType = GetComponentTypeHandle<ComputeBufferSprite>(),
-                managerAddedType = GetComponentTypeHandle<ManagerAdded>(),
-                localTransformType = GetComponentTypeHandle<LocalTransform>(),
-                worldTransformType = GetComponentTypeHandle<LocalToWorld>(),
-                changedType = GetComponentTypeHandle<ComputeBufferSprite.Changed>(),
+                spriteType = SystemAPI.GetComponentTypeHandle<ComputeBufferSprite>(),
+                managerAddedType = SystemAPI.GetComponentTypeHandle<ManagerAdded>(),
+                localTransformType = SystemAPI.GetComponentTypeHandle<LocalTransform>(),
+                worldTransformType = SystemAPI.GetComponentTypeHandle<LocalToWorld>(),
+                changedType = SystemAPI.GetComponentTypeHandle<ComputeBufferSprite.Changed>(),
                 translationsAndScales = spriteManager.TranslationsAndScales,
                 rotations = spriteManager.Rotations,
                 sizes = spriteManager.Sizes,

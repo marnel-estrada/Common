@@ -21,6 +21,10 @@ namespace CommonEcs.UtilityBrain {
         private bool isFilterZeroSized;
         private TStrategy strategy;
         
+        // Handles
+        private ComponentTypeHandle<Consideration> considerationType;
+        private ComponentTypeHandle<TComponent> filterComponentType;
+        
         public void OnCreate(ref SystemState state) {
             this.query = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<Consideration>()
@@ -29,6 +33,9 @@ namespace CommonEcs.UtilityBrain {
             this.isFilterZeroSized = TypeManager.GetTypeInfo(TypeManager.GetTypeIndex<TComponent>()).IsZeroSized;
             
             this.strategy.OnCreate(ref state);
+
+            this.considerationType = state.GetComponentTypeHandle<Consideration>();
+            this.filterComponentType = state.GetComponentTypeHandle<TComponent>();
         }
 
         public void OnDestroy(ref SystemState state) {
@@ -45,10 +52,14 @@ namespace CommonEcs.UtilityBrain {
                 state.WorldUpdateAllocator, state.Dependency, out JobHandle chunkBaseIndicesHandle);
             state.Dependency = JobHandle.CombineDependencies(state.Dependency, chunkBaseIndicesHandle);
             
+            // Update handles
+            this.considerationType.Update(ref state);
+            this.filterComponentType.Update(ref state);
+            
             ComputeConsiderationsJob job = new() {
                 chunkBaseEntityIndices = chunkBaseEntityIndices,
-                considerationType = state.GetComponentTypeHandle<Consideration>(),
-                filterType = state.GetComponentTypeHandle<TComponent>(),
+                considerationType = this.considerationType,
+                filterType = this.filterComponentType,
                 filterHasArray = !this.isFilterZeroSized, // Filter has array if it's not zero sized
                 processor = this.strategy.CreateProcess(ref state)
             };

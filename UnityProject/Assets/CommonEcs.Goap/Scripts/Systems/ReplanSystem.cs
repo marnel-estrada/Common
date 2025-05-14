@@ -18,26 +18,29 @@ namespace CommonEcs.Goap {
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
-            ComponentLookup<GoapAgent> allAgents = GetComponentLookup<GoapAgent>(true);
+            ComponentLookup<GoapAgent> allAgents = SystemAPI.GetComponentLookup<GoapAgent>(true);
             
             ResetAtomActionsJob resetAtomActionsJob = new() {
                 atomActionType = SystemAPI.GetComponentTypeHandle<AtomAction>(),
                 allAgents = allAgents
             };
-            JobHandle handle = resetAtomActionsJob.ScheduleParallel(this.atomActionsQuery, inputDeps);
+            JobHandle resetAtomActionsHandle = resetAtomActionsJob.ScheduleParallel(this.atomActionsQuery, inputDeps);
 
             ResetGoalIndexJob resetGoalIndexJob = new() {
                 plannerType = SystemAPI.GetComponentTypeHandle<GoapPlanner>(), 
                 allAgents = allAgents
             };
-            handle = resetGoalIndexJob.ScheduleParallel(this.plannersQuery, handle);
+            JobHandle resetGoalIndexHandle = resetGoalIndexJob.ScheduleParallel(this.plannersQuery, inputDeps);
 
+            // We can combine these two since it doesn't touch GoapAgent
+            inputDeps = JobHandle.CombineDependencies(resetAtomActionsHandle, resetGoalIndexHandle);
+            
             SetCleanupStateJob setCleanupStateJob = new() {
                 agentType = SystemAPI.GetComponentTypeHandle<GoapAgent>()
             };
-            handle = setCleanupStateJob.ScheduleParallel(this.agentsQuery, handle);
-            
-            return handle;
+            inputDeps = setCleanupStateJob.ScheduleParallel(this.agentsQuery, inputDeps);
+
+            return inputDeps;
         }
         
         [BurstCompile]

@@ -46,16 +46,14 @@ namespace CommonEcs {
                 NativeArray<SortedSpriteEntry> entries = CollectionHelper.CreateNativeArray<SortedSpriteEntry>(count, WorldUpdateAllocator);
                 
                 NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArrayAsync(
-                    WorldUpdateAllocator, inputDeps, out JobHandle chunkBaseIndicesHandle);
-                inputDeps = JobHandle.CombineDependencies(inputDeps, chunkBaseIndicesHandle);
+                    WorldUpdateAllocator, lastHandle, out JobHandle chunkBaseIndicesHandle);
+                lastHandle = JobHandle.CombineDependencies(lastHandle, chunkBaseIndicesHandle);
                 
                 AddJob addJob = new() {
                     chunkBaseEntityIndices = chunkBaseEntityIndices,
                     spriteType = spriteType,
                     sortList = entries
                 };
-
-
                 lastHandle = addJob.ScheduleParallel(this.query, lastHandle);
                 
                 // Sort

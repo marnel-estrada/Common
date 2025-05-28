@@ -22,5 +22,14 @@ namespace CommonEcs {
 
             return prefab.ValueOrError();
         }
+
+        public Entity GetEntityPrefab(int idHashCode) {
+            ValueTypeOption<Entity> prefab = this.prefabManager.GetPrefab(idHashCode);
+            if (prefab.IsNone) {
+                throw new Exception($"The prefab pool does not contain an entry for idHashCode {idHashCode}");
+            }
+
+            return prefab.ValueOrError();
+        }
     }
 }

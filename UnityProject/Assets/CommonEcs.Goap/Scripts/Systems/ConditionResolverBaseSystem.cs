@@ -131,12 +131,6 @@ namespace CommonEcs.Goap {
                     useEnabledMask, chunkEnabledMask, chunk.Count, ref this.chunkBaseEntityIndices, unfilteredChunkIndex);
                 while (enumerator.NextEntity(out int i, out int queryIndex)) {
                     ConditionResolver resolver = resolvers[i];
-                    
-                    // The query already handles that the entities here are not yet resolved
-                    // if (resolver.resolved) {
-                    //     // Already resolved
-                    //     continue;
-                    // }
 
                     if (this.filterHasArray) {
                         TResolverFilter filter = filters[i];

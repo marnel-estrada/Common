@@ -9,7 +9,7 @@ using System;
 namespace CommonEcs
 {
 	[System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-	public unsafe struct FixedList4Entries<T> where T : unmanaged {
+	public unsafe struct FixedList8Entries<T> where T : unmanaged {
 		public ref struct Enumerator
 		{
 			private readonly T* elements;
@@ -76,6 +76,14 @@ namespace CommonEcs
 		
 		private readonly T element3;
 		
+		private readonly T element4;
+		
+		private readonly T element5;
+		
+		private readonly T element6;
+		
+		private readonly T element7;
+		
 		private int version;
 		
 		private int length;
@@ -107,7 +115,7 @@ namespace CommonEcs
 		
 		public int Count => this.length;
 
-		public const int CAPACITY = 4;
+		public const int CAPACITY = 8;
 		
 		public Enumerator GetEnumerator()
 		{

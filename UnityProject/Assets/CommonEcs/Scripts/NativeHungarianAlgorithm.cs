@@ -71,8 +71,7 @@ namespace CommonEcs {
             int step = 1;
 
             int counter = 0;
-            //const int limit = 100000;
-            while (step != -1 /*&& counter < limit*/) {
+            while (step != -1) {
                 step = step switch {
                     1 => RunStep1(ref masks, ref colsCovered, width, height),
                     2 => RunStep2(ref costs, ref masks, ref rowsCovered, ref colsCovered, width, height, ref pathStart),
@@ -82,11 +81,6 @@ namespace CommonEcs {
                 };
                 ++counter;
             }
-
-            // if (counter >= limit) {
-            //     // Reached the limit
-            //     throw new Exception("Something is wrong");
-            // }
 
             NativeArray<int> agentTasks = new(height, Allocator.Temp);
             for (int y = 0; y < height; y++) {

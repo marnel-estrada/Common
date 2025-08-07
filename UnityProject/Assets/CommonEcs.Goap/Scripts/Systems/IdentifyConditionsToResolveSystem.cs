@@ -11,7 +11,11 @@ namespace CommonEcs.Goap {
         private EntityQuery query;
         
         protected override void OnCreate() {
-            this.query = GetEntityQuery(typeof(ConditionResolver));
+            this.query = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<ConditionResolver>()
+                .WithPresent<ConditionResolver.Resolved>()
+                .WithOptions(EntityQueryOptions.IgnoreComponentEnabledState)
+                .Build(this);
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {

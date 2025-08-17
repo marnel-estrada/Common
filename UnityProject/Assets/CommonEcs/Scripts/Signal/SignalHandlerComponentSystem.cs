@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Entities;
 
 namespace CommonEcs {
@@ -29,7 +30,8 @@ namespace CommonEcs {
             this.signalHandler.Update();
             
             EntityCommandBuffer commandBuffer = this.commandBufferSystem.CreateCommandBuffer();
-            commandBuffer.AddComponent<ProcessedBySystem>(this.signalQuery, EntityQueryCaptureMode.AtRecord);
+            NativeArray<Entity> signalEntities = this.signalQuery.ToEntityArray(Allocator.Temp);
+            commandBuffer.AddComponent<ProcessedBySystem>(signalEntities);
         }
     }
 }

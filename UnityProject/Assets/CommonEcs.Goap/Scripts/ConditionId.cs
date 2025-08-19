@@ -9,9 +9,6 @@ namespace CommonEcs.Goap {
     /// </summary>
     public readonly struct ConditionId : IEquatable<ConditionId> {
         public readonly int hashCode;
-
-        public ConditionId(FixedString32Bytes stringId) : this(stringId.GetHashCode()) {
-        }
         
         public ConditionId(FixedString64Bytes stringId) : this(stringId.GetHashCode()) {
         }

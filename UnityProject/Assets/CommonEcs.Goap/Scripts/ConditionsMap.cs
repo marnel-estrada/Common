@@ -8,7 +8,7 @@ namespace CommonEcs.Goap {
     public struct ConditionsMap {
         private readonly Entity plannerEntity;
         private DynamicBufferHashMap<ConditionId, bool> map;
-        private DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> bucket;
+        private DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry> bucket;
 
         /// <summary>
         /// Initializes the conditions map for the specified planner entity.
@@ -16,13 +16,13 @@ namespace CommonEcs.Goap {
         /// <param name="entityManager"></param>
         /// <param name="plannerEntity"></param>
         public static void Init(ref EntityManager entityManager, in Entity plannerEntity) {
-            DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> bucket = 
-                entityManager.GetBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>>(plannerEntity);
+            DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry> bucket = 
+                entityManager.GetBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry>(plannerEntity);
             DynamicBufferHashMap<ConditionId, bool>.Init(ref bucket);
         }
 
         public ConditionsMap(in Entity plannerEntity, DynamicBufferHashMap<ConditionId, bool> map, 
-            DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> bucket) {
+            DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry> bucket) {
             this.plannerEntity = plannerEntity;
             this.map = map;
             this.bucket = bucket;
@@ -30,15 +30,11 @@ namespace CommonEcs.Goap {
 
         public ConditionsMap(ref EntityManager entityManager, in Entity plannerEntity) : this(plannerEntity, 
             entityManager.GetComponentData<DynamicBufferHashMap<ConditionId, bool>>(plannerEntity),
-            entityManager.GetBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>>(plannerEntity)) {
+            entityManager.GetBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry>(plannerEntity)) {
         }
 
         public int AddOrSet(in ConditionId id, bool value) {
             return this.map.AddOrSet(ref this.bucket, id, value);
-        }
-        
-        public int AddOrSet(in FixedString32Bytes id, bool value) {
-            return AddOrSet(new ConditionId(id), value);
         }
         
         public int AddOrSet(in FixedString64Bytes id, bool value) {
@@ -52,10 +48,6 @@ namespace CommonEcs.Goap {
         /// <returns></returns>
         public ValueTypeOption<bool> Find(in ConditionId id) {
             return this.map.Find(this.bucket, id);
-        }
-
-        public ValueTypeOption<bool> Find(in FixedString32Bytes id) {
-            return Find(new ConditionId(id));
         }
         
         public ValueTypeOption<bool> Find(in FixedString64Bytes id) {
@@ -83,7 +75,7 @@ namespace CommonEcs.Goap {
             }
         }
 
-        public static void ResetValues(ref DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> bucket) {
+        public static void ResetValues(ref DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry> bucket) {
             DynamicBufferHashMap<ConditionId, bool>.ResetValues(ref bucket);
         }
     }

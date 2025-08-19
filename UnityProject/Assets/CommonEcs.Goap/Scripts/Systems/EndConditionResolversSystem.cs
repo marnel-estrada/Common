@@ -25,7 +25,7 @@ namespace CommonEcs.Goap {
             // This can run in parallel
             SetResultsToPlannerBucketJob setResultsJob = new() {
                 resolverType = GetComponentTypeHandle<ConditionResolver>(),
-                allBuckets = GetBufferLookup<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>>()
+                allBuckets = GetBufferLookup<DynamicBufferHashMap<ConditionId, bool>.Entry>()
             };
             JobHandle handle = setResultsJob.ScheduleParallel(this.resolversQuery, inputDeps);
 
@@ -43,7 +43,7 @@ namespace CommonEcs.Goap {
             public ComponentTypeHandle<ConditionResolver> resolverType;
 
             [NativeDisableParallelForRestriction]
-            public BufferLookup<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> allBuckets;
+            public BufferLookup<DynamicBufferHashMap<ConditionId, bool>.Entry> allBuckets;
 
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
                 NativeArray<ConditionResolver> resolvers = chunk.GetNativeArray(ref this.resolverType);
@@ -53,8 +53,8 @@ namespace CommonEcs.Goap {
                     ConditionResolver resolver = resolvers[i];
                     
                     // Set the value
-                    DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry<bool>> bucket = this.allBuckets[resolver.plannerEntity];
-                    bucket[resolver.resultIndex] = DynamicBufferHashMap<ConditionId, bool>.Entry<bool>.Something(resolver.conditionId.hashCode, resolver.result);
+                    DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry> bucket = this.allBuckets[resolver.plannerEntity];
+                    bucket[resolver.resultIndex] = DynamicBufferHashMap<ConditionId, bool>.Entry.Something(resolver.conditionId.hashCode, resolver.result);
                 }
             }
         }

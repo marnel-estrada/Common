@@ -28,10 +28,6 @@ namespace CommonEcs.Goap {
             this.resultIndex = resultIndex;
         }
         
-        public ConditionResolver(FixedString32Bytes stringId, Entity agentEntity, Entity plannerEntity, int resultIndex) 
-            : this(new ConditionId(stringId), agentEntity, plannerEntity, resultIndex) {
-        }
-        
         public ConditionResolver(FixedString64Bytes stringId, Entity agentEntity, Entity plannerEntity, int resultIndex) 
             : this(new ConditionId(stringId), agentEntity, plannerEntity, resultIndex) {
         }

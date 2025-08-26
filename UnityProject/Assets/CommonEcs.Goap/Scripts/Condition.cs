@@ -1,17 +1,16 @@
 using System;
 
 using Unity.Collections;
-using UnityEngine;
 
 namespace CommonEcs.Goap {
     public readonly struct Condition : IEquatable<Condition> {
-        public readonly ConditionId id;
+        public readonly ConditionHashId id;
         public readonly bool value;
         
-        public Condition(FixedString64Bytes stringId, bool value) : this(new ConditionId(stringId.GetHashCode()), value) {
+        public Condition(FixedString64Bytes stringId, bool value) : this(new ConditionHashId(stringId.GetHashCode()), value) {
         }
 
-        public Condition(ConditionId id, bool value) {
+        public Condition(ConditionHashId id, bool value) {
             this.id = id;
             this.value = value;
         }

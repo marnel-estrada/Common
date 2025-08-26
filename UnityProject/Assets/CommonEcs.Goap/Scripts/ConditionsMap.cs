@@ -7,8 +7,8 @@ namespace CommonEcs.Goap {
     /// </summary>
     public struct ConditionsMap {
         private readonly Entity plannerEntity;
-        private DynamicBufferHashMap<ConditionId, bool> map;
-        private DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry> bucket;
+        private DynamicBufferHashMap<ConditionHashId, bool> map;
+        private DynamicBuffer<DynamicBufferHashMap<ConditionHashId, bool>.Entry> bucket;
 
         /// <summary>
         /// Initializes the conditions map for the specified planner entity.
@@ -16,29 +16,29 @@ namespace CommonEcs.Goap {
         /// <param name="entityManager"></param>
         /// <param name="plannerEntity"></param>
         public static void Init(ref EntityManager entityManager, in Entity plannerEntity) {
-            DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry> bucket = 
-                entityManager.GetBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry>(plannerEntity);
-            DynamicBufferHashMap<ConditionId, bool>.Init(ref bucket);
+            DynamicBuffer<DynamicBufferHashMap<ConditionHashId, bool>.Entry> bucket = 
+                entityManager.GetBuffer<DynamicBufferHashMap<ConditionHashId, bool>.Entry>(plannerEntity);
+            DynamicBufferHashMap<ConditionHashId, bool>.Init(ref bucket);
         }
 
-        public ConditionsMap(in Entity plannerEntity, DynamicBufferHashMap<ConditionId, bool> map, 
-            DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry> bucket) {
+        public ConditionsMap(in Entity plannerEntity, DynamicBufferHashMap<ConditionHashId, bool> map, 
+            DynamicBuffer<DynamicBufferHashMap<ConditionHashId, bool>.Entry> bucket) {
             this.plannerEntity = plannerEntity;
             this.map = map;
             this.bucket = bucket;
         }
 
         public ConditionsMap(ref EntityManager entityManager, in Entity plannerEntity) : this(plannerEntity, 
-            entityManager.GetComponentData<DynamicBufferHashMap<ConditionId, bool>>(plannerEntity),
-            entityManager.GetBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry>(plannerEntity)) {
+            entityManager.GetComponentData<DynamicBufferHashMap<ConditionHashId, bool>>(plannerEntity),
+            entityManager.GetBuffer<DynamicBufferHashMap<ConditionHashId, bool>.Entry>(plannerEntity)) {
         }
 
-        public int AddOrSet(in ConditionId id, bool value) {
+        public int AddOrSet(in ConditionHashId id, bool value) {
             return this.map.AddOrSet(ref this.bucket, id, value);
         }
         
         public int AddOrSet(in FixedString64Bytes id, bool value) {
-            return AddOrSet(new ConditionId(id), value);
+            return AddOrSet(new ConditionHashId(id), value);
         }
 
         /// <summary>
@@ -46,12 +46,12 @@ namespace CommonEcs.Goap {
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ValueTypeOption<bool> Find(in ConditionId id) {
+        public ValueTypeOption<bool> Find(in ConditionHashId id) {
             return this.map.Find(this.bucket, id);
         }
         
         public ValueTypeOption<bool> Find(in FixedString64Bytes id) {
-            return Find(new ConditionId(id));
+            return Find(new ConditionHashId(id));
         }
 
         /// <summary>
@@ -69,14 +69,14 @@ namespace CommonEcs.Goap {
         /// <summary>
         /// We provide a getter because a job may need it to modify the value
         /// </summary>
-        public DynamicBufferHashMap<ConditionId, bool> Map {
+        public DynamicBufferHashMap<ConditionHashId, bool> Map {
             get {
                 return this.map;
             }
         }
 
-        public static void ResetValues(ref DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry> bucket) {
-            DynamicBufferHashMap<ConditionId, bool>.ResetValues(ref bucket);
+        public static void ResetValues(ref DynamicBuffer<DynamicBufferHashMap<ConditionHashId, bool>.Entry> bucket) {
+            DynamicBufferHashMap<ConditionHashId, bool>.ResetValues(ref bucket);
         }
     }
 }

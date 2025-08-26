@@ -20,18 +20,18 @@ namespace CommonEcs.Goap {
         // Type handles
         private ComponentTypeHandle<GoapPlanner> plannerType;
         private BufferTypeHandle<ResolvedAction> resolvedActionType;
-        private BufferTypeHandle<DynamicBufferHashMap<ConditionId, bool>.Entry> bucketType;
+        private BufferTypeHandle<DynamicBufferHashMap<ConditionHashId, bool>.Entry> bucketType;
 
         protected override void OnCreate() {
             this.textDbSystem = GetOrCreateSystemManaged<GoapTextDbSystem>();
             
             this.query = GetEntityQuery(typeof(GoapPlanner), typeof(ResolvedAction),
-                typeof(DynamicBufferHashMap<ConditionId, bool>),
-                typeof(DynamicBufferHashMap<ConditionId, bool>.Entry));
+                typeof(DynamicBufferHashMap<ConditionHashId, bool>),
+                typeof(DynamicBufferHashMap<ConditionHashId, bool>.Entry));
 
             this.plannerType = GetComponentTypeHandle<GoapPlanner>();
             this.resolvedActionType = GetBufferTypeHandle<ResolvedAction>();
-            this.bucketType = GetBufferTypeHandle<DynamicBufferHashMap<ConditionId, bool>.Entry>();
+            this.bucketType = GetBufferTypeHandle<DynamicBufferHashMap<ConditionHashId, bool>.Entry>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
@@ -61,7 +61,7 @@ namespace CommonEcs.Goap {
             public BufferTypeHandle<ResolvedAction> resolvedActionType;
 
             [ReadOnly]
-            public BufferTypeHandle<DynamicBufferHashMap<ConditionId, bool>.Entry> bucketType;
+            public BufferTypeHandle<DynamicBufferHashMap<ConditionHashId, bool>.Entry> bucketType;
 
             [ReadOnly]
             public ComponentLookup<GoapAgent> allAgents;
@@ -76,7 +76,7 @@ namespace CommonEcs.Goap {
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
                 NativeArray<GoapPlanner> planners = chunk.GetNativeArray(ref this.plannerType);
                 BufferAccessor<ResolvedAction> resolvedActionBuffers = chunk.GetBufferAccessor(ref this.resolvedActionType);
-                BufferAccessor<DynamicBufferHashMap<ConditionId, bool>.Entry> buckets = chunk.GetBufferAccessor(ref this.bucketType);
+                BufferAccessor<DynamicBufferHashMap<ConditionHashId, bool>.Entry> buckets = chunk.GetBufferAccessor(ref this.bucketType);
 
                 ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
                 while (enumerator.NextEntityIndex(out int i)) {
@@ -107,7 +107,7 @@ namespace CommonEcs.Goap {
 
                     // Prepare conditions map. We convert it from the bucket.
                     // The algorithm needs to use BoolHashMap so it can pass the hashmap around. 
-                    DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry> bucket = buckets[i];
+                    DynamicBuffer<DynamicBufferHashMap<ConditionHashId, bool>.Entry> bucket = buckets[i];
                     BoolHashMap boolHashMap = ToBoolHashMap(bucket);
 
                     NativeList<ResolvedAction> actionList = new(Allocator.Temp);
@@ -142,12 +142,12 @@ namespace CommonEcs.Goap {
             }
 
             private static BoolHashMap ToBoolHashMap(
-                in DynamicBuffer<DynamicBufferHashMap<ConditionId, bool>.Entry> bucket) {
+                in DynamicBuffer<DynamicBufferHashMap<ConditionHashId, bool>.Entry> bucket) {
                 BoolHashMap hashMap = new();
 
                 // Add only those with value
                 for (int i = 0; i < bucket.Length; ++i) {
-                    DynamicBufferHashMap<ConditionId, bool>.Entry entry = bucket[i];
+                    DynamicBufferHashMap<ConditionHashId, bool>.Entry entry = bucket[i];
                     if (!entry.HasValue) {
                         // No value
                         continue;

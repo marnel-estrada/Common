@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics.Contracts;
 using Common;
-using Unity.Burst;
 
 namespace CommonEcs {
     /// <summary>

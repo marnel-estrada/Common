@@ -6,9 +6,9 @@ namespace CommonEcs.Goap {
     /// </summary>
     [InternalBufferCapacity(50)]
     public readonly struct RequiredCondition : IBufferElementData {
-        public readonly ConditionId conditionId;
+        public readonly ConditionHashId conditionId;
 
-        public RequiredCondition(ConditionId conditionId) {
+        public RequiredCondition(ConditionHashId conditionId) {
             this.conditionId = conditionId;
         }
     }

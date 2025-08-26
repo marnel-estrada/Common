@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 
 namespace CommonEcs {
-    public struct LinearHashMap8<K, V> 
+    public struct LinearHashMap64<K, V> 
         where K : unmanaged, IEquatable<K>
         where V : unmanaged {
-        private LinearHashMapBucket8<K, V> bucket;
+        private LinearHashMapBucket64<K, V> bucket;
         private int count;
         
         public void AddOrSet(in K key, in V value) {
@@ -38,7 +38,7 @@ namespace CommonEcs {
         }
 
         private readonly int LinearProbeForAdding(int hashCode, int startingIndex) {
-            const int maxCount = LinearHashMapBucket8<K, V>.Length;
+            const int maxCount = LinearHashMapBucket64<K, V>.LENGTH;
             const int maxCountMinusOne = maxCount - 1;
             
             for (int i = 0; i < maxCount; ++i) {
@@ -89,7 +89,7 @@ namespace CommonEcs {
         /// <param name="startingIndex"></param>
         /// <returns></returns>
         private readonly int LinearProbeForExistingEntry(int hashCode, int startingIndex) {
-            const int maxCount = LinearHashMapBucket8<K, V>.Length;
+            const int maxCount = LinearHashMapBucket64<K, V>.LENGTH;
             const int maxCountMinusOne = maxCount - 1;
             
             for (int i = 0; i < maxCount; ++i) {
@@ -155,19 +155,19 @@ namespace CommonEcs {
         private static int ComputeBucketIndex(int hash) {
             // This assumes that the length of the bucket is a power of 2
             // This is the same as hash % Length
-            return hash & (LinearHashMapBucket8<K, V>.Length - 1);
+            return hash & (LinearHashMapBucket64<K, V>.LENGTH - 1);
         }
         
         public int Count => this.count;
 
         public void Clear() {
-            for (int i = 0; i < LinearHashMapBucket8<K, V>.Length; ++i) {
+            for (int i = 0; i < LinearHashMapBucket64<K, V>.LENGTH; ++i) {
                 this.bucket[i] = default;
             }
             
             this.count = 0;
         }
 
-        public LinearHashMapBucket8<K, V>.Enumerator Entries => this.bucket.GetEnumerator();
+        public LinearHashMapBucket64<K, V>.Enumerator Entries => this.bucket.GetEnumerator();
     }
 }

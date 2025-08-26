@@ -59,7 +59,7 @@ namespace CommonEcs.Goap {
 
             // TODO Linear search for now. We can optimize this later by using a Bloom Filter.
             private static bool ContainsConditionId(in DynamicBuffer<RequiredCondition> requiredConditions,
-                ConditionId conditionId) {
+                ConditionHashId conditionId) {
                 for (int i = 0; i < requiredConditions.Length; ++i) {
                     if (requiredConditions[i].conditionId == conditionId) {
                         // Found a required condition that's equal to the specified one

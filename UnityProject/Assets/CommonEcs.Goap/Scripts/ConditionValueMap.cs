@@ -1,22 +1,18 @@
-using System;
-
+﻿using System;
 using Unity.Entities;
 
-namespace CommonEcs {
+namespace CommonEcs.Goap {
     /// <summary>
-    /// A hashmap that uses a DynamicBuffer as its buckets
-    /// This is useful for cases where the elements are child entities that wants to write
-    /// to its parent hashmap. Instead of writing directly to a hashmap, they write to an
-    /// element in the DynamicBuffer. This way, the child elements can be run in parallel.
+    /// This is equivalent to DynamicBufferHashMap<ConditionHashId, bool>. We made it into a concrete type since
+    /// there's an issue in Unity 6.2 where TypeManager.GetTypeIndex(Type) and TypeManager.GetTypeIndex<T>()
+    /// return different results.
     /// </summary>
-    public struct DynamicBufferHashMap<K, V> : IComponentData
-        where K : unmanaged, IEquatable<K>
-        where V : unmanaged, IEquatable<V> {
+    public struct ConditionValueMap : IComponentData {
         private int count;
 
         public const int MAX_COUNT = 64;
         private const int MAX_COUNT_MINUS_ONE = MAX_COUNT - 1;
-
+        
         /// <summary>
         /// This should be called prior to usage so that all of the slots are prepared.
         /// </summary>
@@ -27,7 +23,7 @@ namespace CommonEcs {
                 bucket.Add(Entry.Nothing);
             }
         }
-
+        
         /// <summary>
         /// Adds or sets a value to the specified key
         /// Returns the bucket index where the value is stored
@@ -37,7 +33,7 @@ namespace CommonEcs {
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public int AddOrSet(ref DynamicBuffer<Entry> bucket, in K key, in V value) {
+        public int AddOrSet(ref DynamicBuffer<Entry> bucket, in ConditionHashId key, in bool value) {
             int hashCode = key.GetHashCode();
             
             // This is the same as hashCode % MAX_COUNT
@@ -93,8 +89,8 @@ namespace CommonEcs {
             // We've checked all entries. We can't find a suitable slot.
             throw new Exception("Bucket is full. Can't find an empty or an existing slot with the same hash code.");
         }
-
-        public void Remove(ref DynamicBuffer<Entry> bucket, in K key) {
+        
+        public void Remove(ref DynamicBuffer<Entry> bucket, in ConditionHashId key) {
             int hashCode = key.GetHashCode();
             
             // This is the same as hashCode % MAX_COUNT
@@ -120,8 +116,8 @@ namespace CommonEcs {
             
             // When probedIndex is None, it just means that the item is not in the HashMap
         }
-
-        public readonly ValueTypeOption<V> Find(in DynamicBuffer<Entry> bucket, in K key) {
+        
+        public readonly ValueTypeOption<bool> Find(in DynamicBuffer<Entry> bucket, in ConditionHashId key) {
             int hashCode = key.GetHashCode();
             
             // This is the same as hashCode % MAX_COUNT
@@ -131,21 +127,21 @@ namespace CommonEcs {
             Entry entry = bucket[bucketIndex];
             if (entry.HasValue && entry.HashCode == hashCode) {
                 // Found the item
-                return ValueTypeOption<V>.Some(entry.Value);
+                return ValueTypeOption<bool>.Some(entry.Value);
             }
             
             // At this point, the item in bucketIndex is a different item.
             // Let's do a linear probe
             int probedIndex = LinearProbeForExistingEntry(bucket, hashCode, bucketIndex + 1);
             if (probedIndex >= 0) {
-                return ValueTypeOption<V>.Some(bucket[probedIndex].Value);
+                return ValueTypeOption<bool>.Some(bucket[probedIndex].Value);
             }
             
             // At this point, we didn't find the item
-            return ValueTypeOption<V>.None;
+            return ValueTypeOption<bool>.None;
         }
-
-        public bool Contains(in DynamicBuffer<Entry> bucket, in K key) {
+        
+        public bool Contains(in DynamicBuffer<Entry> bucket, in ConditionHashId key) {
             int hashCode = key.GetHashCode();
             
             // This is the same as hashCode % MAX_COUNT
@@ -213,33 +209,33 @@ namespace CommonEcs {
                 }
                 
                 // Reset value
-                bucket[i] = Entry.Something(entry.HashCode, default);
+                bucket[i] = Entry.Something(entry.HashCode, false);
             }
         }
-
+        
         /// <summary>
-        /// Holds the values in a DynamicBuffer
+        /// Holds the values in a DynamicBuffer. This acts as the bucket to the hashmap.
         /// This is implemented like a Maybe. A hashcode of zero is considered as a nothing.
         /// </summary>
         [InternalBufferCapacity(64)]
         public readonly struct Entry : IBufferElementData {
-            private readonly V value;
             private readonly int hashCode;
+            private readonly bool value;
 
             public static Entry Nothing => new();
 
-            public static Entry Something(int hashCode, in V value) {
+            public static Entry Something(int hashCode, in bool value) {
                 // Hashcode can't be zero because it denotes a nothing value
                 DotsAssert.IsTrue(hashCode != 0);
                 return new Entry(hashCode, value);
             }
 
-            private Entry(int hashCode, V value) {
+            private Entry(int hashCode, bool value) {
                 this.value = value;
                 this.hashCode = hashCode;
             }
 
-            public V Value {
+            public bool Value {
                 get {
                     if (!this.HasValue) {
                         throw new Exception("Trying to access the value when there is none.");
@@ -261,7 +257,7 @@ namespace CommonEcs {
 
             public bool HasValue => this.hashCode != 0;
 
-            public Entry WithValue(in V newValue) {
+            public Entry WithValue(in bool newValue) {
                 return Something(this.hashCode, newValue); 
             }
         }

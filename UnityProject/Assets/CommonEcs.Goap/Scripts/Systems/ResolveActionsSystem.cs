@@ -20,18 +20,18 @@ namespace CommonEcs.Goap {
         // Type handles
         private ComponentTypeHandle<GoapPlanner> plannerType;
         private BufferTypeHandle<ResolvedAction> resolvedActionType;
-        private BufferTypeHandle<DynamicBufferHashMap<ConditionHashId, bool>.Entry> bucketType;
+        private BufferTypeHandle<ConditionValueMap.Entry> bucketType;
 
         protected override void OnCreate() {
             this.textDbSystem = GetOrCreateSystemManaged<GoapTextDbSystem>();
             
             this.query = GetEntityQuery(typeof(GoapPlanner), typeof(ResolvedAction),
-                typeof(DynamicBufferHashMap<ConditionHashId, bool>),
-                typeof(DynamicBufferHashMap<ConditionHashId, bool>.Entry));
+                typeof(ConditionValueMap),
+                typeof(ConditionValueMap.Entry));
 
             this.plannerType = GetComponentTypeHandle<GoapPlanner>();
             this.resolvedActionType = GetBufferTypeHandle<ResolvedAction>();
-            this.bucketType = GetBufferTypeHandle<DynamicBufferHashMap<ConditionHashId, bool>.Entry>();
+            this.bucketType = GetBufferTypeHandle<ConditionValueMap.Entry>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
@@ -61,7 +61,7 @@ namespace CommonEcs.Goap {
             public BufferTypeHandle<ResolvedAction> resolvedActionType;
 
             [ReadOnly]
-            public BufferTypeHandle<DynamicBufferHashMap<ConditionHashId, bool>.Entry> bucketType;
+            public BufferTypeHandle<ConditionValueMap.Entry> bucketType;
 
             [ReadOnly]
             public ComponentLookup<GoapAgent> allAgents;
@@ -76,7 +76,7 @@ namespace CommonEcs.Goap {
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
                 NativeArray<GoapPlanner> planners = chunk.GetNativeArray(ref this.plannerType);
                 BufferAccessor<ResolvedAction> resolvedActionBuffers = chunk.GetBufferAccessor(ref this.resolvedActionType);
-                BufferAccessor<DynamicBufferHashMap<ConditionHashId, bool>.Entry> buckets = chunk.GetBufferAccessor(ref this.bucketType);
+                BufferAccessor<ConditionValueMap.Entry> buckets = chunk.GetBufferAccessor(ref this.bucketType);
 
                 ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
                 while (enumerator.NextEntityIndex(out int i)) {
@@ -107,7 +107,7 @@ namespace CommonEcs.Goap {
 
                     // Prepare conditions map. We convert it from the bucket.
                     // The algorithm needs to use BoolHashMap so it can pass the hashmap around. 
-                    DynamicBuffer<DynamicBufferHashMap<ConditionHashId, bool>.Entry> bucket = buckets[i];
+                    DynamicBuffer<ConditionValueMap.Entry> bucket = buckets[i];
                     BoolHashMap boolHashMap = ToBoolHashMap(bucket);
 
                     NativeList<ResolvedAction> actionList = new(Allocator.Temp);
@@ -142,12 +142,12 @@ namespace CommonEcs.Goap {
             }
 
             private static BoolHashMap ToBoolHashMap(
-                in DynamicBuffer<DynamicBufferHashMap<ConditionHashId, bool>.Entry> bucket) {
+                in DynamicBuffer<ConditionValueMap.Entry> bucket) {
                 BoolHashMap hashMap = new();
 
                 // Add only those with value
                 for (int i = 0; i < bucket.Length; ++i) {
-                    DynamicBufferHashMap<ConditionHashId, bool>.Entry entry = bucket[i];
+                    ConditionValueMap.Entry entry = bucket[i];
                     if (!entry.HasValue) {
                         // No value
                         continue;
@@ -202,8 +202,8 @@ namespace CommonEcs.Goap {
                     // The false goal is already satisfied.
 #if UNITY_EDITOR
                     if (isDebug) {
-                        Debug.Log(string.Format("Goal {0}.{1} is not found in conditionsMap but is false so it's already satisfied.", 
-                            goalName, goal.value));
+                        Debug.Log(
+                            $"Goal {goalName}.{goal.value} is not found in conditionsMap but is false so it's already satisfied.");
                     }
 #endif
                     return true;
@@ -211,8 +211,7 @@ namespace CommonEcs.Goap {
                 
 #if UNITY_EDITOR
                 if (isDebug) {
-                    Debug.Log(string.Format("Goal {0}.{1} is not yet satisfied. Proceeding to look for actions.", 
-                        goalName, goal.value));
+                    Debug.Log($"Goal {goalName}.{goal.value} is not yet satisfied. Proceeding to look for actions.");
                 }
 #endif
 
@@ -221,7 +220,7 @@ namespace CommonEcs.Goap {
                     // There are no actions to satisfy the goal
 #if UNITY_EDITOR
                     if (isDebug) {
-                        Debug.Log(string.Format("There are no actions to satisfy goal {0}.{1}", goalName, goal.value));
+                        Debug.Log($"There are no actions to satisfy goal {goalName}.{goal.value}");
                     }
 #endif
                     
@@ -240,14 +239,14 @@ namespace CommonEcs.Goap {
 #if UNITY_EDITOR
                     FixedString64Bytes actionName = this.textResolver.GetText(action.id);
                     if (isDebug) {
-                        Debug.Log(string.Format("Evaluating action {0}", actionName));
+                        Debug.Log($"Evaluating action {actionName}");
                     }
 #endif
 
                     actionsBeingEvaluated.TryAdd(action.id);
 
                     BoolHashMap conditionsMapCopy = conditionsMap;
-                    NativeList<ResolvedAction> tempActionList = new NativeList<ResolvedAction>(Allocator.Temp);
+                    NativeList<ResolvedAction> tempActionList = new(Allocator.Temp);
                     bool searchSuccess = SearchActionsToSatisfyPreconditions(action, domain, ref conditionsMapCopy, 
                         ref tempActionList, ref actionsBeingEvaluated, isDebug);
 
@@ -257,7 +256,7 @@ namespace CommonEcs.Goap {
                     if (!searchSuccess) {
 #if UNITY_EDITOR
                         if (isDebug) {
-                            Debug.Log(string.Format("Searching for actions for preconditions for {0} failed!", actionName));
+                            Debug.Log($"Searching for actions for preconditions for {actionName} failed!");
                         }
 #endif
                         
@@ -301,8 +300,8 @@ namespace CommonEcs.Goap {
 #if UNITY_EDITOR
                     if (isDebug) {
                         FixedString64Bytes preconditionName = this.textResolver.GetText(precondition.id.hashCode);
-                        Debug.Log(string.Format("SearchActionsToSatisfyPreconditions: Searching for actions for precondition {0}.{1} failed!", 
-                            preconditionName, precondition.value));
+                        Debug.Log(
+                            $"SearchActionsToSatisfyPreconditions: Searching for actions for precondition {preconditionName}.{precondition.value} failed!");
                     }
 #endif
                         
@@ -315,7 +314,8 @@ namespace CommonEcs.Goap {
 #if UNITY_EDITOR
                 if (isDebug) {
                     FixedString64Bytes actionName = this.textResolver.GetText(action.id);
-                    Debug.Log(string.Format("SearchActionsToSatisfyPreconditions: Found actions to satisfy preconditions of action {0}.", actionName));
+                    Debug.Log(
+                        $"SearchActionsToSatisfyPreconditions: Found actions to satisfy preconditions of action {actionName}.");
                 }
 #endif
 

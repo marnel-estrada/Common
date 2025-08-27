@@ -13,7 +13,7 @@ namespace CommonEcs.Goap {
 
         protected override void OnCreate() {
             this.plannerQuery = GetEntityQuery(typeof(GoapPlanner),
-                typeof(DynamicBufferHashMap<ConditionHashId, bool>.Entry));
+                typeof(ConditionValueMap.Entry));
 
             this.agentsQuery = GetEntityQuery(typeof(GoapAgent));
         }
@@ -21,7 +21,7 @@ namespace CommonEcs.Goap {
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
             StartPlanningJob startPlanningJob = new() {
                 plannerType = GetComponentTypeHandle<GoapPlanner>(),
-                bucketType = GetBufferTypeHandle<DynamicBufferHashMap<ConditionHashId, bool>.Entry>(),
+                bucketType = GetBufferTypeHandle<ConditionValueMap.Entry>(),
                 allAgents = GetComponentLookup<GoapAgent>()
             };
             JobHandle handle = startPlanningJob.ScheduleParallel(this.plannerQuery, inputDeps);
@@ -37,14 +37,14 @@ namespace CommonEcs.Goap {
         [BurstCompile]
         private struct StartPlanningJob : IJobChunk {
             public ComponentTypeHandle<GoapPlanner> plannerType;
-            public BufferTypeHandle<DynamicBufferHashMap<ConditionHashId, bool>.Entry> bucketType;
+            public BufferTypeHandle<ConditionValueMap.Entry> bucketType;
             
             [ReadOnly]
             public ComponentLookup<GoapAgent> allAgents;
 
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
                 NativeArray<GoapPlanner> planners = chunk.GetNativeArray(ref this.plannerType);
-                BufferAccessor<DynamicBufferHashMap<ConditionHashId, bool>.Entry> buckets = 
+                BufferAccessor<ConditionValueMap.Entry> buckets = 
                     chunk.GetBufferAccessor(ref this.bucketType);
 
                 ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
@@ -66,7 +66,7 @@ namespace CommonEcs.Goap {
                     planner.StartPlanning(agent.GetGoal(planner.goalIndex));
                     
                     // Reset the condition values
-                    DynamicBuffer<DynamicBufferHashMap<ConditionHashId, bool>.Entry> bucket = buckets[i];
+                    DynamicBuffer<ConditionValueMap.Entry> bucket = buckets[i];
                     ConditionsMap.ResetValues(ref bucket);
                     
                     // Modify

@@ -6,6 +6,9 @@ namespace CommonEcs.Goap {
     /// This is equivalent to DynamicBufferHashMap<ConditionHashId, bool>. We made it into a concrete type since
     /// there's an issue in Unity 6.2 where TypeManager.GetTypeIndex(Type) and TypeManager.GetTypeIndex<T>()
     /// return different results.
+    ///
+    /// Note that we didn't use LinearHashMap here since we wanted the condition resolver entities to write
+    /// directly to the hashmap's bucket by index. In doing so, we could execute the condition resolvers in parallel.
     /// </summary>
     public struct ConditionValueMap : IComponentData {
         private int count;

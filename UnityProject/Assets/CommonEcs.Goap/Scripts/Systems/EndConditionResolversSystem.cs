@@ -69,12 +69,12 @@ namespace CommonEcs.Goap {
                 ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
                 while (enumerator.NextEntityIndex(out int i)) {
                     GoapPlanner planner = planners[i];
-                    if (planner.state == PlanningState.RESOLVING_CONDITIONS) {
-                        planner.state = PlanningState.RESOLVING_ACTIONS;
-                        
-                        // Modify
-                        planners[i] = planner;
+                    if (planner.state != PlanningState.RESOLVING_CONDITIONS) {
+                        continue;
                     }
+
+                    planner.state = PlanningState.RESOLVING_ACTIONS;
+                    planners[i] = planner; // Modify
                 }
             }
         }

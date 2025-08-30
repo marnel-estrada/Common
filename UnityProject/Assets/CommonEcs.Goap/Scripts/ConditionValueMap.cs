@@ -13,7 +13,7 @@ namespace CommonEcs.Goap {
     public struct ConditionValueMap : IComponentData {
         private int count;
 
-        public const int MAX_COUNT = 64;
+        private const int MAX_COUNT = 128;
         private const int MAX_COUNT_MINUS_ONE = MAX_COUNT - 1;
         
         /// <summary>
@@ -220,7 +220,7 @@ namespace CommonEcs.Goap {
         /// Holds the values in a DynamicBuffer. This acts as the bucket to the hashmap.
         /// This is implemented like a Maybe. A hashcode of zero is considered as a nothing.
         /// </summary>
-        [InternalBufferCapacity(64)]
+        [InternalBufferCapacity(0)]
         public readonly struct Entry : IBufferElementData {
             private readonly int hashCode;
             private readonly bool value;

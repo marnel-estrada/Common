@@ -104,11 +104,19 @@ namespace Common.Xml {
         }
 
         public uint GetAttributeAsUint(string attributeKey) {
-            if (!ContainsAttribute(attributeKey)) {
-                return 0;
+            return !TryGetAttribute(attributeKey, out string value) 
+                ? (uint)0 
+                : uint.Parse(value, NumberFormatInfo.InvariantInfo);
+        }
+
+        public bool TryGetAttributeAsUint(string attributeKey, out uint value) {
+            value = 0;
+            if (!TryGetAttribute(attributeKey, out string stringValue)) {
+                return false;
             }
 
-            return uint.Parse(GetAttribute(attributeKey), NumberFormatInfo.InvariantInfo);
+            value = uint.Parse(stringValue, NumberFormatInfo.InvariantInfo);
+            return true;
         }
 
         public long GetAttributeAsLong(string attributeKey) {
@@ -170,6 +178,10 @@ namespace Common.Xml {
          */
         public bool ContainsAttribute(string attributeKey) {
             return this.attributes.ContainsKey(attributeKey);
+        }
+
+        public bool TryGetAttribute(string attributeKey, out string value) {
+            return this.attributes.TryGetValue(attributeKey, out value);
         }
 
         public void AddChild(SimpleXmlNode child) {

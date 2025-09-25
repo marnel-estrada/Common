@@ -58,6 +58,7 @@ namespace CommonEcs.Goap {
                 return inputDeps;
             } catch (InvalidOperationException e) {
                 Debug.LogError(typeof(TActionFilter));
+                Debug.LogError(e.Message);
                 Debug.LogError(e.StackTrace);
                 throw;
             }

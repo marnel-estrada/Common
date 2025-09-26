@@ -8,17 +8,21 @@ namespace CommonEcs.Goap {
     /// We implemented in separate file so we don't need to add in AssemblyInfo.
     /// </summary>
     [BurstCompile]
-    public struct CollectActionsThatCanExecuteJob : IJobChunk {
+    public struct CollectActionEntities : IJobChunk {
         [ReadOnly]
         public EntityTypeHandle entityType;
 
         [ReadOnly]
         public ComponentTypeHandle<AtomAction> atomActionType;
+        
+        [ReadOnly]
+        public ComponentLookup<GoapAgent> allAgents;
 
         [ReadOnly]
         public ComponentLookup<DebugEntity> allDebugEntities;
-            
-        public NativeList<Entity>.ParallelWriter resultList;
+
+        public NativeList<Entity>.ParallelWriter cleanupResults;
+        public NativeList<Entity>.ParallelWriter canExecuteResults;
 
         public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
             NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
@@ -27,6 +31,14 @@ namespace CommonEcs.Goap {
             ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
             while (enumerator.NextEntityIndex(out int i)) {
                 AtomAction atomAction = atomActions[i];
+                GoapAgent agent = this.allAgents[atomAction.agentEntity];
+                
+                if (agent.state == AgentState.CLEANUP) {
+                    // Add to cleanup list so it can be invoked outside of this job
+                    this.cleanupResults.AddNoResize(entities[i]);
+                    continue;
+                }
+                
                 if (!atomAction.canExecute) {
                     continue;
                 }
@@ -37,7 +49,7 @@ namespace CommonEcs.Goap {
                     ++breakpoint;
                 }
                     
-                this.resultList.AddNoResize(entities[i]);
+                this.canExecuteResults.AddNoResize(entities[i]);
             }
         }
     }

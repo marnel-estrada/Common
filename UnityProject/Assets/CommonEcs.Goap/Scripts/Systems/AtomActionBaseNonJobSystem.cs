@@ -29,38 +29,68 @@ namespace CommonEcs.Goap {
         }
 
         protected override void OnUpdate() {
-            NativeList<Entity> actionsThatCanExecuteList =
-                new(this.query.CalculateEntityCount(), WorldUpdateAllocator);
+            int entityCount = this.query.CalculateEntityCount();
+            NativeList<Entity> cleanupActionsList = new(entityCount, WorldUpdateAllocator);
+            NativeList<Entity> canExecuteActionsList = new(entityCount, WorldUpdateAllocator);
 
             // We collect action entities that can execute via a job so that it would be faster
             // compared to using non bursted chunk iteration which will check all actions.
-            CollectActionsThatCanExecuteJob collectJob = new() {
+            CollectActionEntities collectJob = new() {
                 entityType = GetEntityTypeHandle(),
-                atomActionType = GetComponentTypeHandle<AtomAction>(),
-                allDebugEntities = GetComponentLookup<DebugEntity>(),
-                resultList = actionsThatCanExecuteList.AsParallelWriter()
+                atomActionType = GetComponentTypeHandle<AtomAction>(true),
+                allAgents = GetComponentLookup<GoapAgent>(true),
+                allDebugEntities = GetComponentLookup<DebugEntity>(true),
+                cleanupResults = cleanupActionsList.AsParallelWriter(),
+                canExecuteResults = canExecuteActionsList.AsParallelWriter()
             };
             collectJob.ScheduleParallel(this.query, this.Dependency).Complete();
-
-            if (actionsThatCanExecuteList.IsEmpty) {
-                // There are no actions that can execute. We can skip executing the actions.
-
-                // Don't forget to dispose
-                actionsThatCanExecuteList.Dispose();
-                return;
-            }
-
+            
             // Execute each action that can execute
             ComponentLookup<AtomAction> allAtomActions = GetComponentLookup<AtomAction>();
             ComponentLookup<TActionFilter> allFilterActions =
                 this.isActionFilterHasArray ? GetComponentLookup<TActionFilter>() : default;
-
+            
             BeforeActionsExecution();
 
-            for (int i = 0; i < actionsThatCanExecuteList.Length; ++i) {
-                Entity actionEntity = actionsThatCanExecuteList[i];
+            ExecuteCleanup(ref cleanupActionsList, ref allAtomActions, ref allFilterActions);
+            ExecuteActions(ref canExecuteActionsList, ref allAtomActions, ref allFilterActions);
+        }
+
+        private void ExecuteCleanup(ref NativeList<Entity> actionsList, ref ComponentLookup<AtomAction> allAtomActions, 
+            ref ComponentLookup<TActionFilter> allFilterActions) {
+            if (actionsList.IsEmpty) {
+                // Nothing to process
+                return;
+            }
+            
+            for (int i = 0; i < actionsList.Length; ++i) {
+                Entity actionEntity = actionsList[i];
                 AtomAction atomAction = allAtomActions[actionEntity];
                 TActionFilter actionFilter = this.isActionFilterHasArray ? allFilterActions[actionEntity] : default;
+                
+                Cleanup(ref atomAction, ref actionFilter);
+
+                // Modify
+                allAtomActions[actionEntity] = atomAction;
+
+                if (this.isActionFilterHasArray) {
+                    allFilterActions[actionEntity] = actionFilter;
+                }
+            }
+        }
+
+        private void ExecuteActions(ref NativeList<Entity> actionsList, ref ComponentLookup<AtomAction> allAtomActions, 
+            ref ComponentLookup<TActionFilter> allFilterActions) {
+            if (actionsList.IsEmpty) {
+                // There are no actions that can execute. We can skip executing the actions.
+                return;
+            }
+
+            for (int i = 0; i < actionsList.Length; ++i) {
+                Entity actionEntity = actionsList[i];
+                AtomAction atomAction = allAtomActions[actionEntity];
+                TActionFilter actionFilter = this.isActionFilterHasArray ? allFilterActions[actionEntity] : default;
+                
                 ExecuteAction(ref atomAction, ref actionFilter);
 
                 // Modify
@@ -70,9 +100,6 @@ namespace CommonEcs.Goap {
                     allFilterActions[actionEntity] = actionFilter;
                 }
             }
-
-            // Don't forget to dispose
-            actionsThatCanExecuteList.Dispose();
         }
 
         private void ExecuteAction(ref AtomAction atomAction, ref TActionFilter actionFilter) {
@@ -98,7 +125,7 @@ namespace CommonEcs.Goap {
 
         protected abstract GoapResult Update(ref AtomAction atomAction, ref TActionFilter actionComponent);
 
-        // Note that we don't have Cleanup() here yet because it's not really needed. Very few actions should
-        // use this and they may not need Cleanup()
+        protected virtual void Cleanup(ref AtomAction atomAction, ref TActionFilter actionComponent) {
+        }
     }
 }

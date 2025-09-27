@@ -34,7 +34,7 @@ namespace Common {
             GUI.backgroundColor = ColorUtils.RED;
             if (GUILayout.Button("X", EditorStyles.miniButton, GUILayout.Width(20))) {
                 if (EditorUtility.DisplayDialog("Remove Variable",
-                    string.Format("Are you sure you want to remove variable \"{0}\"?", valueHolder.Name), "Yes",
+                        $"Are you sure you want to remove variable \"{valueHolder.Name}\"?", "Yes",
                     "No")) {
                     this.removalMap[this.type].Add(valueHolder.Name); // Add to removal list
                 }

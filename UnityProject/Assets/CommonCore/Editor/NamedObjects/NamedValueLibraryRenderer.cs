@@ -31,7 +31,7 @@ namespace Common {
         public NamedValueLibraryRenderer() {
             PreparePopupValues();
 
-            this.fieldRenderer = new VariableFieldRenderer(150);
+            this.fieldRenderer = new VariableFieldRenderer(250);
 
             // Populate removalMap and entryRendererMap
             for (int i = 0; i < NamedValueType.ALL_TYPES.Length; ++i) {

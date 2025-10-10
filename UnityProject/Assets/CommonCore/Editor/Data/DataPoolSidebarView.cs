@@ -6,14 +6,14 @@ using UnityEngine;
 
 namespace Common {
     public class DataPoolSidebarView<T> : IDataPoolSidebarView<T> where T : class, IDataPoolItem, IDuplicable<T>, new() {
-        private readonly Dictionary<string, T> filteredMap = new Dictionary<string, T>();
-        private readonly List<string> filteredIds = new List<string>(); // Used to render list of action buttons
+        private readonly Dictionary<string, T> filteredMap = new();
+        private readonly List<string> filteredIds = new(); // Used to render list of action buttons
 
         private Vector2 scrollPos;
 
         private int selection;
         
-        private readonly SimpleList<DataPoolFilterStrategy<T>> filterStrategies = new SimpleList<DataPoolFilterStrategy<T>>();
+        private readonly SimpleList<DataPoolFilterStrategy<T>> filterStrategies = new();
 
         private bool shouldSortItems = true;
 
@@ -59,13 +59,7 @@ namespace Common {
 
                     // Add the new item
                     T newItem = pool.AddNew(this.newItemId);
-
-                    // Add to filtered and select it
-                    AddToFiltered(newItem);
-                    
-                    // This will trigger a custom selection when selection grid is rendered
-                    this.itemToSelect = Option<string>.Some(this.newItemId);
-                    
+                    OnItemAdded(newItem);
                     this.newItemId = "";
 
                     EditorUtility.SetDirty(pool);
@@ -73,6 +67,14 @@ namespace Common {
             }
 
             GUILayout.EndHorizontal();
+        }
+
+        public void OnItemAdded(T item) {
+            // Add to filtered and select it
+            AddToFiltered(item);
+                    
+            // This will trigger a custom selection when selection grid is rendered
+            this.itemToSelect = Option<string>.Some(item.Id);
         }
 
         private void AddToFiltered(T item) {
@@ -202,12 +204,8 @@ namespace Common {
         }
 
         public bool ShouldSortItems {
-            get {
-                return this.shouldSortItems;
-            }
-            set {
-                this.shouldSortItems = value;
-            }
+            get => this.shouldSortItems;
+            set => this.shouldSortItems = value;
         }
 
         /// <summary>

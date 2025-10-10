@@ -10,5 +10,18 @@ namespace Common {
 
         [SerializeField]
         public List<string>? stringList;
+
+        public RangeDataWithStringList CreateCopy() {
+            RangeDataWithStringList copy = new() {
+                min = this.min,
+                max = this.max
+            };
+
+            if (this.stringList != null) {
+                copy.stringList = new List<string>(this.stringList);
+            }
+
+            return copy;
+        }
     }
 }

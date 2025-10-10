@@ -56,5 +56,9 @@ namespace Common {
         public IdGenerator Duplicate() {
             return new IdGenerator(this.counter);
         }
+
+        public void DuplicateTo(IdGenerator copy) {
+            copy.counter = this.counter;
+        }
     }
 }

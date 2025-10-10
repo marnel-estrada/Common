@@ -6,7 +6,7 @@
     /// We only limit parameters to struct so that users of this wouldn't pass references or
     /// create small objects from classes which is garbage.
     /// </summary>
-    public class TypedSignal<T> where T : struct {
+    public class TypedSignal<T> {
         public delegate void SignalListener(T parameter);
         
         private readonly SimpleList<SignalListener> listeners = new(1);

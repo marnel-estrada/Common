@@ -1,9 +1,9 @@
 namespace Common {
-    public interface IDuplicable<out T> {
+    public interface IDuplicable<in T> {
         /// <summary>
-        /// Creates the duplicate
+        /// Copies the values unto the specified copy
         /// </summary>
         /// <returns></returns>
-        T Duplicate();
+        void DuplicateTo(T copy);
     }
 }

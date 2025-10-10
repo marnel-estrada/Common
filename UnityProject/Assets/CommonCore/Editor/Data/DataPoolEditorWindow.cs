@@ -10,9 +10,10 @@ namespace Common {
     public class DataPoolEditorWindow<T> : EditorWindow where T : class, IDataPoolItem, IDuplicable<T>, new() {
         private DataPool<T>? target;
 
-        public static readonly Signal.Signal REPAINT = new Signal.Signal("Repaint");
+        public static readonly Signal.Signal REPAINT = new("Repaint");
+        public static readonly TypedSignal<T> ITEM_ADDED = new();
 
-        private readonly DataPoolSidebarView<T> sidebar = new DataPoolSidebarView<T>();
+        private readonly DataPoolSidebarView<T> sidebar = new();
         private DataPoolInspectorView<T>? inspector;
 
         private Action<DataPool<T>>? runAction;
@@ -31,10 +32,12 @@ namespace Common {
 
         private void OnEnable() {
             REPAINT.AddListener(Repaint);
+            ITEM_ADDED.AddListener(this.sidebar.OnItemAdded);
         }
 
         private void OnDisable() {
             REPAINT.RemoveListener(Repaint);
+            ITEM_ADDED.RemoveListener(this.sidebar.OnItemAdded);
         }
 
         private void Repaint(ISignalParameters parameters) {
@@ -47,7 +50,7 @@ namespace Common {
         }
 
         private void OnGUI() {
-            if (this.target == null) {
+            if (!this.target) {
                 GUILayout.BeginVertical();
                 GUILayout.Label("Data Class Editor: (Missing DataClassPool target)", EditorStyles.largeLabel);
                 GUILayout.Space(10);

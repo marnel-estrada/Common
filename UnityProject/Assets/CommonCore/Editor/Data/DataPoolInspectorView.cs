@@ -82,9 +82,8 @@ namespace Common {
             }
             
             // Add the duplicate item
-            T duplicateItem = item.Duplicate();
-            duplicateItem.Id = this.duplicateId; // Don't forget to override. Can't add if it's the same ID.
-            pool.Add(duplicateItem); // New integer ID is assigned here
+            T copyItem = pool.AddNew(this.duplicateId);
+            item.DuplicateTo(copyItem);
             
             EditorUtility.SetDirty(pool);
             

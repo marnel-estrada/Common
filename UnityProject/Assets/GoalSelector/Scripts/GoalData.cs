@@ -137,9 +137,7 @@ namespace GoalSelector {
             }
         }
 
-        public GoalData Duplicate() {
-            // Not really implemented for now
-            return new GoalData();
+        public void DuplicateTo(GoalData copy) {
         }
     }
 }

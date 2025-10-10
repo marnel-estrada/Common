@@ -88,5 +88,13 @@ namespace Common {
             this.components.Remove(component);
             this.componentMap.Remove(component.GetType().FullName.GetHashCode());
         }
+
+        public DataEntity CreateCopy() {
+            DataEntity copy = new();
+            copy.components.AddRange(this.components);
+            copy.PopulateMap();
+
+            return copy;
+        }
     }
 }

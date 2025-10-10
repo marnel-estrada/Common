@@ -6,5 +6,6 @@ namespace Common {
     /// </summary>
     [Serializable]
     public abstract class DataComponent {
+        public abstract DataComponent CreateCopy();
     }
 }

@@ -131,12 +131,10 @@ namespace Common {
         private IOptionMatcher<string> resolveSelectionMatcher;
 
         private void ResolveSelection() {
-            if (this.resolveSelectionMatcher == null) {
-                this.resolveSelectionMatcher = new DelegateOptionMatcher<string>(delegate(string newlyAddedItemId) {
-                    this.selection = this.filteredIds.IndexOf(newlyAddedItemId);
-                    this.selection = Mathf.Clamp(this.selection, 0, this.filteredIds.Count - 1);
-                });
-            }
+            this.resolveSelectionMatcher ??= new DelegateOptionMatcher<string>(delegate(string newlyAddedItemId) {
+                this.selection = this.filteredIds.IndexOf(newlyAddedItemId);
+                this.selection = Mathf.Clamp(this.selection, 0, this.filteredIds.Count - 1);
+            });
 
             this.itemToSelect.Match(this.resolveSelectionMatcher);
             

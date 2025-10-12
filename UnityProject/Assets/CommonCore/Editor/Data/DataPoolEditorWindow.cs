@@ -11,7 +11,6 @@ namespace Common {
         private DataPool<T>? target;
 
         public static readonly Signal.Signal REPAINT = new("Repaint");
-        public static readonly TypedSignal<T> ITEM_ADDED = new();
 
         private readonly DataPoolSidebarView<T> sidebar = new();
         private DataPoolInspectorView<T>? inspector;
@@ -32,16 +31,18 @@ namespace Common {
 
         private void OnEnable() {
             REPAINT.AddListener(Repaint);
-            ITEM_ADDED.AddListener(this.sidebar.OnItemAdded);
         }
 
         private void OnDisable() {
             REPAINT.RemoveListener(Repaint);
-            ITEM_ADDED.RemoveListener(this.sidebar.OnItemAdded);
+        }
+
+        public void OnItemAdded(T item) {
+            this.sidebar.OnItemAdded(item);
         }
 
         private void Repaint(ISignalParameters parameters) {
-            if (this.target == null) {
+            if (!this.target) {
                 throw new CantBeNullException(nameof(this.target));
             }
         

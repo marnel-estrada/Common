@@ -127,16 +127,14 @@ namespace Common {
             this.selection = GUILayout.SelectionGrid(this.selection, this.filteredIds.ToArray(), 1);
             GUILayout.EndScrollView();
         }
-        
-        private IOptionMatcher<string> resolveSelectionMatcher;
 
         private void ResolveSelection() {
-            this.resolveSelectionMatcher ??= new DelegateOptionMatcher<string>(delegate(string newlyAddedItemId) {
-                this.selection = this.filteredIds.IndexOf(newlyAddedItemId);
-                this.selection = Mathf.Clamp(this.selection, 0, this.filteredIds.Count - 1);
-            });
-
-            this.itemToSelect.Match(this.resolveSelectionMatcher);
+            if (this.itemToSelect.IsNone) {
+                return;
+            }
+            
+            this.selection = this.filteredIds.IndexOf(this.itemToSelect.ValueOrError());
+            this.selection = Mathf.Clamp(this.selection, 0, this.filteredIds.Count - 1);
             
             // We always set it to none to mark that the value has been "processed" already
             this.itemToSelect = Option<string>.NONE;

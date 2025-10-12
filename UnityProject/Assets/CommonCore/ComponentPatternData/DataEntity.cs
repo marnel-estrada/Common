@@ -91,7 +91,12 @@ namespace Common {
 
         public DataEntity CreateCopy() {
             DataEntity copy = new();
-            copy.components.AddRange(this.components);
+            
+            // Copy components
+            foreach (DataComponent component in this.components) {
+                copy.components.Add(component.CreateCopy());
+            }
+            
             copy.PopulateMap();
 
             return copy;

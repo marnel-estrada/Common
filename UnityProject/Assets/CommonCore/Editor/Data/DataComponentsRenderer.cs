@@ -66,6 +66,12 @@ namespace Common {
             IReadOnlyList<DataComponent> components = item.Components;
             for (int i = 0; i < components.Count; i++) {
                 DataComponent component = components[i];
+                if (component == null) {
+                    GUI.color = Color.red;
+                    GUILayout.Label($"There's a null component at index {i}. Remove this using Default GUI Layout.");
+                    GUI.color = Color.white;
+                    continue;
+                }
                 
                 GUILayout.BeginHorizontal();
 

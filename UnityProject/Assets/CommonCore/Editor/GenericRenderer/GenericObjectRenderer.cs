@@ -16,28 +16,36 @@ namespace Common {
         private readonly PropertyInfo[] properties;
 
         private delegate void PropertyRenderer(PropertyInfo property, object instance);
-        private static readonly Dictionary<Type, PropertyRenderer> RENDERER_MAP = new() {
-            { typeof(string), RenderString },
-            { typeof(byte), RenderByte },
-            { typeof(int), RenderInt },
-            { typeof(float), RenderFloat },
-            { typeof(bool), RenderBool },
-            { typeof(Vector2), RenderVector2 },
-            { typeof(float2), RenderFloat2 },
-            { typeof(Color), RenderColor },
-            { typeof(List<string>), RenderStringList }
-        };
+        private readonly Dictionary<Type, PropertyRenderer> rendererMap;
 
         private readonly Dictionary<string, List<PropertyInfo>> groupMap = new();
         
         private readonly Dictionary<string, EditorPropertyRenderer> customRenderers = new(1);
 
+        private const int DEFAULT_LABEL_WIDTH = 200;
+
+        private readonly int labelWidth;
+
         /// <summary>
         /// Constructor
         /// </summary>
-        public GenericObjectRenderer(Type type) {
+        public GenericObjectRenderer(Type type, int labelWidth = DEFAULT_LABEL_WIDTH) {
             this.type = type;
+            this.labelWidth = labelWidth;
             this.properties = this.type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            
+            // Populate rendererMap
+            this.rendererMap = new Dictionary<Type, PropertyRenderer> {
+                { typeof(string), RenderString },
+                { typeof(byte), RenderByte },
+                { typeof(int), RenderInt },
+                { typeof(float), RenderFloat },
+                { typeof(bool), RenderBool },
+                { typeof(Vector2), RenderVector2 },
+                { typeof(float2), RenderFloat2 },
+                { typeof(Color), RenderColor },
+                { typeof(List<string>), RenderStringList }
+            };
         }
 
         private readonly List<PropertyInfo> ungroupedList = new();
@@ -96,13 +104,13 @@ namespace Common {
             }
         }
 
-        private static bool HasRenderer(PropertyInfo property) {
+        private bool HasRenderer(PropertyInfo property) {
             // Check if property has a custom renderer
             Common.PropertyRenderer? propertyRenderer = TypeUtils.GetCustomAttribute<Common.PropertyRenderer>(property);
             
             if (propertyRenderer == null || string.IsNullOrEmpty(propertyRenderer.RendererType)) {
                 // No custom renderer
-                Option<PropertyRenderer> renderer = RENDERER_MAP.Find(property.PropertyType);
+                Option<PropertyRenderer> renderer = rendererMap.Find(property.PropertyType);
                 return renderer.IsSome;
             }
             
@@ -139,12 +147,12 @@ namespace Common {
             }
         }
 
-        private static void RenderAsDefault(PropertyInfo property, object instance) {
+        private void RenderAsDefault(PropertyInfo property, object instance) {
             ReadOnlyFieldAttribute? readOnlyAttribute = TypeUtils.GetCustomAttribute<ReadOnlyFieldAttribute>(property);
 
             if (readOnlyAttribute == null) {
                 // It's an editable field
-                RENDERER_MAP[property.PropertyType](property, instance); // Invoke the renderer
+                rendererMap[property.PropertyType](property, instance); // Invoke the renderer
             } else {
                 // It's readonly
                 RenderReadOnly(property, instance);
@@ -229,7 +237,7 @@ namespace Common {
 
         private static GUIStyle? TextAreaStyle;
 
-        private static void RenderString(PropertyInfo property, object instance) {
+        private void RenderString(PropertyInfo property, object instance) {
             string? value = property.GetGetMethod().Invoke(instance, null) as string;
             value = string.IsNullOrEmpty(value) ? "" : value; // Prevent null
 
@@ -237,7 +245,7 @@ namespace Common {
             if (textAreaAttribute == null) {
                 // No text area. Render as text field.
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(property.Name + ":", GUILayout.Width(150));
+                GUILayout.Label(property.Name + ":", GUILayout.Width(this.labelWidth));
                 value = EditorGUILayout.TextField(value, GUILayout.Width(300)).Trim();
                 GUILayout.EndHorizontal();
             } else {
@@ -256,11 +264,11 @@ namespace Common {
             property.GetSetMethod().Invoke(instance, new object[] { value });
         }
 
-        private static void RenderByte(PropertyInfo property, object instance) {
+        private void RenderByte(PropertyInfo property, object instance) {
             byte value = (byte)property.GetGetMethod().Invoke(instance, null);
             
             GUILayout.BeginHorizontal();
-            GUILayout.Label(property.Name + ":", GUILayout.Width(150));
+            GUILayout.Label(property.Name + ":", GUILayout.Width(this.labelWidth));
             value = (byte)EditorGUILayout.IntField(value, GUILayout.Width(150));
             GUILayout.EndHorizontal();
 
@@ -268,11 +276,11 @@ namespace Common {
             property.GetSetMethod().Invoke(instance, new object[] { value });
         }
 
-        private static void RenderInt(PropertyInfo property, object instance) {
+        private void RenderInt(PropertyInfo property, object instance) {
             int value = (int)property.GetGetMethod().Invoke(instance, null);
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(property.Name + ":", GUILayout.Width(150));
+            GUILayout.Label(property.Name + ":", GUILayout.Width(this.labelWidth));
             value = EditorGUILayout.IntField(value, GUILayout.Width(150));
             GUILayout.EndHorizontal();
 
@@ -280,11 +288,11 @@ namespace Common {
             property.GetSetMethod().Invoke(instance, new object[] { value });
         }
 
-        private static void RenderFloat(PropertyInfo property, object instance) {
+        private void RenderFloat(PropertyInfo property, object instance) {
             float value = (float)property.GetGetMethod().Invoke(instance, null);
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(property.Name + ":", GUILayout.Width(150));
+            GUILayout.Label(property.Name + ":", GUILayout.Width(this.labelWidth));
             value = EditorGUILayout.FloatField(value, GUILayout.Width(150));
             GUILayout.EndHorizontal();
 
@@ -292,11 +300,11 @@ namespace Common {
             property.GetSetMethod().Invoke(instance, new object[] { value });
         }
 
-        private static void RenderBool(PropertyInfo property, object instance) {
+        private void RenderBool(PropertyInfo property, object instance) {
             bool value = (bool)property.GetGetMethod().Invoke(instance, null);
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(property.Name + ":", GUILayout.Width(150));
+            GUILayout.Label(property.Name + ":", GUILayout.Width(this.labelWidth));
             value = EditorGUILayout.Toggle(value);
             GUILayout.EndHorizontal();
 
@@ -304,11 +312,11 @@ namespace Common {
             property.GetSetMethod().Invoke(instance, new object[] { value });
         }
 
-        private static void RenderVector2(PropertyInfo property, object instance) {
+        private void RenderVector2(PropertyInfo property, object instance) {
             Vector2 value = (Vector2)property.GetGetMethod().Invoke(instance, null);
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(property.Name + ":", GUILayout.Width(150));
+            GUILayout.Label(property.Name + ":", GUILayout.Width(this.labelWidth));
             value = EditorGUILayout.Vector2Field("", value, GUILayout.Width(150));
             GUILayout.EndHorizontal();
 
@@ -316,11 +324,11 @@ namespace Common {
             property.GetSetMethod().Invoke(instance, new object[] { value });
         }
 
-        private static void RenderFloat2(PropertyInfo property, object instance) {
+        private void RenderFloat2(PropertyInfo property, object instance) {
             float2 value = (float2)property.GetGetMethod().Invoke(instance, null);
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(property.Name + ":", GUILayout.Width(150));
+            GUILayout.Label(property.Name + ":", GUILayout.Width(this.labelWidth));
             value = EditorGUILayout.Vector2Field("", value, GUILayout.Width(150));
             GUILayout.EndHorizontal();
 
@@ -328,11 +336,11 @@ namespace Common {
             property.GetSetMethod().Invoke(instance, new object[] { value });
         }
 
-        private static void RenderColor(PropertyInfo property, object instance) {
+        private void RenderColor(PropertyInfo property, object instance) {
             Color value = (Color)property.GetGetMethod().Invoke(instance, null);
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(property.Name + ":", GUILayout.Width(150));
+            GUILayout.Label(property.Name + ":", GUILayout.Width(this.labelWidth));
             value = EditorGUILayout.ColorField("", value, GUILayout.Width(150));
             GUILayout.EndHorizontal();
 

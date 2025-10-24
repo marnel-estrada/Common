@@ -48,43 +48,48 @@ namespace CommonEcs.Goap {
                     AtomAction atomAction = atomActions[i];
                     GoapAgent agent = this.allAgents[atomAction.agentEntity];
                     DebugEntity debugEntity = this.allDebugEntities[atomAction.agentEntity];
-                    
-                    if (agent.state != AgentState.EXECUTING) {
-                        // Agent owner is not executing
-                        // We skip
-                        continue;
-                    }
 
-                    if (atomAction.executing) {
-                        if (debugEntity.enabled) {
-                            int breakpoint = 0;
-                            ++breakpoint;
+                    try {
+                        if (agent.state != AgentState.EXECUTING) {
+                            // Agent owner is not executing
+                            // We skip but we set canExecute to false so that the system that processes the action
+                            // will not run this
+                            atomAction.canExecute = false;
+                            continue;
                         }
-                        
-                        // The atom action is already currently executing. We should not continue
-                        // because if we do, we will call AtomAction.MarkCanExecute() which will reset
-                        // the started flag. If we do this, Start() routines will be invoked again
-                        // and this is a bug because the action could be stuck.
-                        continue;
-                    }
 
-                    if (CanExecute(atomAction, agent)) {
-                        if (debugEntity.enabled) {
-                            int breakpoint = 0;
-                            ++breakpoint;
+                        if (atomAction.executing) {
+                            if (debugEntity.enabled) {
+                                int breakpoint = 0;
+                                ++breakpoint;
+                            }
+                            
+                            // The atom action is already currently executing. We should not continue
+                            // because if we do, we will call AtomAction.MarkCanExecute() which will reset
+                            // the started flag. If we do this, Start() routines will be invoked again
+                            // and this is a bug because the action could be stuck.
+                            continue;
                         }
-                        
-                        atomAction.MarkCanExecute();
-                    } else {
-                        // Reset this to false so that other systems that are using this will not
-                        // mistake that the atom action is still running.
-                        // Only one atom action should run per frame per agent.
-                        atomAction.canExecute = false;
-                        atomAction.executing = false;
+
+                        if (CanExecute(atomAction, agent)) {
+                            if (debugEntity.enabled) {
+                                int breakpoint = 0;
+                                ++breakpoint;
+                            }
+                            
+                            atomAction.MarkCanExecute();
+                        } else {
+                            // Reset this to false so that other systems that are using this will not
+                            // mistake that the atom action is still running.
+                            // Only one atom action should run per frame per agent.
+                            atomAction.canExecute = false;
+                            atomAction.executing = false;
+                        }
+                    } finally {
+                        // Modify
+                        atomActions[i] = atomAction;
                     }
                     
-                    // Modify
-                    atomActions[i] = atomAction;
                 }
             }
 

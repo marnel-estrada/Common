@@ -14,7 +14,7 @@ namespace GoapBrain {
 
         public override void Prepare(ref EntityManager entityManager, in Entity agentEntity, ref NativeList<Entity> linkedEntities) {
             Entity actionEntity = entityManager.CreateEntity(this.archetype);
-            entityManager.SetComponentData(actionEntity, new AtomAction(this.ActionId, agentEntity, this.Order));
+            entityManager.SetComponentData(actionEntity, new AtomAction(this.ActionId, agentEntity, this.Order, AtomActionIdGenerator.NextAtomActionId()));
             
             PrepareActionComponent(ref entityManager, agentEntity, actionEntity);
             

@@ -33,7 +33,13 @@ namespace CommonEcs.Goap {
             return GetEntityQuery(typeof(AtomAction), typeof(TActionFilter));
         }
 
+        protected virtual bool CanExecute => true;
+
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
+            if (!CanExecute) {
+                return inputDeps;
+            }
+            
             NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArrayAsync(
                 WorldUpdateAllocator, inputDeps, out JobHandle chunkBaseIndicesHandle);
             inputDeps = JobHandle.CombineDependencies(inputDeps, chunkBaseIndicesHandle);

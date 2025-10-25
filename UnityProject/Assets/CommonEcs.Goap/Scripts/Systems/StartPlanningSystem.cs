@@ -3,6 +3,7 @@ using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using UnityEngine;
 
 namespace CommonEcs.Goap {
     [UpdateInGroup(typeof(GoapSystemGroup))]
@@ -24,14 +25,16 @@ namespace CommonEcs.Goap {
                 bucketType = GetBufferTypeHandle<ConditionValueMap.Entry>(),
                 allAgents = GetComponentLookup<GoapAgent>()
             };
-            JobHandle handle = startPlanningJob.ScheduleParallel(this.plannerQuery, inputDeps);
+            inputDeps = startPlanningJob.ScheduleParallel(this.plannerQuery, inputDeps);
 
             SetIdleAgentsWithGoalsToPlanningJob setToPlanningJob = new() {
-                agentType = GetComponentTypeHandle<GoapAgent>()
+                entityType = GetEntityTypeHandle(),
+                agentType = GetComponentTypeHandle<GoapAgent>(),
+                debugEntityType = GetComponentTypeHandle<DebugEntity>()
             };
-            handle = setToPlanningJob.ScheduleParallel(this.agentsQuery, handle);
+            inputDeps = setToPlanningJob.ScheduleParallel(this.agentsQuery, inputDeps);
 
-            return handle;
+            return inputDeps;
         }
 
         [BurstCompile]
@@ -77,22 +80,37 @@ namespace CommonEcs.Goap {
         
         [BurstCompile]
         private struct SetIdleAgentsWithGoalsToPlanningJob : IJobChunk {
+            [ReadOnly]
+            public EntityTypeHandle entityType;
+            
             public ComponentTypeHandle<GoapAgent> agentType;
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
-                NativeArray<GoapAgent> agents = chunk.GetNativeArray(ref this.agentType);
+            [ReadOnly]
+            public ComponentTypeHandle<DebugEntity> debugEntityType;
 
-                ChunkEntityEnumerator enumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
-                while(enumerator.NextEntityIndex(out int i)) {
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask) {
+                NativeArray<Entity> entities = chunk.GetNativeArray(this.entityType);
+                NativeArray<GoapAgent> agents = chunk.GetNativeArray(ref this.agentType);
+                NativeArray<DebugEntity> debugEntities = chunk.GetNativeArray(ref this.debugEntityType);
+                
+                DotsAssert.IsFalse(useEnabledMask);
+                for (int i = 0; i < chunk.Count; i++) {
                     GoapAgent agent = agents[i];
-                    
-                    if (agent.state == AgentState.IDLE && agent.goals.Count > 0) {
-                        // Agent must have started planning
-                        agent.state = AgentState.PLANNING;
-                        
-                        // Modify
-                        agents[i] = agent;
+
+                    if (agent.state != AgentState.IDLE || agent.goals.Count <= 0) {
+                        continue;
                     }
+
+                    // Agent must have started planning
+                    agent.state = AgentState.PLANNING;
+
+                    DebugEntity debugEntity = debugEntities[i];
+                    if (debugEntity.enabled) {
+                        Debug.Log($"Agent {entities[i].Index} has been set to AgentState.PLANNING.");
+                    }
+                        
+                    // Modify
+                    agents[i] = agent;
                 }
             }
         }

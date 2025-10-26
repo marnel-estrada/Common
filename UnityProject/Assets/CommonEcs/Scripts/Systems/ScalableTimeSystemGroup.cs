@@ -10,10 +10,8 @@ namespace CommonEcs {
         private int updateCount = 1;
 
         public int UpdateCount {
-            get {
-                return this.updateCount;
-            }
-            
+            get => this.updateCount;
+
             set {
                 this.updateCount = value;
                 Assertion.IsTrue(this.updateCount > 0);

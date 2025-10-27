@@ -2,7 +2,7 @@
 
 namespace CommonEcs {
     public static class ValueTypeOptionExtensions {
-        public static bool EqualsEquatable<TEquatable>(this ValueTypeOption<TEquatable> self, ValueTypeOption<TEquatable> other) where TEquatable : struct, IEquatable<TEquatable> {
+        public static bool EqualsEquatable<T>(this ValueTypeOption<T> self, ValueTypeOption<T> other) where T : unmanaged, IEquatable<T> {
             if (self.IsNone && other.IsNone) {
                 return true;
             }
@@ -10,7 +10,7 @@ namespace CommonEcs {
             return self.IsSome && other.IsSome && self.value.Equals(other.value);
         }
         
-        public static bool EqualsValue<TEquatable>(this ValueTypeOption<TEquatable> self, TEquatable otherValue) where TEquatable : struct, IEquatable<TEquatable> {
+        public static bool EqualsValue<T>(this ValueTypeOption<T> self, T otherValue) where T : unmanaged, IEquatable<T> {
             if (self.IsNone) {
                 return false;
             }

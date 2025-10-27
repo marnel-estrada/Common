@@ -56,14 +56,14 @@ namespace CommonEcs {
         }
 
         public static void IsSome<T>(in ValueTypeOption<T> option, FixedString128Bytes message = new()) 
-            where T : struct, IEquatable<T> {
+            where T : unmanaged {
 #if UNITY_EDITOR
             IsTrue(option.IsSome, message);
 #endif
         }
 
         public static void IsNone<T>(in ValueTypeOption<T> option, FixedString128Bytes message = new()) 
-            where T : struct, IEquatable<T> {
+            where T : unmanaged {
 #if UNITY_EDITOR
             IsTrue(option.IsNone, message);
 #endif      

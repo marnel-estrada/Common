@@ -15,16 +15,8 @@ namespace CommonEcs {
             this.hasValue = true;
         }
 
-        public int HashCode {
-            get {
-                return this.key.GetHashCode();
-            }
-        }
+        public int HashCode => this.key.GetHashCode();
 
-        public static LinearHashMapEntry<K, V> Nothing {
-            get {
-                return default;
-            }
-        }
+        public static LinearHashMapEntry<K, V> Nothing => default;
     }
 }

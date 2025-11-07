@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace GoapBrain {
     [Serializable]
-    public class ConditionName {
+    public class ConditionName : IComparable<ConditionName> {
         // Name of the condition
         [SerializeField]
         private string name;
@@ -16,33 +16,30 @@ namespace GoapBrain {
         private string newName;
 
         public string Name {
-            get {
-                return this.name;
-            }
-
-            set {
-                this.name = value;
-            }
+            get => this.name;
+            set => this.name = value;
         }
 
         public bool RenameMode {
-            get {
-                return this.renameMode;
-            }
-
-            set {
-                this.renameMode = value;
-            }
+            get => this.renameMode;
+            set => this.renameMode = value;
         }
 
         public string NewName {
-            get {
-                return this.newName;
+            get => this.newName;
+            set => this.newName = value;
+        }
+
+        public int CompareTo(ConditionName? other) {
+            if (ReferenceEquals(this, other)) {
+                return 0;
             }
 
-            set {
-                this.newName = value;
+            if (other is null) {
+                return 1;
             }
+
+            return string.Compare(this.name, other.name, StringComparison.Ordinal);
         }
     }
 }

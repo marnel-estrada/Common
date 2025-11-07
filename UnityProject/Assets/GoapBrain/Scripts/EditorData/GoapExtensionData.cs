@@ -8,13 +8,8 @@ namespace GoapBrain {
         private GoapDomainData domainData;
 
         public GoapDomainData? DomainData {
-            get {
-                return this.domainData;
-            }
-
-            set {
-                this.domainData = value;
-            }
+            get => this.domainData;
+            set => this.domainData = value;
         }
     }
 }

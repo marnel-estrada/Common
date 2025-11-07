@@ -8,19 +8,19 @@ namespace GoapBrain {
         // Note here that this only keeps track of names
         // It doesn't care about values yet
         [SerializeField]
-        private List<ConditionName> conditionNames = new List<ConditionName>();
+        private List<ConditionName> conditionNames = new();
 
         [SerializeField]
-        private NamedValueLibrary variables = new NamedValueLibrary();
+        private NamedValueLibrary variables = new();
 
         [SerializeField]
-        private List<GoapActionData> actions = new List<GoapActionData>();
+        private List<GoapActionData> actions = new();
 
         [SerializeField]
-        private List<ConditionResolverData> conditionResolvers = new List<ConditionResolverData>();
+        private List<ConditionResolverData> conditionResolvers = new();
 
         [SerializeField]
-        private List<GoapExtensionData> extensions = new List<GoapExtensionData>();
+        private List<GoapExtensionData> extensions = new();
 
         /// <summary>
         /// Adds a condition
@@ -30,10 +30,12 @@ namespace GoapBrain {
         public void AddConditionName(string name) {
             Assertion.NotEmpty(name);
 
-            ConditionName condition = new ConditionName();
-            condition.Name = name;
+            ConditionName condition = new() {
+                Name = name
+            };
 
             this.conditionNames.Add(condition);
+            this.conditionNames.Sort();
         }
 
         /// <summary>
@@ -52,11 +54,7 @@ namespace GoapBrain {
             return null;
         }
 
-        public int ConditionNamesCount {
-            get {
-                return this.conditionNames.Count;
-            }
-        }
+        public int ConditionNamesCount => this.conditionNames.Count;
 
         /// <summary>
         /// Returns the ConditionName at the specified index
@@ -75,13 +73,18 @@ namespace GoapBrain {
             this.conditionNames.Remove(conditionName);
         }
 
+        public void SortConditionNames() {
+            this.conditionNames.Sort();
+        }
+
         /// <summary>
         /// Adds a new action
         /// </summary>
         /// <param name="actionName"></param>
         public GoapActionData AddAction(string actionName) {
-            GoapActionData action = new GoapActionData();
-            action.Name = actionName;
+            GoapActionData action = new() {
+                Name = actionName
+            };
 
             this.actions.Add(action);
 
@@ -104,29 +107,13 @@ namespace GoapBrain {
             return null;
         }
 
-        public int ActionCount {
-            get {
-                return this.actions.Count;
-            }
-        }
+        public int ActionCount => this.actions.Count;
 
-        public List<ConditionResolverData> ConditionResolvers {
-            get {
-                return this.conditionResolvers;
-            }
-        }
+        public List<ConditionResolverData> ConditionResolvers => this.conditionResolvers;
 
-        public NamedValueLibrary Variables {
-            get {
-                return this.variables;
-            }
-        }
+        public NamedValueLibrary Variables => this.variables;
 
-        public List<GoapExtensionData> Extensions {
-            get {
-                return this.extensions;
-            }
-        }
+        public List<GoapExtensionData> Extensions => this.extensions;
 
         /// <summary>
         /// Returns the action at the specified index

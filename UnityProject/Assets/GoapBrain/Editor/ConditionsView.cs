@@ -46,6 +46,10 @@ namespace GoapBrain {
 
                 // Condition names
                 RenderConditionNames(domain);
+                
+                GUILayout.Space(10);
+                
+                RenderConditionNamesFromExtensions(domain);
 
                 EditorGUILayout.EndScrollView();
             }
@@ -55,9 +59,10 @@ namespace GoapBrain {
             if (domain.ConditionNamesCount <= 0) {
                 // No names at the moment
                 GUILayout.Label("(no condition names yet)");
-
                 return;
             }
+            
+            domain.SortConditionNames();
 
             for (int i = 0; i < domain.ConditionNamesCount; ++i) {
                 ConditionName name = domain.GetConditionNameAt(i);
@@ -97,6 +102,30 @@ namespace GoapBrain {
                 }
 
                 GUILayout.EndHorizontal();
+            }
+        }
+
+        private static void RenderConditionNamesFromExtensions(GoapDomainData domain) {
+            GUILayout.Label("Conditions From Extensions", EditorStyles.boldLabel);
+
+            if (domain.Extensions.Count == 0) {
+                GUILayout.Label("(none)");
+                return;
+            }
+            
+            foreach (GoapExtensionData extensionData in domain.Extensions) {
+                if (!extensionData.DomainData) {
+                    // Skip null domain
+                    continue;
+                }
+                
+                GoapDomainData extensionDomain = extensionData.DomainData;
+                GUILayout.Label($"Extension: {extensionDomain.name}");
+
+                extensionData.DomainData.SortConditionNames();
+                for (int i = 0; i < extensionDomain.ConditionNamesCount; i++) {
+                    GUILayout.Label($"- {extensionDomain.GetConditionNameAt(i).Name}");
+                }
             }
         }
 

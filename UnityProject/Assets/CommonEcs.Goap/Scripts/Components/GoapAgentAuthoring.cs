@@ -63,11 +63,7 @@ namespace CommonEcs.Goap {
             }
         }
 
-        public readonly GoapDomain Domain {
-            get {
-                return this.domainDbReference.Value.domains[this.domainId];
-            }
-        }
+        public readonly GoapDomain Domain => this.domainDbReference.Value.domains[this.domainId];
 
         public readonly Condition GetGoal(int index) {
             return this.goals[index];

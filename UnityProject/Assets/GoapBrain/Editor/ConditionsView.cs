@@ -28,7 +28,7 @@ namespace GoapBrain {
 
                 using (new GUILayout.HorizontalScope()) {
                     // Add section
-                    GUILayout.Label("New condition:", GUILayout.Width(100));
+                    GUILayout.Label("New condition:", GUILayout.Width(150));
                     GUILayout.Space(5);
                     this.newConditionName = EditorGUILayout.TextField(this.newConditionName, GUILayout.Width(200));
                     if (GUILayout.Button("Add", GUILayout.Width(50), GUILayout.Height(15))) {
@@ -124,7 +124,9 @@ namespace GoapBrain {
 
                 extensionData.DomainData.SortConditionNames();
                 for (int i = 0; i < extensionDomain.ConditionNamesCount; i++) {
-                    GUILayout.Label($"- {extensionDomain.GetConditionNameAt(i).Name}");
+                    string name = extensionDomain.GetConditionNameAt(i).Name;
+                    string hashcode = new FixedString64Bytes(name).GetHashCode().ToString();
+                    GUILayout.Label($"- {name} ({hashcode})");
                 }
             }
         }

@@ -81,10 +81,12 @@ namespace GoapBrain {
             for (int i = 0; i < extensions.Count; ++i) {
                 GoapDomainData? extensionDomain = extensions[i].DomainData;
                 Assertion.NotNull(extensionDomain);
-                if (extensionDomain != null) {
-                    AddActions(ref domain, extensionDomain, this.addedActions);
-                    AddConditionNamesText(extensionDomain);
+                if (!extensionDomain) {
+                    continue;
                 }
+
+                AddActions(ref domain, extensionDomain, this.addedActions);
+                AddConditionNamesText(extensionDomain);
             }
 
             return domain;

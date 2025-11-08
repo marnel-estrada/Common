@@ -6,7 +6,7 @@ namespace CommonEcs.Goap {
         public readonly FixedString64Bytes name;
 
         // This is the list of actions
-        public GoapActionList64 actions;
+        public GoapActionList128 actions;
 
         // The list of integers mapped to the condition are indices to actions
         public FixedHashMap<Condition, FixedList64Bytes<int>> actionMap;
@@ -53,7 +53,7 @@ namespace CommonEcs.Goap {
             }
 
             // Not found yet. We create a new list.
-            FixedList64Bytes<int> newList = new FixedList64Bytes<int>();
+            FixedList64Bytes<int> newList = new();
             this.actionMap.AddOrSet(effect, newList);
             return newList;
         }

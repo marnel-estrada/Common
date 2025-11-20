@@ -12,15 +12,44 @@ namespace CommonEcs {
         private Maybe<NativeArray<EntityBufferElement>> cellEntities;
 
         private MultipleGrid2dWrapper gridWrapper;
-        
-        protected override void OnUpdate() {
-            ComponentLookup<Cell2D> allCells = GetComponentLookup<Cell2D>();
 
-            this.Entities.ForEach((in MultipleGrid2D multipleGrid, in DynamicBuffer<EntityBufferElement> entityBuffer) => {
+        private EntityQuery query;
+
+        protected override void OnCreate() {
+            this.query = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<MultipleGrid2D>()
+                .WithAll<EntityBufferElement>()
+                .Build(this);
+        }
+
+        private ComponentTypeHandle<MultipleGrid2D> multipleGrid2dType;
+        private BufferTypeHandle<EntityBufferElement> entityBufferType;
+        private ComponentLookup<Cell2D> allCells;
+
+        protected override void OnUpdate() {
+            this.multipleGrid2dType = GetComponentTypeHandle<MultipleGrid2D>(true);
+            this.entityBufferType = GetBufferTypeHandle<EntityBufferElement>(true);
+            this.allCells = GetComponentLookup<Cell2D>();
+
+            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(Allocator.Temp);
+            for (int i = 0; i < chunks.Length; i++) {
+                ArchetypeChunk chunk = chunks[i];
+                ProcessChunk(ref chunk);
+            }
+        }
+
+        private void ProcessChunk(ref ArchetypeChunk chunk) {
+            NativeArray<MultipleGrid2D> grids = chunk.GetNativeArray(ref this.multipleGrid2dType);
+            BufferAccessor<EntityBufferElement> entityBufferElementsBuffers = chunk.GetBufferAccessor(ref this.entityBufferType);
+            
+            for (int i = 0; i < chunk.Count; i++) {
                 if (this.resolved) {
                     // Resolve only once
                     return;
                 }
+                
+                MultipleGrid2D multipleGrid = grids[i];
+                DynamicBuffer<EntityBufferElement> entityBuffer = entityBufferElementsBuffers[i];
                 
                 this.grid = multipleGrid;
                 PopulateCellEntities(in entityBuffer);
@@ -36,7 +65,7 @@ namespace CommonEcs {
 
                 this.resolved = true;
                 this.Enabled = false; // So update will not be called again
-            }).WithoutBurst().Run();
+            }
         }
         
         private void PopulateCellEntities(in DynamicBuffer<EntityBufferElement> entityBuffer) {

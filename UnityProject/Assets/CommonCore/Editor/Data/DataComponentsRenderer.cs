@@ -60,7 +60,7 @@ namespace Common {
             GUI.backgroundColor = ColorUtils.WHITE; 
         }
         
-        private Option<DataComponent> componentToRemove;
+        private Option<DataComponent> componentToRemove; 
 
         private void RenderExistingComponents(IDataComponentContainer item) {
             IReadOnlyList<DataComponent> components = item.Components;
@@ -76,15 +76,16 @@ namespace Common {
                 GUILayout.BeginHorizontal();
 
                 GUI.backgroundColor = Color.red;
-                if (GUILayout.Button("X", GUILayout.Width(20))) {
+                if (GUILayout.Button("X", GUILayout.Width(20), GUILayout.Height(20))) {
                     if (EditorUtility.DisplayDialog("Remove DataComponent", $"Are you sure you want to remove component {component.GetType().FullName}?", "Yes", "No")) {
                         this.componentToRemove = Option<DataComponent>.AsOption(component);
                     }
                 }
-                
                 GUI.backgroundColor = Color.white;
-                
-                GUILayout.Label($"-- {component.GetType().Name} --", EditorStyles.boldLabel);
+
+                GUI.backgroundColor = Color.green;
+                GUILayout.Box(component.GetType().Name, GUILayout.Width(250), GUILayout.Height(20));
+                GUI.backgroundColor = Color.white;
                 GUILayout.EndHorizontal();
                 
                 // Values

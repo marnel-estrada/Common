@@ -84,7 +84,7 @@ namespace Common {
 		 * Asserts that the specified string is not empty.
 		 */
 		public static void NotEmpty(string? s, UnityEngine.Object? context = null) {
-			IsTrue( !string.IsNullOrEmpty(s?.Trim()), DEFAULT_MESSAGE, context);
+			IsTrue( !string.IsNullOrWhiteSpace(s), DEFAULT_MESSAGE, context);
 		}	
 	}
 }

@@ -12,7 +12,7 @@ namespace Common {
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public readonly struct Option<T> : IEquatable<Option<T>> {
-        public static readonly Option<T> NONE = new Option<T>();
+        public static readonly Option<T> NONE = new();
 
         /// <summary>
         /// Returns an option with a value

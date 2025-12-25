@@ -1,18 +1,25 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Common {
     /// <summary>
-    /// Utility class to convert a collection of integers into base 64 and vice versa
+    /// The same concept as IntToBase64Converter but for uint.
     /// </summary>
-    public class IntToBase64Converter {
-        private readonly List<byte> bytes = new(32);
+    public class UintToBase64Converter {
+        private readonly List<byte> bytes;
+        
+        public UintToBase64Converter() : this(32) {
+        }
+
+        public UintToBase64Converter(int initialCapacity) {
+            this.bytes = new List<byte>(initialCapacity * 4);
+        }
 
         public void Clear() {
             this.bytes.Clear();
         }
 
-        public void Add(int value) {
+        public void Add(uint value) {
             Span<byte> valueBytes = stackalloc byte[4];
 
             if (!BitConverter.TryWriteBytes(valueBytes, value)) {
@@ -23,23 +30,23 @@ namespace Common {
                 this.bytes.Add(valueBytes[i]);
             }
         }
-
+        
         public string Base64 => Convert.ToBase64String(this.bytes.ToArray());
 
-        private const int INT_SIZE = sizeof(int);
+        private const int UINT_SIZE = sizeof(int);
 
-        public static void LoadValues(string base64String, List<int> resultList) {
+        public static void LoadValues(string base64String, List<uint> resultList) {
             resultList.Clear();
-
+            
             byte[] bytes = Convert.FromBase64String(base64String);
-            int integerCount = bytes.Length / INT_SIZE;
+            int integerCount = bytes.Length / UINT_SIZE;
 
             int byteArrayIndex = 0; // Index to bytes
             for (int i = 0; i < integerCount; ++i) {
-                int value = BitConverter.ToInt32(bytes, byteArrayIndex);
+                uint value = BitConverter.ToUInt32(bytes, byteArrayIndex);
                 resultList.Add(value);
                 
-                byteArrayIndex += INT_SIZE; // Jump to next integer
+                byteArrayIndex += UINT_SIZE; // Jump to next integer
             }
         }
     }

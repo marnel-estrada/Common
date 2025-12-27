@@ -94,7 +94,7 @@ namespace Common {
         /// Compresses the atlas
         /// </summary>
         public void Compress() {
-            if (this.atlas == null) {
+            if (!this.atlas) {
                 throw new Exception("Atlas is not prepared yet.");
             }
             
@@ -114,6 +114,22 @@ namespace Common {
             }
 
             throw new Exception($"PackedTextureEntry for {key} can't be found.");
+        }
+
+        public PackedTextureEntry GetEntry(FixedString64Bytes key) {
+            if (this.entriesMap.TryGetValue(key.GetHashCode(), out PackedTextureEntry entry)) {
+                return entry;
+            }
+
+            throw new Exception($"PackedTextureEntry for {key} can't be found.");
+        }
+        
+        public PackedTextureEntry GetEntry(int entryIdHashCode) {
+            if (this.entriesMap.TryGetValue(entryIdHashCode, out PackedTextureEntry entry)) {
+                return entry;
+            }
+
+            throw new Exception($"PackedTextureEntry for {entryIdHashCode} can't be found.");
         }
 
         public Texture2D Atlas {

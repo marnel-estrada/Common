@@ -18,11 +18,7 @@
             this.provider = provider;
         }
 
-        public bool HasProvider {
-            get {
-                return this.provider != null;
-            }
-        }
+        public bool HasProvider => this.provider != null;
 
         /// <summary>
         /// Executes the query

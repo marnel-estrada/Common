@@ -11,7 +11,7 @@ namespace Common {
     /// Match().
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public readonly struct Option<T> : IEquatable<Option<T>> {
+    public readonly struct Option<T> : IEquatable<Option<T>> where T : class {
         public static readonly Option<T> NONE = new();
 
         /// <summary>
@@ -34,44 +34,18 @@ namespace Common {
         }
         
         private readonly bool hasValue;
-        private readonly T value;
+        private readonly T? value;
 
-        private Option(T value) {
+        private Option(T? value) {
             this.value = value;
             
             // This means that value is considered None if the specified value is null
-            this.hasValue = !IsNull(this.value);
+            this.hasValue = this.value != null;
         }
 
-        private static bool IsNull(T value) {
-            // Check only for null if it's nullable or reference type
-            if (IsNullable() || IsReferenceType()) {
-                return value == null;
-            }
+        public bool IsSome => this.hasValue;
 
-            // Value types can't be null
-            return false;
-        }
-
-        private static bool IsNullable() {
-            return Nullable.GetUnderlyingType(typeof(T)) != null;
-        }
-
-        private static bool IsReferenceType() {
-            return !typeof(T).IsValueType;
-        }
-
-        public bool IsSome {
-            get {
-                return this.hasValue;
-            }
-        }
-
-        public bool IsNone {
-            get {
-                return !this.hasValue;
-            }
-        }
+        public bool IsNone => !this.hasValue;
 
         /// <summary>
         /// A utility matcher that only requires an Action<T>
@@ -140,7 +114,7 @@ namespace Common {
 
         public override int GetHashCode() {
             unchecked {
-                return (this.hasValue.GetHashCode() * 397) ^ EqualityComparer<T>.Default.GetHashCode(this.value);
+                return (this.hasValue.GetHashCode() * 397) ^ this.value?.GetHashCode() ?? 0;
             }
         }
 
@@ -153,11 +127,6 @@ namespace Common {
         }
 
         public T ValueOr(T valueWhenNone) {
-            if (IsNull(valueWhenNone)) {
-                // Can't be null
-                throw new Exception("valueWhenNone can't be null");
-            }
-
             return this.IsSome ? this.value : valueWhenNone;
         }
 

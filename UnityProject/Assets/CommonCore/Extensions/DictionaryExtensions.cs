@@ -14,7 +14,7 @@ namespace Common {
         /// <typeparam name="K"></typeparam>
         /// <typeparam name="V"></typeparam>
         /// <returns></returns>
-        public static Option<V> Find<K, V>(this Dictionary<K, V> dictionary, K key) {
+        public static Option<V> Find<K, V>(this Dictionary<K, V> dictionary, K key) where V : class {
             return dictionary.TryGetValue(key, out V value) ? Option<V>.Some(value) : Option<V>.NONE;
         }
 

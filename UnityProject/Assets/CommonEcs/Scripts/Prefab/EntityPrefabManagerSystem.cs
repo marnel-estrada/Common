@@ -1,5 +1,4 @@
 using System;
-using Common;
 using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
@@ -10,7 +9,7 @@ namespace CommonEcs {
     /// </summary>
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     public partial class EntityPrefabManagerSystem : SystemBase {
-        private Option<EntityPrefabManager> prefabManager;
+        private ValueTypeOption<EntityPrefabManager> prefabManager;
         
         protected override void OnCreate() {
         }
@@ -62,7 +61,7 @@ namespace CommonEcs {
 
         public void RegisterPrefabManager(ref EntityPrefabManager prefabManager) {
             Debug.Log("The EntityPrefabManager is found.");
-            this.prefabManager = Option<EntityPrefabManager>.AsOption(prefabManager);
+            this.prefabManager = ValueTypeOption<EntityPrefabManager>.Some(prefabManager);
         }
 
         protected override void OnUpdate() {

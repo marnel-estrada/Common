@@ -6,8 +6,8 @@ namespace Common.Xml {
     public class SimpleXmlNode {
         private const string YES = "y";
         private const string TRUE = "true";
-        private readonly Dictionary<string, string> attributes = new Dictionary<string, string>();
-        private readonly List<SimpleXmlNode> children = new List<SimpleXmlNode>();
+        private readonly Dictionary<string, string> attributes = new();
+        private readonly List<SimpleXmlNode> children = new();
         public SimpleXmlNode? parentNode;
 
         public string tagName;
@@ -144,15 +144,6 @@ namespace Common.Xml {
             }
 
             return float.Parse(GetAttribute(attributeKey), NumberFormatInfo.InvariantInfo);
-        }
-        
-        public Option<float> GetFloatAttributeAsOption(string attributeKey) {
-            if (!ContainsAttribute(attributeKey)) {
-                return Option<float>.NONE;
-            }
-            
-            float value = float.Parse(GetAttribute(attributeKey), NumberFormatInfo.InvariantInfo);
-            return Option<float>.Some(value);
         }
 
         /**

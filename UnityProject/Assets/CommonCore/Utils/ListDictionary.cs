@@ -81,17 +81,6 @@ namespace Common {
         }
 
         /// <summary>
-        /// Looks for the value with the specified key
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public Option<V> Find(K key) {
-            // This may be null so client code should check for it
-            return this.dictionary.Find(key);
-            
-        }
-
-        /// <summary>
         /// Retrieves a value using an index
         /// </summary>
         /// <param name="index"></param>

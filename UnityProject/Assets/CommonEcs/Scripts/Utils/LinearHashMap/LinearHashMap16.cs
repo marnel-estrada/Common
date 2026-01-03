@@ -158,11 +158,7 @@ namespace CommonEcs {
             return hash & (LinearHashMapBucket16<K, V>.Length - 1);
         }
 
-        public int Count {
-            get {
-                return this.count;
-            }
-        }
+        public int Count => this.count;
 
         public void Clear() {
             for (int i = 0; i < LinearHashMapBucket16<K, V>.Length; ++i) {
@@ -172,10 +168,6 @@ namespace CommonEcs {
             this.count = 0;
         }
 
-        public LinearHashMapBucket16<K, V>.Enumerator Entries {
-            get {
-                return this.bucket.GetEnumerator();
-            }
-        }
+        public LinearHashMapBucket16<K, V>.Enumerator Entries => this.bucket.GetEnumerator();
     }
 }

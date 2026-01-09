@@ -107,7 +107,7 @@ namespace Common {
         }
 
         /// <summary>
-        /// Traverses the tranform tree using the specified visitor
+        /// Traverses the transform tree using the specified visitor
         /// </summary>
         /// <param name="transform"></param>
         /// <param name="visitor"></param>

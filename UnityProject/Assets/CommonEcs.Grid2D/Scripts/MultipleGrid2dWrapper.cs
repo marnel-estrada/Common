@@ -98,7 +98,7 @@ namespace CommonEcs {
             int xCoord = (int)(xDiff / this.grid.cellWidth);
             
             float yDiff = worldPosition.y - this.worldBoundingBox.Min.y;
-            int yCoord = (int)(yDiff / this.grid.cellHeight);
+            int yCoord = RoundUpToNearestTile(yDiff / this.grid.cellHeight);
 
             // Note here that positive z means negative z in world space so that the sprite would be closer 
             // to the camera.
@@ -107,14 +107,23 @@ namespace CommonEcs {
             return ValueTypeOption<GridCoord3>.Some(new GridCoord3(xCoord, yCoord, zCoord));
         }
 
-        public ValueTypeOption<Entity> GetCellEntityFromWorld(in float3 worldPosition) {
-            ValueTypeOption<GridCoord3> gridCoordinate = ToGridCoordinate(worldPosition);
-            if (gridCoordinate.IsNone) {
-                // Must be outside map
-                return ValueTypeOption<Entity>.None;
+        private static int RoundUpToNearestTile(float value) {
+            int floor = (int)value;
+            float ceiling = floor + 1;
+            const float unitsPerPixel = 1.0f / 384f;
+            if (ceiling - value > unitsPerPixel) {
+                // The difference is greater than one pixel to get the ceiling
+                return floor;
             }
 
-            return GetCellEntity(gridCoordinate.ValueOrError());
+            return floor + 1;
+        }
+
+        public ValueTypeOption<Entity> GetCellEntityFromWorld(in float3 worldPosition) {
+            ValueTypeOption<GridCoord3> gridCoordinate = ToGridCoordinate(worldPosition);
+            return gridCoordinate.IsSome
+                ? GetCellEntity(gridCoordinate.ValueOrError())
+                : ValueTypeOption<Entity>.None; // Must be outside map 
         }
 
         // Note here that the z position is just multiplied with cell height

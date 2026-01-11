@@ -12,13 +12,13 @@ namespace CommonEcs {
     /// </summary>
     /// <typeparam name="T"></typeparam>
     #if UNITY_EDITOR
-    public struct ValueTypeOption<T> : IEquatable<ValueTypeOption<T>> where T : unmanaged {
+    public struct ValueTypeOption<T> where T : unmanaged {
         // Set these values to non-readonly public variables so that we can see and select them in 
         // Unity's Component Inspector
         public T value;
         public bool hasValue;
         #else
-    public readonly struct ValueTypeOption<T> : IEquatable<ValueTypeOption<T>> where T : struct, IEquatable<T> {
+    public readonly struct ValueTypeOption<T> where T : unmanaged {
         private readonly T value;
         private readonly bool hasValue;
         #endif
@@ -77,28 +77,6 @@ namespace CommonEcs {
             }
 
             throw new Exception("Trying to access value from a None option.");
-        }
-
-        public bool Equals(ValueTypeOption<T> other) {
-            return this.value.Equals(other.value) && this.hasValue == other.hasValue;
-        }
-
-        public override bool Equals(object? obj) {
-            return obj is ValueTypeOption<T> other && Equals(other);
-        }
-
-        public override int GetHashCode() {
-            unchecked {
-                return (this.value.GetHashCode() * 397) ^ this.hasValue.GetHashCode();
-            }
-        }
-
-        public static bool operator ==(ValueTypeOption<T> left, ValueTypeOption<T> right) {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ValueTypeOption<T> left, ValueTypeOption<T> right) {
-            return !left.Equals(right);
         }
     }
 }

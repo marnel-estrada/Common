@@ -7,7 +7,7 @@ namespace CommonEcs {
                 return true;
             }
 
-            return self.IsSome && other.IsSome && self.value.Equals(other.value);
+            return self.IsSome && other.IsSome && self.ValueOrError().Equals(other.ValueOrError());
         }
         
         public static bool EqualsValue<T>(this ValueTypeOption<T> self, T otherValue) where T : unmanaged, IEquatable<T> {
@@ -15,7 +15,7 @@ namespace CommonEcs {
                 return false;
             }
 
-            return self.IsSome && self.value.Equals(otherValue);
+            return self.IsSome && self.ValueOrError().Equals(otherValue);
         }
     }
 }

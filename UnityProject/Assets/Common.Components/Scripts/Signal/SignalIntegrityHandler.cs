@@ -7,18 +7,18 @@ namespace Common.Signal {
      * Handles the integrity of signals during the lifetime of a GameObject.
      */
     public class SignalIntegrityHandler : MonoBehaviour {
-        private readonly SimpleList<SignalListenerPair> pairList = new SimpleList<SignalListenerPair>(1);
+        private readonly SimpleList<SignalListenerPair> pairList = new(1);
 
         /**
          * Adds a signal and listener pair to be maintained
          */
         public void Add(Signal signal, Signal.SignalListener listener) {
-            SignalListenerPair pair = new SignalListenerPair(signal, listener);
+            SignalListenerPair pair = new(signal, listener);
             pair.AddListener(); // automatically add the listener to the signal
             this.pairList.Add(pair);
         }
 
-        void OnDestroy() {
+        private void OnDestroy() {
             // remove all listeners from their signals
             for(int i = 0; i < this.pairList.Count; ++i) {
                 this.pairList[i].RemoveListener();

@@ -71,6 +71,9 @@ namespace CommonEcs {
 
         public const int LENGTH = 2;
 
+        // Just so we could use it in for loops
+        public int Length => LENGTH;
+
         public Enumerator GetEnumerator() {
             // Safe because Enumerator is a 'ref struct'
             fixed (T* elements = &this.m_Element0) {

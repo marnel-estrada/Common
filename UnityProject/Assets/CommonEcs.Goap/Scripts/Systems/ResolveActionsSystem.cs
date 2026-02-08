@@ -215,7 +215,7 @@ namespace CommonEcs.Goap {
                 }
 #endif
 
-                ValueTypeOption<FixedList64Bytes<int>> foundActionIndices = domain.GetActionIndices(goal);
+                ValueTypeOption<FixedList128Bytes<int>> foundActionIndices = domain.GetActionIndices(goal);
                 if (foundActionIndices.IsNone) {
                     // There are no actions to satisfy the goal
 #if UNITY_EDITOR

@@ -9,7 +9,7 @@ namespace CommonEcs.Goap {
         public GoapActionList128 actions;
 
         // The list of integers mapped to the condition are indices to actions
-        public FixedHashMap<Condition, FixedList64Bytes<int>> actionMap;
+        public LinearHashMap64<Condition, FixedList128Bytes<int>> actionMap;
 
         public int actionsCount;
 
@@ -21,7 +21,7 @@ namespace CommonEcs.Goap {
             this.actions[this.actionsCount] = action;
 
             // Add to action map
-            FixedList32Bytes<int> indexList = ResolveFixedList(action.effect);
+            FixedList128Bytes<int> indexList = ResolveFixedList(action.effect);
             indexList.Add(this.actionsCount);
 
             // We need to do insertion sort here because we need to sort the actions by cost
@@ -46,14 +46,14 @@ namespace CommonEcs.Goap {
             ++this.actionsCount;
         }
 
-        private FixedList64Bytes<int> ResolveFixedList(in Condition effect) {
-            ValueTypeOption<FixedList64Bytes<int>> found = this.actionMap.Find(effect);
+        private FixedList128Bytes<int> ResolveFixedList(in Condition effect) {
+            ValueTypeOption<FixedList128Bytes<int>> found = this.actionMap.Find(effect);
             if (found.IsSome) {
                 return found.ValueOr(default);
             }
 
             // Not found yet. We create a new list.
-            FixedList64Bytes<int> newList = new();
+            FixedList128Bytes<int> newList = new();
             this.actionMap.AddOrSet(effect, newList);
             return newList;
         }
@@ -72,7 +72,7 @@ namespace CommonEcs.Goap {
         /// </summary>
         /// <param name="effect"></param>
         /// <returns></returns>
-        public readonly ValueTypeOption<FixedList64Bytes<int>> GetActionIndices(in Condition effect) {
+        public readonly ValueTypeOption<FixedList128Bytes<int>> GetActionIndices(in Condition effect) {
             return this.actionMap.Find(effect);
         }
     }

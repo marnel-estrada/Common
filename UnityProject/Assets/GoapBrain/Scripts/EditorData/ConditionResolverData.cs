@@ -13,23 +13,25 @@ namespace GoapBrain {
         private ClassData resolver;
 
         public string ConditionName {
-            get {
-                return this.conditionName;
-            }
+            get => this.conditionName;
 
-            set {
-                this.conditionName = value;
-            }
+            set => this.conditionName = value;
         }
 
         public ClassData ResolverClass {
-            get {
-                return this.resolver;
-            }
+            get => this.resolver;
 
-            set {
-                this.resolver = value;
-            }
+            set => this.resolver = value;
+        }
+
+        public ConditionResolverData CreateCopy() {
+            ClassData resolverCopy = new();
+            this.resolver.CopyTo(resolverCopy);
+
+            return new ConditionResolverData() {
+                conditionName = this.conditionName,
+                resolver = resolverCopy
+            };
         }
     }
 }

@@ -82,8 +82,9 @@ namespace Common {
                     this.variablesValueSet.Update(variableNames, variableNames);
                     holder.OtherHolderName =
                         EditorRenderUtils.Dropdown(holder.OtherHolderName, this.variablesValueSet, this.fieldWidth);
-                    holder.UseOtherHolder =
-                        true; // We set to true here because EditorHint.SELECTION does not automatically set it to true
+                    
+                    // We set to true here because EditorHint.SELECTION does not automatically set it to true
+                    holder.UseOtherHolder = true;
                 } else {
                     VariableFieldRenderer.FieldRenderer fieldRenderer =
                         this.variableFieldRenderer.GetFieldRenderer(namedType);

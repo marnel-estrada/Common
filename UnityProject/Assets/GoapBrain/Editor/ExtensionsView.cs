@@ -95,7 +95,7 @@ namespace GoapBrain {
         }
 
         private void RenderExtension(GoapDomainData domainData, GoapExtensionData extension) {
-            if (extension.DomainData == null) {
+            if (!extension.DomainData) {
                 return;
             }
 

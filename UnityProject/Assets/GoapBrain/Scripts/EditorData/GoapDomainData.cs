@@ -29,6 +29,11 @@ namespace GoapBrain {
         /// <returns></returns>
         public void AddConditionName(string name) {
             Assertion.NotEmpty(name);
+            
+            if (ConditionExists(name)) {
+                // We don't add conditions that already exists
+                return;
+            }
 
             ConditionName condition = new() {
                 Name = name
@@ -36,6 +41,41 @@ namespace GoapBrain {
 
             this.conditionNames.Add(condition);
             this.conditionNames.Sort();
+        }
+
+        /// <summary>
+        /// Adds the conditions in the specified list that does not exist in this domain data yet.
+        /// </summary>
+        /// <param name="conditions"></param>
+        public void AddNonExistentConditions(List<ConditionData> conditions) {
+            foreach (ConditionData conditionToAdd in conditions) {
+                if (string.IsNullOrWhiteSpace(conditionToAdd.Name)) {
+                    // Skip empty condition names
+                    continue;
+                }
+
+                if (ConditionExists(conditionToAdd.Name)) {
+                    // We don't add conditions that already exists
+                    continue;
+                }
+
+                ConditionName newCondition = new() {
+                    Name = conditionToAdd.Name
+                };
+                this.conditionNames.Add(newCondition);
+            }
+            
+            this.conditionNames.Sort();
+        }
+
+        private bool ConditionExists(string conditionName) {
+            foreach (ConditionName condition in this.conditionNames) {
+                if (condition.Name.EqualsFast(conditionName)) {
+                    return true;
+                }
+            }
+            
+            return false;
         }
 
         /// <summary>
@@ -89,6 +129,11 @@ namespace GoapBrain {
             this.actions.Add(action);
 
             return action;
+        }
+
+        // May be used when copying from another GoapDomainData
+        public void AddAction(GoapActionData action) {
+            this.actions.Add(action);
         }
 
         /// <summary>
@@ -149,12 +194,48 @@ namespace GoapBrain {
             return null;
         }
 
+        public bool TryGetConditionResolver(string conditionName, out ConditionResolverData? result) {
+            for (int i = 0; i < this.conditionResolvers.Count; ++i) {
+                ConditionResolverData data = this.conditionResolvers[i];
+                if (!data.ConditionName.Equals(conditionName)) {
+                    continue;
+                }
+
+                result = data;
+                return true;
+            }
+
+            result = null;
+            return false;
+        }
+
+        public void AddConditionResolver(ConditionResolverData conditionResolver) {
+            // Must not exist yet
+            if (TryGetConditionResolver(conditionResolver.ConditionName, out ConditionResolverData? _)) {
+                // Already contains the resolver. We don't add.
+                return;
+            }
+            
+            this.conditionResolvers.Add(conditionResolver);
+        }
+
         /// <summary>
         /// Removes the specified resolver
         /// </summary>
         /// <param name="resolver"></param>
         public void RemoveConditionResolver(ConditionResolverData resolver) {
             this.conditionResolvers.Remove(resolver);
+        }
+
+        public bool HasAction(string actionName) {
+            foreach (GoapActionData action in this.actions) {
+                if (action.Name.EqualsFast(actionName)) {
+                    // Found an action with the same name
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

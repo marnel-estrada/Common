@@ -43,30 +43,18 @@ namespace GoapBrain {
         }
 
         public string? Name {
-            get {
-                return this.name;
-            }
+            get => this.name;
 
-            set {
-                this.name = value;
-            }
+            set => this.name = value;
         }
 
         public bool Value {
-            get {
-                return this.value;
-            }
+            get => this.value;
 
-            set {
-                this.value = value;
-            }
+            set => this.value = value;
         }
 
-        public ConditionId Id {
-            get {
-                return this.id;
-            }
-        }
+        public ConditionId Id => this.id;
 
         /// <summary>
         ///     Sets an ID
@@ -80,6 +68,14 @@ namespace GoapBrain {
             if (!string.IsNullOrEmpty(this.name)) {
                 Assertion.IsTrue(this.name == ConditionNamesDatabase.Instance.GetName(this.id));
             }
+        }
+
+        public ConditionData CreateCopy() {
+            return new ConditionData() {
+                name = this.name,
+                id = this.id,
+                value = this.value
+            };
         }
     }
 }

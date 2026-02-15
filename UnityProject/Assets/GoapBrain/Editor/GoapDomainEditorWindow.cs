@@ -62,7 +62,7 @@ namespace GoapBrain {
         }
 
         private void OnGUI() {
-            if (this.target == null) {
+            if (!this.target) {
                 EditorGUILayout.BeginVertical();
                 GUILayout.Label("GOAP Domain Editor: (Missing GoapDomainData)", EditorStyles.largeLabel);
                 GUILayout.Space(10);

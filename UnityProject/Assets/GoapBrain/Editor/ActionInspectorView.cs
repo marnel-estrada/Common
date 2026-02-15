@@ -132,17 +132,19 @@ namespace GoapBrain {
             }
 
             if (this.copyActionDest) {
-                CopyAction(source, action, this.copyActionDest);
-                EditorUtility.DisplayDialog(DIALOG_TITLE, $"Action {action.Name} was copied to {this.copyActionDest?.name}.", "OK");
+                if (CopyAction(source, action, this.copyActionDest)) {
+                    EditorUtility.DisplayDialog(DIALOG_TITLE, $"Action {action.Name} was copied to {this.copyActionDest?.name}.", "OK");
+                }
             } else {
                 EditorUtility.DisplayDialog(DIALOG_TITLE, "A destination GOAP domain must be specified.", "OK");
             }
         }
 
-        private static void CopyAction(GoapDomainData source, GoapActionData action, GoapDomainData destination) {
+        // Returns whether the copy was successful
+        private static bool CopyAction(GoapDomainData source, GoapActionData action, GoapDomainData destination) {
             if (destination.HasAction(action.Name)) {
                 EditorUtility.DisplayDialog(DIALOG_TITLE, $"Destination GoapDomainData {destination.name} already has an action named {action.Name}.", "OK");
-                return;
+                return false;
             }
             
             // Add the conditions to the destination. Note that we only add non-existent ones here.
@@ -154,11 +156,20 @@ namespace GoapBrain {
             
             // Copy condition resolvers
             CopyConditionResolvers(source, action, destination);
+
+            // Copy variables that are used in atom actions
+            CopyAtomActionVariables(source, action, destination);
             
             // Add the non existent variables from the condition resolvers of both preconditions and effect
-            CopyRequiredVariables(source, action, destination);
+            CopyConditionResolverVariables(source, action, destination);
 
             destination.AddAction(action.CreateCopy());
+            
+            // Save the destination
+            EditorUtility.SetDirty(destination);
+            AssetDatabase.SaveAssets();
+
+            return true;
         }
 
         private static void CopyConditionResolvers(GoapDomainData source, GoapActionData action,
@@ -193,10 +204,17 @@ namespace GoapBrain {
             destination.AddConditionResolver(sourceResolver.CreateCopy());
         }
 
-        private static void CopyRequiredVariables(GoapDomainData source, GoapActionData action, GoapDomainData destination) {
+        private static void CopyAtomActionVariables(GoapDomainData source, GoapActionData action,
+            GoapDomainData destination) {
+            foreach (ClassData atomActionData in action.AtomActions) {
+                CopyVariables(source, destination, atomActionData);
+            }
+        }
+
+        private static void CopyConditionResolverVariables(GoapDomainData source, GoapActionData action, GoapDomainData destination) {
             // Copy variables from preconditions
             foreach (ConditionData precondition in action.Preconditions) {
-                CopyRequiredVariables(source, destination, precondition.Name);
+                CopyConditionResolverVariables(source, destination, precondition.Name);
             }
             
             // Copy variables from effect
@@ -204,22 +222,21 @@ namespace GoapBrain {
                 return;
             }
             
-            CopyRequiredVariables(source, destination, action.Effect.Name);
+            CopyConditionResolverVariables(source, destination, action.Effect.Name);
         }
 
-        private static void CopyRequiredVariables(GoapDomainData source, GoapDomainData destination,
+        private static void CopyConditionResolverVariables(GoapDomainData source, GoapDomainData destination,
             string conditionName) {
             if (!source.TryGetConditionResolver(conditionName, out ConditionResolverData? conditionResolver)) {
                 // No resolver for the precondition. No variable to copy.
                 return;
             }
 
-            CopyRequiredVariables(source, destination, conditionResolver);
+            CopyVariables(source, destination, conditionResolver.ResolverClass);
         }
 
-        private static void CopyRequiredVariables(GoapDomainData source, GoapDomainData destination, ConditionResolverData conditionResolver) {
-            ClassData classData = conditionResolver.ResolverClass;
-            Type classType = classData.ClassType;
+        private static void CopyVariables(GoapDomainData source, GoapDomainData destination, ClassData classData) {
+            Type classType = TypeUtils.GetType(classData.ClassName);
             PropertyInfo[] properties = classType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (PropertyInfo property in properties) {
                 if (!TypeUtils.IsVariableProperty(property)) {

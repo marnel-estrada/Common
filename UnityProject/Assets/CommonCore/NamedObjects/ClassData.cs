@@ -89,7 +89,7 @@ namespace Common {
             destination.Clear();
 
             for (int i = 0; i < source.Count; ++i) {
-                ClassData dataCopy = new ClassData();
+                ClassData dataCopy = new();
                 source[i].CopyTo(dataCopy);
                 
                 destination.Add(dataCopy);

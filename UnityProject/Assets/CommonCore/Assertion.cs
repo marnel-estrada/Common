@@ -7,37 +7,69 @@ namespace Common {
 	public static class Assertion {
 		public const string DEFAULT_MESSAGE = "AssertionError";
 	
-		/**
-		 * Asserts the specified expression
-		 */
+		/// <summary>
+		/// Asserts that the expression is true
+		/// </summary>
+		/// <param name="expression"></param>
+		/// <param name="context"></param>
 		public static void IsTrue(bool expression, UnityEngine.Object? context = null) {
 			IsTrue(expression, DEFAULT_MESSAGE, context);
 		}
 	
-		/**
-		 * Asserts the specified expression.
-		 */
+		/// <summary>
+		/// Asserts that the expression is true
+		/// </summary>
+		/// <param name="expression"></param>
+		/// <param name="assertErrorMessage"></param>
+		/// <param name="context"></param>
+		/// <exception cref="Exception"></exception>
 		public static void IsTrue(bool expression, string assertErrorMessage, UnityEngine.Object? context = null) {
-			if (!expression) {
-				Debug.LogError(assertErrorMessage, context);
+			if (expression) {
+				return;
+			}
+
+			Debug.LogError(assertErrorMessage, context);
 				
 #if UNITY_EDITOR
-				// Always throw the exception if on editor so we are forced to debug
-				throw new Exception(assertErrorMessage);
-#endif		
+			// Always throw the exception if on editor so we are forced to debug
+			throw new Exception(assertErrorMessage);
+#endif
+		}
+
+		/// <summary>
+		/// Asserts that the expression is false
+		/// </summary>
+		/// <param name="expression"></param>
+		/// <param name="context"></param>
+		public static void IsFalse(bool expression, UnityEngine.Object? context = null) {
+			IsFalse(expression, DEFAULT_MESSAGE, context);
+		}
+
+		/// <summary>
+		/// Asserts that the expression is false
+		/// </summary>
+		/// <param name="expression"></param>
+		/// <param name="assertErrorMessage"></param>
+		/// <param name="context"></param>
+		/// <exception cref="Exception"></exception>
+		public static void IsFalse(bool expression, string assertErrorMessage, UnityEngine.Object? context = null) {
+			if (!expression) {
+				// Expression is already false
+				return;
 			}
+			
+			Debug.LogError(assertErrorMessage, context);
+				
+#if UNITY_EDITOR
+			// Always throw the exception if on editor so we are forced to debug
+			throw new Exception(assertErrorMessage);
+#endif
 		}
 	
-		/**
-		 * Asserts that the specified pointer is not null.
-		 */
 		public static void NotNull(object? pointer, string name, UnityEngine.Object? context = null) {
 			IsTrue(pointer != null, name, context);
 		}
 	
-		/**
-		 * Asserts that the specified pointer is not null.
-		 */
 		public static void NotNull(object? pointer, UnityEngine.Object? context = null) {
 			IsTrue(pointer != null, DEFAULT_MESSAGE, context);
 		}
@@ -54,18 +86,12 @@ namespace Common {
 			IsTrue(option.IsSome, name, context);
 		}
 		
-		/**
-		 * Asserts that the specified UnityEngine object is not null.
-		 */
 		public static void NotNull(UnityEngine.Object? pointer, string name, UnityEngine.Object? context = null) {
 			if(!pointer) {
 				IsTrue(false, name, context);
 			}
 		}
 	
-		/**
-		 * Asserts that the specified UnityEngine object is not null.
-		 */
 		public static void NotNull(UnityEngine.Object? pointer, UnityEngine.Object? context = null) {
 			if(!pointer) {
 				IsTrue(false, DEFAULT_MESSAGE, context);
@@ -76,7 +102,7 @@ namespace Common {
 		 * Asserts that the specified string is not empty.
 		 */
 		public static void NotEmpty(string? s, string name, UnityEngine.Object? context = null) {
-			IsTrue(!string.IsNullOrEmpty(s), name, context);
+			IsTrue(!string.IsNullOrWhiteSpace(s), name, context);
 		}
 	
 		

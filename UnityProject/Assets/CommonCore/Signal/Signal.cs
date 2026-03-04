@@ -74,7 +74,7 @@ namespace Common.Signal {
 		public void Dispatch() {
             try {
                 if (this.listenerList.Count == 0) {
-                    Debug.Log("There are no listeners to the signal: " + this.name);
+                    Debug.LogWarning("There are no listeners to the signal: " + this.name);
                 }
 
                 for (int i = 0; i < this.listenerList.Count; ++i) {

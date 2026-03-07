@@ -11,10 +11,6 @@ namespace CommonEcs {
         }
         
         public static bool EqualsValue<T>(this ValueTypeOption<T> self, T otherValue) where T : unmanaged, IEquatable<T> {
-            if (self.IsNone) {
-                return false;
-            }
-
             return self.IsSome && self.ValueOrError().Equals(otherValue);
         }
     }

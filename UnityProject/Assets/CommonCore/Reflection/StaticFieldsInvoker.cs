@@ -4,15 +4,15 @@ using System.Reflection;
 namespace Common {
     public class StaticFieldsInvoker {
         private readonly Type ownerType;
-        private readonly FieldInfo[] fields;
+        private readonly FieldInfo[] staticFields;
         
         // The methods to call
-        private readonly SimpleList<string> methodNames = new SimpleList<string>(1);
+        private readonly SimpleList<string> methodNames = new(1);
 
         // This ensures that there's always at least one method name
         public StaticFieldsInvoker(Type ownerType, string methodName) {
             this.ownerType = ownerType;
-            this.fields = this.ownerType.GetFields(BindingFlags.Public | BindingFlags.Static);
+            this.staticFields = this.ownerType.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
             
             AddMethod(methodName);
         }
@@ -33,8 +33,8 @@ namespace Common {
         private static readonly object[] EMPTY_PARAMETERS = new object[0];
 
         private void Execute(string methodName) {
-            for (int i = 0; i < this.fields.Length; ++i) {
-                FieldInfo field = this.fields[i];
+            for (int i = 0; i < this.staticFields.Length; ++i) {
+                FieldInfo field = this.staticFields[i];
                 
                 // The type of the field does not matter. As long it has the named method,
                 // it will be invoked

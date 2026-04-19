@@ -103,6 +103,11 @@ namespace CommonEcs {
 
             private ComputeBuffer layerOrderBuffer;
             public NativeArray<int> layerOrderArray;
+
+            // We need this to index in each buffer such that we don't need to sort each
+            // The sorted order will be stored here
+            private ComputeBuffer sortedIndicesBuffer;
+            public NativeArray<int> sortedIndices;
             
             private readonly uint[] args;
             private readonly ComputeBuffer argsBuffer;
@@ -125,6 +130,7 @@ namespace CommonEcs {
             private readonly int colorsBufferId;
             private readonly int activeBufferId;
             private readonly int layerOrderBufferId;
+            private readonly int sortedIndicesBufferId;
 
             public Internal(Material material, NativeArray<float4> uvValues, int initialCapacity) {
                 this.material = material;
@@ -167,6 +173,10 @@ namespace CommonEcs {
                 this.layerOrderBuffer = new ComputeBuffer(this.capacity, sizeof(int));
                 this.layerOrderArray = new NativeArray<int>(this.capacity, Allocator.Persistent);
                 this.layerOrderBuffer.SetData(this.layerOrderArray);
+
+                this.sortedIndicesBuffer = new ComputeBuffer(this.capacity, sizeof(int));
+                this.sortedIndices = new NativeArray<int>(this.capacity, Allocator.Persistent);
+                this.sortedIndicesBuffer.SetData(this.sortedIndices);
                 
                 // Prepare the shader IDs
                 this.uvBufferId = Shader.PropertyToID("uvBuffer");
@@ -177,6 +187,7 @@ namespace CommonEcs {
                 this.colorsBufferId = Shader.PropertyToID("colorsBuffer");
                 this.activeBufferId = Shader.PropertyToID("activeBuffer");
                 this.layerOrderBufferId = Shader.PropertyToID("layerOrderBuffer");
+                this.sortedIndicesBufferId = Shader.PropertyToID("sortedIndicesBuffer");
 
                 SetMaterialBuffers();
 
@@ -199,6 +210,7 @@ namespace CommonEcs {
                 this.material.SetBuffer(this.colorsBufferId, this.colorBuffer);
                 this.material.SetBuffer(this.activeBufferId, this.activeBuffer);
                 this.material.SetBuffer(this.layerOrderBufferId, this.layerOrderBuffer);
+                this.material.SetBuffer(this.sortedIndicesBufferId, this.sortedIndicesBuffer);
 
                 for (int i = 0; i < this.uvIndicesBuffers.Count; i++) {
                     this.uvIndicesBuffers[i].SetBuffer(this.material);
@@ -213,6 +225,8 @@ namespace CommonEcs {
                 this.pivotBuffer.Release();
                 this.colorBuffer.Release();
                 this.activeBuffer.Release();
+                this.layerOrderBuffer.Release();
+                this.sortedIndicesBuffer.Release();
                 this.argsBuffer.Release();
                 
                 this.uvValues.Dispose();
@@ -223,6 +237,7 @@ namespace CommonEcs {
                 this.colors.Dispose();
                 this.activeArray.Dispose();
                 this.layerOrderArray.Dispose();
+                this.sortedIndices.Dispose();
                 this.inactiveList.Dispose();
                 
                 // Dispose UV indices
@@ -272,6 +287,9 @@ namespace CommonEcs {
                 this.sizes[managerIndex] = sprite.size;
                 this.pivots[managerIndex] = sprite.pivot;
                 this.colors[managerIndex] = sprite.color;
+
+                // We do this for now but this should be sorted before rendering
+                this.sortedIndices[managerIndex] = managerIndex;
 
                 ++this.spriteCount;
             }
@@ -329,6 +347,7 @@ namespace CommonEcs {
                 Expand(ref this.colors, ref this.colorBuffer, float4Size);
                 Expand(ref this.activeArray, ref this.activeBuffer, sizeof(int));
                 Expand(ref this.layerOrderArray, ref this.layerOrderBuffer, sizeof(int));
+                Expand(ref this.sortedIndices, ref this.sortedIndicesBuffer, sizeof(int));
                 
                 // Expand UV indices as well
                 for (int i = 0; i < this.uvIndicesBuffers.Count; i++) {
@@ -366,6 +385,7 @@ namespace CommonEcs {
                 this.colorBuffer.SetData(this.colors);
                 this.activeBuffer.SetData(this.activeArray);
                 this.layerOrderBuffer.SetData(this.layerOrderArray);
+                this.sortedIndicesBuffer.SetData(this.sortedIndices);
 
                 // Update the data of indices as well
                 for (int i = 0; i < this.uvIndicesBuffers.Count; i++) {

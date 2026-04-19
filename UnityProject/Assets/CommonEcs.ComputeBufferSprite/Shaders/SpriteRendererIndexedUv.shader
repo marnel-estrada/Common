@@ -49,6 +49,8 @@
 
             StructuredBuffer<int> layerOrderBuffer;
 
+            StructuredBuffer<int> sortedIndicesBuffer;
+
             struct v2f {
                 float4 pos : SV_POSITION;
                 float2 uv: TEXCOORD0;
@@ -83,27 +85,29 @@
             }
 
             v2f vert(appdata_full v, uint instanceID : SV_InstanceID) {
+                uint sortedIndex = sortedIndicesBuffer[instanceID];
+                
                 // pivot
-                float2 pivot = pivotBuffer[instanceID];
+                float2 pivot = pivotBuffer[sortedIndex];
                 v.vertex = v.vertex - float4(pivot, 0, 0);
                 
                 // size
-                float2 size = sizeBuffer[instanceID];
+                float2 size = sizeBuffer[sortedIndex];
                 v.vertex.x = v.vertex.x * size.x;
                 v.vertex.y = v.vertex.y * size.y;
                 
                 // rotate the vertex (rotate at center)
-                float4 quaternion = rotationBuffer[instanceID];
+                float4 quaternion = rotationBuffer[sortedIndex];
                 v.vertex = mul(v.vertex, quaternionToMatrix(quaternion));
                 
                 // scale it
-                float4 translationAndScale = translationAndScaleBuffer[instanceID];
+                float4 translationAndScale = translationAndScaleBuffer[sortedIndex];
                 float scale = translationAndScale.w;
                 float3 worldPosition = translationAndScale.xyz + (v.vertex.xyz * scale);
 
                 // layer order
                 // We multiply by negative value here because higher order means to be rendered later
-                int layerOrder = layerOrderBuffer[instanceID];
+                int layerOrder = layerOrderBuffer[sortedIndex];
                 worldPosition.z = worldPosition.z + (layerOrder * -0.001);
                 
                 v2f o;
@@ -112,12 +116,12 @@
                 
                 // XY here is the dimension (width, height). 
                 // ZW is the offset in the texture (the actual UV coordinates)
-                int uvIndex = uvIndexBuffer[instanceID];
+                int uvIndex = uvIndexBuffer[sortedIndex];
                 float4 uv = uvBuffer[uvIndex];
                 o.uv =  v.texcoord * uv.xy + uv.zw;
                 
-				o.color = colorsBuffer[instanceID];
-                o.color.a = o.color.a * activeBuffer[instanceID];
+				o.color = colorsBuffer[sortedIndex];
+                o.color.a = o.color.a * activeBuffer[sortedIndex];
                 return o;
             }
 

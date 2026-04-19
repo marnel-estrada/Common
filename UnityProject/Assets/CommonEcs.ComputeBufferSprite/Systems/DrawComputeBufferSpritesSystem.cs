@@ -1,7 +1,9 @@
-﻿using Unity.Burst;
+﻿using System.Collections.Generic;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace CommonEcs {
@@ -37,23 +39,37 @@ namespace CommonEcs {
 
             try {
                 int spriteCount = spriteManager.Count;
-                
+
+                NativeArray<int> sortedIndices = spriteManager.SortedIndices;
                 ResetSortedIndicesJob resetJob = new() {
-                    sortedIndices = spriteManager.SortedIndices
+                    sortedIndices = sortedIndices
                 };
                 handle = resetJob.ScheduleParallel(spriteCount, 64, handle);
-                
-                if (spriteManager.TransparentIndices.Count() >= spriteManager.SortedIndices.Length) {
+
+                NativeParallelHashSet<int> transparentIndices = spriteManager.TransparentIndices;
+                int transparentIndicesCount = transparentIndices.Count();
+                if (transparentIndicesCount >= sortedIndices.Length) {
                     // This means that all sprites are transparent. No need to move them to the end. 
                     return;
                 }
 
                 MoveTransparentIndicesToTheEndJob moveTransparentToTheEndJob = new() {
-                    transparentIndices = spriteManager.TransparentIndices,
+                    transparentIndices = transparentIndices,
                     colors = spriteManager.Colors,
-                    sortedIndices = spriteManager.SortedIndices
+                    sortedIndices = sortedIndices
                 };
                 handle = moveTransparentToTheEndJob.Schedule(handle);
+                
+                // Sort the transparent entries by position and layer order
+                // Note here that we only sort starting from the transparent entries
+                SpriteIndexComparer comparer = new() {
+                    translationsAndScales = spriteManager.TranslationsAndScales,
+                    layerOrders = spriteManager.LayerOrderArray
+                };
+                
+                int startIndex = sortedIndices.Length - transparentIndicesCount;
+                handle = MultithreadedSort.SortWithComparer(ref sortedIndices, ref comparer, startIndex,
+                    sortedIndices.Length - 1, handle);
             } finally {
                 handle.Complete();
             }
@@ -91,8 +107,9 @@ namespace CommonEcs {
                             break;
                         }
 
-                        if (transparentIndex > lastCheckedIndex) {
+                        if (transparentIndex >= lastCheckedIndex) {
                             // This means that the transparent index is already at the correct position
+                            --lastCheckedIndex;
                             break;
                         }
                         
@@ -107,9 +124,34 @@ namespace CommonEcs {
                         // We swap
                         sortedIndices[transparentIndex] = lastCheckedIndex;
                         sortedIndices[lastCheckedIndex] = transparentIndex;
+
+                        --lastCheckedIndex;
+                        
                         swapped = true;
                     } while (!swapped);
                 }
+            }
+        }
+
+        private struct SpriteIndexComparer : IComparer<int> {
+            [ReadOnly]
+            public NativeArray<float4> translationsAndScales;
+
+            [ReadOnly]
+            public NativeArray<int> layerOrders;
+            
+            public int Compare(int a, int b) {
+                // We multiply by negative value here because higher order means to be rendered later
+                // This is also the calculation used in SpriteRendererIndexUv.shader
+                // We negate Y because objects with lower Y should be rendered later. The lower it is, the higher
+                // should the sprite be in the ordering.
+                float4 aPos = this.translationsAndScales[a];
+                float aOrder = -aPos.y + (this.layerOrders[a] * 0.001f);
+
+                float4 bPos = this.translationsAndScales[b];
+                float bOrder = -bPos.y + (this.layerOrders[b] * 0.001f);
+
+                return aOrder.CompareTo(bOrder);
             }
         }
     }

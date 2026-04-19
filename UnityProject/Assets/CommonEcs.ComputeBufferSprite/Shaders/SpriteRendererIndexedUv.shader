@@ -13,8 +13,8 @@
         Cull Off
         Lighting Off
         ZWrite On
+        ZTest LEqual
         Fog{ Mode Off }
-        AlphaTest Greater 0
         Blend SrcAlpha OneMinusSrcAlpha
         Pass {
             CGPROGRAM

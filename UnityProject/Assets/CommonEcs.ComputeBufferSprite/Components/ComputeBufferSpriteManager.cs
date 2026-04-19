@@ -39,6 +39,8 @@ namespace CommonEcs {
             return this.internalInstance.Add(ref sprite, position, rotation, scale);
         }
 
+        public int Count => this.internalInstance.spriteCount;
+
         /// <summary>
         /// Sets the uvIndex of the sprite.
         /// </summary>
@@ -67,6 +69,9 @@ namespace CommonEcs {
         public NativeArray<Color> Colors => this.internalInstance.colors;
         public NativeArray<int> ActiveArray => this.internalInstance.activeArray;
         public NativeArray<int> LayerOrderArray => this.internalInstance.layerOrderArray;
+        public NativeArray<int> SortedIndices => this.internalInstance.sortedIndices;
+
+        public NativeParallelHashSet<int> TransparentIndices => this.internalInstance.transparentIndices;
 
         public void Remove(int managerIndex) {
             this.internalInstance.Remove(managerIndex);
@@ -118,8 +123,11 @@ namespace CommonEcs {
             // We're only managing the removed manager indices here instead of the whole Sprite values
             private NativeList<int> inactiveList;
 
+            // Used to maintain entries with transparent entries so we don't have to identify them per frame
+            internal NativeParallelHashSet<int> transparentIndices;
+
             private int capacity;
-            private int spriteCount;
+            internal int spriteCount;
 
             // Buffer IDs
             private readonly int uvBufferId;
@@ -199,6 +207,8 @@ namespace CommonEcs {
                 this.argsBuffer.SetData(this.args);
 
                 this.inactiveList = new NativeList<int>(10, Allocator.Persistent);
+
+                this.transparentIndices = new NativeParallelHashSet<int>(initialCapacity, Allocator.Persistent);
             }
 
             private void SetMaterialBuffers() {
@@ -238,7 +248,9 @@ namespace CommonEcs {
                 this.activeArray.Dispose();
                 this.layerOrderArray.Dispose();
                 this.sortedIndices.Dispose();
+                
                 this.inactiveList.Dispose();
+                this.transparentIndices.Dispose();
                 
                 // Dispose UV indices
                 for (int i = 0; i < this.uvIndicesBuffers.Count; i++) {
@@ -290,6 +302,11 @@ namespace CommonEcs {
 
                 // We do this for now but this should be sorted before rendering
                 this.sortedIndices[managerIndex] = managerIndex;
+                
+                // Add to transparent indices
+                if (sprite.hasTransparentContent || sprite.color.a < 0.99f) {
+                    this.transparentIndices.Add(managerIndex);
+                }
 
                 ++this.spriteCount;
             }

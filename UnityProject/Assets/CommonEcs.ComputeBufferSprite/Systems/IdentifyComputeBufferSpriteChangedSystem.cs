@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Common;
 using CommonEcs.Math;
 using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
@@ -48,6 +50,8 @@ namespace CommonEcs {
             ComputeBufferSpriteManager spriteManager = spriteManagers[1];
             
             // Schedule job
+            NativeParallelHashSet<int> removeFromTransparentSet = 
+                new(this.spritesQuery.CalculateEntityCount(), WorldUpdateAllocator);
             TrackChangedJob trackChangedJob = new() {
                 spriteType = SystemAPI.GetComponentTypeHandle<ComputeBufferSprite>(),
                 managerAddedType = SystemAPI.GetComponentTypeHandle<ManagerAdded>(),
@@ -60,9 +64,17 @@ namespace CommonEcs {
                 pivots = spriteManager.Pivots,
                 colors = spriteManager.Colors,
                 layerOrderArray = spriteManager.LayerOrderArray,
+                transparentIndices = spriteManager.TransparentIndices.AsParallelWriter(),
+                removeFromTransparentSet = removeFromTransparentSet.AsParallelWriter(),
                 lastSystemVersion = this.LastSystemVersion
             };
             this.Dependency = trackChangedJob.ScheduleParallel(this.spritesQuery, this.Dependency);
+
+            ApplyRemovalSetJob applyRemovalSetJob = new() {
+                removeFromTransparentSet = removeFromTransparentSet,
+                transparentIndices = spriteManager.TransparentIndices,
+            };
+            this.Dependency = applyRemovalSetJob.Schedule(this.Dependency);
         }
         
         /// <summary>
@@ -101,6 +113,9 @@ namespace CommonEcs {
 
             [ReadOnly]
             public NativeArray<int> layerOrderArray;
+
+            public NativeParallelHashSet<int>.ParallelWriter transparentIndices;
+            public NativeParallelHashSet<int>.ParallelWriter removeFromTransparentSet;
             
             public uint lastSystemVersion;
             
@@ -175,8 +190,16 @@ namespace CommonEcs {
                     // Check color
                     Color colorInManager = this.colors[managerIndex];
                     if (!sprite.color.TolerantEquals(colorInManager)) {
-                        // Changed scale
+                        // Changed color
                         chunk.SetComponentEnabled(ref this.changedType, i, true);
+                        
+                        // See if to remove from transparent indices
+                        if (sprite.hasTransparentContent && sprite.color.a < 0.99f) {
+                            this.transparentIndices.Add(managerIndex);
+                        } else {
+                            this.removeFromTransparentSet.Add(managerIndex);
+                        }
+                        
                         continue;
                     }
                     
@@ -186,6 +209,20 @@ namespace CommonEcs {
                         // Change layer in order
                         chunk.SetComponentEnabled(ref this.changedType, i, true);
                     }
+                }
+            }
+        }
+        
+        [BurstCompile]
+        private struct ApplyRemovalSetJob : IJob {
+            [ReadOnly]
+            public NativeParallelHashSet<int> removeFromTransparentSet;
+            
+            public NativeParallelHashSet<int> transparentIndices;
+            
+            public void Execute() {
+                foreach (int index in this.removeFromTransparentSet) {
+                    this.transparentIndices.Remove(index);
                 }
             }
         }

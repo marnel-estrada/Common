@@ -150,9 +150,7 @@ namespace CommonEcs {
 
                     if (i <= j) {
                         // Swap
-                        T temp = this.array[i];
-                        this.array[i] = this.array[j];
-                        this.array[j] = temp;
+                        (this.array[i], this.array[j]) = (this.array[j], this.array[i]);
 
                         ++i;
                         --j;
@@ -252,12 +250,12 @@ namespace CommonEcs {
                             // first value is lesser
                             this.array[resultIndex] = firstValue;
                             ++firstIndex;
-                            ++resultIndex;
                         } else {
                             this.array[resultIndex] = secondValue;
                             ++secondIndex;
-                            ++resultIndex;
                         }
+
+                        ++resultIndex;
                     } else if (firstIndex <= this.first.max) {
                         // Only the first range has remaining elements
                         T firstValue = copy[firstIndex - this.first.min];

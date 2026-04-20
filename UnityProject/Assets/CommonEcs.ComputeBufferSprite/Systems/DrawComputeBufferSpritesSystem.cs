@@ -46,12 +46,12 @@ namespace CommonEcs {
                 };
                 handle = resetJob.ScheduleParallel(spriteCount, 64, handle);
 
-                NativeParallelHashSet<int> transparentIndices = spriteManager.TransparentIndices;
-                int transparentIndicesCount = transparentIndices.Count();
-                if (transparentIndicesCount >= sortedIndices.Length) {
-                    // This means that all sprites are transparent. No need to move them to the end. 
-                    return;
-                }
+                NativeParallelHashSet<int> transparentIndices = new(spriteCount, WorldUpdateAllocator);
+                CollectTransparentIndicesJob collectTransparentIndicesJob = new() {
+                    colors = spriteManager.Colors,
+                    resultSet = transparentIndices.AsParallelWriter()
+                };
+                handle = collectTransparentIndicesJob.ScheduleParallel(spriteCount, 64, handle);
 
                 MoveTransparentIndicesToTheEndJob moveTransparentToTheEndJob = new() {
                     transparentIndices = transparentIndices,
@@ -62,14 +62,14 @@ namespace CommonEcs {
                 
                 // Sort the transparent entries by position and layer order
                 // Note here that we only sort starting from the transparent entries
-                SpriteIndexComparer comparer = new() {
-                    translationsAndScales = spriteManager.TranslationsAndScales,
-                    layerOrders = spriteManager.LayerOrderArray
-                };
-                
-                int startIndex = sortedIndices.Length - transparentIndicesCount;
-                handle = MultithreadedSort.SortWithComparer(ref sortedIndices, ref comparer, startIndex,
-                    sortedIndices.Length - 1, handle);
+                // SpriteIndexComparer comparer = new() {
+                //     translationsAndScales = spriteManager.TranslationsAndScales,
+                //     layerOrders = spriteManager.LayerOrderArray
+                // };
+                //
+                // int startIndex = sortedIndices.Length - transparentIndicesCount;
+                // handle = MultithreadedSort.SortWithComparer(ref sortedIndices, ref comparer, startIndex,
+                //     sortedIndices.Length - 1, handle);
             } finally {
                 handle.Complete();
             }
@@ -86,6 +86,20 @@ namespace CommonEcs {
         }
 
         [BurstCompile]
+        private struct CollectTransparentIndicesJob : IJobFor {
+            [ReadOnly]
+            public NativeArray<Color> colors;
+            
+            public NativeParallelHashSet<int>.ParallelWriter resultSet;
+            
+            public void Execute(int index) {
+                if (colors[index].a < 0.99f) {
+                    this.resultSet.Add(index);
+                }
+            }
+        }
+
+        [BurstCompile]
         private struct MoveTransparentIndicesToTheEndJob : IJob {
             [ReadOnly]
             public NativeParallelHashSet<int> transparentIndices;
@@ -97,11 +111,18 @@ namespace CommonEcs {
             
             public void Execute() {
                 int lastCheckedIndex = this.sortedIndices.Length - 1; // Start at the end
+                int firstTransparentIndex = this.sortedIndices.Length - this.transparentIndices.Count();
 
                 foreach (int transparentIndex in this.transparentIndices) {
                     // Look for an index to swap
                     bool swapped = false;
                     do {
+                        if (transparentIndex >= firstTransparentIndex) {
+                            // This means that the index is already part of the transparent set at the end
+                            // No need to move it.
+                            break;
+                        }
+                        
                         if (lastCheckedIndex < 0) {
                             // Reached the end. No more index to swap
                             break;

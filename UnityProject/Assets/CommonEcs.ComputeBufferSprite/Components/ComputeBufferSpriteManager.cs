@@ -71,8 +71,6 @@ namespace CommonEcs {
         public NativeArray<int> LayerOrderArray => this.internalInstance.layerOrderArray;
         public NativeArray<int> SortedIndices => this.internalInstance.sortedIndices;
 
-        public NativeParallelHashSet<int> TransparentIndices => this.internalInstance.transparentIndices;
-
         public void Remove(int managerIndex) {
             this.internalInstance.Remove(managerIndex);
         }
@@ -122,9 +120,6 @@ namespace CommonEcs {
 
             // We're only managing the removed manager indices here instead of the whole Sprite values
             private NativeList<int> inactiveList;
-
-            // Used to maintain entries with transparent entries so we don't have to identify them per frame
-            internal NativeParallelHashSet<int> transparentIndices;
 
             private int capacity;
             internal int spriteCount;
@@ -207,8 +202,6 @@ namespace CommonEcs {
                 this.argsBuffer.SetData(this.args);
 
                 this.inactiveList = new NativeList<int>(10, Allocator.Persistent);
-
-                this.transparentIndices = new NativeParallelHashSet<int>(initialCapacity, Allocator.Persistent);
             }
 
             private void SetMaterialBuffers() {
@@ -250,7 +243,6 @@ namespace CommonEcs {
                 this.sortedIndices.Dispose();
                 
                 this.inactiveList.Dispose();
-                this.transparentIndices.Dispose();
                 
                 // Dispose UV indices
                 for (int i = 0; i < this.uvIndicesBuffers.Count; i++) {
@@ -302,11 +294,6 @@ namespace CommonEcs {
 
                 // We do this for now but this should be sorted before rendering
                 this.sortedIndices[managerIndex] = managerIndex;
-                
-                // Add to transparent indices
-                if (sprite.hasTransparentContent || sprite.color.a < 0.99f) {
-                    this.transparentIndices.Add(managerIndex);
-                }
 
                 ++this.spriteCount;
             }

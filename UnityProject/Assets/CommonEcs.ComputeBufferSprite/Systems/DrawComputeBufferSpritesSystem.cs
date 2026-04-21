@@ -9,70 +9,67 @@ using UnityEngine;
 namespace CommonEcs {
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public partial class DrawComputeBufferSpritesSystem : SystemBase {
-        private EntityQuery query;
+        private SharedComponentQuery<ComputeBufferSpriteManager> spriteManagerQuery;
 
         protected override void OnCreate() {
-            this.query = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<ComputeBufferSpriteManager>()
-                .Build(this);
+            this.spriteManagerQuery = 
+                new SharedComponentQuery<ComputeBufferSpriteManager>(this, this.EntityManager);
         }
         
         private static readonly Bounds BOUNDS = new(Vector2.zero, Vector3.one * 100);
 
         protected override void OnUpdate() {
-            NativeArray<ArchetypeChunk> chunks = this.query.ToArchetypeChunkArray(WorldUpdateAllocator);
-            SharedComponentTypeHandle<ComputeBufferSpriteManager> spriteManagerType = 
-                GetSharedComponentTypeHandle<ComputeBufferSpriteManager>();
+            this.spriteManagerQuery.Update();
+            IReadOnlyList<ComputeBufferSpriteManager> spriteManagers = this.spriteManagerQuery.SharedComponents;
             
-            for (int i = 0; i < chunks.Length; i++) {
-                ComputeBufferSpriteManager spriteManager = chunks[i].GetSharedComponentManaged(spriteManagerType, this.EntityManager);
-                SortIndices(ref spriteManager);
-                spriteManager.Draw(BOUNDS);
-            }
-
-            chunks.Dispose();
+            // Note here that we start counting from 1 since the first entry is always a default one
+            // In this case, SpriteManager.internal has not been allocated. So we get a NullPointerException
+            // if we try to access the default entry at 0.
+            ComputeBufferSpriteManager spriteManager = spriteManagers[1];
+            SortIndices(ref spriteManager);
+            spriteManager.Draw(BOUNDS);
         }
 
         // Sorts the indices based on alpha
         private void SortIndices(ref ComputeBufferSpriteManager spriteManager) {
             JobHandle handle = new();
 
-            try {
-                int spriteCount = spriteManager.Count;
+            int spriteCount = spriteManager.Count;
 
-                NativeArray<int> sortedIndices = spriteManager.SortedIndices;
-                ResetSortedIndicesJob resetJob = new() {
-                    sortedIndices = sortedIndices
-                };
-                handle = resetJob.ScheduleParallel(spriteCount, 64, handle);
+            NativeArray<int> sortedIndices = spriteManager.SortedIndices;
+            ResetSortedIndicesJob resetJob = new() {
+                sortedIndices = sortedIndices
+            };
+            handle = resetJob.ScheduleParallel(spriteCount, 64, handle);
 
-                NativeParallelHashSet<int> transparentIndices = new(spriteCount, WorldUpdateAllocator);
-                CollectTransparentIndicesJob collectTransparentIndicesJob = new() {
-                    colors = spriteManager.Colors,
-                    resultSet = transparentIndices.AsParallelWriter()
-                };
-                handle = collectTransparentIndicesJob.ScheduleParallel(spriteCount, 64, handle);
+            NativeParallelHashSet<int> transparentIndices = new(spriteCount, WorldUpdateAllocator);
+            CollectTransparentIndicesJob collectTransparentIndicesJob = new() {
+                colors = spriteManager.Colors,
+                resultSet = transparentIndices.AsParallelWriter()
+            };
+            handle = collectTransparentIndicesJob.ScheduleParallel(spriteCount, 64, handle);
 
-                MoveTransparentIndicesToTheEndJob moveTransparentToTheEndJob = new() {
-                    transparentIndices = transparentIndices,
-                    colors = spriteManager.Colors,
-                    sortedIndices = sortedIndices
-                };
-                handle = moveTransparentToTheEndJob.Schedule(handle);
+            MoveTransparentIndicesToTheEndJob moveTransparentToTheEndJob = new() {
+                transparentIndices = transparentIndices,
+                colors = spriteManager.Colors,
+                sortedIndices = sortedIndices,
+                spriteCount = spriteCount
+            };
+            handle = moveTransparentToTheEndJob.Schedule(handle);
+            
+            handle.Complete();
                 
-                // Sort the transparent entries by position and layer order
-                // Note here that we only sort starting from the transparent entries
-                // SpriteIndexComparer comparer = new() {
-                //     translationsAndScales = spriteManager.TranslationsAndScales,
-                //     layerOrders = spriteManager.LayerOrderArray
-                // };
-                //
-                // int startIndex = sortedIndices.Length - transparentIndicesCount;
-                // handle = MultithreadedSort.SortWithComparer(ref sortedIndices, ref comparer, startIndex,
-                //     sortedIndices.Length - 1, handle);
-            } finally {
-                handle.Complete();
-            }
+            // // Sort the transparent entries by position and layer order
+            // // Note here that we only sort starting from the transparent entries
+            // SpriteIndexComparer comparer = new() {
+            //     translationsAndScales = spriteManager.TranslationsAndScales,
+            //     layerOrders = spriteManager.LayerOrderArray
+            // };
+            //
+            // int startIndex = spriteCount - transparentIndices.Count();
+            // handle = MultithreadedSort.SortWithComparer(ref sortedIndices, ref comparer, startIndex,
+            //     spriteCount - 1, handle);
+            // handle.Complete();
         }
         
         [BurstCompile]
@@ -108,10 +105,12 @@ namespace CommonEcs {
             public NativeArray<Color> colors;
 
             public NativeArray<int> sortedIndices;
+
+            public int spriteCount;
             
             public void Execute() {
-                int lastCheckedIndex = this.sortedIndices.Length - 1; // Start at the end
-                int firstTransparentIndex = this.sortedIndices.Length - this.transparentIndices.Count();
+                int lastCheckedIndex = spriteCount - 1; // Start at the end
+                int firstTransparentIndex = spriteCount - this.transparentIndices.Count();
 
                 foreach (int transparentIndex in this.transparentIndices) {
                     // Look for an index to swap

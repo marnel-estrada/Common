@@ -19,7 +19,8 @@ namespace CommonEcs {
         protected override void OnCreate() {
             this.commandBufferSystem = this.GetOrCreateSystemManaged<EndSimulationEntityCommandBufferSystem>();
             
-            this.spriteManagerQuery = new SharedComponentQuery<ComputeBufferSpriteManager>(this, this.EntityManager);
+            this.spriteManagerQuery = 
+                new SharedComponentQuery<ComputeBufferSpriteManager>(this, this.EntityManager);
             
             this.spritesQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<ComputeBufferSprite>()

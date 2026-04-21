@@ -310,15 +310,15 @@ namespace CommonEcs {
                         --j;
                     }
 
-                    if (i <= j) {
-                        // Swap
-                        T temp = this.array[i];
-                        this.array[i] = this.array[j];
-                        this.array[j] = temp;
-
-                        ++i;
-                        --j;
+                    if (i > j) {
+                        continue;
                     }
+
+                    // Swap
+                    (this.array[i], this.array[j]) = (this.array[j], this.array[i]);
+
+                    ++i;
+                    --j;
                 }
 
                 // Recurse

@@ -30,6 +30,8 @@ namespace CommonEcs {
             spriteManager.Draw(BOUNDS);
         }
 
+        private int prevTransparentCount;
+
         // Sorts the indices based on alpha
         private void SortIndices(ref ComputeBufferSpriteManager spriteManager) {
             JobHandle handle = new();
@@ -48,28 +50,38 @@ namespace CommonEcs {
                 resultSet = transparentIndices.AsParallelWriter()
             };
             handle = collectTransparentIndicesJob.ScheduleParallel(spriteCount, 64, handle);
+            
+            handle.Complete();
+            int transparentCount = transparentIndices.Count();
+            if (this.prevTransparentCount != transparentCount) {
+                // Count count
+                Debug.Log($"spriteCount: {spriteCount}; transparentCount: {transparentCount}");
+                this.prevTransparentCount = transparentCount;
+            }
 
             MoveTransparentIndicesToTheEndJob moveTransparentToTheEndJob = new() {
                 transparentIndices = transparentIndices,
-                colors = spriteManager.Colors,
                 sortedIndices = sortedIndices,
                 spriteCount = spriteCount
             };
             handle = moveTransparentToTheEndJob.Schedule(handle);
+                
+            // Sort the transparent entries by position and layer order
+            // Note here that we only sort starting from the transparent entries
+            SpriteIndexComparer comparer = new() {
+                translationsAndScales = spriteManager.TranslationsAndScales,
+                layerOrders = spriteManager.LayerOrderArray
+            };
+
+            SortJob sortJob = new() {
+                comparer = comparer,
+                transparentIndices = transparentIndices,
+                sortedIndices = sortedIndices,
+                spriteCount = spriteCount
+            };
+            handle = sortJob.Schedule(handle);
             
             handle.Complete();
-                
-            // // Sort the transparent entries by position and layer order
-            // // Note here that we only sort starting from the transparent entries
-            // SpriteIndexComparer comparer = new() {
-            //     translationsAndScales = spriteManager.TranslationsAndScales,
-            //     layerOrders = spriteManager.LayerOrderArray
-            // };
-            //
-            // int startIndex = spriteCount - transparentIndices.Count();
-            // handle = MultithreadedSort.SortWithComparer(ref sortedIndices, ref comparer, startIndex,
-            //     spriteCount - 1, handle);
-            // handle.Complete();
         }
         
         [BurstCompile]
@@ -101,9 +113,6 @@ namespace CommonEcs {
             [ReadOnly]
             public NativeParallelHashSet<int> transparentIndices;
 
-            [ReadOnly]
-            public NativeArray<Color> colors;
-
             public NativeArray<int> sortedIndices;
 
             public int spriteCount;
@@ -133,8 +142,8 @@ namespace CommonEcs {
                             break;
                         }
                         
-                        if (this.colors[lastCheckedIndex].a < 0.99f ||
-                            this.transparentIndices.Contains(lastCheckedIndex)) {
+                        int indexAtLastChecked = sortedIndices[lastCheckedIndex];
+                        if (this.transparentIndices.Contains(indexAtLastChecked)) {
                             // Entry is transparent. Can't use this to swap.
                             --lastCheckedIndex;
                             continue;
@@ -142,7 +151,7 @@ namespace CommonEcs {
                         
                         // At this point, we found a non-transparent entry
                         // We swap
-                        sortedIndices[transparentIndex] = lastCheckedIndex;
+                        sortedIndices[transparentIndex] = indexAtLastChecked;
                         sortedIndices[lastCheckedIndex] = transparentIndex;
 
                         --lastCheckedIndex;
@@ -150,6 +159,23 @@ namespace CommonEcs {
                         swapped = true;
                     } while (!swapped);
                 }
+            }
+        }
+        
+        private struct SortJob : IJob {
+            [ReadOnly]
+            public SpriteIndexComparer comparer;
+
+            [ReadOnly]
+            public NativeParallelHashSet<int> transparentIndices;
+
+            public NativeArray<int> sortedIndices;
+
+            public int spriteCount;
+            
+            public void Execute() {
+                int startIndex = spriteCount - transparentIndices.Count();
+                SortUtils.Quicksort(ref this.sortedIndices, ref this.comparer, startIndex, this.spriteCount - 1);
             }
         }
 

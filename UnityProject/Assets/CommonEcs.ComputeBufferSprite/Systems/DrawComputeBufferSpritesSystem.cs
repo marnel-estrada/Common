@@ -36,33 +36,33 @@ namespace CommonEcs {
         private void SortIndices(ref ComputeBufferSpriteManager spriteManager) {
             JobHandle handle = new();
 
-            int spriteCount = spriteManager.Count;
+            int occupiedCount = spriteManager.OccupiedCount;
 
             NativeArray<int> sortedIndices = spriteManager.SortedIndices;
             ResetSortedIndicesJob resetJob = new() {
                 sortedIndices = sortedIndices
             };
-            handle = resetJob.ScheduleParallel(spriteCount, 64, handle);
+            handle = resetJob.ScheduleParallel(occupiedCount, 64, handle);
 
-            NativeParallelHashSet<int> transparentIndices = new(spriteCount, WorldUpdateAllocator);
+            NativeParallelHashSet<int> transparentIndices = new(occupiedCount, WorldUpdateAllocator);
             CollectTransparentIndicesJob collectTransparentIndicesJob = new() {
                 colors = spriteManager.Colors,
                 resultSet = transparentIndices.AsParallelWriter()
             };
-            handle = collectTransparentIndicesJob.ScheduleParallel(spriteCount, 64, handle);
+            handle = collectTransparentIndicesJob.ScheduleParallel(occupiedCount, 64, handle);
             
             handle.Complete();
             int transparentCount = transparentIndices.Count();
             if (this.prevTransparentCount != transparentCount) {
                 // Count count
-                Debug.Log($"spriteCount: {spriteCount}; transparentCount: {transparentCount}");
+                Debug.Log($"occupiedCount: {occupiedCount}; transparentCount: {transparentCount}");
                 this.prevTransparentCount = transparentCount;
             }
 
             MoveTransparentIndicesToTheEndJob moveTransparentToTheEndJob = new() {
                 transparentIndices = transparentIndices,
                 sortedIndices = sortedIndices,
-                spriteCount = spriteCount
+                spriteCount = occupiedCount
             };
             handle = moveTransparentToTheEndJob.Schedule(handle);
                 
@@ -77,7 +77,7 @@ namespace CommonEcs {
                 comparer = comparer,
                 transparentIndices = transparentIndices,
                 sortedIndices = sortedIndices,
-                spriteCount = spriteCount
+                spriteCount = occupiedCount
             };
             handle = sortJob.Schedule(handle);
             

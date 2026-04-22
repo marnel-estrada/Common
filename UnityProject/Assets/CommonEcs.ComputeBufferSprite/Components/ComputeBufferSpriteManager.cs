@@ -39,7 +39,7 @@ namespace CommonEcs {
             return this.internalInstance.Add(ref sprite, position, rotation, scale);
         }
 
-        public int Count => this.internalInstance.spriteCount;
+        public int OccupiedCount => this.internalInstance.occupiedCount;
 
         /// <summary>
         /// Sets the uvIndex of the sprite.
@@ -122,7 +122,13 @@ namespace CommonEcs {
             private NativeList<int> inactiveList;
 
             private int capacity;
-            internal int spriteCount;
+            
+            // This is different from spriteCount. Note that when we remove a sprite, we don't remove it from the
+            // arrays. We set the values at an index to not render anything. We use mainly use this to get the next
+            // sprite index. This is also considered as activeSpriteCount + inactiveSpriteCount.
+            internal int occupiedCount;
+
+            private int spriteCount;
 
             // Buffer IDs
             private readonly int uvBufferId;
@@ -264,11 +270,11 @@ namespace CommonEcs {
                 }
 
                 // Expand if we're out of space
-                while (this.spriteCount >= this.capacity) {
+                while (this.occupiedCount >= this.capacity) {
                     Expand();
                 }
 
-                int managerIndex = this.spriteCount;
+                int managerIndex = this.occupiedCount;
                 InternalAdd(ref sprite, managerIndex, position, rotation, scale);
                 return managerIndex;
             }
@@ -295,7 +301,12 @@ namespace CommonEcs {
                 // We do this for now but this should be sorted before rendering
                 this.sortedIndices[managerIndex] = managerIndex;
 
+                ++this.occupiedCount;
                 ++this.spriteCount;
+                
+                // Update the amount of quads to draw in args
+                this.args[1] = (uint)this.occupiedCount;
+                this.argsBuffer.SetData(this.args);
             }
 
             /// <summary>
@@ -327,6 +338,9 @@ namespace CommonEcs {
                 this.inactiveList.Add(managerIndex);
 
                 --this.spriteCount;
+                
+                // Note here that we don't decrement occupiedCount. This number doesn't go down since the removed
+                // sprite are still there.
             }
 
             public void AddUvIndicesBuffer(string shaderPropertyId) {
@@ -359,10 +373,6 @@ namespace CommonEcs {
                 }
                 
                 SetMaterialBuffers();
-                
-                // Update capacity in args
-                this.args[1] = (uint)this.capacity;
-                this.argsBuffer.SetData(this.args);
             }
 
             private void Expand<T>(ref NativeArray<T> array, ref ComputeBuffer computeBuffer, int stride) where T : unmanaged {

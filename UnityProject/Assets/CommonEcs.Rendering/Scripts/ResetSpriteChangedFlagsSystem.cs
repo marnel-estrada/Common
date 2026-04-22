@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
@@ -23,6 +24,7 @@ namespace CommonEcs {
             this.Dependency = resetJob.ScheduleParallel(this.query, this.Dependency);
         }
 
+        [BurstCompile]
         private struct ResetJob : IJobChunk {
             public ComponentTypeHandle<Sprite> spriteType;
             

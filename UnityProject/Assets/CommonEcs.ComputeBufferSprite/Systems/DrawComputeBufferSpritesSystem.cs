@@ -30,8 +30,6 @@ namespace CommonEcs {
             spriteManager.Draw(BOUNDS);
         }
 
-        private int prevTransparentCount;
-
         // Sorts the indices based on alpha
         private void SortIndices(ref ComputeBufferSpriteManager spriteManager) {
             JobHandle handle = new();
@@ -42,22 +40,17 @@ namespace CommonEcs {
             ResetSortedIndicesJob resetJob = new() {
                 sortedIndices = sortedIndices
             };
-            handle = resetJob.ScheduleParallel(occupiedCount, 64, handle);
+            JobHandle resetHandle = resetJob.ScheduleParallel(occupiedCount, 64, handle);
 
             NativeParallelHashSet<int> transparentIndices = new(occupiedCount, WorldUpdateAllocator);
             CollectTransparentIndicesJob collectTransparentIndicesJob = new() {
                 colors = spriteManager.Colors,
                 resultSet = transparentIndices.AsParallelWriter()
             };
-            handle = collectTransparentIndicesJob.ScheduleParallel(occupiedCount, 64, handle);
+            JobHandle collectHandle = 
+                collectTransparentIndicesJob.ScheduleParallel(occupiedCount, 64, handle);
             
-            handle.Complete();
-            int transparentCount = transparentIndices.Count();
-            if (this.prevTransparentCount != transparentCount) {
-                // Count count
-                Debug.Log($"occupiedCount: {occupiedCount}; transparentCount: {transparentCount}");
-                this.prevTransparentCount = transparentCount;
-            }
+            handle = JobHandle.CombineDependencies(resetHandle, collectHandle);
 
             MoveTransparentIndicesToTheEndJob moveTransparentToTheEndJob = new() {
                 transparentIndices = transparentIndices,
@@ -142,8 +135,7 @@ namespace CommonEcs {
                             break;
                         }
                         
-                        int indexAtLastChecked = sortedIndices[lastCheckedIndex];
-                        if (this.transparentIndices.Contains(indexAtLastChecked)) {
+                        if (this.transparentIndices.Contains(lastCheckedIndex)) {
                             // Entry is transparent. Can't use this to swap.
                             --lastCheckedIndex;
                             continue;
@@ -151,7 +143,7 @@ namespace CommonEcs {
                         
                         // At this point, we found a non-transparent entry
                         // We swap
-                        sortedIndices[transparentIndex] = indexAtLastChecked;
+                        sortedIndices[transparentIndex] = lastCheckedIndex;
                         sortedIndices[lastCheckedIndex] = transparentIndex;
 
                         --lastCheckedIndex;
@@ -162,6 +154,7 @@ namespace CommonEcs {
             }
         }
         
+        [BurstCompile]
         private struct SortJob : IJob {
             [ReadOnly]
             public SpriteIndexComparer comparer;

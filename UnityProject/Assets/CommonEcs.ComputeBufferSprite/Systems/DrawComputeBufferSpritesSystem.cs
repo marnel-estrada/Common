@@ -181,14 +181,14 @@ namespace CommonEcs {
             
             public int Compare(int a, int b) {
                 // We multiply by negative value here because higher order means to be rendered later
-                // This is also the calculation used in SpriteRendererIndexUv.shader
-                // We negate Y because objects with lower Y should be rendered later. The lower it is, the higher
-                // should the sprite be in the ordering.
+                // This is also the calculation used in SpriteRendererIndexUv.shader.
+                // We also negate the order value since we want the more positive z to be earlier in the rendering
+                // More positive z means farther from the camera.
                 float4 aPos = this.translationsAndScales[a];
-                float aOrder = -aPos.y + (this.layerOrders[a] * 0.001f);
+                float aOrder = -(aPos.z + (this.layerOrders[a] * -0.001f));
 
                 float4 bPos = this.translationsAndScales[b];
-                float bOrder = -bPos.y + (this.layerOrders[b] * 0.001f);
+                float bOrder = -(bPos.z + (this.layerOrders[b] * -0.001f));
 
                 return aOrder.CompareTo(bOrder);
             }

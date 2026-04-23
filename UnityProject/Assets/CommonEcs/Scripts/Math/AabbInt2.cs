@@ -46,35 +46,15 @@ namespace CommonEcs {
             }
         }
 
-        public int2 Min {
-            get {
-                return this.min;
-            }
-        }
+        public int2 Min => this.min;
 
-        public int2 Max {
-            get {
-                return this.max;
-            }
-        }
+        public int2 Max => this.max;
 
-        public int Width {
-            get {
-                return this.max.x - this.min.x;
-            }
-        }
+        public int Width => this.max.x - this.min.x;
 
-        public int Height {
-            get {
-                return this.max.y - this.min.y;
-            }
-        }
+        public int Height => this.max.y - this.min.y;
 
-        public bool IsEmpty {
-            get {
-                return this.max.x < this.min.x || this.max.y < this.min.y;
-            }
-        }
+        public bool IsEmpty => this.max.x < this.min.x || this.max.y < this.min.y;
 
         /// <summary>
         /// Returns whether the AABB overlaps with the specified point

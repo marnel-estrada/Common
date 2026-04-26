@@ -39,6 +39,13 @@ namespace CommonEcs.Goap {
             if (!CanExecute) {
                 return inputDeps;
             }
+
+            // TProcessor processor;
+            // if (ShouldPrepareProcesserWithJobHandle) {
+            //     inputDeps = PrepareProcessorWithJobHandle(inputDeps, out processor);
+            // } else {
+            //     processor = PrepareProcessor();
+            // }
             
             NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArrayAsync(
                 WorldUpdateAllocator, inputDeps, out JobHandle chunkBaseIndicesHandle);
@@ -83,6 +90,15 @@ namespace CommonEcs.Goap {
         protected ref EntityQuery Query => ref this.query;
 
         protected abstract TProcessor PrepareProcessor();
+        
+        // Returns whether the processor should be prepared with JobHandle dependency. This may be used for cases
+        // when the processor needs to execute another job first to function.
+        protected virtual bool ShouldPrepareProcesserWithJobHandle => false;
+
+        protected virtual JobHandle PrepareProcessorWithJobHandle(JobHandle inputDeps, out TProcessor processor) {
+            processor = default;
+            return inputDeps;
+        }
 
         // We need this to be public so it can be referenced in AssemblyInfo
         [BurstCompile]

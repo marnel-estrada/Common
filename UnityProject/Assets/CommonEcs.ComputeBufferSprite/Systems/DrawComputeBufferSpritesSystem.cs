@@ -25,9 +25,11 @@ namespace CommonEcs {
             // Note here that we start counting from 1 since the first entry is always a default one
             // In this case, SpriteManager.internal has not been allocated. So we get a NullPointerException
             // if we try to access the default entry at 0.
-            ComputeBufferSpriteManager spriteManager = spriteManagers[1];
-            SortIndices(ref spriteManager);
-            spriteManager.Draw(BOUNDS);
+            for (int i = 1; i < spriteManagers.Count; i++) {
+                ComputeBufferSpriteManager spriteManager = spriteManagers[i];
+                SortIndices(ref spriteManager);
+                spriteManager.Draw(BOUNDS);
+            }
         }
 
         // Sorts the indices based on alpha

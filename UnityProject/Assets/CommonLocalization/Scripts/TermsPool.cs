@@ -58,8 +58,6 @@ namespace Common {
         /// </summary>
         /// <param name="xmlPath"></param>
         private void Parse(string xmlPath) {
-            Debug.Log("Parsed " + xmlPath);
-
             if (this.currentTranslation == null) {
                 this.currentTranslation = TranslationContainer.Load(xmlPath);
             } else {

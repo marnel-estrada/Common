@@ -1,6 +1,6 @@
 ﻿using Unity.Entities;
 
-namespace Components {
+namespace CommonEcs {
     /// <summary>
     /// A component that stores the source prefab of an entity. It can be used in serialization
     /// to spawn such prefab. The idHashCode here is the hash code of the text ID of the prefab.

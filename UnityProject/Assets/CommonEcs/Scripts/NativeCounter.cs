@@ -113,8 +113,8 @@ namespace CommonEcs {
             this.countIntegers = null;
         }
 
-        [NativeContainer]
         // This attribute is what makes it possible to use NativeCounter.Concurrent in a ParallelFor job
+        [NativeContainer]
         [NativeContainerIsAtomicWriteOnly]
         public struct ParallelWriter {
             // Copy of the pointer from the full NativeCounter

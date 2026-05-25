@@ -30,7 +30,7 @@ namespace CommonEcs {
             return new ValueTypeOption<T>(value);
         }
 
-        private ValueTypeOption(in T value) {
+        public ValueTypeOption(in T value) {
             this.value = value;
             this.hasValue = true;
         }

@@ -130,7 +130,7 @@ namespace CommonEcs {
             return ValueTypeOption<V>.None;
         }
 
-        public bool ContainsKey(in K key) {
+        public readonly bool ContainsKey(in K key) {
             int hashCode = key.GetHashCode();
             int bucketIndex = ComputeBucketIndex(hashCode);
             
@@ -144,12 +144,7 @@ namespace CommonEcs {
             // At this point, the item in bucketIndex is a different item.
             // Let's do a linear probe
             int probedIndex = LinearProbeForExistingEntry(hashCode, bucketIndex + 1);
-            if (probedIndex >= 0) {
-                return true;
-            }
-
-            // Not found
-            return false;
+            return probedIndex >= 0;
         }
 
         private static int ComputeBucketIndex(int hash) {

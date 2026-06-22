@@ -148,7 +148,7 @@ namespace Common {
         /// <param name="date"></param>
         /// <returns></returns>
         public static string FormatDateToCurrentCulture(DateTime date) {
-            return date.ToString("MM/dd/yyyy hh:mm tt", CultureInfo.CurrentCulture);
+            return date.ToString("g", CultureInfo.CurrentCulture);
         }
 
         /// <summary>

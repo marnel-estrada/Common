@@ -8,12 +8,12 @@ namespace Common {
         [SerializeField]
         private GameVariables gameVariables;
         
-        public static readonly Query<string, string> GET_STRING_GAME_VARIABLE = new Query<string, string>();
-        public static readonly Query<string, int> GET_INT_GAME_VARIABLE = new Query<string, int>();
-        public static readonly Query<string, float> GET_FLOAT_GAME_VARIABLE = new Query<string, float>();
-        public static readonly Query<string, bool> GET_BOOL_GAME_VARIABLE = new Query<string, bool>();
+        public static readonly Query<string, string> GET_STRING_GAME_VARIABLE = new();
+        public static readonly Query<string, int> GET_INT_GAME_VARIABLE = new();
+        public static readonly Query<string, float> GET_FLOAT_GAME_VARIABLE = new();
+        public static readonly Query<string, bool> GET_BOOL_GAME_VARIABLE = new();
         
-        private static readonly StaticFieldsInvoker CLEAR_PROVIDERS = new StaticFieldsInvoker(typeof(GameVariablesQuery), "ClearProvider");
+        private static readonly StaticFieldsInvoker CLEAR_PROVIDERS = new(typeof(GameVariablesQuery), "ClearProvider");
         
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void OnDomainReload() {

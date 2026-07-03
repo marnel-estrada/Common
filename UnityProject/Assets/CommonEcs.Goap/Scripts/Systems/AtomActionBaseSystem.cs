@@ -40,12 +40,12 @@ namespace CommonEcs.Goap {
                 return inputDeps;
             }
 
-            // TProcessor processor;
-            // if (ShouldPrepareProcesserWithJobHandle) {
-            //     inputDeps = PrepareProcessorWithJobHandle(inputDeps, out processor);
-            // } else {
-            //     processor = PrepareProcessor();
-            // }
+            TProcessor processor;
+            if (this.ShouldPrepareProcessorWithJobHandle) {
+                inputDeps = PrepareProcessorWithJobHandle(inputDeps, out processor);
+            } else {
+                processor = PrepareProcessor();
+            }
             
             NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArrayAsync(
                 WorldUpdateAllocator, inputDeps, out JobHandle chunkBaseIndicesHandle);
@@ -55,7 +55,7 @@ namespace CommonEcs.Goap {
                 atomActionType = GetComponentTypeHandle<AtomAction>(),
                 actionFilterType = GetComponentTypeHandle<TActionFilter>(),
                 isActionFilterHasArray = this.isActionFilterHasArray, // Action filter has array if it's not zero sized
-                processor = PrepareProcessor(),
+                processor = processor,
                 allAgents = GetComponentLookup<GoapAgent>(true),
                 allDebugEntities = GetComponentLookup<DebugEntity>(true)
             };
@@ -93,7 +93,7 @@ namespace CommonEcs.Goap {
         
         // Returns whether the processor should be prepared with JobHandle dependency. This may be used for cases
         // when the processor needs to execute another job first to function.
-        protected virtual bool ShouldPrepareProcesserWithJobHandle => false;
+        protected virtual bool ShouldPrepareProcessorWithJobHandle => false;
 
         protected virtual JobHandle PrepareProcessorWithJobHandle(JobHandle inputDeps, out TProcessor processor) {
             processor = default;

@@ -227,7 +227,7 @@ namespace CommonEcs.Goap {
                     return false;
                 }
 
-                FixedList64Bytes<int> actionIndices = foundActionIndices.ValueOrError();
+                FixedList128Bytes<int> actionIndices = foundActionIndices.ValueOrError();
                 for (int i = 0; i < actionIndices.Length; ++i) {
                     GoapAction action = domain.GetAction(actionIndices[i]);
                     if (actionsBeingEvaluated.Contains(action.id)) {

@@ -137,12 +137,16 @@ namespace GoapBrain {
                 return;
             }
 
+            if (conditionName.Length > 64) {
+                EditorUtility.DisplayDialog("Can't add", "Can't add a condition name that's more than 64 characters in length.", "OK");
+                return;
+            }
+
             // Check if it already exists
             ConditionName? name = data.GetConditionName(conditionName);
             if (name != null) {
                 // An action with the same name already exists
                 EditorUtility.DisplayDialog("Can't add", "A condition with the same name already exists.", "OK");
-
                 return;
             }
 

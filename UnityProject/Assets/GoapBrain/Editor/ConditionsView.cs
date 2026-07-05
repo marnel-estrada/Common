@@ -10,6 +10,8 @@ namespace GoapBrain {
     /// </summary>
     public class ConditionsView {
         private string newConditionName = string.Empty;
+
+        private string filter = string.Empty;
         private string filterHashCode = string.Empty;
 
         private Vector2 scrollPos;
@@ -28,17 +30,21 @@ namespace GoapBrain {
 
                 using (new GUILayout.HorizontalScope()) {
                     // Add section
-                    GUILayout.Label("New condition:", GUILayout.Width(150));
+                    GUILayout.Label("New condition:", GUILayout.Width(90));
                     GUILayout.Space(5);
-                    this.newConditionName = EditorGUILayout.TextField(this.newConditionName, GUILayout.Width(200));
+                    this.newConditionName = EditorGUILayout.TextField(this.newConditionName, GUILayout.Width(270));
                     if (GUILayout.Button("Add", GUILayout.Width(50), GUILayout.Height(15))) {
                         AddConditionName(domain, this.newConditionName);
                     }
 
                     GUILayout.Space(5);
 
-                    GUILayout.Label("Filter Hashcode:", GUILayout.Width(100));
+                    GUILayout.Label("Filter Name:", GUILayout.Width(80));
+                    this.filter = EditorGUILayout.TextField(this.filter, GUILayout.Width(270));
+                    
                     GUILayout.Space(5);
+                    
+                    GUILayout.Label("Filter Hashcode:", GUILayout.Width(100));
                     this.filterHashCode = EditorGUILayout.TextField(this.filterHashCode, GUILayout.Width(100));
                 }
 
@@ -92,7 +98,11 @@ namespace GoapBrain {
                     }
 
                     string hashcode = new FixedString64Bytes(name.Name).GetHashCode().ToString();
-                    if (!string.IsNullOrEmpty(this.filterHashCode) && hashcode.Contains(this.filterHashCode)) {
+                    if (!string.IsNullOrWhiteSpace(this.filter) && name.Name.Contains(this.filter)) {
+                        GUI.contentColor = ColorUtils.GREEN;
+                        GUILayout.Label($"{name.Name} ({hashcode})");
+                        GUI.contentColor = ColorUtils.WHITE;
+                    } else if (!string.IsNullOrEmpty(this.filterHashCode) && hashcode.Contains(this.filterHashCode)) {
                         GUI.contentColor = ColorUtils.YELLOW;
                         GUILayout.Label($"{name.Name} ({hashcode})");
                         GUI.contentColor = ColorUtils.WHITE;

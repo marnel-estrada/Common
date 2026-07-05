@@ -111,7 +111,7 @@ namespace CommonEcs.Goap {
                     BoolHashMap boolHashMap = ToBoolHashMap(bucket);
 
                     NativeList<ResolvedAction> actionList = new(Allocator.Temp);
-                    NativeHashSet<int> actionsBeingEvaluated = new(4, Allocator.Temp);
+                    Unity.Collections.NativeHashSet<int> actionsBeingEvaluated = new(4, Allocator.Temp);
                     Condition currentGoal = planner.currentGoal.ValueOrError();
                     bool result = SearchActions(currentGoal, domain, ref boolHashMap, ref actionList, ref actionsBeingEvaluated, debug.enabled);
 
@@ -176,7 +176,8 @@ namespace CommonEcs.Goap {
             }
 
             private bool SearchActions(in Condition goal, in GoapDomain domain, ref BoolHashMap conditionsMap,
-                ref NativeList<ResolvedAction> actionList, ref NativeHashSet<int> actionsBeingEvaluated, bool isDebug) {
+                ref NativeList<ResolvedAction> actionList, ref Unity.Collections.NativeHashSet<int> actionsBeingEvaluated, 
+                bool isDebug) {
 #if UNITY_EDITOR
                 FixedString64Bytes goalName = this.textResolver.GetText(goal.id.hashCode);
                 if (isDebug) {
@@ -243,7 +244,7 @@ namespace CommonEcs.Goap {
                     }
 #endif
 
-                    actionsBeingEvaluated.TryAdd(action.id);
+                    actionsBeingEvaluated.Add(action.id);
 
                     BoolHashMap conditionsMapCopy = conditionsMap;
                     NativeList<ResolvedAction> tempActionList = new(Allocator.Temp);
@@ -288,7 +289,8 @@ namespace CommonEcs.Goap {
             }
 
             private bool SearchActionsToSatisfyPreconditions(in GoapAction action, in GoapDomain domain,
-                ref BoolHashMap conditionsMap, ref NativeList<ResolvedAction> actionList, ref NativeHashSet<int> actionsBeingEvaluated, bool isDebug) {
+                ref BoolHashMap conditionsMap, ref NativeList<ResolvedAction> actionList, 
+                ref Unity.Collections.NativeHashSet<int> actionsBeingEvaluated, bool isDebug) {
                 for (int i = 0; i < action.preconditions.Count; ++i) {
                     Condition precondition = action.preconditions[i];
                     if (SearchActions(precondition, domain, ref conditionsMap, ref actionList,

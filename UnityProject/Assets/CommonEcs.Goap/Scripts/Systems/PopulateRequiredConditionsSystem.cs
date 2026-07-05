@@ -55,7 +55,7 @@ namespace CommonEcs.Goap {
                 BufferAccessor<RequiredCondition> requiredConditionsList = chunk.GetBufferAccessor(ref this.requiredConditionType);
                 
                 // This is used to keep track of actions that were already added
-                NativeHashSet<int> addedActions = new(50, Allocator.Temp);
+                Unity.Collections.NativeHashSet<int> addedActions = new(64, Allocator.Temp);
 
                 for (int i = 0; i < chunk.Count; ++i) {
                     GoapPlanner planner = planners[i];
@@ -76,7 +76,8 @@ namespace CommonEcs.Goap {
                 }
             }
 
-            private void Process(in GoapPlanner planner, ref DynamicBuffer<RequiredCondition> requiredConditions, ref NativeHashSet<int> addedActions) {
+            private void Process(in GoapPlanner planner, ref DynamicBuffer<RequiredCondition> requiredConditions, 
+                ref Unity.Collections.NativeHashSet<int> addedActions) {
                 // Clear first
                 requiredConditions.Clear();
 
@@ -91,8 +92,8 @@ namespace CommonEcs.Goap {
                 AddPreconditions(ref requiredConditions, ref addedActions, domain, currentGoal);
             }
 
-            private void AddPreconditions(ref DynamicBuffer<RequiredCondition> requiredConditions, ref NativeHashSet<int> addedActions, 
-                in GoapDomain domain, in Condition effect) {
+            private void AddPreconditions(ref DynamicBuffer<RequiredCondition> requiredConditions, 
+                ref Unity.Collections.NativeHashSet<int> addedActions, in GoapDomain domain, in Condition effect) {
                 // We don't use match here because this needs to fast as much as possible
                 ValueTypeOption<FixedList128Bytes<int>> foundActionIndices = domain.GetActionIndices(effect);
                 if (foundActionIndices.IsNone) {
@@ -115,18 +116,18 @@ namespace CommonEcs.Goap {
             }
 
             // Adds the preconditions of the specified action
-            private static void AddPreconditions(ref DynamicBuffer<RequiredCondition> requiredConditions, ref NativeHashSet<int> addedActions,
-                in GoapAction action) {
+            private static void AddPreconditions(ref DynamicBuffer<RequiredCondition> requiredConditions, 
+                ref Unity.Collections.NativeHashSet<int> addedActions, in GoapAction action) {
                 ConditionList10 preconditions = action.preconditions;
                 for (int i = 0; i < preconditions.Count; ++i) {
                     requiredConditions.Add(new RequiredCondition(preconditions[i].id));
                 }
 
-                addedActions.TryAdd(action.id);
+                addedActions.Add(action.id);
             }
 
-            private void RecurseThroughPreconditions(ref DynamicBuffer<RequiredCondition> requiredConditions, ref NativeHashSet<int> addedActions,
-                in GoapDomain domain, in GoapAction action) {
+            private void RecurseThroughPreconditions(ref DynamicBuffer<RequiredCondition> requiredConditions, 
+                ref Unity.Collections.NativeHashSet<int> addedActions, in GoapDomain domain, in GoapAction action) {
                 ConditionList10 preconditions = action.preconditions;
                 for (int i = 0; i < preconditions.Count; ++i) {
                     AddPreconditions(ref requiredConditions, ref addedActions, domain, preconditions[i]);

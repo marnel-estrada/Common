@@ -46,6 +46,13 @@ namespace CommonEcs.Goap {
                 return inputDeps;
             }
             
+            TResolverProcessor processor;
+            if (this.ShouldPrepareProcessorWithJobHandle) {
+                inputDeps = PrepareProcessorWithJobHandle(inputDeps, out processor);
+            } else {
+                processor = PrepareProcessor();
+            }
+            
             NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArrayAsync(
                 WorldUpdateAllocator, inputDeps, out JobHandle chunkBaseIndicesHandle);
             inputDeps = JobHandle.CombineDependencies(inputDeps, chunkBaseIndicesHandle);
@@ -57,7 +64,7 @@ namespace CommonEcs.Goap {
                 allDebugEntity = GetComponentLookup<DebugEntity>(true),
                 textResolver = this.textDbSystem.TextResolver,
                 filterHasArray = !this.isFilterZeroSized, // Filter has array if it's not zero sized
-                processor = PrepareProcessor()
+                processor = processor
             };
 
             try {
@@ -100,6 +107,15 @@ namespace CommonEcs.Goap {
         protected ref EntityQuery Query => ref this.query;
 
         protected abstract TResolverProcessor PrepareProcessor();
+        
+        // Returns whether the processor should be prepared with JobHandle dependency. This may be used for cases
+        // when the processor needs to execute another job first to function.
+        protected virtual bool ShouldPrepareProcessorWithJobHandle => false;
+
+        protected virtual JobHandle PrepareProcessorWithJobHandle(JobHandle inputDeps, out TResolverProcessor processor) {
+            processor = default;
+            return inputDeps;
+        }
         
         [BurstCompile]
         public struct ExecuteResolversJob : IJobChunk {

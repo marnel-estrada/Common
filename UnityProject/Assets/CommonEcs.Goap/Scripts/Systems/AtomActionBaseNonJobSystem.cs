@@ -28,6 +28,8 @@ namespace CommonEcs.Goap {
             return GetEntityQuery(typeof(AtomAction), typeof(TActionFilter));
         }
 
+        protected virtual bool ShouldScheduleParallel => true;
+
         protected override void OnUpdate() {
             int entityCount = this.query.CalculateEntityCount();
             NativeList<Entity> cleanupActionsList = new(entityCount, WorldUpdateAllocator);
@@ -43,7 +45,12 @@ namespace CommonEcs.Goap {
                 cleanupResults = cleanupActionsList.AsParallelWriter(),
                 canExecuteResults = canExecuteActionsList.AsParallelWriter()
             };
-            collectJob.ScheduleParallel(this.query, this.Dependency).Complete();
+
+            if (ShouldScheduleParallel) {
+                collectJob.ScheduleParallel(this.query, this.Dependency).Complete();
+            } else {
+                collectJob.Schedule(this.query, this.Dependency).Complete();
+            }
             
             // Execute each action that can execute
             ComponentLookup<AtomAction> allAtomActions = GetComponentLookup<AtomAction>();

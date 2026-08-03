@@ -16,7 +16,7 @@ namespace Common {
             this.entriesMap = entriesMap;
         }
 
-        public PackedTextureEntry GetEntry(in FixedString64Bytes entryId) {
+        public PackedTextureEntry GetEntry(FixedString64Bytes entryId) {
             if (this.entriesMap.TryGetValue(entryId.GetHashCode(), out PackedTextureEntry entry)) {
                 return entry;
             }
@@ -30,6 +30,10 @@ namespace Common {
             }
             
             throw new Exception($"PackedTextureEntry can't be found {hashcode}");
+        }
+
+        public bool HasEntry(int hashcode) {
+            return this.entriesMap.ContainsKey(hashcode);
         }
     }
 }

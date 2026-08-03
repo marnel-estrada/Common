@@ -2,7 +2,7 @@
     /// <summary>
     /// A wrapper class that wraps a NamedMap instance such that it will implement the NamedValueContainer interface
     /// </summary>
-    class NamedMapContainerWrapper<T> : NamedValueContainer where T : NamedValueHolder, new() {
+    internal class NamedMapContainerWrapper<T> : NamedValueContainer where T : NamedValueHolder, new() {
         // we use a delegate to resolve the NamedMap instance instead of the actual instance
         // because we can't really know when are the variable maps instantiated in editor time
         public delegate NamedMap<T> MapResolver();

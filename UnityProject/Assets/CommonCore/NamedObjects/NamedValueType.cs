@@ -18,7 +18,7 @@ namespace Common {
         public static readonly NamedValueType INT2 = new(typeof(NamedInt2), typeof(int2), "NamedInt2", "int2");
         public static readonly NamedValueType INT3 = new(typeof(NamedInt3), typeof(int3), "NamedInt3", "int3");
 
-        public static readonly NamedValueType[] ALL_TYPES = new NamedValueType[] {
+        public static readonly NamedValueType[] ALL_TYPES = {
             STRING,
             INT,
             FLOAT,

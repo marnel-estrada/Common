@@ -134,7 +134,7 @@ namespace Common {
 
         public Texture2D Atlas {
             get {
-                if (this.atlas == null) {
+                if (!this.atlas) {
                     throw new Exception("Atlas is not prepared yet.");
                 }
                 

@@ -35,11 +35,7 @@ namespace CommonEcs {
             }
         }
 
-        public byte InternalValue {
-            get {
-                return this.internalValue;
-            }
-        }
+        public byte InternalValue => this.internalValue;
 
         public void Clear() {
             this.internalValue = 0;

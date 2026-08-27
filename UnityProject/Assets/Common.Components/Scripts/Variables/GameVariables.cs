@@ -117,24 +117,24 @@ namespace Common {
         }
 
         private Option<string> ResolveOverride() {
-            if(this.overrideResolver != null) {
-                return Option<string>.Some(this.overrideResolver.ResolveOverride());
-            }
-
-            return Option<string>.NONE;
+            return this.overrideResolver 
+                ? Option<string>.Some(this.overrideResolver.ResolveOverride()) 
+                : Option<string>.NONE;
         }
 
         private void ParseOverride(SimpleXmlNode node) {
             for (int i = 0; i < node.Children.Count; ++i) {
                 SimpleXmlNode child = node.Children[i];
-                if (ENTRY.Equals(child.tagName)) {
-                    // parse key-value pair
-                    string key = child.GetAttribute(KEY);
-                    string value = child.GetAttribute(VALUE);
-
-                    Assertion.IsTrue(this.defaultVariables.Contains(key), key, this.gameObject);
-                    this.defaultVariables.Set(key, value);
+                if (!ENTRY.Equals(child.tagName)) {
+                    continue;
                 }
+
+                // parse key-value pair
+                string key = child.GetAttribute(KEY);
+                string value = child.GetAttribute(VALUE);
+
+                Assertion.IsTrue(this.defaultVariables.Contains(key), key, this.gameObject);
+                this.defaultVariables.Set(key, value);
             }
         }
 

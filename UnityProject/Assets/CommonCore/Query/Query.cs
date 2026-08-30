@@ -28,7 +28,7 @@
         /// <returns></returns>
         public TResult Execute(TRequest request) {
             if (this.provider == null) {
-                throw new Exception("Provider was not specified yet");
+                throw new Exception($"Provider was not specified yet for Query<{typeof(TRequest).Name}, {typeof(TResult).Name}>");
             }
             
             return this.provider(request);
@@ -41,7 +41,7 @@
         /// <returns></returns>
         public TResult Execute() {
             if (this.provider == null) {
-                throw new Exception("Provider was not specified yet");
+                throw new Exception($"Provider was not specified yet for Query<{typeof(TRequest).Name}, {typeof(TResult).Name}>");
             }
             
             return this.provider(default!);

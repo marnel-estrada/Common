@@ -38,8 +38,21 @@ namespace Common {
 
         private void ParseDefaultLanguage() {
             Assertion.NotEmpty(this.xmlPath);
-            string masterFullPath = Path.Combine(Application.streamingAssetsPath, this.xmlPath);
-            Parse(masterFullPath);
+            ParseFromText(StreamingAssetsCache.ReadAllText(this.xmlPath));
+        }
+
+        private void ParseFromText(string xmlText) {
+            if (this.currentTranslation == null) {
+                this.currentTranslation = TranslationContainer.LoadFromText(xmlText);
+            } else {
+                this.currentTranslation.CompareTranslation(TranslationContainer.LoadFromText(xmlText));
+            }
+
+            Assertion.NotNull(this.currentTranslation);
+
+            // Dispatch this signal after parsing to change the text
+            CommonLocalizationSignals.TERMS_CHANGED.Dispatch();
+            CommonLocalizationSignals.LANGUAGE_CHANGED.Dispatch();
         }
 
         private void Parse(ISignalParameters parameters) {

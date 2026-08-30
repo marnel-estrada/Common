@@ -19,34 +19,53 @@ namespace Common {
         [SerializeField]
         private bool showLoadingTime;
 
-        private readonly Dictionary<string, LoadProfile> profileMap = new Dictionary<string, LoadProfile>();
-        private readonly Dictionary<string, SceneSet> sceneSetMap = new Dictionary<string, SceneSet>();
+        [SerializeField]
+        private StreamingAssetsPreloader? streamingAssetsPreloader;
+
+        private readonly Dictionary<string, LoadProfile> profileMap = new();
+        private readonly Dictionary<string, SceneSet> sceneSetMap = new();
 
         public bool ShowLoadingTime {
-            get {
-                return this.showLoadingTime;
-            }
-            set {
-                this.showLoadingTime = value;
-            }
+            get => this.showLoadingTime;
+            set => this.showLoadingTime = value;
         }
 
         private void Awake() {
             Assertion.NotNull(this.configXml);
-            
+
             Parse();
 
-            if(!string.IsNullOrEmpty(this.loadProfileToExecute)) {
-                Load(this.loadProfileToExecute ?? throw new InvalidOperationException());
+            if (string.IsNullOrEmpty(this.loadProfileToExecute)) {
+                return;
             }
+
+            string profile = this.loadProfileToExecute ?? throw new InvalidOperationException();
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+            // On WebGL, StreamingAssets must be fetched asynchronously before any scene's
+            // readers run, so gate the scene loading behind the preloader.
+            StartCoroutine(PreloadThenLoad(profile));
+#else
+            Load(profile);
+#endif
         }
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+        private System.Collections.IEnumerator PreloadThenLoad(string profile) {
+            if (this.streamingAssetsPreloader) {
+                yield return this.streamingAssetsPreloader.PreloadRoutine();
+            }
+
+            Load(profile);
+        }
+#endif
 
         // elements
         private const string LOAD_PROFILE = "LoadProfile";
         private const string SCENE_SET = "SceneSet";
 
         private void Parse() {
-            if (this.configXml == null) {
+            if (!this.configXml) {
                 Debug.LogError("configXml can't be null");
                 return;
             }
@@ -76,7 +95,7 @@ namespace Common {
 
         private void ParseLoadProfile(SimpleXmlNode node) {
             string id = node.GetAttribute(ID);
-            LoadProfile profile = new LoadProfile(id);
+            LoadProfile profile = new(id);
 
             // parse scene sets in the profile
             for(int i = 0; i < node.Children.Count; ++i) {
@@ -98,7 +117,7 @@ namespace Common {
 
         private void ParseSceneSet(SimpleXmlNode node) {
             string id = node.GetAttribute(ID);
-            SceneSet sceneSet = new SceneSet(id);
+            SceneSet sceneSet = new(id);
 
             // parse scenes in the set
             for(int i = 0; i < node.Children.Count; ++i) {

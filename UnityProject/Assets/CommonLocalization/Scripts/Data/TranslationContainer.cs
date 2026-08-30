@@ -35,17 +35,31 @@ namespace Common {
             this.catList = new List<Category>();
         }
 
-        private List<Term> termList = new List<Term>();
+        private List<Term> termList = new();
 
-        private Dictionary<string, Term> termDictionary = new Dictionary<string, Term>();
+        private Dictionary<string, Term> termDictionary = new();
 
         //This might not be needed, but it's good for an exact matching kind of search for category.
-        private Dictionary<string, Category> catDictionary = new Dictionary<string, Category>();
+        private Dictionary<string, Category> catDictionary = new();
 
         //Caches, Indices, and whatever.
 
+        public static TranslationContainer LoadFromText(string xmlText) {
+            XmlSerializer serializer = new(typeof(TranslationContainer));
+
+            using StringReader reader = new(xmlText);
+            TranslationContainer t = serializer.Deserialize(reader) as TranslationContainer;
+
+            if (t != null) {
+                t.SetupLists();
+                return t;
+            }
+
+            return null; //OOPS.
+        }
+
         public static TranslationContainer Load(string urlPath) {
-            XmlSerializer serializer = new XmlSerializer(typeof(TranslationContainer));
+            XmlSerializer serializer = new(typeof(TranslationContainer));
 
             StreamReader reader = null;
             TranslationContainer t = null;
@@ -114,7 +128,7 @@ namespace Common {
             return null;
         }
 
-        private readonly List<Category> unionCategory = new List<Category>();
+        private readonly List<Category> unionCategory = new();
 
         public void CompareTranslation(TranslationContainer newList) {
             this.unionCategory.Clear();

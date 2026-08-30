@@ -83,17 +83,9 @@ namespace Common {
             }
 
             Option<Term> currentTerm = this.currentTranslation.GetTerm(termId.Trim());
-            return currentTerm.MatchExplicit<GetTranslationMatcher, Option<string>>(new GetTranslationMatcher());
-        }
-
-        private readonly struct GetTranslationMatcher : IFuncOptionMatcher<Term, Option<string>> {
-            public Option<string> OnSome(Term term) {
-                return Option<string>.Some(term.translation);
-            }
-
-            public Option<string> OnNone() {
-                return Option<string>.NONE;
-            }
+            return currentTerm.IsSome
+                ? Option<string>.AsOption(currentTerm.ValueOrError().translation)
+                : Option<string>.NONE; 
         }
 
         /// <summary>
@@ -109,7 +101,7 @@ namespace Common {
 
         public static TermsPool Instance {
             get {
-                if (INSTANCE != null) {
+                if (INSTANCE) {
                     return INSTANCE;
                 }
 

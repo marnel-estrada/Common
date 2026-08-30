@@ -35,7 +35,7 @@ namespace Common.Time {
 				return timeReference;
 			}
 			
-			throw new Exception($"Can't find TimeReference named \"name\"");
+			throw new Exception($"Can't find TimeReference with int ID {id}");
 		}
 		
 		/**

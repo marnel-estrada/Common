@@ -65,7 +65,7 @@ namespace Common {
             return CanReadAndWrite(property);
         }
 
-        public static bool CanReadAndWrite(PropertyInfo property) {
+        private static bool CanReadAndWrite(PropertyInfo property) {
             // should be writable and readable
             if(!(property.CanRead && property.CanWrite)) {
                 return false;
@@ -128,34 +128,21 @@ namespace Common {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public static Option<T> Instantiate<T>(ClassData data, NamedValueLibrary? parentVariables = null) where T : class {
-            Option<Type> type = TypeIdentifier.GetType(data.ClassName);
-            Assertion.IsSome(type, data.ClassName);
+            Option<Type> typeOption = TypeIdentifier.GetType(data.ClassName);
+            Assertion.IsSome(typeOption, data.ClassName);
 
-            return type.MatchExplicit<InstantiateMatcher<T>, Option<T>>(new InstantiateMatcher<T>(data, parentVariables));
-        }
-
-        private readonly struct InstantiateMatcher<T> : IFuncOptionMatcher<Type, Option<T>> where T : class {
-            private readonly ClassData data;
-            private readonly NamedValueLibrary? parentVariables;
-
-            public InstantiateMatcher(ClassData data, NamedValueLibrary? parentVariables) {
-                this.data = data;
-                this.parentVariables = parentVariables;
-            }
-            
-            public Option<T> OnSome(Type type) {
-                ConstructorInfo constructor = ResolveEmptyConstructor(type);
-                T instance = (T) constructor.Invoke(EMPTY_PARAMETERS);
-            
-                // Inject variables
-                NamedValueUtils.InjectNamedProperties(this.parentVariables, this.data.Variables, type, instance);
-                
-                return Option<T>.Some(instance);
-            }
-
-            public Option<T> OnNone() {
+            if (typeOption.IsNone) {
                 return Option<T>.NONE;
             }
+
+            Type type = typeOption.ValueOrError();
+            ConstructorInfo constructor = ResolveEmptyConstructor(type);
+            T instance = (T) constructor.Invoke(EMPTY_PARAMETERS);
+
+            // Inject variables
+            NamedValueUtils.InjectNamedProperties(parentVariables, data.Variables, type, instance);
+
+            return Option<T>.Some(instance);
         }
     }
 }

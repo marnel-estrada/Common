@@ -122,25 +122,13 @@ namespace Common {
         /// <param name="type"></param>
         /// <returns></returns>
         public bool Contains(string name, NamedValueType type) {
-            Option<NamedValueContainer> container = this.containerMap.Find(type);
-            return container.MatchExplicit<ContainsMatcher, bool>(new ContainsMatcher(name));
-        }
-        
-        private readonly struct ContainsMatcher : IFuncOptionMatcher<NamedValueContainer, bool> {
-            private readonly string name;
-
-            public ContainsMatcher(string name) {
-                this.name = name;
-            }
-
-            public bool OnSome(NamedValueContainer container) {
-                return container.Contains(this.name);
-            }
-
-            public bool OnNone() {
+            Option<NamedValueContainer> containerOption = this.containerMap.Find(type);
+            if (containerOption.IsNone) {
                 // No container
                 return false;
             }
+
+            return containerOption.ValueOrError().Contains(name);
         }
 
         /// <summary>

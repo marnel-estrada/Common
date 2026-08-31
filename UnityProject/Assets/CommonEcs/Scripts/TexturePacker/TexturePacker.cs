@@ -91,6 +91,33 @@ namespace Common {
         }
 
         /// <summary>
+        /// Reconstructs the packer state from a pre-baked atlas and its entries, without loading
+        /// or packing any individual textures. Produces the same Atlas/Uvs/entries a runtime Pack()
+        /// would, so all queries (GetEntry, Resolver, Uvs, Atlas) behave identically.
+        /// </summary>
+        public void LoadPrebuilt(Texture2D prebuiltAtlas, IReadOnlyList<PrebuiltAtlasEntry> entries) {
+            this.atlas = prebuiltAtlas;
+
+            this.entriesMap.Clear();
+            if (this.uvs.IsCreated) {
+                this.uvs.Dispose();
+            }
+
+            this.uvs = new NativeArray<float4>(entries.Count, Allocator.Persistent);
+
+            for (int i = 0; i < entries.Count; ++i) {
+                PrebuiltAtlasEntry entry = entries[i];
+                Rect uvRect = entry.uvRect;
+                this.uvs[entry.uvIndex] = new float4(uvRect.width, uvRect.height, uvRect.x, uvRect.y);
+
+                int hashcode = new FixedString64Bytes(entry.name).GetHashCode();
+                this.entriesMap[hashcode] = new PackedTextureEntry(
+                    uvRect, prebuiltAtlas.width, prebuiltAtlas.height,
+                    entry.originalWidth, entry.originalHeight, entry.uvIndex);
+            }
+        }
+
+        /// <summary>
         /// Compresses the atlas
         /// </summary>
         public void Compress() {

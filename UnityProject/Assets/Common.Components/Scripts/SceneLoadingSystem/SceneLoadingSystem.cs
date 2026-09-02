@@ -50,16 +50,6 @@ namespace Common {
 #endif
         }
 
-#if UNITY_WEBGL && !UNITY_EDITOR
-        private System.Collections.IEnumerator PreloadThenLoad(string profile) {
-            if (this.streamingAssetsPreloader) {
-                yield return this.streamingAssetsPreloader.PreloadRoutine();
-            }
-
-            Load(profile);
-        }
-#endif
-
         // elements
         private const string LOAD_PROFILE = "LoadProfile";
         private const string SCENE_SET = "SceneSet";

@@ -5,28 +5,40 @@ namespace Common {
     using UnityEngine.Networking;
 
     /// <summary>
-    /// Fetches a configured set of StreamingAssets files via UnityWebRequest into the
-    /// StreamingAssetsCache. Meant to run before scenes that read those files load
-    /// (driven by SceneLoadingSystem on WebGL). Put this on the same GameObject as
-    /// SceneLoadingSystem.
+    /// Makes StreamingAssets data available to the StreamingAssetsCache on WebGL. Boot-critical
+    /// files are baked into TextAssets (via the editor button) and stored synchronously in Awake,
+    /// so frame-1 ECS reads find them without waiting for any async load. Non-critical files may
+    /// still be fetched via UnityWebRequest through PreloadRoutine. Put this on the same GameObject
+    /// as SceneLoadingSystem.
     /// </summary>
     public class StreamingAssetsPreloader : MonoBehaviour {
+        [Serializable]
+        public struct BakedTextAsset {
+            [Tooltip("Relative StreamingAssets path, e.g. Game/Data/GameVariables.xml")]
+            public string path;
+
+            [Tooltip("Baked copy under Assets/Game/Data/Baked (filled by the Bake button).")]
+            public TextAsset asset;
+        }
+
+        [Header("Bundled as TextAssets (synchronous, boot-safe)")]
         [SerializeField]
-        private string[] streamingAssetsToPreload = Array.Empty<string>();
+        private BakedTextAsset[] bakedAssets = Array.Empty<BakedTextAsset>();
 
-        public IEnumerator PreloadRoutine() {
-            for (int i = 0; i < this.streamingAssetsToPreload.Length; ++i) {
-                string rel = this.streamingAssetsToPreload[i].Replace('\\', '/').TrimStart('/');
-                using UnityWebRequest request = UnityWebRequest.Get($"{Application.streamingAssetsPath}/{rel}");
-                yield return request.SendWebRequest();
+        public BakedTextAsset[] BakedAssets => this.bakedAssets;
 
-                if (request.result != UnityWebRequest.Result.Success) {
-                    Debug.LogError($"Failed to preload StreamingAsset '{rel}': {request.error}");
-                    continue;
+        private void Awake() {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            // Populate synchronously from bundled TextAssets so boot-critical reads (frame-1 ECS
+            // systems) find the data with no async wait. Desktop/editor read live StreamingAssets
+            // via the cache's File fallback, so this is WebGL-only.
+            for (int i = 0; i < this.bakedAssets.Length; ++i) {
+                BakedTextAsset entry = this.bakedAssets[i];
+                if (entry.asset != null && !string.IsNullOrEmpty(entry.path)) {
+                    StreamingAssetsCache.Store(entry.path, entry.asset.bytes);
                 }
-
-                StreamingAssetsCache.Store(rel, request.downloadHandler.data);
             }
+#endif
         }
     }
 }

@@ -3,7 +3,7 @@ using UnityEditor;
 
 namespace Common {
 	[CustomEditor(typeof(ProceduralTexturedQuad))]
-	public class ProceduralTexturedQuadEditor : Editor {
+	public class ProceduralTexturedQuadEditor : UnityEditor.Editor {
 		public override void OnInspectorGUI() {
 			base.OnInspectorGUI();
 			

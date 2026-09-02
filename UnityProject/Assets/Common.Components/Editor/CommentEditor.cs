@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Common {
     [CustomEditor(typeof(Comment))]
-    public class CommentEditor : Editor {
+    public class CommentEditor : UnityEditor.Editor {
 
         private Comment targetComponent;
 

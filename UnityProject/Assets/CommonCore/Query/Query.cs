@@ -47,6 +47,15 @@
             return this.provider(default!);
         }
 
+        /// <summary>
+        /// Executes the query, or returns the given default when no provider has been registered yet.
+        /// Useful for systems that may run before the provider's MonoBehaviour has initialized
+        /// (e.g. on WebGL where gameplay scenes load after the boot preload gate).
+        /// </summary>
+        public TResult ExecuteOr(TResult defaultValue) {
+            return this.provider == null ? defaultValue : this.provider(default!);
+        }
+
         // Do not remove this even if not called. This is invoked by reflection such as StaticFieldsInvoker.
         public void ClearProvider() {
             this.provider = null;

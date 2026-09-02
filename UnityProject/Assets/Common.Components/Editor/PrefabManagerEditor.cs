@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace Common {
 	[CustomEditor(typeof(PrefabManager))]
-	public class PrefabManagerEditor : Editor {
+	public class PrefabManagerEditor : UnityEditor.Editor {
 		private PrefabManager prefabManager;
 
 		void OnEnable() {

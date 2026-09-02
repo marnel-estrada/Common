@@ -4,7 +4,7 @@
     using UnityEngine;
 
     [CustomEditor(typeof(LockTransform))]
-    public class LockTransformEditor : Editor {
+    public class LockTransformEditor : UnityEditor.Editor {
         private LockTransform lockTransform;
 
         private void OnEnable() {

@@ -40,14 +40,7 @@ namespace Common {
             }
 
             string profile = this.loadProfileToExecute ?? throw new InvalidOperationException();
-
-#if UNITY_WEBGL && !UNITY_EDITOR
-            // On WebGL, StreamingAssets must be fetched asynchronously before any scene's
-            // readers run, so gate the scene loading behind the preloader.
-            StartCoroutine(PreloadThenLoad(profile));
-#else
             Load(profile);
-#endif
         }
 
         // elements

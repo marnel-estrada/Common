@@ -20,7 +20,14 @@ namespace CommonEcs.DotsFsm {
             this.systemGroup = this.World.GetOrCreateSystemManaged<DotsFsmSystemGroup>();
         }
 
+        protected virtual bool CanExecute => true;
+
         protected override JobHandle OnUpdate(JobHandle inputDeps) {
+            if (!CanExecute) {
+                // Can't execute base on the rule implemented by the deriving class
+                return inputDeps;
+            }
+            
             NativeArray<int> chunkBaseEntityIndices = this.query.CalculateBaseEntityIndexArrayAsync(
                 WorldUpdateAllocator, inputDeps, out JobHandle chunkBaseIndicesHandle);
             inputDeps = JobHandle.CombineDependencies(inputDeps, chunkBaseIndicesHandle);
@@ -41,17 +48,9 @@ namespace CommonEcs.DotsFsm {
             return inputDeps;
         }
 
-        protected ref NativeReference<bool> RerunGroup {
-            get {
-                return ref this.systemGroup.RerunGroup;
-            }
-        }
+        protected ref NativeReference<bool> RerunGroup => ref this.systemGroup.RerunGroup;
 
-        protected virtual bool ShouldScheduleParallel {
-            get {
-                return true;
-            }
-        }
+        protected virtual bool ShouldScheduleParallel => true;
 
         protected abstract TActionExecutionType PrepareActionExecution(); 
 

@@ -34,8 +34,14 @@ namespace Common.Time {
 			if (this.instanceMap.TryGetValue(id, out TimeReference timeReference)) {
 				return timeReference;
 			}
-			
-			throw new Exception($"Can't find TimeReference with int ID {id}");
+
+			// The id may be requested (e.g. by an ECS system on frame 1) before its owner has registered
+			// it (TimeReferenceCenter.Awake runs later, especially on WebGL). Lazily register a normal-speed
+			// reference instead of throwing; when the authoritative Add() arrives for this same id it
+			// replaces this one, so time scaling still applies once registration completes.
+			TimeReference lazy = new(id);
+			this.instanceMap[id] = lazy;
+			return lazy;
 		}
 		
 		/**

@@ -9,7 +9,6 @@ namespace Common {
     /// still be fetched via UnityWebRequest through PreloadRoutine. Put this on the same GameObject
     /// as SceneLoadingSystem.
     /// </summary>
-    [DefaultExecutionOrder(-10000)]   // populate the cache before any other Awake reads it
     public class StreamingAssetsPreloader : MonoBehaviour {
         [Serializable]
         public struct BakedTextAsset {

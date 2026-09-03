@@ -10,10 +10,12 @@ namespace Common {
     /// to direct File reads, so behavior there is unchanged.
     /// </summary>
     public static class StreamingAssetsCache {
-        private static readonly Dictionary<string, byte[]> CACHE = new();
+        private static readonly Dictionary<string, byte[]> CACHE = new(8);
 
         public static void Store(string relativePath, byte[] bytes) {
-            CACHE[Normalize(relativePath)] = bytes;
+            string key = Normalize(relativePath);
+            CACHE[key] = bytes;
+            Debug.Log($"StreamingAssetsCache: Stored data for {key}");
         }
 
         public static bool Has(string relativePath) {
@@ -27,6 +29,7 @@ namespace Common {
             }
 
 #if UNITY_WEBGL && !UNITY_EDITOR
+            Debug.LogError($"StreamingAssets not preloaded (add it to the StreamingAssetsPreloader list): {key}");
             throw new FileNotFoundException(
                 $"StreamingAssets not preloaded (add it to the StreamingAssetsPreloader list): {key}");
 #else

@@ -50,10 +50,11 @@ namespace Common {
             string xmlText;
 
             if (this.useStreamingSource) {
+                Debug.Log($"GameVariables.Parse(): StreamingAssetsCache.ReadAllText(): {this.gameVarXmlPath}");
                 xmlText = StreamingAssetsCache.ReadAllText(this.gameVarXmlPath);
             } else {
                 // Not using the streaming source (the secret one)
-                if (this.nonStreamingSource == null) {
+                if (!this.nonStreamingSource) {
                     throw new CantBeNullException(nameof(this.nonStreamingSource));
                 }
                 

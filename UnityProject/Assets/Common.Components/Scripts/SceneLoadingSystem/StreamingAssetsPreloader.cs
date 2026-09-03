@@ -1,9 +1,7 @@
-namespace Common {
-    using System;
-    using System.Collections;
-    using UnityEngine;
-    using UnityEngine.Networking;
+using System;
+using UnityEngine;
 
+namespace Common {
     /// <summary>
     /// Makes StreamingAssets data available to the StreamingAssetsCache on WebGL. Boot-critical
     /// files are baked into TextAssets (via the editor button) and stored synchronously in Awake,
@@ -11,6 +9,7 @@ namespace Common {
     /// still be fetched via UnityWebRequest through PreloadRoutine. Put this on the same GameObject
     /// as SceneLoadingSystem.
     /// </summary>
+    [DefaultExecutionOrder(-10000)]   // populate the cache before any other Awake reads it
     public class StreamingAssetsPreloader : MonoBehaviour {
         [Serializable]
         public struct BakedTextAsset {

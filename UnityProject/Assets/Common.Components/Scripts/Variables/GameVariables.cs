@@ -1,9 +1,6 @@
-﻿using System.IO;
-
-using UnityEngine;
-
+﻿using System.Globalization;
 using Common.Xml;
-using System.Globalization;
+using UnityEngine;
 
 namespace Common {
     public class GameVariables : MonoBehaviour {
@@ -20,7 +17,7 @@ namespace Common {
         [SerializeField]
         private GameVariableOverrideResolver? overrideResolver; // May be null
 
-        private readonly GameVariableSet defaultVariables = new GameVariableSet();
+        private readonly GameVariableSet defaultVariables = new();
 
         private void Awake() {
             Assertion.NotEmpty(this.gameVarXmlPath);
@@ -49,17 +46,27 @@ namespace Common {
         private void Parse() {
             string xmlText;
 
+#if UNITY_WEBGL && !UNITY_EDITOR
+            // On WebGL, read from the bundled TextAsset. It's available synchronously with no
+            // StreamingAssets cache or scene-load ordering dependency, which matters because game
+            // variables are read very early (frame-1 ECS systems), before any preload can complete.
+            if (!this.nonStreamingSource) {
+                throw new CantBeNullException(nameof(this.nonStreamingSource));
+            }
+
+            xmlText = this.nonStreamingSource.text;
+#else
             if (this.useStreamingSource) {
-                Debug.Log($"GameVariables.Parse(): StreamingAssetsCache.ReadAllText(): {this.gameVarXmlPath}");
                 xmlText = StreamingAssetsCache.ReadAllText(this.gameVarXmlPath);
             } else {
                 // Not using the streaming source (the secret one)
                 if (!this.nonStreamingSource) {
                     throw new CantBeNullException(nameof(this.nonStreamingSource));
                 }
-                
+
                 xmlText = this.nonStreamingSource.text;
             }
+#endif
 
             SimpleXmlNode root = SimpleXmlReader.Read(xmlText).FindFirstNodeInChildren("GameVariables");
 

@@ -15,7 +15,6 @@ namespace Common {
         public static void Store(string relativePath, byte[] bytes) {
             string key = Normalize(relativePath);
             CACHE[key] = bytes;
-            Debug.Log($"StreamingAssetsCache: Stored data for {key}");
         }
 
         public static bool Has(string relativePath) {

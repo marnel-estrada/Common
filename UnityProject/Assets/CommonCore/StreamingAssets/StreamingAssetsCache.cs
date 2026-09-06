@@ -48,5 +48,10 @@ namespace Common {
         private static string Normalize(string relativePath) {
             return relativePath.Replace('\\', '/').TrimStart('/');
         }
+        
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatic() {
+            CACHE.Clear();
+        }
     }
 }

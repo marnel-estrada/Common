@@ -11,7 +11,7 @@ namespace Common.Editor {
             DrawDefaultInspector();
 
             EditorGUILayout.Space();
-            if (GUILayout.Button("Bake StreamingAssets → Game/Data/Baked")) {
+            if (GUILayout.Button("Bake StreamingAssets")) {
                 Bake();
             }
         }
@@ -39,7 +39,8 @@ namespace Common.Editor {
                     continue;
                 }
 
-                string dest = $"{BakedDir}/{Path.GetFileName(relPath)}";
+                string fileName = $"{Path.GetFileNameWithoutExtension(relPath)}_Baked{Path.GetExtension(relPath)}";
+                string dest = $"{BakedDir}/{fileName}";
                 File.Copy(source, dest, true);
                 AssetDatabase.ImportAsset(dest, ImportAssetOptions.ForceUpdate);
 

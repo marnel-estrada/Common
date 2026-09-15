@@ -11,14 +11,10 @@ namespace CommonEcs {
     /// </summary>
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     public partial class AddComputeBufferSpriteToManagerSystem : SystemBase {
-        private EntityCommandBufferSystem commandBufferSystem;
-        
         private SharedComponentQuery<ComputeBufferSpriteManager> spriteManagerQuery;
         private EntityQuery spritesQuery;
 
         protected override void OnCreate() {
-            this.commandBufferSystem = this.GetOrCreateSystemManaged<EndSimulationEntityCommandBufferSystem>();
-            
             this.spriteManagerQuery = 
                 new SharedComponentQuery<ComputeBufferSpriteManager>(this, this.EntityManager);
             
@@ -42,6 +38,9 @@ namespace CommonEcs {
         protected override void OnUpdate() {
             this.spriteManagerQuery.Update();
             IReadOnlyList<ComputeBufferSpriteManager> spriteManagers = this.spriteManagerQuery.SharedComponents;
+            if (spriteManagers.Count <= 1) {
+                return; // There are no sprite managers yet. Note that the one at zero does not count.
+            }
             
             // Note here that we start counting from 1 since the first entry is always a default one
             // In this case, SpriteManager.internal has not been allocated. So we get a NullPointerException

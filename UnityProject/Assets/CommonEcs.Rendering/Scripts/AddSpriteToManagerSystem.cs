@@ -76,6 +76,10 @@ namespace CommonEcs {
                 // We add the shared component so that it can be filtered using such shared component
                 // in other systems. For example, in SortRenderOrderSystem.
                 commandBuffer.AddSharedComponentManaged(entities[i], maybeManager.Value);
+
+                // Also add the unmanaged id twin so systems can filter without boxing the managed
+                // SpriteManager value every frame (see SortRenderOrderSystem).
+                commandBuffer.AddSharedComponent(entities[i], new SpriteManagerId(maybeManager.Value.Id));
             }
         }
         

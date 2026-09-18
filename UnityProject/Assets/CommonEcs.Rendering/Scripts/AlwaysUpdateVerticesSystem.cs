@@ -8,7 +8,8 @@ namespace CommonEcs {
     public partial class AlwaysUpdateVerticesSystem : UpdateVerticesSystem {
         protected override EntityQuery ResolveQuery() {
             return GetEntityQuery(ComponentType.ReadOnly<Sprite>(),
-                ComponentType.ReadOnly<SpriteManager>());
+                ComponentType.ReadOnly<SpriteManager>(),
+                ComponentType.ReadOnly<SpriteManagerId>());
         }
 
         protected override bool ShouldProcess(in SpriteManager spriteManager) {

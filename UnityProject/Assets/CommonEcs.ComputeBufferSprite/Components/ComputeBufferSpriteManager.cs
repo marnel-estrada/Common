@@ -327,7 +327,7 @@ namespace CommonEcs {
             /// <param name="managerIndex"></param>
             public void Remove(int managerIndex) {
                 // The inactive list should not have this index yet
-                Assert.IsFalse(this.inactiveList.Contains(managerIndex));
+                DotsAssert.IsFalse(this.inactiveList.Contains(managerIndex));
                 
                 this.translationsAndScales[managerIndex] = new float4(10000, 10000, 10000, 0);
                 this.rotations[managerIndex] = quaternion.identity.value;

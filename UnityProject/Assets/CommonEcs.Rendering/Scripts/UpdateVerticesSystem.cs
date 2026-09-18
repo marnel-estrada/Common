@@ -53,7 +53,10 @@ namespace CommonEcs {
                     continue;
                 }
 
-                this.query.SetSharedComponentFilterManaged(manager);
+                // Filter by the unmanaged id twin instead of the managed SpriteManager value.
+                // SetSharedComponentFilterManaged boxes the struct through Entities' managed
+                // hash/equals path every frame; the unmanaged filter allocates nothing.
+                this.query.SetSharedComponentFilter(new SpriteManagerId(manager.Id));
     
                 UpdateVerticesJob job = new() {
                     spriteType = this.spriteType,

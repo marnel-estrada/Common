@@ -129,6 +129,12 @@ namespace CommonEcs {
         public int Count => this.internalInstance.spriteCount;
 
         /// <summary>
+        /// The unique id of this manager. Used to build a boxing-free <see cref="SpriteManagerId"/>
+        /// filter (see SortRenderOrderSystem).
+        /// </summary>
+        public int Id => this.id;
+
+        /// <summary>
         /// Sets whether or not to always update mesh
         /// This is used in cases where the sprite manager is used for non static sprites
         /// In this case, there's no use trying to determine when to update mesh

@@ -18,7 +18,8 @@ namespace CommonEcs {
         private SharedComponentQuery<SpriteManager> managerQuery;
 
         protected override void OnCreate() {
-            this.query = GetEntityQuery(ComponentType.ReadOnly<Sprite>(), ComponentType.ReadOnly<SpriteManager>());
+            this.query = GetEntityQuery(ComponentType.ReadOnly<Sprite>(), ComponentType.ReadOnly<SpriteManager>(),
+                ComponentType.ReadOnly<SpriteManagerId>());
             RequireForUpdate(this.query);
             
             this.managerQuery = new SharedComponentQuery<SpriteManager>(this, this.EntityManager);
@@ -41,7 +42,10 @@ namespace CommonEcs {
                     continue;
                 }
                 
-                this.query.SetSharedComponentFilterManaged(spriteManager);
+                // Filter by the unmanaged id twin instead of the managed SpriteManager value.
+                // SetSharedComponentFilterManaged boxes the struct through Entities' managed
+                // hash/equals path every frame; the unmanaged filter allocates nothing.
+                this.query.SetSharedComponentFilter(new SpriteManagerId(spriteManager.Id));
                 int count = this.query.CalculateEntityCount();
                 NativeArray<SortedSpriteEntry> entries = CollectionHelper.CreateNativeArray<SortedSpriteEntry>(count, WorldUpdateAllocator);
                 
@@ -134,13 +138,13 @@ namespace CommonEcs {
                     return;
                 }
                 
-                // Vertex indeces
+                // Vertex indices
                 int index1 = this.sortList[index].index * 4;
                 int index2 = index1 + 1;
                 int index3 = index2 + 1;
                 int index4 = index3 + 1;
 
-                // Triangle indeces
+                // Triangle indices
                 int triangle1 = index * 6;
                 int triangle2 = triangle1 + 1;
                 int triangle3 = triangle2 + 1;

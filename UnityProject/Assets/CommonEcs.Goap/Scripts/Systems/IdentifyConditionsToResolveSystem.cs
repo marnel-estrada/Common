@@ -22,8 +22,8 @@ namespace CommonEcs.Goap {
             IdentifyJob job = new() {
                 resolverHandle = GetComponentTypeHandle<ConditionResolver>(),
                 resolvedEnableableType = GetComponentTypeHandle<ConditionResolver.Resolved>(),
-                allPlanners = GetComponentLookup<GoapPlanner>(),
-                allRequiredConditions = GetBufferLookup<RequiredCondition>()
+                allPlanners = GetComponentLookup<GoapPlanner>(true),
+                allRequiredConditions = GetBufferLookup<RequiredCondition>(true)
             };
             
             return job.ScheduleParallel(this.query, inputDeps);
@@ -51,9 +51,6 @@ namespace CommonEcs.Goap {
                     bool isResolved = !(planner.state == PlanningState.RESOLVING_CONDITIONS 
                         && ContainsConditionId(requiredConditions, resolver.conditionId));
                     chunk.SetComponentEnabled(ref this.resolvedEnableableType, i, isResolved);
-                    
-                    // Modify
-                    resolvers[i] = resolver;
                 }
             }
 

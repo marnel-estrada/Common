@@ -30,26 +30,24 @@
             sampler2D _MainTex;
             fixed _Cutoff;
 
-            // xyz is the position, w is the scale
-            StructuredBuffer<float4> translationAndScaleBuffer;
-            StructuredBuffer<float4> rotationBuffer;
+            // Section size of the packed buffers
+            // Note that we pack buffers of the same type to reduce the amount of StructuredBuffer
+            // It was done this way since on web builds, some environments may only support 8 StructuredBuffers
+            int _Capacity;
 
-            StructuredBuffer<float2> sizeBuffer; // Size of each sprite
-            StructuredBuffer<float2> pivotBuffer; // Pivot of each sprite
+            // [0, cap) translationAndScale (xyz position, w scale), [cap, cap * 2) rotation, [cap * 2, cap * 3) color
+            StructuredBuffer<float4> float4Buffer;
+
+            // [0, cap) size, [cap, cap * 2) pivot
+            StructuredBuffer<float2> float2Buffer;
+
+            // [0, cap) sortedIndices, [cap, cap * 2) active (1 active, 0 inactive), [cap * 2, cap * 3) layerOrder
+            StructuredBuffer<int> intBuffer;
             
-			StructuredBuffer<float4> colorsBuffer;
-
             // Note here that uvBuffer is only the available UV coordinates
             // An int value from uvIndexBuffer would then index the uvBuffer
             StructuredBuffer<float4> uvBuffer;
             StructuredBuffer<int> uvIndexBuffer;
-
-            // 1 means active zero is inactive
-            StructuredBuffer<int> activeBuffer;
-
-            StructuredBuffer<int> layerOrderBuffer;
-
-            StructuredBuffer<int> sortedIndicesBuffer;
 
             struct v2f {
                 float4 pos : SV_POSITION;
@@ -85,29 +83,29 @@
             }
 
             v2f vert(appdata_full v, uint instanceID : SV_InstanceID) {
-                uint sortedIndex = sortedIndicesBuffer[instanceID];
+                uint sortedIndex = intBuffer[instanceID];
                 
                 // pivot
-                float2 pivot = pivotBuffer[sortedIndex];
+                float2 pivot = float2Buffer[_Capacity + sortedIndex];
                 v.vertex = v.vertex - float4(pivot, 0, 0);
                 
                 // size
-                float2 size = sizeBuffer[sortedIndex];
+                float2 size = float2Buffer[sortedIndex];
                 v.vertex.x = v.vertex.x * size.x;
                 v.vertex.y = v.vertex.y * size.y;
                 
                 // rotate the vertex (rotate at center)
-                float4 quaternion = rotationBuffer[sortedIndex];
+                float4 quaternion = float4Buffer[_Capacity + sortedIndex];
                 v.vertex = mul(v.vertex, quaternionToMatrix(quaternion));
                 
                 // scale it
-                float4 translationAndScale = translationAndScaleBuffer[sortedIndex];
+                float4 translationAndScale = float4Buffer[sortedIndex];
                 float scale = translationAndScale.w;
                 float3 worldPosition = translationAndScale.xyz + (v.vertex.xyz * scale);
 
                 // layer order
                 // We multiply by negative value here because higher order means to be rendered later
-                int layerOrder = layerOrderBuffer[sortedIndex];
+                int layerOrder = intBuffer[_Capacity * 2 + sortedIndex];
                 worldPosition.z = worldPosition.z + (layerOrder * -0.001);
                 
                 v2f o;
@@ -120,8 +118,8 @@
                 float4 uv = uvBuffer[uvIndex];
                 o.uv =  v.texcoord * uv.xy + uv.zw;
                 
-				o.color = colorsBuffer[sortedIndex];
-                o.color.a = o.color.a * activeBuffer[sortedIndex];
+				o.color = float4Buffer[_Capacity * 2 + sortedIndex];
+                o.color.a = o.color.a * intBuffer[_Capacity + sortedIndex];
                 return o;
             }
 

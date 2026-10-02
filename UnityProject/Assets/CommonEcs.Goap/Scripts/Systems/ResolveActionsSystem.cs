@@ -25,7 +25,8 @@ namespace CommonEcs.Goap {
         protected override void OnCreate() {
             this.textDbSystem = GetOrCreateSystemManaged<GoapTextDbSystem>();
             
-            this.query = GetEntityQuery(typeof(GoapPlanner), typeof(ResolvedAction),
+            this.query = GetEntityQuery(typeof(GoapPlanner), 
+                typeof(ResolvedAction),
                 typeof(ConditionValueMap),
                 typeof(ConditionValueMap.Entry));
 

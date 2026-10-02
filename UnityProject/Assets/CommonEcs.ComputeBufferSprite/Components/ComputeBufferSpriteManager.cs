@@ -84,32 +84,29 @@ namespace CommonEcs {
             private readonly ComputeBuffer uvBuffer;
             private NativeArray<float4> uvValues;
             
+            // Packed buffers. Each holds sections of capacity length so that the shader stays within
+            // WebGPU's limit of 8 storage buffers per shader stage.
+            // float4Buffer: translationsAndScales | rotations | colors
+            // float2Buffer: sizes | pivots
+            // intBuffer: sortedIndices | activeArray | layerOrderArray
+            private ComputeBuffer float4Buffer;
+            private ComputeBuffer float2Buffer;
+            private ComputeBuffer intBuffer;
+            
             // Matrix here is a compressed transform information
             // xy is the position, z is rotation, w is the scale
-            private ComputeBuffer translationAndScaleBuffer;
+            // private ComputeBuffer translationAndScaleBuffer;
             public NativeArray<float4> translationsAndScales;
-
-            public ComputeBuffer rotationBuffer;
             public NativeArray<float4> rotations;
-
-            private ComputeBuffer sizeBuffer;
             public NativeArray<float2> sizes;
-
-            private ComputeBuffer pivotBuffer;
             public NativeArray<float2> pivots;
-        
-            private ComputeBuffer colorBuffer;
             public NativeArray<Color> colors;
-
-            private ComputeBuffer activeBuffer;
             public NativeArray<int> activeArray;
-
-            private ComputeBuffer layerOrderBuffer;
             public NativeArray<int> layerOrderArray;
 
             // We need this to index in each buffer such that we don't need to sort each
             // The sorted order will be stored here
-            private ComputeBuffer sortedIndicesBuffer;
+            // private ComputeBuffer sortedIndicesBuffer;
             public NativeArray<int> sortedIndices;
             
             private readonly uint[] args;
@@ -130,16 +127,12 @@ namespace CommonEcs {
 
             private int spriteCount;
 
-            // Buffer IDs
+            // Shader variable IDs
             private readonly int uvBufferId;
-            private readonly int translationAndScaleBufferId;
-            private readonly int rotationBufferId;
-            private readonly int sizeBufferId;
-            private readonly int pivotBufferId;
-            private readonly int colorsBufferId;
-            private readonly int activeBufferId;
-            private readonly int layerOrderBufferId;
-            private readonly int sortedIndicesBufferId;
+            private readonly int float4BufferId;
+            private readonly int float2BufferId;
+            private readonly int intBufferId;
+            private readonly int capacityId;
 
             public Internal(Material material, NativeArray<float4> uvValues, int initialCapacity) {
                 this.material = material;
@@ -147,58 +140,30 @@ namespace CommonEcs {
                 this.quad = MeshUtils.Quad(1.0f);
 
                 const int floatSize = sizeof(float);
-                const int float2Size = floatSize * 2; 
-                const int float4Size = floatSize * 4;
-                
-                this.uvBuffer = new ComputeBuffer(uvValues.Length, float4Size);
+                this.uvBuffer = new ComputeBuffer(uvValues.Length, floatSize * 4);
                 this.uvValues = new NativeArray<float4>(uvValues.Length, Allocator.Persistent);
                 this.uvValues.CopyFrom(uvValues);
                 this.uvBuffer.SetData(this.uvValues);
                 
-                this.translationAndScaleBuffer = new ComputeBuffer(this.capacity, float4Size);
                 this.translationsAndScales = new NativeArray<float4>(this.capacity, Allocator.Persistent);
-                this.translationAndScaleBuffer.SetData(this.translationsAndScales);
-
-                this.rotationBuffer = new ComputeBuffer(this.capacity, float4Size);
                 this.rotations = new NativeArray<float4>(this.capacity, Allocator.Persistent);
-                this.rotationBuffer.SetData(this.rotations);
-
-                this.sizeBuffer = new ComputeBuffer(this.capacity, float2Size);
                 this.sizes = new NativeArray<float2>(this.capacity, Allocator.Persistent);
-                this.sizeBuffer.SetData(this.sizes);
-
-                this.pivotBuffer = new ComputeBuffer(this.capacity, float2Size);
                 this.pivots = new NativeArray<float2>(this.capacity, Allocator.Persistent);
-                this.pivotBuffer.SetData(this.pivots);
-
-                this.colorBuffer = new ComputeBuffer(this.capacity, float4Size);
                 this.colors = new NativeArray<Color>(this.capacity, Allocator.Persistent);
-                this.colorBuffer.SetData(this.colors);
-
-                this.activeBuffer = new ComputeBuffer(this.capacity, sizeof(int));
                 this.activeArray = new NativeArray<int>(this.capacity, Allocator.Persistent);
-                this.activeBuffer.SetData(this.activeArray);
-
-                this.layerOrderBuffer = new ComputeBuffer(this.capacity, sizeof(int));
                 this.layerOrderArray = new NativeArray<int>(this.capacity, Allocator.Persistent);
-                this.layerOrderBuffer.SetData(this.layerOrderArray);
-
-                this.sortedIndicesBuffer = new ComputeBuffer(this.capacity, sizeof(int));
                 this.sortedIndices = new NativeArray<int>(this.capacity, Allocator.Persistent);
-                this.sortedIndicesBuffer.SetData(this.sortedIndices);
                 
                 // Prepare the shader IDs
                 this.uvBufferId = Shader.PropertyToID("uvBuffer");
-                this.translationAndScaleBufferId = Shader.PropertyToID("translationAndScaleBuffer");
-                this.rotationBufferId = Shader.PropertyToID("rotationBuffer");
-                this.sizeBufferId = Shader.PropertyToID("sizeBuffer");
-                this.pivotBufferId = Shader.PropertyToID("pivotBuffer");
-                this.colorsBufferId = Shader.PropertyToID("colorsBuffer");
-                this.activeBufferId = Shader.PropertyToID("activeBuffer");
-                this.layerOrderBufferId = Shader.PropertyToID("layerOrderBuffer");
-                this.sortedIndicesBufferId = Shader.PropertyToID("sortedIndicesBuffer");
+                this.float4BufferId = Shader.PropertyToID("float4Buffer");
+                this.float2BufferId = Shader.PropertyToID("float2Buffer");
+                this.intBufferId = Shader.PropertyToID("intBuffer");
+                this.capacityId = Shader.PropertyToID("_Capacity");
 
-                SetMaterialBuffers();
+                CreatePackedBuffers();
+                UploadPackedBuffers();
+                SetMaterialParameters();
 
                 this.args = new uint[] {
                     6, (uint)this.capacity, 0, 0, 0
@@ -210,16 +175,33 @@ namespace CommonEcs {
                 this.inactiveList = new NativeList<int>(10, Allocator.Persistent);
             }
 
-            private void SetMaterialBuffers() {
+            private void CreatePackedBuffers() {
+                const int floatSize = sizeof(float);
+                this.float4Buffer = new ComputeBuffer(this.capacity * 3, floatSize * 4);
+                this.float2Buffer = new ComputeBuffer(this.capacity * 2, floatSize * 2);
+                this.intBuffer = new ComputeBuffer(this.capacity * 3, sizeof(int));
+            }
+
+            private void UploadPackedBuffers() {
+                int c = this.capacity;
+                this.float4Buffer.SetData(this.translationsAndScales, 0, 0, c);
+                this.float4Buffer.SetData(this.rotations, 0, c, c);
+                this.float4Buffer.SetData(this.colors, 0, c * 2, c);
+                
+                this.float2Buffer.SetData(this.sizes, 0, 0, c);
+                this.float2Buffer.SetData(this.pivots, 0, c, c);
+                
+                this.intBuffer.SetData(this.sortedIndices, 0, 0, c);
+                this.intBuffer.SetData(this.activeArray, 0, c, c);
+                this.intBuffer.SetData(this.layerOrderArray, 0, c * 2, c);
+            }
+
+            private void SetMaterialParameters() {
                 this.material.SetBuffer(this.uvBufferId, this.uvBuffer);
-                this.material.SetBuffer(this.translationAndScaleBufferId, this.translationAndScaleBuffer);
-                this.material.SetBuffer(this.rotationBufferId, this.rotationBuffer);
-                this.material.SetBuffer(this.sizeBufferId, this.sizeBuffer);
-                this.material.SetBuffer(this.pivotBufferId, this.pivotBuffer);
-                this.material.SetBuffer(this.colorsBufferId, this.colorBuffer);
-                this.material.SetBuffer(this.activeBufferId, this.activeBuffer);
-                this.material.SetBuffer(this.layerOrderBufferId, this.layerOrderBuffer);
-                this.material.SetBuffer(this.sortedIndicesBufferId, this.sortedIndicesBuffer);
+                this.material.SetBuffer(this.float4BufferId, this.float4Buffer);
+                this.material.SetBuffer(this.float2BufferId, this.float2Buffer);
+                this.material.SetBuffer(this.intBufferId, this.intBuffer);
+                this.material.SetInteger(this.capacityId, this.capacity);
 
                 for (int i = 0; i < this.uvIndicesBuffers.Count; i++) {
                     this.uvIndicesBuffers[i].SetBuffer(this.material);
@@ -228,14 +210,9 @@ namespace CommonEcs {
 
             public void Dispose() {
                 this.uvBuffer.Release();
-                this.translationAndScaleBuffer.Release();
-                this.rotationBuffer.Release();
-                this.sizeBuffer.Release();
-                this.pivotBuffer.Release();
-                this.colorBuffer.Release();
-                this.activeBuffer.Release();
-                this.layerOrderBuffer.Release();
-                this.sortedIndicesBuffer.Release();
+                this.float4Buffer.Release();
+                this.float2Buffer.Release();
+                this.intBuffer.Release();
                 this.argsBuffer.Release();
                 
                 this.uvValues.Dispose();
@@ -353,36 +330,36 @@ namespace CommonEcs {
             private void Expand() {
                 this.capacity <<= 1; // Multiply by 2
                 
-                const int floatSize = sizeof(float);
-                const int float2Size = floatSize * 2;
-                const int float4Size = floatSize * 4;
-                
                 // Copy existing arrays to the new one
-                Expand(ref this.translationsAndScales, ref this.translationAndScaleBuffer, float4Size);
-                Expand(ref this.rotations, ref this.rotationBuffer, float4Size);
-                Expand(ref this.sizes, ref this.sizeBuffer, float2Size);
-                Expand(ref this.pivots, ref this.pivotBuffer, float2Size);
-                Expand(ref this.colors, ref this.colorBuffer, float4Size);
-                Expand(ref this.activeArray, ref this.activeBuffer, sizeof(int));
-                Expand(ref this.layerOrderArray, ref this.layerOrderBuffer, sizeof(int));
-                Expand(ref this.sortedIndices, ref this.sortedIndicesBuffer, sizeof(int));
+                Expand(ref this.translationsAndScales);
+                Expand(ref this.rotations);
+                Expand(ref this.sizes);
+                Expand(ref this.pivots);
+                Expand(ref this.colors);
+                Expand(ref this.activeArray);
+                Expand(ref this.layerOrderArray);
+                Expand(ref this.sortedIndices);
+                
+                // Recreate the packed buffers since the capacity changed
+                this.float4Buffer.Release();
+                this.float2Buffer.Release();
+                this.intBuffer.Release();
+                
+                CreatePackedBuffers();
+                UploadPackedBuffers();
                 
                 // Expand UV indices as well
                 for (int i = 0; i < this.uvIndicesBuffers.Count; i++) {
                     this.uvIndicesBuffers[i].Expand(this.capacity);
                 }
                 
-                SetMaterialBuffers();
+                SetMaterialParameters();
             }
 
-            private void Expand<T>(ref NativeArray<T> array, ref ComputeBuffer computeBuffer, int stride) where T : unmanaged {
+            private void Expand<T>(ref NativeArray<T> array) where T : unmanaged {
                 NativeArray<T> newArray = array.CopyAndExpand(this.capacity);
                 array.Dispose();
                 array = newArray;
-                
-                computeBuffer.Release();
-                computeBuffer = new ComputeBuffer(this.capacity, stride);
-                computeBuffer.SetData(array);
             }
 
             public int UvIndicesBufferCount => this.uvIndicesBuffers.Count;
@@ -392,14 +369,7 @@ namespace CommonEcs {
             }
 
             public void Draw(Bounds bounds) {
-                this.translationAndScaleBuffer.SetData(this.translationsAndScales);
-                this.rotationBuffer.SetData(this.rotations);
-                this.sizeBuffer.SetData(this.sizes);
-                this.pivotBuffer.SetData(this.pivots);
-                this.colorBuffer.SetData(this.colors);
-                this.activeBuffer.SetData(this.activeArray);
-                this.layerOrderBuffer.SetData(this.layerOrderArray);
-                this.sortedIndicesBuffer.SetData(this.sortedIndices);
+                UploadPackedBuffers();
 
                 // Update the data of indices as well
                 for (int i = 0; i < this.uvIndicesBuffers.Count; i++) {

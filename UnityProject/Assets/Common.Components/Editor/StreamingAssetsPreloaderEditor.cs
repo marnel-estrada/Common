@@ -12,12 +12,12 @@ namespace Common.Editor {
 
             EditorGUILayout.Space();
             if (GUILayout.Button("Bake StreamingAssets")) {
-                Bake();
+                Bake((StreamingAssetsPreloader) this.target);
             }
         }
 
-        private void Bake() {
-            StreamingAssetsPreloader preloader = (StreamingAssetsPreloader) this.target;
+        // Public static so headless/CI builds can bake without the inspector.
+        public static void Bake(StreamingAssetsPreloader preloader) {
             StreamingAssetsPreloader.BakedTextAsset[] entries = preloader.BakedAssets;
 
             if (!Directory.Exists(BakedDir)) {

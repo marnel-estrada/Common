@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using Common.Signal;
 using Common.Xml;
 using UnityEngine;
 
@@ -19,6 +20,15 @@ namespace Common {
 
         private readonly GameVariableSet defaultVariables = new();
 
+        public static readonly TypedSignal<GameVariables> VARIABLES_POPULATED = new();
+        
+        private static readonly StaticFieldsInvoker CLEAR_LISTENERS = new(typeof(GameVariables), "ClearListeners");
+        
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatic() {
+            CLEAR_LISTENERS.Execute();
+        }
+
         private void Awake() {
             Assertion.NotEmpty(this.gameVarXmlPath);
 
@@ -35,6 +45,7 @@ namespace Common {
 
         private void PopulateVariables() {
             Parse();
+            VARIABLES_POPULATED.Dispatch(this);
         }
 
         private const string ENTRY = "Entry";

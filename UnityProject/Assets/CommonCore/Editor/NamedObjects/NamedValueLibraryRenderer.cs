@@ -9,7 +9,6 @@ namespace Common {
     ///     A utility class that renders the variables of an event
     /// </summary>
     public class NamedValueLibraryRenderer {
-
         private const int LABEL_WIDTH = 200;
         private const int VALUE_WIDTH = 200;
 
@@ -107,7 +106,8 @@ namespace Common {
                 return;
             }
 
-            NamedValueContainer container = library.GetContainer(ResolveTypeForNewVariable());
+            NamedValueType type = ResolveTypeForNewVariable();
+            NamedValueContainer container = library.GetContainer(type);
             if (container.Contains(this.newVariableName)) {
                 EditorUtility.DisplayDialog("Add Variable", "Can't add variable. Variable already exists.", "OK");
 
@@ -115,6 +115,12 @@ namespace Common {
             }
 
             container.Add(this.newVariableName);
+
+            if (type == NamedValueType.STRING) {
+                // New string variables start with the variable name as their value
+                NamedValueHolder holder = (NamedValueHolder)container.Get(this.newVariableName);
+                holder.Set(this.newVariableName);
+            }
 
             this.newVariableName = ""; // empty to avoid confusion
         }
